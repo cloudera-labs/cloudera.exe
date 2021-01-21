@@ -1,0 +1,219 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create a temporary directory for policy documents
+  ansible.builtin.tempfile:
+    prefix: "aws-policy-"
+    state: directory
+  register: __aws_policy_tmpdir
+
+- name: Download AWS default policy documents
+  ansible.builtin.get_url:
+    dest: "{{ __aws_policy_tmpdir.path }}"
+    url: "{{ __policy_url_item.value }}"
+  loop_control:
+    loop_var: __policy_url_item
+    label: "{{ __policy_url_item.key }}"
+  loop: "{{ plat__aws_policy_urls | dict2items }}"
+  register: __aws_policy_documents
+
+- name: Process AWS default policy documents
+  ansible.builtin.include_tasks: aws_policy_regex.yml
+  loop: "{{ __aws_policy_documents.results }}"
+  loop_control:
+    loop_var: __aws_policy_document_item
+    label: "{{ __aws_policy_document_item.__policy_url_item.key }}"
+
+# TODO - Handle if XAccount External and Account ID are provided - where is Account Policy defined?
+- name: Create AWS Cross Account Policy
+  community.aws.iam_managed_policy:
+    region: "{{ plat__region }}"
+    policy_name: "{{ plat__aws_xaccount_policy_name }}"
+    policy_description: "CDP Cross Account policy for {{ plat__namespace }}"
+    policy: "{{ plat__aws_xaccount_account_policy }}"
+    state: present
+
+- name: Create AWS Cross Account Role
+  community.aws.iam_role:
+    name: "{{ plat__aws_xaccount_role_name }}"
+    region: "{{ plat__region }}"
+    description: "CDP Cross Account role for {{ plat__namespace }}"
+    assume_role_policy_document:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Principal:
+            AWS: "arn:aws:iam::{{ plat__aws_xaccount_account_id }}:root"
+          Action: "sts:AssumeRole"
+          Condition:
+            StringEquals:
+              "sts:ExternalId": "{{ plat__aws_xaccount_external_id }}"
+    managed_policy:
+      - "{{ plat__aws_xaccount_policy_name }}"
+    state: present
+  register: __aws_xaccount_role_info
+  until: __aws_xaccount_role_info is not failed
+  retries: 5
+  delay: "{{ 10 | random(start=3, step=1) }}"
+
+- name: Create CDP Cross Account Credential for AWS
+  when: plat__xacccount_credential_name not in plat__cdp_credentials_list
+  cloudera.cloud.env_cred:
+    cloud: "{{ plat__infra_type }}"
+    name: "{{ plat__xacccount_credential_name }}"
+    role: "{{ __aws_xaccount_role_info.arn }}"
+    state: present
+
+- name: Create CDP IDBroker Assume Role policy
+  community.aws.iam_managed_policy:
+    region: "{{ plat__region }}"
+    policy_name: "{{ plat__aws_idbroker_policy_name }}"
+    policy_description: "CDP IDBroker Assume Role policy for {{ plat__namespace }}"
+    policy:
+      Version: "2012-10-17"
+      Statement:
+        - Sid: "VisualEditor0"
+          Effect: "Allow"
+          Action:
+            - "sts:AssumeRole"
+          Resource:
+            - "*"
+    state: present
+
+- name: Create CDP Data Access Policies
+  community.aws.iam_managed_policy:
+    region: "{{ plat__region }}"
+    policy_name: "{{ __aws_policy_details_item.name }}"
+    policy_description: "{{ __aws_policy_details_item.description }} policy for {{ plat__namespace }}"
+    policy: "{{ lookup('file', policy_file) }}"
+    state: present
+  vars:
+    policy_file: "{{ __aws_policy_documents | community.general.json_query(location_query) }}"
+    location_query: "results[?__policy_url_item.key==`{{ __aws_policy_details_item.key }}`].dest | [0]"
+  loop_control:
+    loop_var: __aws_policy_details_item
+    label: "{{ __aws_policy_details_item.name }}"
+  loop:
+    - key: log
+      name: "{{ plat__aws_log_location_policy_name }}"
+      description: CDP Log Location Access
+    - key: ranger_audit_s3
+      name: "{{ plat__aws_ranger_audit_s3_policy_name }}"
+      description: CDP Ranger Audit S3 Access
+    - key: datalake_admin_s3
+      name: "{{ plat__aws_datalake_admin_s3_policy_name }}"
+      description: CDP Datalake Admin S3 Access
+    - key: bucket_access
+      name: "{{ plat__aws_bucket_access_policy_name }}"
+      description: CDP Bucket S3 Access
+    - key: dynamodb
+      name: "{{ plat__aws_dynamodb_policy_name }}"
+      description: AWS DynamoDB Table Access
+
+- name: Create AWS Service Roles
+  community.aws.iam_role:
+    region: "{{ plat__region }}"
+    name: "{{ __aws_service_role_details_item.name }}"
+    description: "{{ __aws_service_role_details_item.description }} role for {{ plat__namespace }}"
+    create_instance_profile: yes
+    purge_policies: yes
+    assume_role_policy_document:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Principal:
+            Service: "{{ __aws_service_role_details_item.service }}"
+          Action: "sts:AssumeRole"
+    managed_policy: "{{ __aws_service_role_details_item.policies }}"
+    state: present
+  register: __aws_service_role_info
+  until: __aws_service_role_info is not failed
+  retries: 5 # Can encounter race condition where IDBroker Role not yet referencable
+  delay: "{{ 10|random(start=3, step=1) }}"
+  loop_control:
+    loop_var: __aws_service_role_details_item
+    label: "{{ __aws_service_role_details_item.name }}"
+  loop:
+    - name: "{{ plat__aws_idbroker_role_name }}"
+      description: CDP IDBroker
+      service: ec2.amazonaws.com
+      policies:
+        - "{{ plat__aws_idbroker_policy_name }}"
+    - name: "{{ plat__aws_log_role_name }}"
+      description: CDP Log
+      service: ec2.amazonaws.com
+      policies:
+        - "{{ plat__aws_log_location_policy_name }}"
+        - "{{ plat__aws_bucket_access_policy_name }}"
+
+- name: Create AWS Data Access Roles
+  community.aws.iam_role:
+    region: "{{ plat__region }}"
+    name: "{{ __aws_data_access_role_details_item.name }}"
+    description: "{{ __aws_data_access_role_details_item.description }} role for {{ plat__namespace }}"
+    create_instance_profile: yes
+    purge_policies: yes
+    assume_role_policy_document:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Principal:
+            AWS: "arn:aws:iam::{{ plat__aws_caller_account }}:role/{{ plat__aws_idbroker_role_name }}"
+          Action: "sts:AssumeRole"
+    managed_policy: "{{ __aws_data_access_role_details_item.policies }}"
+    state: present
+  register: __aws_data_access_role_info
+  until: __aws_data_access_role_info is not failed
+  retries: 5 # Can encounter race condition where IDBroker Role not yet referencable
+  delay: "{{ 10|random(start=3, step=1) }}"
+  loop_control:
+    loop_var: __aws_data_access_role_details_item
+    label: "{{ __aws_data_access_role_details_item.name }}"
+  loop:
+    - name: "{{ plat__aws_datalake_admin_role_name }}"
+      description: CDP Datalake Admin
+      policies:
+        - "{{ plat__aws_datalake_admin_s3_policy_name }}"
+        - "{{ plat__aws_bucket_access_policy_name }}"
+        - "{{ plat__aws_dynamodb_policy_name }}"
+    - name: "{{ plat__aws_ranger_audit_role_name }}"
+      description: CDP Ranger Audit
+      policies:
+        - "{{ plat__aws_ranger_audit_s3_policy_name }}"
+        - "{{ plat__aws_bucket_access_policy_name }}"
+        - "{{ plat__aws_dynamodb_policy_name }}"
+
+- name: Ensure AWS Instance Profiles are attached to CDP Roles
+  command: >
+    aws iam add-role-to-instance-profile
+    --instance-profile-name {{ __aws_role_item }}
+    --role-name {{ __aws_role_item }}
+  failed_when:
+    - __aws_attach_instance_profile.rc != 0 and 'LimitExceeded' not in __aws_attach_instance_profile.stderr
+  loop_control:
+    loop_var: __aws_role_item
+  loop:
+    - "{{ plat__aws_idbroker_role_name }}"
+    - "{{ plat__aws_log_role_name }}"
+    - "{{ plat__aws_datalake_admin_role_name }}"
+    - "{{ plat__aws_ranger_audit_role_name }}"
+    - "{{ plat__aws_xaccount_role_name }}"
+  register: __aws_attach_instance_profile
+
+- name: Remove temporary directory for policy documents
+  ansible.builtin.file:
+    path: "{{ __aws_policy_tmpdir.path }}"
+    state: absent

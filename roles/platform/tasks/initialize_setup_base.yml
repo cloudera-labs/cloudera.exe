@@ -1,0 +1,99 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Check CDP CLI is installed
+  ansible.builtin.command: "cdp --version"
+  register: __cdp_cli
+
+- name: Confirm CDP CLI returns information
+  ansible.builtin.assert:
+    that:
+      - "__cdp_cli.rc == 0"
+    fail_msg: "CDP CLI failed to execute: {{ __cdp_cli.stdout }} ({{ __cdp_cli.stderr }})"
+    quiet: yes
+
+- name: Query CDP Caller to confirm access to Endpoints
+  cloudera.cloud.iam_user_info:
+    current_user: yes
+  register: __cdp_iam_current_user_info
+
+- name: Set facts for CDP Caller Workload Username and CRN
+  ansible.builtin.set_fact:
+    plat__cdp_workload_username: "{{ __cdp_iam_current_user_info.users[0].workloadUsername }}"
+    plat__cdp_user_crn: "{{ __cdp_iam_current_user_info.users[0].crn }}"
+
+- name: Print Workload Username
+  ansible.builtin.debug:
+    msg: "CDP Workload Username is {{ plat__cdp_workload_username }}"
+    verbosity: 1
+
+- name: Retrieve listing of CDP Credentials
+  cloudera.cloud.env_cred_info:
+  failed_when: __cdp_credential_listings.credentials is not defined
+  register: __cdp_credential_listings
+
+- name: Set fact for CDP Credential Names
+  ansible.builtin.set_fact:
+    plat__cdp_credentials_list: "{{ __cdp_credential_listings | community.general.json_query(query) }}"
+  vars:
+    query: "credentials[*].credentialName"
+
+- name: Set fact for CDP Environment Admin Group Role CRNs
+  ansible.builtin.set_fact:
+    plat__cdp_pub_admin_group_role_crns: "{{ plat__cdp_pub_admin_group_role_crns | default([]) | union([role]) }}"
+  vars:
+    role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_role_suffix, __cdp_pub_admin_group_role_item] | join(':') }}"
+  loop_control:
+    loop_var: __cdp_pub_admin_group_role_item
+  loop: "{{ plat__cdp_iam_admin_group_roles }}"
+
+- name: Set fact for CDP Environment Admin Group Resource Role CRNs
+  ansible.builtin.set_fact:
+    plat__cdp_pub_admin_group_resource_role_crns: "{{ plat__cdp_pub_admin_group_resource_role_crns | default([]) | union([resource_role]) }}"
+  vars:
+    resource_role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_resource_suffix, __cdp_env_admin_group_resource_role_item] | join(':') }}"
+  loop_control:
+    loop_var: __cdp_env_admin_group_resource_role_item
+  loop: "{{ plat__cdp_iam_admin_group_resource_roles }}"
+
+- name: Set fact for CDP Environment User Group Role CRNs
+  ansible.builtin.set_fact:
+    plat__cdp_pub_user_group_role_crns: "{{ plat__cdp_pub_user_group_role_crns | default([]) | union([role]) }}"
+  vars:
+    role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_role_suffix, __cdp_pub_user_group_role_item] | join(':') }}"
+  loop_control:
+    loop_var: __cdp_pub_user_group_role_item
+  loop: "{{ plat__cdp_iam_user_group_roles }}"
+
+- name: Set fact for CDP Environment User Group Resource Role CRNs
+  ansible.builtin.set_fact:
+    plat__cdp_pub_user_group_resource_role_crns: "{{ plat__cdp_pub_user_group_resource_role_crns | default([]) | union([resource_role]) }}"
+  vars:
+    resource_role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_resource_suffix, __cdp_pub_user_group_resource_role_item] | join(':') }}"
+  loop_control:
+    loop_var: __cdp_pub_user_group_resource_role_item
+  loop: "{{ plat__cdp_iam_user_group_resource_roles }}"
+
+- name: Fetch CDP Environment info
+  cloudera.cloud.env_info:
+    name: "{{ plat__env_name }}"
+  register: __cdp_env_info
+  failed_when: __cdp_env_info.environments is not defined
+
+- name: Set fact for CDP Environment CRN, if exists
+  when: __cdp_env_info.environments | length > 0
+  ansible.builtin.set_fact:
+    plat__cdp_env_crn: "{{ __cdp_env_info.environments[0].crn }}"

@@ -1,0 +1,72 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Discover GCP VPC
+  google.cloud.gcp_compute_network_info:
+    project: "{{ plat__gcp_project }}"
+    filters:
+      - name = "{{ plat__vpc_name }}"
+  register: __gcp_vpc_discovered
+
+- name: Set GCP VPC Details
+  when:
+    - __gcp_vpc_discovered is defined
+    - __gcp_vpc_discovered.resources is defined
+    - __gcp_vpc_discovered.resources | length > 0
+  ansible.builtin.set_fact:
+    plat__gcp_vpc_discovered: "{{ __gcp_vpc_discovered.resources[0] }}"
+
+# GCP Filter by network name doesn't seem to work with the Ansible Collection, thus the below construction
+- name: Discover GCP Subnets
+  when:
+    - plat__gcp_vpc_discovered is defined
+    - plat__gcp_vpc_discovered | length > 0
+  register: __gcp_subnets_discovered
+  google.cloud.gcp_compute_subnetwork_info:
+    region: "{{ plat__region }}"
+    filters:
+      - "name = {{ plat__namespace }}*"
+    project: "{{ plat__gcp_project }}"
+
+- name: Set GCP Subnet Details
+  when:
+    - __gcp_subnets_discovered is defined
+    - __gcp_subnets_discovered.resources is defined
+    - __gcp_subnets_discovered.resources | length > 0
+    - __gcp_subnet_item.selfLink in plat__gcp_vpc_discovered.subnetworks
+  ansible.builtin.set_fact:
+    plat__gcp_subnets_discovered: "{{ plat__gcp_subnets_discovered | default([]) | union([__gcp_subnet_item]) }}"
+  loop: "{{ __gcp_subnets_discovered.resources }}"
+  loop_control:
+    loop_var: __gcp_subnet_item
+
+- name: Discover GCP Cross Account Service Account Keys
+  register: __gcp_xaccount_sa_discovered
+  failed_when:
+    - __gcp_xaccount_sa_discovered.rc == 1
+    - "'NOT_FOUND:' not in __gcp_xaccount_sa_discovered.stderr"
+  command: >
+    gcloud iam service-accounts keys list
+    --iam-account "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+    --format="json"
+
+- name: Set discovered Cross Account Service Account keys if exists
+  when:
+    - __gcp_xaccount_sa_discovered is defined
+    - __gcp_xaccount_sa_discovered.stdout is defined
+    - __gcp_xaccount_sa_discovered.stdout | length > 0
+  ansible.builtin.set_fact:
+    plat__gcp_xaccount_keys: "{{ __gcp_xaccount_sa_discovered.stdout | from_json }}"

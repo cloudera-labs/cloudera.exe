@@ -1,0 +1,95 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Request Azure Storage Account Creation with HNS
+  azure.azcollection.azure_rm_resource:
+    state: present
+    resource_group: "{{ infra__azure_metagroup_name }}"
+    provider: Storage
+    resource_type: storageAccounts
+    resource_name: "{{ infra__azure_storage_name }}"
+    api_version: '2019-04-01'
+    idempotency: yes
+    body:
+      sku:
+        name: "{{ infra__azure_storage_class }}"
+      kind: "{{ infra__azure_storage_kind }}"
+      properties:
+        isHnsEnabled: yes
+      location:  "{{ infra__region }}"
+      tags: "{{ infra__tags }}"
+
+- name: Wait for Azure Storage Account Creation
+  register: __azure_storage_account_info
+  until: __azure_storage_account_info.storageaccounts[0].provisioning_state == 'Succeeded'
+  retries: 20
+  delay: 5
+  azure.azcollection.azure_rm_storageaccount_info:
+    name: "{{ infra__azure_storage_name }}"
+    resource_group: "{{ infra__azure_metagroup_name }}"
+
+- name: Create Azure Storage Containers
+  loop_control:
+    loop_var: __azure_storcont_item
+  loop:
+    - "{{ infra__logs_path }}"
+    - "{{ infra__data_path }}"
+  azure.azcollection.azure_rm_storageblob:
+    resource_group: "{{ infra__azure_metagroup_name }}"
+    storage_account_name: "{{ infra__azure_storage_name }}"
+    container: "{{ __azure_storcont_item }}"
+    state: present
+
+- name: Handle Azure NetApp Storage if deploying CML
+  when:
+    - infra__ml_deploy
+    - __azure_netapp_vol_info is undefined or __azure_netapp_vol_info == ''
+  block:
+    - name: Handle Netapp Storage Account
+      netapp.azure.azure_rm_netapp_account:
+        resource_group: "{{ infra__azure_metagroup_name }}"
+        name: "{{ infra__azure_netapp_account_name }}"
+        state: present
+        location: "{{ infra__region }}"
+
+    - name: Handle NetApp Capacity Pool
+      netapp.azure.azure_rm_netapp_capacity_pool:
+        resource_group: "{{ infra__azure_metagroup_name }}"
+        account_name: "{{ infra__azure_netapp_account_name }}"
+        name: "{{ infra__azure_netapp_pool_name }}"
+        state: present
+        location: "{{ infra__region }}"
+        size: "{{ infra__azure_netapp_pool_size }}"
+        service_level: "{{ infra__azure_netapp_pool_type }}"
+
+    - name: Handle Azure NetApp Volume
+      register: __azure_netapp_vol_info
+      netapp.azure.azure_rm_netapp_volume:
+        resource_group: "{{ infra__azure_metagroup_name }}"
+        account_name: "{{ infra__azure_netapp_account_name }}"
+        pool_name: "{{ infra__azure_netapp_pool_name }}"
+        name: "{{ infra__azure_netapp_vol_name }}"
+        state: present
+        location: "{{ infra__region }}"
+        file_path: "{{ infra__namespace }}"
+        virtual_network: "{{ infra__vpc_name }}"
+        subnet_id: "{{ infra__vpc_svcnet_name }}"
+        service_level: "{{ infra__azure_netapp_vol_type }}"
+        size: "{{ infra__azure_netapp_vol_size }}"
+
+    - name: Prepare netapp vol info for submission
+      set_fact:
+        __azure_netapp_vol_info: "{{ __azure_netapp_vol_info.msg }}"

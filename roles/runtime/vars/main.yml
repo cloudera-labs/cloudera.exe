@@ -1,0 +1,61 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# vars file for runtime
+
+run__datahub_compute:
+  aws: "{{ run__datahub_compute_default['aws'] | combine(run__datahub_compute_aws) }}"
+  azure: "{{ run__datahub_compute_default['azure'] | combine(run__datahub_compute_azure) }}"
+  gcp: "{{ run__datahub_compute_default['gcp'] | combine(run__datahub_compute_gcp) }}"
+
+run__datahub_compute_default:
+  aws:
+    std_gp: 'm5.2xlarge'
+    lrg_gp: 'm5.4xlarge'
+    std_mem: 'r5.4xlarge'
+    dsk_mem: 'r5d.4xlarge'
+    std_gpu: "p2.8xlarge"
+  azure:
+    std_gp: 'Standard_D8_v3'
+    lrg_gp: 'Standard_D16_v3'
+    std_mem: 'Standard_D16_v3'
+    dsk_mem: 'Standard_D8_v3'
+    std_gpu: 'Standard_D8_v3'
+  gcp:
+    std_gp: 'e2-standard-8'
+    lrg_gp: 'e2-standard-8'
+    std_mem: 'e2-standard-8'
+    dsk_mem: 'e2-standard-8'
+    std_gpu: 'e2-standard-8'
+
+run__datahub_storage:
+  aws: "{{ run__datahub_storage_default['aws'] | combine(run__datahub_storage_aws) }}"
+  azure: "{{ run__datahub_storage_default['azure'] | combine(run__datahub_storage_azure) }}"
+  gcp: "{{ run__datahub_storage_default['gcp'] | combine(run__datahub_storage_gcp) }}"
+
+run__datahub_storage_default:
+  aws:
+    std: 'standard'
+    fast: 'st1'
+    eph: 'ephemeral'
+  azure:
+    std: 'StandardSSD_LRS'
+    fast: 'StandardSSD_LRS'
+    eph: 'StandardSSD_LRS'
+  gcp:
+    std: 'pd-standard'
+    fast: 'pd-standard'
+    eph: 'pd-standard'

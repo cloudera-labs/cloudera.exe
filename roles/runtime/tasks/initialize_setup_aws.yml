@@ -1,0 +1,39 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Discover AWS VPC Subnets
+  when: infra__aws_subnet_ids is undefined
+  block:
+    - name: Query AWS Subnets
+      amazon.aws.ec2_vpc_subnet_info:
+        region: "{{ run__region }}"
+        filters:
+          "tag:Name": "{{ run__namespace }}"
+      register: __aws_subnets_info
+
+    - name: Set fact for AWS Subnet IDs
+      when: __aws_subnets_info is defined
+      ansible.builtin.set_fact:
+        run__datahub_subnet_ids: "{{ run__datahub_subnet_ids | default([]) | union([__aws_subnet_item.subnet_id]) }}"
+      loop_control:
+        loop_var: __aws_subnet_item
+        label: "{{ __aws_subnet_item.subnet_id }}"
+      loop: "{{ __aws_subnets_info.subnets }}"
+
+- name: Set fact for AWS Subnet IDs by assignment
+  when: infra__aws_subnet_ids is defined
+  ansible.builtin.set_fact:
+    run__datahub_subnet_ids: "{{ infra__aws_subnet_ids }}"

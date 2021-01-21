@@ -1,0 +1,48 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Check GCP CLI is available
+  ansible.builtin.command: "gcloud --version"
+  register: __gcloud_cli
+
+- name: Confirm GCP CLI
+  ansible.builtin.assert:
+    that:
+      - "__gcloud_cli.rc == 0"
+    fail_msg: "GCP CLI failed to execute: {{ __gcloud_cli.stdout }} ({{ __gcloud_cli.stderr }})"
+    quiet: yes
+
+- name: Get Google VPC Info if exists
+  google.cloud.gcp_compute_network_info:
+    project: "{{ infra__gcp_project }}"
+    filters:
+      - name = "{{ infra__vpc_name }}"
+  register: __gcp_vpc_info
+
+- name: Check that GCloud provided resource info
+  ansible.builtin.assert:
+    that: "__gcp_vpc_info.resources is defined"
+    fail_msg: "Gcloud Collection failed to retrieve resources, you may need to run 'gcloud auth login' or 'gcloud init': {{ __gcp_vpc_info }}"
+    quiet: yes
+
+- name: Set fact for Log and Data locations
+  ansible.builtin.set_fact:
+    infra__gcp_storage_locations: "{{ infra__gcp_storage_locations | default([]) | union([__gcp_storage_location_item]) }}"
+  loop_control:
+    loop_var: __gcp_storage_location_item
+  loop:
+    - "{{ infra__gcp_storage_location_data }}"
+    - "{{ infra__gcp_storage_location_logs }}"

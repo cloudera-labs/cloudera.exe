@@ -1,0 +1,7 @@
+# Azure
+
+# NOTE: The Azure CLI is installed as a OS package.
+
+# Azure Collection requirements, which are distinct from Azure CLI
+-r https://raw.githubusercontent.com/ansible-collections/azure/dev/requirements-azure.txt
+azure-mgmt-netapp>=1.0.0    # NetApp Collection requirements

@@ -1,0 +1,180 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Check Azure CLI Account to ensure functionality and user access
+  register: __azure_account_info
+  ansible.builtin.command: "az account show"  # Calling the CLI version doesn't test much of the install
+
+- name: Set Azure Caller Information
+  ansible.builtin.set_fact:
+    plat__azure_subscription_id: "{{ __azure_account_info.stdout | from_json | json_query('id') }}"
+    plat__azure_subscription_name: "{{ __azure_account_info.stdout | from_json | json_query('name') }}"
+    plat__azure_tenant_id: "{{ __azure_account_info.stdout | from_json | json_query('tenantId') }}"
+    plat__azure_calling_user: "{{ __azure_account_info.stdout | from_json | json_query('user.name') }}"
+
+- name: Set Azure Subscription URI
+  ansible.builtin.set_fact:
+    plat__azure_subscription_uri: "/subscriptions/{{ plat__azure_subscription_id }}"
+
+- name: Print Azure Account Info
+  ansible.builtin.debug:
+    msg: |
+      "Using Azure Tenant Id [{{ plat__azure_tenant_id }}]"
+      "Subscription Id [{{ plat__azure_subscription_id }}] with Subscription Name [{{ plat__azure_subscription_name }}]"
+      "Calling User Name [{{ plat__azure_calling_user }}]"
+    verbosity: 1
+
+- name: Refresh listing of Azure Apps matching Namespace
+  ansible.builtin.command: "az ad app list --display-name {{ plat__azure_xaccount_app_name }}"
+  register: __azure_xaccount_app
+
+- name: Set fact Azure App UUID, if exists
+  when: __azure_xaccount_app.stdout != "[]"
+  ansible.builtin.set_fact:
+    plat__azure_xaccount_app_uuid: "{{ __azure_xaccount_app.stdout | from_json | json_query('[0].appId') }}"
+
+- name: Get Azure Resource Group matching Namespace, if exists
+  azure.azcollection.azure_rm_resourcegroup_info:
+    name: "{{ plat__azure_metagroup_name }}"
+  register: __azure_resource_metagroup_info
+
+- name: Set fact Azure Resource Group URI, if exists
+  ansible.builtin.set_fact:
+    plat__azure_metagroup_uri: "{{ __azure_resource_metagroup_info.resourcegroups[0].id | default('') }}"
+
+- name: Get Service Principal for Azure App
+  when: ( plat__azure_xaccount_app_uuid is defined ) and ( plat__azure_xaccount_app_uuid | length > 0 )
+  block:
+    - name: Refresh listing of Azure Service Principals
+      ansible.builtin.command: "az ad sp list --filter {{ __azure_ad_filter | quote }}"
+      vars:
+        __azure_ad_filter: "appId eq '{{ plat__azure_xaccount_app_uuid }}'"
+      register: __azure_application_service_principals_list
+
+    - name: Set Service Principal Object UUID for Azure App
+      ansible.builtin.set_fact:
+        plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | json_query('[0].objectId') }}"
+
+- name: Get Azure Cross Account Role Info if exists
+  azure.azcollection.azure_rm_roledefinition_info:
+    scope: "{{ plat__azure_subscription_uri }}"
+    role_name: "{{ plat__azure_xaccount_role_name }}"
+  register: __azure_xaccount_role_info
+
+- name: Set fact Azure Cross Account Role URI
+  ansible.builtin.set_fact:
+    plat__azure_xaccount_role_uri: "{{ __azure_xaccount_role_info.roledefinitions[0].id | default('') }}"
+
+- name: Refresh List of Identities in Azure Resource Group
+  when: plat__azure_metagroup_uri | length > 0
+  register: __azure_identity_list
+  command: "az identity list -g {{ plat__azure_metagroup_name }}"
+
+- name: Preparse Azure Resource Group list of Identity Names
+  when:
+    - __azure_identity_list is defined
+    - __azure_identity_list.stdout is defined
+    - __azure_identity_list.stdout | count > 0
+  ansible.builtin.set_fact:
+    __azure_identity_list_names: "{{ __azure_identity_list.stdout | from_json | json_query('[*].name') }}"
+
+- name: Fetch Azure Security Group Info
+  register: __azure_sg_info
+  command: "az network nsg list"
+
+- name: Extract URIs for Azure Security Groups
+  when: __azure_sg_info | length > 0
+  ignore_errors: True  # We do not want to fail if collecting facts and nsg are not already present
+  ansible.builtin.set_fact:
+    __azure_sec_group_knox_uri: "{{ __azure_sg_info.stdout | from_json | json_query(__azure_jq_knox) | first }}"
+    __azure_sec_group_default_uri: "{{ __azure_sg_info.stdout | from_json | json_query(__azure_jq_default) | first }}"
+  vars:
+    __azure_jq_knox: "[?name=='{{ plat__security_group_knox_name }}'].id"
+    __azure_jq_default: "[?name=='{{ plat__security_group_default_name }}'].id"
+
+- name: Extract Azure Identity Principals
+  ignore_errors: True
+  ansible.builtin.set_fact:
+    __azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_idbroker_uri) | first }}"
+    __azure_datalakeadmin_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_dtadmin_uri) | first }}"
+    __azure_log_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_log_rl_uri) | first }}"
+    __azure_ranger_audit_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_rngr_rl_uri) | first }}"
+  vars:
+    jq_idbroker_uri: "[?name=='{{ plat__azure_idbroker_identity_name }}'].id"
+    jq_dtadmin_uri: "[?name=='{{ plat__azure_datalakeadmin_identity_name }}'].id"
+    jq_log_rl_uri: "[?name=='{{ plat__azure_log_identity_name }}'].id"
+    jq_rngr_rl_uri: "[?name=='{{ plat__azure_ranger_audit_identity_name }}'].id"
+
+- name: Get Azure Netapp NFS Info
+  register: __azure_netapp_nfs_info
+  command: >
+    az netappfiles volume show \
+    --resource-group "{{ plat__azure_metagroup_name |quote }}" \
+    --account-name "{{ plat__azure_netapp_account_name |quote }}" \
+    --pool-name "{{ plat__azure_netapp_pool_name |quote }}" \
+    --volume-name "{{ plat__azure_netapp_vol_name |quote }}"
+  ignore_errors: true
+
+- name: Set Azure NetApp Volume Start IP if exists
+  when: __azure_netapp_nfs_info.stdout != ''
+  ansible.builtin.set_fact:
+    __azure_netapp_startip: "{{ __azure_netapp_nfs_info.stdout | from_json | json_query('mountTargets[0].ipAddress') }}"
+
+- name: Set Azure NetApp Volume Info if exists
+  when: __azure_netapp_startip is defined
+  ansible.builtin.set_fact:
+    __azure_netapp_vol_info: "{{ __azure_netapp_startip }}:/{{ plat__azure_namespace }}"
+
+- name: Generate Public Subnet details
+  ansible.builtin.set_fact:
+    plat__vpc_public_subnets_info: "{{ plat__vpc_public_subnets_info | default([]) | union([entry]) }}"
+  loop_control:
+    loop_var: __public_subnet_item
+    index_var: __public_subnet_idx
+  loop: "{{ plat__vpc_public_subnet_cidrs }}"
+  vars:
+    entry:
+      name: "{{ [plat__namespace, plat__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+      cidr: "{{ __public_subnet_item }}"
+      tags:
+        "kubernetes.io/role/elb": "1"
+
+- name: Generate Private Subnet Details
+  ansible.builtin.set_fact:
+    plat__vpc_private_subnets_info: "{{ plat__vpc_private_subnets_info | default([]) | union([entry]) }}"
+  loop_control:
+    loop_var: __private_subnet_item
+    index_var: __private_subnet_idx
+  loop: "{{ plat__vpc_private_subnet_cidrs }}"
+  vars:
+    entry:
+      name: "{{ [plat__namespace, plat__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+      cidr: "{{ __private_subnet_item }}"
+      tags:
+        "kubernetes.io/role/internal-elb": "1"
+
+- name: Set fact for Subnet IDs
+  ansible.builtin.set_fact:
+    plat__azure_subnets: "{{ plat__azure_subnets | default([]) | union([__azure_subnet_item.name | default('')]) }}"
+  loop_control:
+    loop_var: __azure_subnet_item
+  loop: "{{ plat__vpc_public_subnets_info | union(plat__vpc_private_subnets_info) }}"
+
+- name: Set fact for Azure Storage URIs
+  ansible.builtin.set_fact:
+    plat__azure_storage_account_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}"
+    plat__azure_logpath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{ plat__azure_log_suffix }}"
+    plat__azure_datapath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{ plat__azure_data_suffix }}"

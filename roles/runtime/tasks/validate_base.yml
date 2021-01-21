@@ -1,0 +1,43 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Check OpDB database names
+  when:
+    - run__include_opdb
+    - "'name' in __opdb_definition"
+  ansible.builtin.assert:
+    that:
+      - "__opdb_definition.name | length < 16"
+    fail_msg: "OpDB name exceeds 15 characters"
+    quiet: yes
+  loop_control:
+    loop_var: __opdb_definition
+    label: "{{ __opdb_definition.name | default ('None') }}"
+  loop: "{{ run__opdb_definitions }}"
+
+- name: Check Datahub names
+  when:
+    - run__include_datahub
+    - "'name' in __datahub_definition"
+  ansible.builtin.assert:
+    that:
+      - "__datahub_definition.name | length < 21"
+    fail_msg: "Datahub name exceeds 20 characters"
+    quiet: yes
+  loop_control:
+    loop_var: __datahub_definition
+    label: "{{ __datahub_definition.name | default ('None') }}"
+  loop: "{{ run__datahub_definitions }}"

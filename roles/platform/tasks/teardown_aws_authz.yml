@@ -1,0 +1,105 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Tear down AWS Roles
+  when: plat__teardown_deletes_roles
+  block:
+    - name: Remove AWS Data Access Roles
+      community.aws.iam_role:
+        region: "{{ plat__region }}"
+        name: "{{ __aws_data_access_role_name_item }}"
+        purge_policies: yes
+        delete_instance_profile: yes
+        state: absent
+      loop_control:
+        loop_var: __aws_data_access_role_name_item
+      loop:
+        - "{{ plat__aws_datalake_admin_role_name }}"
+        - "{{ plat__aws_ranger_audit_role_name }}"
+
+    - name: Remove AWS Service Roles
+      community.aws.iam_role:
+        region: "{{ plat__region }}"
+        name: "{{ __aws_service_role_name_item }}"
+        purge_policies: yes
+        delete_instance_profile: yes
+        state: absent
+      loop_control:
+        loop_var: __aws_service_role_name_item
+      loop:
+        - "{{ plat__aws_idbroker_role_name }}"
+        - "{{ plat__aws_log_role_name }}"
+
+    - name: Ensure AWS Instance Profiles are detached from CDP Roles
+      command: >
+        aws iam remove-role-from-instance-profile
+        --instance-profile-name {{ __aws_role_item }}
+        --role-name {{ __aws_role_item }}
+      failed_when:
+        - __aws_attach_instance_profile.rc != 0 and 'NoSuchEntity' not in __aws_attach_instance_profile.stderr
+      loop_control:
+        loop_var: __aws_role_item
+      loop:
+        - "{{ plat__aws_idbroker_role_name }}"
+        - "{{ plat__aws_log_role_name }}"
+        - "{{ plat__aws_datalake_admin_role_name }}"
+        - "{{ plat__aws_ranger_audit_role_name }}"
+        - "{{ plat__aws_xaccount_role_name }}"
+      register: __aws_attach_instance_profile
+
+- name: Tear down AWS Policies
+  when: plat__teardown_deletes_policies
+  block:
+    - name: Remove CDP Data Access Policies
+      community.aws.iam_managed_policy:
+        region: "{{ plat__region }}"
+        policy_name: "{{ __aws_policy_name_item }}"
+        state: absent
+      loop_control:
+        loop_var: __aws_policy_name_item
+      loop:
+        - "{{ plat__aws_log_location_policy_name }}"
+        - "{{ plat__aws_ranger_audit_s3_policy_name }}"
+        - "{{ plat__aws_datalake_admin_s3_policy_name }}"
+        - "{{ plat__aws_bucket_access_policy_name }}"
+        - "{{ plat__aws_dynamodb_policy_name }}"
+
+    - name: Remove CDP IDBroker Assume Role Policy
+      community.aws.iam_managed_policy:
+        region: "{{ plat__region }}"
+        policy_name: "{{ plat__aws_idbroker_policy_name }}"
+        state: absent
+
+- name: Remove CDP Cross Account Credential for AWS
+  when: plat__teardown_deletes_credential
+  cloudera.cloud.env_cred:
+    name: "{{ plat__xacccount_credential_name }}"  # TODO: Make specific to AWS Teardown as credentials can be for multiple environments
+    state: absent
+
+- name: Tear down AWS Cross Acount
+  when: plat__teardown_deletes_xaccount
+  block:
+    - name: Remove AWS Cross Account Role
+      community.aws.iam_role:
+        name: "{{ plat__aws_xaccount_role_name }}"
+        region: "{{ plat__region }}"
+        state: absent
+
+    - name: Remove AWS Cross Account Policy
+      community.aws.iam_managed_policy:
+        region: "{{ plat__region }}"
+        policy_name: "{{ plat__aws_xaccount_policy_name }}"
+        state: absent

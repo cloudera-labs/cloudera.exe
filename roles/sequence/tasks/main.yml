@@ -1,0 +1,221 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Sequential management (individual tasks that execute implicit runlevel dependencies and order-of-operations)
+
+- name: Validate Infrastructure Configuration
+  ansible.builtin.include_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: validate
+    apply:
+      tags:
+        - validate
+        - infra
+        - plat
+        - run
+  tags:
+    - validate
+    - infra
+    - plat
+    - run
+
+- name: Validate Platform Configuration
+  ansible.builtin.include_role:
+    name: cloudera.exe.platform
+    tasks_from: validate
+    apply:
+      tags:
+        - validate
+        - plat
+        - run
+  tags:
+    - validate
+    - plat
+    - run
+
+- name: Validate Runtime Configuration
+  ansible.builtin.include_role:
+    name: cloudera.exe.runtime
+    tasks_from: validate
+    apply:
+      tags:
+        - validate
+        - run
+  tags:
+    - validate
+    - run
+
+- name: Initialize Runtime Teardown
+  ansible.builtin.include_role:
+    name: cloudera.exe.runtime
+    tasks_from: initialize_teardown
+    apply:
+      tags:
+        - teardown
+        - infra
+        - plat
+  tags:
+    - teardown
+    - infra
+    - plat
+    - never
+
+- name: Teardown Runtime
+  ansible.builtin.include_role:
+    name: cloudera.exe.runtime
+    tasks_from: teardown
+    apply:
+      tags:
+        - teardown
+        - infra
+        - plat
+  tags:
+    - teardown
+    - infra
+    - plat
+    - never
+
+- name: Initialize Platform Teardown
+  ansible.builtin.include_role:
+    name: cloudera.exe.platform
+    tasks_from: initialize_teardown
+    apply:
+      tags:
+        - teardown
+        - infra
+  tags:
+    - teardown
+    - infra
+    - never
+
+- name: Teardown Platform
+  ansible.builtin.include_role:
+    name: cloudera.exe.platform
+    tasks_from: teardown
+    apply:
+      tags:
+        - teardown
+        - infra
+  tags:
+    - teardown
+    - infra
+    - never
+
+- name: Initialize Infrastructure Teardown
+  ansible.builtin.include_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: initialize_teardown
+    apply:
+      tags:
+        - teardown
+  tags:
+    - teardown
+    - never
+
+- name: Teardown Infrastructure
+  ansible.builtin.include_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: teardown
+    apply:
+      tags:
+        - teardown
+  tags:
+    - teardown
+    - never
+
+- name: Initialize Infrastructure Setup
+  when: sequence__setup_infra | bool
+  ansible.builtin.include_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: initialize_setup
+    apply:
+      tags:
+        - init
+        - infra
+        - plat
+        - run
+  tags:
+    - init
+    - infra
+    - plat
+    - run
+
+- name: Setup Infrastructure
+  when: sequence__setup_infra | bool
+  ansible.builtin.include_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: setup
+    apply:
+      tags:
+        - infra
+        - plat
+        - run
+  tags:
+    - infra
+    - plat
+    - run
+
+- name: Initialize Platform Setup
+  when: sequence__setup_plat | bool
+  ansible.builtin.include_role:
+    name: cloudera.exe.platform
+    tasks_from: initialize_setup
+    apply:
+      tags:
+        - init
+        - plat
+        - run
+  tags:
+    - init
+    - plat
+    - run
+
+- name: Setup Platform
+  when: sequence__setup_plat | bool
+  ansible.builtin.include_role:
+    name: cloudera.exe.platform
+    tasks_from: setup
+    apply: 
+      tags:
+        - plat
+        - run
+  tags:
+    - plat
+    - run
+
+- name: Initialize Runtime Setup
+  when: sequence__setup_runtime | bool
+  ansible.builtin.include_role:
+    name: cloudera.exe.runtime
+    tasks_from: initialize_setup
+    apply:
+      tags:
+        - init
+        - run
+  tags:
+    - init
+    - run
+
+- name: Setup Runtime
+  when: sequence__setup_runtime | bool
+  ansible.builtin.include_role:
+    name: cloudera.exe.runtime
+    tasks_from: setup
+    apply:
+      tags:
+        - run
+  tags:
+    - run

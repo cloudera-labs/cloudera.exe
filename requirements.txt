@@ -1,0 +1,14 @@
+# Python internals
+wheel
+
+# CVE avoidance
+requests[security]>2.5.3
+urllib3>1.24.2
+cryptography>=2.3.1
+
+# Ansible 
+jmespath    # community.general.json_query
+netaddr     # ansible.netcommon.ipaddr
+
+# CDPCLI / cdpy
+git+git://github.com/cloudera-labs/cdpy@main#egg=cdpy

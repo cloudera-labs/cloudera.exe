@@ -1,0 +1,43 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create AWS Buckets
+  amazon.aws.aws_s3:
+    region: "{{ infra__region }}"
+    bucket: "{{ __aws_storage_location_item.bucket }}"
+    mode: create
+    permission: private
+  loop_control:
+    loop_var: __aws_storage_location_item
+  loop: "{{ infra__aws_storage_locations }}"
+
+- name: Create AWS Buckets directory structures
+  amazon.aws.aws_s3:
+    region: "{{ infra__region }}"
+    bucket: "{{ __aws_storage_object_item.bucket }}"
+    object: "{{ __aws_storage_object_item.path }}"
+    mode: create  # Put will not work here due to the way the s3 module is written
+  loop_control:
+    loop_var: __aws_storage_object_item
+  loop: "{{ infra__aws_storage_locations }}"
+
+- name: Ensure Download Mirror Bucket exists in target region
+  when: infra__create_utility_service
+  amazon.aws.aws_s3:
+    region: "{{ infra__region }}"
+    bucket: "{{ infra__utlity_bucket_name }}"
+    mode: create
+    permission: private

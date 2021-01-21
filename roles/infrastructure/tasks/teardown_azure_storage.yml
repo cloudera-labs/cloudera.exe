@@ -1,0 +1,52 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Remove Main Azure Storage Account during Teardown
+  when:
+  - infra__teardown_deletes_data
+  - infra__azure_metagroup_uri | length > 0
+  azure.azcollection.azure_rm_storageaccount:
+    resource_group: "{{ infra__azure_metagroup_name }}"
+    location: "{{ infra__region }}"
+    force_delete_nonempty: "{{ infra__teardown_deletes_data }}"
+    state: absent
+    name: "{{ infra__storage_name }}"  # HNS Property currently NA in Stock Ansible
+
+- name: Remove Azure Netapp Storage during Teardown
+  when:
+    - infra__teardown_deletes_data
+    - infra__azure_metagroup_uri | length > 0
+  block:
+    - name: Remove Azure NetApp Volume
+      netapp.azure.azure_rm_netapp_volume:
+        resource_group: "{{ infra__azure_metagroup_name }}"
+        account_name: "{{ infra__azure_netapp_account_name }}"
+        pool_name: "{{ infra__azure_netapp_pool_name }}"
+        name: "{{ infra__azure_netapp_vol_name }}"
+        state: absent
+
+    - name: Remove NetApp Capacity Pool
+      netapp.azure.azure_rm_netapp_capacity_pool:
+        resource_group: "{{ infra__azure_metagroup_name }}"
+        account_name: "{{ infra__azure_netapp_account_name }}"
+        name: "{{ infra__azure_netapp_pool_name }}"
+        state: absent
+
+    - name: Remove Netapp Storage Account
+      netapp.azure.azure_rm_netapp_account:
+        resource_group: "{{ infra__azure_metagroup_name }}"
+        name: "{{ infra__azure_netapp_account_name }}"
+        state: absent

@@ -1,0 +1,43 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Request identity deletion
+  when:
+    - __azure_identity_list_names is defined
+    - __azure_identity_list_names | length > 0
+    - __azure_msi_item in __azure_identity_list_names
+  loop_control:
+    loop_var: __azure_msi_item
+  register: __azure_msi_info
+  command: "az identity delete -g {{ plat__azure_metagroup_name }} -n {{ __azure_msi_item }}"
+  loop:
+    - "{{ plat__azure_idbroker_identity_name }}"
+    - "{{ plat__azure_datalakeadmin_identity_name }}"
+    - "{{ plat__azure_log_identity_name }}"
+    - "{{ plat__azure_ranger_audit_identity_name }}"
+
+- name: Wait for identities to be unlisted
+  when: plat__azure_metagroup_uri | length > 0
+  command: "az identity list -g {{ plat__azure_metagroup_name }}"
+  register: __azure_identity_list
+  failed_when: __azure_identity_list.rc != 0
+  delay: 5
+  retries: 10
+  until:
+    - plat__azure_idbroker_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_datalakeadmin_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_log_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_ranger_audit_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )

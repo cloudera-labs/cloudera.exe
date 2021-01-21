@@ -1,0 +1,63 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Set up AWS EC2 metadata for CDP Datahubs
+  when: run__include_datahub
+  block:
+    - name: Retrieve AWS EC2 instance details
+      community.aws.ec2_instance_info:
+        region: "{{ run__region }}"
+        filters:
+          "tag:Name": "{{ run__namespace }}*"
+      register: __aws_instance_info
+
+    - name: Add tags to AWS EC2 instances
+      amazon.aws.ec2_tag:
+        region: "{{ run__region }}"
+        tags: "{{ run__datahub_tags }}"
+        resource: "{{ __aws_instance_item.instance_id }}"
+      loop_control:
+        loop_var: __aws_instance_item
+        label: "{{ __aws_instance_item.instance_id }}"
+      loop: "{{ __aws_instance_info.instances }}"
+
+- name: Setup CDP DW cluster on AWS
+  when: run__include_dw
+  block:
+    - name: Execute CDP DW cluster setup
+      cloudera.cloud.dw_cluster:
+        env: "{{ run__env_name }}"
+        overlay: no
+        # TODO - Allow direct assignment (will need to coordinate with infra role)
+        aws_public_subnets: "{{ run__datahub_subnet_ids[:3] }}"
+        aws_private_subnets: []
+        state: present
+        wait: yes
+      async: 3600 # 1 hour timeout
+      poll: 0
+      register: __dw_builds
+
+    - name: Wait for CDP DW cluster setup to complete
+      ansible.builtin.async_status:
+        jid: "{{ __dw_builds.ansible_job_id }}"
+      #loop_control:
+      #  loop_var: __opdb_build
+      #  label: "{{ __opdb_build.__opdb_config.name }}"
+      #loop: "{{ __opdb_builds.results }}"
+      register: __dw_builds_async
+      until: __dw_builds_async.finished
+      retries: 120
+      delay: 30

@@ -1,0 +1,56 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Tear down AWS Network
+  when: infra__aws_vpc_id | length > 1 and infra__teardown_deletes_network
+  block:
+    - name: Remove Security Groups
+      amazon.aws.ec2_group:
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        name: "{{ __security_group_name_item }}"
+        state: absent
+      loop_control:
+        loop_var: __security_group_name_item
+      loop:
+        - "{{ infra__security_group_knox_name }}"
+        - "{{ infra__security_group_default_name }}"
+
+    - name: Remove VPC subnets
+      amazon.aws.ec2_vpc_subnet:
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        cidr: "{{ __aws_subnet_item }}"
+        state: absent
+      loop_control:
+        loop_var: __aws_subnet_item
+        index_var: __aws_subnet_index
+      loop: "{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) }}"
+
+    - name: Remove IGW
+      community.aws.ec2_vpc_igw:
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        state: absent
+        tags:
+          Name: "{{ infra__aws_igw_name }}"
+
+    - name: Remove VPC, if exists
+      amazon.aws.ec2_vpc_net:
+        region: "{{ infra__region }}"
+        name: "{{ infra__vpc_name }}"
+        cidr_block: "{{ infra__vpc_cidr }}"
+        state: absent

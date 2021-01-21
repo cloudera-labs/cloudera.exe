@@ -1,0 +1,4 @@
+# Google Cloud
+    
+# NOTE: google-cloud-sdk, including the CLI, is installed as OS package.
+google-auth

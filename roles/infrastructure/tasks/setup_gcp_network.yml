@@ -1,0 +1,76 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create GCP VPC
+  google.cloud.gcp_compute_network:
+    project: "{{ infra__gcp_project }}"
+    name: "{{ infra__vpc_name }}"
+    auto_create_subnetworks: 'false'
+    state: present
+  register: __gcp_vpc_info
+
+- name: Create GCP VPC Subnets
+  google.cloud.gcp_compute_subnetwork:
+    region: "{{ infra__region }}"
+    project: "{{ infra__gcp_project }}"
+    name: "{{ __gcp_subnet_item.name }}"
+    network: "{{ __gcp_vpc_info }}"
+    ip_cidr_range: "{{ __gcp_subnet_item.cidr }}"
+    private_ip_google_access: yes
+    state: present
+  loop_control:
+    loop_var: __gcp_subnet_item
+  loop: "{{ infra__vpc_public_subnets_info | union(infra__vpc_private_subnets_info) }}"
+  register: __gcp_subnets_results
+
+- name: Set fact for Subnet Names
+  ansible.builtin.set_fact:
+    infra__gcp_subnets: "{{ infra__gcp_subnets | default([]) | union([__gcp_subnet_item.name | default('')]) }}"
+  loop_control:
+    loop_var: __gcp_subnet_item
+  loop: "{{ __gcp_subnets_results.results }}"
+
+- name: Create GCP Security Groups via Firewall
+  google.cloud.gcp_compute_firewall:
+    project: "{{ infra__gcp_project }}"
+    network: "{{ __gcp_vpc_info }}"
+    name: "{{ infra__security_group_default_name }}"
+    direction: INGRESS
+    allowed:
+      - ip_protocol: all
+    source_ranges: "{{ infra__gcp_security_group_rules }}"
+    state: present
+  register: ___gcp_security_group_info
+
+- name: Create Address range for peering to GCP Services
+  google.cloud.gcp_compute_global_address:
+    project: "{{ infra__gcp_project }}"
+    name: "{{ infra__vpc_svcnet_name }}"
+    network: "{{ __gcp_vpc_info }}"
+    address: "{{ infra__vpc_svcnet_cidr | ansible.netcommon.ipaddr('network') }}"
+    prefix_length: 19
+    address_type: INTERNAL
+    purpose: VPC_PEERING
+    state: present
+  register: __gcp_peer_vnet_info
+
+- name: Create VPC Peering for CloudSQL
+  command: >
+    gcloud services vpc-peerings connect
+    --project={{ infra__gcp_project }}
+    --network={{ infra__vpc_name }}
+    --service=servicenetworking.googleapis.com
+    --ranges={{ infra__vpc_svcnet_name }}

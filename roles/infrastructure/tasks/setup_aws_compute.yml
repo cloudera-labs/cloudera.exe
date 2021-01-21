@@ -1,0 +1,83 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# You must have subscribed to Centos in the AWS Marketplace: https://aws.amazon.com/marketplace/pp?sku=aw0evgkw8e5c1q413zgy5pjce
+
+- name: Ensure required number of Dynamic Inventory VMs are deployed and tagged correctly during deployment
+  register: __infra_dynamic_inventory_instances
+  loop_control:
+    loop_var: __infra_compute_instance_item
+  loop: "{{ range(0, infra__dynamic_inventory_count | int ) | list }}"
+  amazon.aws.ec2:
+    region: "{{ infra__region }}"
+    group_id: "{{ infra__aws_security_group_default_id }}"
+    key_name: "{{ infra__public_key_id }}"
+    instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type][infra__dynamic_inventory_vm_type] }}"
+    image: "{{ __infra_aws_ami_info.image_id }}"
+    ebs_optimized: yes
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type][infra__dynamic_inventory_storage_type] }}"
+        volume_size: "{{ infra__dynamic_inventory_storage_size }}"
+        delete_on_termination: "{{ infra__dynamic_inventory_delete_storage }}"
+    wait: yes
+    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, '%02d' | format(__infra_compute_instance_item)]) }) }}"
+    exact_count: 1
+    count_tag:
+      Name: "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, '%02d' | format(__infra_compute_instance_item)]) }}"
+    vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
+    assign_public_ip: yes
+
+- name: Create output Dictionary for producing Static Inventory artefact
+  ansible.builtin.set_fact:
+    infra__dynamic_inventory_host_entries: "{{ infra__dynamic_inventory_host_entries | default([]) | union([host_entry]) }}"
+  vars:
+    host_entry: "{{ [__infra_di_item.tagged_instances[0].private_dns_name, 'ansible_host=' + __infra_di_item.tagged_instances[0].public_ip, infra__dynamic_inventory_connectors] | join(' ') }}"
+  loop: "{{ __infra_dynamic_inventory_instances.results }}"
+  loop_control:
+    loop_var: __infra_di_item
+
+- name: Create localised Utility Instance to process Downloads
+  when: infra__create_utility_service
+  register: __infra_utility_vm_instance
+  amazon.aws.ec2:
+    region: "{{ infra__region }}"
+    group_id: "{{ infra__aws_security_group_default_id }}"
+    key_name: "{{ infra__public_key_id }}"
+    instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type]['sml'] }}"
+    image: "{{ __infra_aws_ami_info.image_id }}"
+    ebs_optimized: yes
+    instance_profile_name: "{{ infra__download_mirror_role.iam_role.role_name }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type]['std'] }}"
+        volume_size: 100
+        delete_on_termination: yes
+    wait: yes
+    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }) }}"
+    exact_count: 1
+    count_tag:
+      Name: "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}"
+    vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
+    assign_public_ip: yes
+
+- name: Add Utility Instance to host group
+  when: infra__create_utility_service
+  ansible.builtin.add_host:
+    hostname: "{{__infra_utility_vm_instance.tagged_instances[0].public_ip}}"
+    ansible_user: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user }}"
+    ansible_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary(omit, infra__private_key_file) }}"
+    groupname: cldr_utility

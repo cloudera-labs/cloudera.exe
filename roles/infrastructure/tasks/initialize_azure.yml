@@ -1,0 +1,74 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Azure Service Principal login
+  when: common__azure_sp_login_from_env |bool
+  ansible.builtin.command: >
+    az login
+    --service-principal
+    --username "{{ lookup('env','AZURE_CLIENT_ID') }}"
+    --password "{{ lookup('env','AZURE_SECRET') }}"
+    --tenant "{{ lookup('env','AZURE_TENANT') }}"
+  async: 30
+  poll: 5
+  no_log: yes
+
+- name: Check Azure CLI Account to ensure functionality and user access
+  register: __azure_account_info
+  ansible.builtin.command: "az account show"  # Calling the CLI version doesn't test much of the install
+
+- name: Confirm Azure CLI
+  ansible.builtin.assert:
+    that:
+      - "__azure_account_info.rc == 0"
+    fail_msg: "Azure CLI failed to execute: {{ __azure_account_info.stdout }} ({{ __azure_account_info.stderr }})"
+    quiet: yes
+
+- name: Fetch Netapp subnet URI if it exists
+  azure.azcollection.azure_rm_subnet_info:
+    name: "{{ infra__vpc_svcnet_name }}"
+    resource_group: "{{ infra__azure_metagroup_name }}"
+    virtual_network_name: "{{ infra__vpc_name }}"
+  ignore_errors: yes  # Microsoft throws errors instead of reporting a simple 'not found'.
+  register: __azure_netapp_subnet_info
+
+- name: Set fact NetApp Subnet URI if exists
+  ansible.builtin.set_fact:
+    infra__azure_netapp_subnet_uri: "{{ __azure_netapp_subnet_info[0].id | default('') }}"
+
+- name: Set Azure Caller Information
+  ansible.builtin.set_fact:
+    infra__azure_subscription_id: "{{ __azure_account_info.stdout | from_json | json_query('id') }}"
+    infra__azure_subscription_name: "{{ __azure_account_info.stdout | from_json | json_query('name') }}"
+    infra__azure_tenant_id: "{{ __azure_account_info.stdout | from_json | json_query('tenantId') }}"
+    infra__azure_calling_user: "{{ __azure_account_info.stdout | from_json | json_query('user.name') }}"
+
+- name: Print Azure Account Info
+  ansible.builtin.debug:
+    msg: |
+      "Using Azure Tenant Id [{{ infra__azure_tenant_id }}]"
+      "Subscription Id [{{ infra__azure_subscription_id }}] with Subscription Name [{{ infra__azure_subscription_name }}]"
+      "Calling User Name [{{ infra__azure_calling_user }}]"
+    verbosity: 1
+
+- name: Get Azure Resource Group matching Namespace, if exists
+  azure.azcollection.azure_rm_resourcegroup_info:
+    name: "{{ infra__azure_metagroup_name }}"
+  register: __azure_resource_metagroup_info
+
+- name: Set fact Azure Resource Group URI, if exists
+  ansible.builtin.set_fact:
+    infra__azure_metagroup_uri: "{{ __azure_resource_metagroup_info.resourcegroups[0].id | default('') }}"

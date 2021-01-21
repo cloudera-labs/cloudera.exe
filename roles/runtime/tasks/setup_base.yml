@@ -1,0 +1,112 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Request CDP Datahub deployments
+  when: run__include_datahub
+  cloudera.cloud.datahub_cluster:
+    name: "{{ __datahub_config_item.name }}"
+    env: "{{ run__env_name }}"
+    state: present
+    subnet: "{{ run__datahub_subnet_ids | first }}"
+    image: "{{ run__datahub_image_catalog_entry.uuid }}"
+    catalog: "{{ run__datahub_image_catalog_name }}"
+    template: "{{ run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template) | list | first }}"
+    groups: "{{ __datahub_config_item.instance_groups }}"
+    tags: "{{ __datahub_config_item.tags }}"
+    wait: yes
+  loop_control:
+    loop_var: __datahub_config_item
+    label: "{{ __datahub_config_item.name | default ('None') }}"
+  loop: "{{ run__datahub_configs }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __datahub_builds
+
+- name: Execute CDP ML Workspace experiences setup
+  when: run__include_ml
+  cloudera.cloud.ml:
+    name: "{{ __ml_config_item.name }}"
+    env: "{{ run__env_name }}"
+    k8s_request: "{{ __ml_config_item.k8s_request if __ml_config_item.k8s_request.instanceGroups | length > 1 else omit }}"
+    tls: "{{ __ml_config_item.raw.tls | default(omit) }}"
+    monitoring: "{{ __ml_config_item.raw.monitoring | default(omit) }}"
+    database: "{{ __ml_config_item.raw.database | default(omit) }}"
+    nfs: "{{ __ml_config_item.raw.nfs | default(omit) }}"
+    nfs_version: "{{ __ml_config_item.raw.nfs_version | default(omit) }}"
+    ip_addresses: "{{ __ml_config_item.raw.ip_addresses | default(omit) }}"
+    public_loadbalancer: "{{ __ml_config_item.raw.public_loadbalancer | default(omit) }}"
+    storage: "{{ __ml_config_item.raw.storage | default(omit) }}"
+  loop_control:
+    loop_var: __ml_config_item
+    label: "{{ __ml_config_item.name | default ('None') }}"
+  loop: "{{ run__ml_configs }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __ml_builds
+
+- name: Execute CDP OpDB setup
+  when: run__include_opdb
+  cloudera.cloud.opdb:
+    name: "{{ __opdb_config_item.name }}"
+    env: "{{ run__env_name }}"
+    state: present
+    wait: yes
+  loop_control:
+    loop_var: __opdb_config_item
+    label: "{{ __opdb_config_item.name | default ('None') }}"
+  loop: "{{ run__opdb_definitions }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __opdb_builds
+
+- name: Wait for CDP Datahub deployments to complete
+  when: run__include_datahub
+  ansible.builtin.async_status:
+    jid: "{{ __datahub_build_item.ansible_job_id }}"
+  loop_control:
+    loop_var: __datahub_build_item
+    label: "{{ __datahub_build_item.__datahub_config_item.name | default ('None') }}"
+  loop: "{{ __datahub_builds.results }}"
+  register: __datahub_builds_async
+  until: __datahub_builds_async.finished
+  retries: 120
+  delay: 30
+
+- name: Wait for CDP ML Workspace experiences to complete
+  when: run__include_ml
+  ansible.builtin.async_status:
+    jid: "{{ __ml_build.ansible_job_id }}"
+  loop_control:
+    loop_var: __ml_build
+    label: "{{ __ml_build.__ml_config_item.name | default ('None') }}"
+  loop: "{{ __ml_builds.results }}"
+  register: __ml_builds_async
+  until: __ml_builds_async.finished
+  retries: 120
+  delay: 30
+
+- name: Wait for CDP OpDB deployments to complete
+  when: run__include_opdb
+  ansible.builtin.async_status:
+    jid: "{{ __opdb_build.ansible_job_id }}"
+  loop_control:
+    loop_var: __opdb_build
+    label: "{{ __opdb_build.__opdb_config_item.name | default ('None') }}"
+  loop: "{{ __opdb_builds.results }}"
+  register: __opdb_builds_async
+  until: __opdb_builds_async.finished
+  retries: 120
+  delay: 30

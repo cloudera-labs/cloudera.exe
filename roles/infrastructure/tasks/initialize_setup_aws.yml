@@ -1,0 +1,125 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Check AWS CLI
+  ansible.builtin.command: "aws --version"
+  register: __aws_cli
+
+- name: Confirm AWS CLI
+  ansible.builtin.assert:
+    that: "__aws_cli.rc == 0"
+    fail_msg: "AWS CLI failed to execute: {{ __aws_cli.stdout }} ({{ __aws_cli.stderr }})"
+    quiet: yes
+
+- name: Validate access to AWS Endpoints using supplied Credentials
+  amazon.aws.aws_caller_info:
+  register: infra__aws_caller_info
+  failed_when: infra__aws_caller_info.arn is not defined
+
+- name: Print AWS Caller ARN
+  ansible.builtin.debug:
+    msg: "AWS Caller ARN is {{ infra__aws_caller_info.arn }}"
+    verbosity: 1
+
+- name: Retrieve AWS Availability Zones in region
+  amazon.aws.aws_az_info:
+    region: "{{ infra__region }}"
+  register: __aws_az_info
+
+- name: Check AWS Availability Zones count
+  ansible.builtin.assert:
+    that: "__aws_az_info.availability_zones | length >= infra__aws_vpc_az_count | int"
+    fail_msg: "Not enough Availability Zones in the AWS Region, found less than {{ infra__aws_vpc_az_count }} threshold"
+    quiet: yes
+
+- name: List available AWS EC2 Instance Types in region
+  command: "aws ec2 describe-instance-type-offerings --region {{ infra__region }}"
+  register: __aws_ec2_types
+
+- name: Check required AWS EC2 Instance Types
+  ansible.builtin.assert:
+    that: "__ec2_type_item.value in (__aws_ec2_types.stdout | from_json | community.general.json_query(query))"
+    fail_msg: |
+      EC2 Instance Type {{ __ec2_type_item.value }} is required, but not available in Region {{ infra__region }}.
+      You might try 'aws ec2 describe-instance-type-offerings --filters Name=instance-type,Values={{__ec2_type_item.value}}'"
+    quiet: yes
+  loop_control:
+    loop_var: __ec2_type_item
+  loop: "{{ infra__dynamic_inventory_vm_type_default[infra__type] | dict2items }}"
+  vars:
+    query: 'InstanceTypeOfferings[].InstanceType'
+
+- name: Find AMI for Dynamic Inventory Deployment
+  when: infra__dynamic_inventory_count
+  block:
+    - name: List suitable AMIs within our region
+      amazon.aws.ec2_ami_info:
+        region: "{{ infra__region }}"
+        filters:
+          name: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].search }}"
+          owner-alias: aws-marketplace
+      register: __infra_aws_ami_list
+
+    - name:  Filter to latest Image
+      ansible.builtin.set_fact:
+        __infra_aws_ami_info: "{{ __infra_aws_ami_list.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}"
+
+- name: Prepare AWS Security Group Rules
+  ansible.builtin.set_fact:
+    infra__aws_security_group_rules:
+      - proto: all
+        ports: 0-65535
+        cidr_ip: "{{ infra__vpc_cidr }}"
+      - proto: all
+        ports: "{{ infra__vpc_user_ports }}"
+        cidr_ip: "{{ ipify_public_ip }}/32"
+      - proto: tcp
+        ports: "{{ infra__vpc_extra_ports }}"
+        cidr_ip: "{{ infra__vpc_extra_cidr }}"
+
+- name: Add CDP Public Cloud security group rules for AWS
+  ansible.builtin.set_fact:
+    infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
+  vars:
+    rule:
+      proto: tcp
+      ports: "{{ infra__cdp_control_plane_ports }}"
+      cidr_ip: "{{ infra__cdp_control_plane_cidr }}"
+
+- name: Set fact to include MLX data location
+  when: infra__ml_deploy
+  ansible.builtin.set_fact:
+    infra__aws_storage_locations: "{{ infra__aws_storage_locations | default([]) | union([storage_location]) }}"
+  vars:
+    storage_location:
+      bucket: "{{ infra__storage_name }}"
+      path: "{{ infra__ml_path }}"
+    
+- name: Set fact to include DWX data location
+  when: infra__de_deploy
+  ansible.builtin.set_fact:
+    infra__aws_storage_locations: "{{ infra__aws_storage_locations | default([]) | union([storage_location]) }}"
+  vars:
+    storage_location:
+      bucket: "{{ infra__storage_name }}"
+      path: "{{ infra__dwx_path }}"
+
+- name: Set facts for dynamic inventory metadata
+  ansible.builtin.set_fact:
+    infra__dynamic_inventory_tags: "{{ infra__tags | combine(infra__dynamic_inventory_tag) }}"
+    infra__dynamic_inventory_connectors: "{{ 'ansible_user=' + infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user + provided_ssh_private_key_file }}"
+  vars:
+    provided_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary('', ' ansible_ssh_private_key_file=' + infra__private_key_file) }}"

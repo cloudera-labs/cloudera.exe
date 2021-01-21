@@ -1,0 +1,121 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Update CDP Environment information
+  cloudera.cloud.env_info:
+    name: "{{ plat__env_name }}"
+  register: plat__cdp_env_info
+  failed_when: plat__cdp_env_info.environments | length == 0
+
+- name: Set fact for CDP Environment CRN
+  ansible.builtin.set_fact:
+    plat__cdp_env_crn: "{{ plat__cdp_env_info.environments[0].crn }}"
+
+- name: Set CDP Workload password
+  cloudera.cloud.env_auth:
+    password: "{{ plat__env_admin_password }}"
+    name: "{{ plat__env_name }}"
+    strict: false
+
+- name: Set fact for CDP Admin Group Resource Role assignments
+  ansible.builtin.set_fact:
+    plat__cdp_env_admin_group_resource_role_assignments: "{{ plat__cdp_env_admin_group_resource_role_assignments | default([]) | union([resource_role_assignment]) }}"
+  vars:
+    resource_role_assignment:
+      resource: "{{ plat__cdp_env_crn }}"
+      role: "{{ __cdp_resource_role_item }}"
+  loop_control:
+    loop_var: __cdp_resource_role_item
+  loop: "{{ plat__cdp_pub_admin_group_resource_role_crns }}"
+
+- name: Create CDP Admin group
+  cloudera.cloud.iam_group:
+    name: "{{ plat__cdp_iam_admin_group_name }}"
+    state: present
+    sync: false
+    roles: "{{ plat__cdp_pub_admin_group_role_crns }}"
+    resource_roles: "{{ plat__cdp_env_admin_group_resource_role_assignments }}"
+    users:
+      - "{{ plat__cdp_user_crn }}"
+  register: __cdp_pub_admin_group_info
+
+- name: Set fact for CDP Admin Group CRN
+  ansible.builtin.set_fact:
+    plat__cdp_pub_admin_group_crn: "{{ __cdp_pub_admin_group_info | community.general.json_query('group.crn') }}"
+
+- name: Set fact for CDP User Group Resource Role assignments
+  ansible.builtin.set_fact:
+    plat__cdp_pub_user_group_resource_role_assignments: "{{ plat__cdp_pub_user_group_resource_role_assignments | default([]) | union([resource_role_assignment]) }}"
+  vars:
+    resource_role_assignment:
+      resource: "{{ plat__cdp_env_crn }}"
+      role: "{{ __cdp_resource_role_item }}"
+  loop_control:
+    loop_var: __cdp_resource_role_item
+  loop: "{{ plat__cdp_pub_user_group_resource_role_crns }}"
+
+- name: Create CDP User group
+  cloudera.cloud.iam_group:
+    name: "{{ plat__cdp_iam_user_group_name }}"
+    state: present
+    sync: false
+    roles: "{{ plat__cdp_pub_user_group_role_crns }}"
+    resource_roles: "{{ plat__cdp_pub_user_group_resource_role_assignments }}"
+  register: __cdp_pub_user_group_info
+
+- name: Set fact for CDP User Group CRN
+  ansible.builtin.set_fact:
+    plat__cdp_pub_user_group_crn: "{{ __cdp_pub_user_group_info | community.general.json_query('group.crn') }}"
+
+- name: Set up provider-specific IDBroker mappings
+  ansible.builtin.include_tasks: "setup_{{ plat__infra_type | lower }}_idbroker.yml"
+
+- name: Set up provider-specific CDP Datalake
+  ansible.builtin.include_tasks: "setup_{{ plat__infra_type | lower }}_datalake.yml"
+
+- name: Refresh CDP Datalake information
+  cloudera.cloud.datalake_info:
+    name: "{{ plat__datalake_name }}"
+  register: __cdp_datalake_info
+
+- name: Extract Datalake version and Cloudera Manager endpoint
+  ansible.builtin.set_fact:
+    plat__cdp_datalake_version: "{{ __cdp_datalake_info.datalakes[0] | community.general.json_query(runtime) | first | regex_search('^\\d+\\.\\d+\\.\\d+') }}"
+    plat__cdp_datalake_cm_api: "{{ __cdp_datalake_info.datalakes[0] | community.general.json_query(cm_api) | first }}"
+  vars:
+    runtime: "productVersions[?name=='CDH'].version"
+    cm_api: "endpoints.endpoints[?serviceName == 'CM-API'].serviceUrl"
+
+- name: Handle User sync for CDP Datalake
+  when: plat__datalake_user_sync | bool
+  block:
+    - name: Check if CDP Workload User is already sync'ed
+      ansible.builtin.uri:
+        url: "{{ plat__cdp_datalake_cm_api.rstrip('/') }}/version"
+        timeout: 60
+        return_content: no
+        status_code: 200
+        url_username: "{{ plat__cdp_workload_username }}"
+        url_password: "{{ plat__env_admin_password }}"
+        validate_certs: false
+      run_once: yes
+      register: __cdp_datalake_cm_api_response
+      ignore_errors: yes
+
+    - name: Request User Sync for CDP Datalake, if needed
+      when: __cdp_datalake_cm_api_response.status != 200
+      cloudera.cloud.env_user_sync:
+        name: "{{ plat__cdp_env_crn }}"

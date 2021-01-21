@@ -1,0 +1,130 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# global file for common
+
+# Role prefix is 'common__'
+
+# Labels
+common__namespace:                        "{{ globals.name_prefix | default([globals.namespace_root | default('cdp'), globals.namespace_uid | default(ansible_date_time.date | replace('-',''))] | join('-')) }}"
+
+common__xaccount_suffix:                  "{{ globals.labels.cross_account | default('xaccount') }}"
+common__credential_suffix:                "{{ globals.labels.credential | default('cred') }}"
+common__env_suffix:                       "{{ globals.labels.env | default('env') }}"
+common__datalake_suffix:                  "{{ globals.labels.datalake | default('dl') }}"
+common__table_suffix:                     "{{ globals.labels.table | default('table') }}"
+common__vpc_name_suffix:                  "{{ globals.labels.vpc | default('net') }}"
+common__vpc_subnet_suffix:                "{{ globals.labels.subnet | default('sbnt') }}"
+common__vpc_svcnet_suffix:                "{{ globals.labels.service_network | default('svcnet') }}"
+common__public_suffix:                    "{{ globals.labels.public | default('pub') }}"
+common__private_suffix:                   "{{ globals.labels.private | default('pvt') }}"
+common__security_group_knox_suffix:       "{{ globals.labels.knox | default('knox') }}"
+common__security_group_default_suffix:    "{{ globals.labels.default | default('default') }}"
+common__role_suffix:                      "{{ globals.labels.role | default('role') }}"
+common__policy_suffix:                    "{{ globals.labels.policy | default('policy') }}"
+common__storage_suffix:                   "{{ globals.labels.storage | default('storage') }}"
+common__identity_suffix:                  "{{ globals.labels.identity | default('identity') }}"
+common__idbroker_suffix:                  "{{ globals.labels.idbroker | default('idbroker') }}"
+common__logs_suffix:                      "{{ globals.labels.logs | default('logs') }}"
+common__data_suffix:                      "{{ globals.labels.data | default('data') }}"
+common__external_data_suffix:             "{{ globals.labels.external_data | default('external') }}"
+common__datalake_admin_suffix:            "{{ globals.labels.datalake_admin | default('dladmin') }}"
+common__ranger_audit_suffix:              "{{ globals.labels.ranger_audit | default('audit') }}"
+common__cml_suffix:                       "{{ globals.labels.cml | default('cml') }}"
+common__igw_suffix:                       "{{ globals.labels.internet_gateway | default('igw') }}"
+common__route_table_suffix:               "{{ globals.labels.route_table | default('rtb') }}"
+common__app_suffix:                       "{{ globals.labels.app | default('app') }}"
+common__group_suffix:                     "{{ globals.labels.group | default('group') }}"
+common__admin_suffix:                     "{{ globals.labels.admin | default('admin') }}"
+common__user_suffix:                      "{{ globals.labels.user | default('user') }}"
+
+common__unique_storage_name_suffix:       "{{ globals.storage.name | default((common__region + common__aws_profile) if 'aws' in common__infra_type else common__region) }}"
+
+# Infra
+common__infra_type:                       "{{ globals.infra_type | default('aws') }}"
+common__public_key_file:                  "{{ globals.ssh.public_key_file | default('') }}"
+common__namespace_cdp:                    "{{ globals.namespace_cdp | default([common__namespace, common__infra_type[:2]] | join('-')) }}"
+common__tags:                             "{{ globals.tags | default({}) }}"
+common__public_key_id:                    "{{ globals.ssh.public_key_id | default('') }}"
+common__public_key_text:                  "{{ globals.ssh.public_key_text | default('') }}"
+common__region:                           "{{ globals.region | default(common__region_default[common__infra_type]) }}"
+common__storage_name:                     "{{ infra.storage.name | default([common__namespace, common__unique_storage_name_suffix[::2] | replace('-','')] | join('-')) }}"
+
+common__vpc_name:                         "{{ infra.vpc.name | default([common__namespace, common__vpc_name_suffix] | join('-')) }}"
+common__vpc_public_subnet_cidrs:          "{{ infra.vpc.public_subnets | default(['10.10.0.0/19', '10.10.32.0/19', '10.10.64.0/19']) }}"
+common__vpc_private_subnet_cidrs:         "{{ infra.vpc.private_subnets | default(['10.10.96.0/19', '10.10.128.0/19', '10.10.160.0/19']) }}"
+common__vpc_private_subnets_suffix:       "{{ infra.vpc.public_subnets_suffix | default([common__vpc_subnet_suffix, common__private_suffix] | join('-')) }}"
+common__vpc_public_subnets_suffix:        "{{ infra.vpc.private_subnets_suffix | default([common__vpc_subnet_suffix, common__public_suffix] | join('-')) }}"
+
+common__security_group_knox_name:         "{{ infra.security_group.knox.name | default([common__namespace, common__security_group_knox_name_suffix] | join('-')) }}"
+common__security_group_default_name:      "{{ infra.security_group.default.name | default([common__namespace, common__security_group_default_name_suffix] | join('-')) }}"
+
+common__security_group_knox_name_suffix:    "{{ infra.security_group.knox.suffix | default(common__security_group_knox_suffix) }}"
+common__security_group_default_name_suffix: "{{ infra.security_group.default.suffix | default(common__security_group_default_suffix) }}"
+
+common__ml_path:                          "{{ infra.storage.path.ml | default('datasci') }}"
+common__de_path:                          "{{ infra.storage.path.de | default('dataeng') }}"
+common__logs_path:                        "{{ infra.storage.path.logs | default(common__logs_suffix) }}"
+common__data_path:                        "{{ infra.storage.path.data | default(common__data_suffix) }}"
+common__ranger_audit_path:                "{{ infra.storage.path.ranger_audit | default('ranger/audit') }}"
+
+# AWS Infra
+common__aws_region:                       "{{ infra.aws.region | default('eu-west-1') }}"
+common__aws_profile:                      "{{ infra.aws.profile | default('') }}"
+common__aws_role_suffix:                  "{{ infra.aws.role.suffix | default(common__role_suffix) }}"
+common__aws_dynamodb_table_name:          "{{ infra.aws.dynamodb.table_name | default([common__namespace, common__table_suffix] | join('-')) }}"
+common__aws_datalake_admin_role_name:     "{{ env.aws.role.name.datalake_admin | default([common__namespace, common__aws_datalake_admin_suffix, common__aws_role_suffix] | join('-')) }}"
+common__aws_datalake_admin_suffix:        "{{ env.aws.role.label.datalake_admin | default(common__datalake_admin_suffix) }}"
+common__aws_idbroker_role_name:           "{{ env.aws.role.name.idbroker | default([common__namespace, common__aws_idbroker_suffix, common__aws_role_suffix] | join('-')) }}"
+common__aws_idbroker_suffix:              "{{ env.aws.role.label.idbroker | default(common__idbroker_suffix) }}"
+
+# Azure Infra
+common__azure_storage_name:               "{{ infra.azure.storage.name | default(common__storage_name | replace('-','')) }}"
+
+common__azure_account_suffix:             "{{ infra.azure.netapp.account.suffix | default('account') }}"
+common__azure_netapp_suffix:              "{{ infra.azure.netapp.suffix | default('netapp') }}"
+common__azure_pool_suffix:                "{{ infra.azure.netapp.pool.suffix | default('pool') }}"
+common__azure_volume_suffix:              "{{ infra.azure.netapp.volume.suffix | default('vol') }}"
+
+common__azure_metagroup_name_suffix:      "{{ infra.azure.metagroup.suffix | default('rmgp') }}"
+common__azure_metagroup_name:             "{{ infra.azure.metagroup.name | default([common__namespace, common__azure_metagroup_name_suffix] | join('-')) }}"
+common__azure_region:                     "{{ infra.azure.region | default('westeurope') }}"
+common__azure_sp_login_from_env:          "{{ infra.azure.sp_login_from_env | default(False) }}"
+common__azure_netapp_account_name:        "{{ infra.azure.netapp.account.name | default([common__namespace, common__azure_netapp_suffix, common__azure_account_suffix] | join('-'))}}"
+common__azure_netapp_pool_name:           "{{ infra.azure.netapp.pool.name | default([common__namespace, common__azure_netapp_suffix, common__azure_pool_suffix] | join('-')) }}"
+common__azure_netapp_vol_name:            "{{ infra.azure.netapp.volume.name | default([common__namespace, common__azure_netapp_suffix, common__azure_volume_suffix] | join('-')) }}"
+
+# GCP Infra
+common__gcp_project:                      "{{ infra.gcp.project | default('gcp-se') }}"
+common__gcp_region:                       "{{ infra.gcp.region | default('europe-west1') }}"
+
+# Plat
+common__xaccount_credential_suffix:       "{{ env.cdp.credential.suffix | default(common__xaccount_suffix) }}"
+common__xaccount_credential_name_suffix:  "{{ env.cdp.credential.name_suffix | default(common__credential_suffix) }}"
+common__xaccount_credential_name:         "{{ env.cdp.credential.name | default([common__namespace_cdp, common__xaccount_credential_suffix, common__xaccount_credential_name_suffix] | join('-')) }}"
+
+common__env_name:                         "{{ env.name | default([common__namespace_cdp, common__env_name_suffix] | join('-')) }}"
+common__env_name_suffix:                  "{{ env.suffix | default(common__env_suffix) }}"
+
+common__datalake_name:                    "{{ env.datalake.name | default([common__namespace_cdp, common__datalake_name_suffix] | join('-')) }}"
+common__datalake_name_suffix:             "{{ env.datalake.suffix | default(common__datalake_suffix) }}"
+
+# Deploy
+common__include_ml:                        "{{ ml is defined | bool }}"
+common__include_dw:                        "{{ dw is defined | bool }}"
+common__include_de:                        "{{ de is defined | bool }}"
+common__include_datahub:                   "{{ datahub is defined | bool }}"
+common__include_opdb:                      "{{ opdb is defined | bool }}"

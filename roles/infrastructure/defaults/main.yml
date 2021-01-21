@@ -1,0 +1,124 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# defaults file for infrastructure
+
+# Role prefix is 'infra__'
+
+# Labels
+infra__namespace:                   "{{ common__namespace }}"
+
+infra__vpc_subnet_suffix:           "{{ common__vpc_subnet_suffix }}"
+infra__vpc_svcnet_suffix:           "{{ common__vpc_svcnet_suffix }}"
+infra__vpc_private_subnets_suffix:  "{{ common__vpc_private_subnets_suffix }}"
+infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
+
+# Infra
+infra__type:                        "{{ common__infra_type }}"
+
+# Dynamic Inventory for Clusters
+infra__private_key_file:                 "{{ globals.ssh.private_key_file | default('') }}"
+infra__dynamic_inventory_count:          "{{ globals.dynamic_inventory.vm.count | default(0) }}"
+infra__dynamic_inventory_vm_suffix:      "{{ infra.dynamic_inventory.vm.suffix | default('vm') }}"
+infra__dynamic_inventory_os:             "{{ infra.dynamic_inventory.vm.os | default('centos7') }}"
+infra__dynamic_inventory_vm_type:        "{{ infra.dynamic_inventory.vm.type | default('std') }}"
+infra__dynamic_inventory_storage_type:   "{{ infra.dynamic_inventory.storage.type | default('std') }}"
+infra__dynamic_inventory_storage_size:   "{{ infra.dynamic_inventory.storage.size | default('200') }}"
+infra__dynamic_inventory_tag_key:        "{{ infra.dynamic_inventory.tag_key | default('cldr_deploy_namespace') }}"
+infra__dynamic_inventory_tag_value:      "{{ infra.dynamic_inventory.tag_value | default(infra__namespace) }}"
+infra__dynamic_inventory_tag:            "{{ infra.dynamic_inventory.tag | default({infra__dynamic_inventory_tag_key: infra__dynamic_inventory_tag_value }) }}"
+infra__dynamic_inventory_delete_storage: "{{ infra.dynamic_inventory.storage.delete | default('yes') }}"
+
+#  TODO: consider moving to globals?
+infra__teardown_deletes_data:       "{{ infra.teardown.delete_data | default(False) }}"
+infra__teardown_deletes_ssh_key:    "{{ infra.teardown.delete_ssh_key | default(False) }}"
+infra__teardown_deletes_network:    "{{ infra.teardown.delete_network | default(True) }}"
+infra__teardown_download_mirror:    "{{ infra.teardown.delete_mirror | default(False) }}"
+
+infra__region:                      "{{ common__region }}"
+
+infra__storage_name:                "{{ common__storage_name }}"
+
+infra__logs_path:                   "{{ common__logs_path }}"
+infra__data_path:                   "{{ common__data_path }}"
+infra__ranger_audit_path:           "{{ common__ranger_audit_path }}"
+
+infra__public_key_path:             "{{ globals.ssh.key_path | default('~/.ssh') }}"
+infra__public_key_id:               "{{ common__public_key_id }}"
+infra__public_key_file:             "{{ common__public_key_file }}"
+infra__public_key_text:             "{{ common__public_key_text }}"
+
+infra__tags:                        "{{ common__tags }}"
+
+infra__vpc_name:                    "{{ common__vpc_name }}"
+infra__vpc_cidr:                    "{{ infra.vpc.cidr | default('10.10.0.0/16') }}"
+infra__vpc_svcnet_cidr:             "{{ infra.vpc.service_network.subnet | default('10.10.192.0/28') }}"
+infra__vpc_svcnet_name:             "{{ infra.vpc.service_network.name | default([infra__namespace, infra__vpc_svcnet_suffix] | join('-')) }}"
+
+infra__vpc_public_subnet_cidrs:     "{{ common__vpc_public_subnet_cidrs }}"
+infra__vpc_private_subnet_cidrs:    "{{ common__vpc_private_subnet_cidrs }}"
+
+infra__vpc_extra_ports:             "{{ infra.vpc.extra_ports | default([22, 443, 7180, 7183]) }}"
+infra__vpc_extra_cidr:              "{{ infra.vpc.extra_cidr | default([]) }}"
+infra__vpc_user_ports:              "{{ infra.vpc.user_ports | default([infra__all_ports_security_rule[infra__type]]) }}"
+infra__vpc_user_cidr:               "{{ infra.vpc.user_cidr | default([]) }}"
+
+infra__security_group_knox_name:    "{{ common__security_group_knox_name }}"
+infra__security_group_default_name: "{{ common__security_group_default_name }}"
+
+infra__ml_deploy:                   "{{ common__include_ml }}"
+infra__ml_path:                     "{{ common__ml_path }}"
+
+infra__de_deploy:                   "{{ common__include_de }}"
+infra__de_path:                     "{{ common__de_path }}"
+
+infra__aws_profile:                 "{{ common__aws_profile }}"
+infra__aws_dynamodb_table_name:     "{{ common__aws_dynamodb_table_name }}"
+infra__aws_vpc_az_count:            "{{ infra.aws.vpc.az_count | default(3) }}"
+infra__aws_igw_name:                "{{ infra.aws.vpc.internet_gateway.name | default([infra__namespace, infra__aws_igw_suffix] | join('-')) }}"
+infra__aws_igw_suffix:              "{{ infra.aws.vpc.internet_gateway.suffix | default(common__igw_suffix) }}"
+infra__aws_route_table_name:        "{{ infra.aws.vpc.labels.route_table | default([infra__namespace, infra__aws_route_table_suffix] | join('-')) }}"
+infra__aws_route_table_suffix:      "{{ infra.aws.vpc.route_table.suffix | default(common__route_table_suffix) }}"
+
+# GCP
+infra__gcp_project:                 "{{ common__gcp_project }}"
+
+infra__gcp_storage_location_data:   "{{ infra.gcp.storage.path.data | default([infra__storage_name, infra__data_path] | join('-')) }}"
+infra__gcp_storage_location_logs:   "{{ infra.gcp.storage.path.logs | default([infra__storage_name, infra__logs_path] | join('-')) }}"
+
+# Azure
+infra__azure_metagroup_name:        "{{ common__azure_metagroup_name }}"
+
+infra__azure_storage_name:          "{{ common__azure_storage_name }}"
+infra__azure_storage_class:         "{{ infra.azure.storage.class | default('Standard_LRS') }}"
+infra__azure_storage_kind:          "{{ infra.azure.storage.type | default('StorageV2') }}"
+
+infra__azure_netapp_account_name:   "{{ common__azure_netapp_account_name }}"
+infra__azure_netapp_pool_name:      "{{ common__azure_netapp_pool_name }}"
+infra__azure_netapp_vol_name:       "{{ common__azure_netapp_vol_name }}"
+
+infra__azure_netapp_pool_size:      "{{ infra.azure.netapp.pool.size | default(4) }}"
+infra__azure_netapp_pool_type:      "{{ infra.azure.netapp.pool.type | default('Standard') }}"
+infra__azure_netapp_vol_size:       "{{ infra.azure.netapp.volume.size | default(500) }}"
+infra__azure_netapp_vol_type:       "{{ infra.azure.netapp.volume.type | default('Standard') }}"
+
+# CDP Control Plane
+infra__cdp_control_plane_ports:     "{{ env.cdp.control_plane.ports | default([443, 9443]) }}"
+infra__cdp_control_plane_cidr:      "{{ env.cdp.control_plane.cidr | default(infra__cdp_control_plane_cidr_default) }}"
+
+# Utility Service for Download Mirror
+infra__create_utility_service:      "{{ globals.create_utility_service | default('no') | bool }}"
+infra__utlity_bucket_name:          "{{ globals.utility_bucket_name | default('') }}"

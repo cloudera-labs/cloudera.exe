@@ -1,0 +1,199 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Ensure Azure Cross Account App and Credential are Deployed
+  when: plat__azure_xaccount_app_uuid is undefined or plat__xacccount_credential_name not in plat__cdp_credentials_list
+  block:
+    - name: Remove CDP Cross Account Credential for Recreation as Azure App needs (re)creating
+      cloudera.cloud.env_cred:
+        state: absent
+        name: "{{ plat__xacccount_credential_name }}"
+        # Azure xaccount App and Credential must be created in the same session, or already exist
+
+    - name: Remove Azure App as CDP Credential needs (re)creating
+      when: plat__azure_xaccount_app_uuid is defined
+      command: "az ad app delete --id {{ plat__azure_xaccount_app_uuid }}"
+
+    # Owner role is required for DWX
+    - name: Request Azure Cross Account App Creation
+      no_log: True
+      register: __azure_xaccount_app_info
+      command: >
+        az ad sp create-for-rbac
+        --name http://{{ plat__azure_xaccount_app_name }}
+        --role {{ plat__azure_roles.owner }}
+        --scopes {{ plat__azure_metagroup_uri }}
+
+    - name: Register Azure Cross Account App info
+      no_log: True
+      set_fact:
+        __azure_xaccount_app_pword: "{{ __azure_xaccount_app_info.stdout | from_json | json_query('password')  }}"
+        plat__azure_xaccount_app_uuid: "{{ __azure_xaccount_app_info.stdout | from_json | json_query('appId')  }}"
+
+    - name: Get Service Principal for Azure App
+      when: ( plat__azure_xaccount_app_uuid is defined ) and ( plat__azure_xaccount_app_uuid | length > 0 )
+      block:
+        - name: Refresh listing of Azure Service Principals
+          ansible.builtin.command: "az ad sp list --filter {{ __azure_ad_filter | quote }}"
+          vars:
+            __azure_ad_filter: "appId eq '{{ plat__azure_xaccount_app_uuid }}'"
+          register: __azure_application_service_principals_list
+
+        - name: Set Service Principal Object UUID for Azure App
+          ansible.builtin.set_fact:
+            plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | json_query('[0].objectId') }}"
+
+    - name: Create the CDP Cross Account Credential with the new Azure App details
+      cloudera.cloud.env_cred:
+        state: present
+        cloud: "{{ plat__infra_type }}"
+        name: "{{ plat__xacccount_credential_name }}"
+        subscription: "{{ plat__azure_subscription_id }}"
+        tenant: "{{ plat__azure_tenant_id }}"
+        application: "{{ plat__azure_xaccount_app_uuid }}"
+        secret: "{{ __azure_xaccount_app_pword }}"
+  
+- name: Handle Azure Cross Account Role
+  register: __azure_xaccount_role_info
+  azure.azcollection.azure_rm_roledefinition:  # This version fails idempotence if a description is set
+    state: present
+    name: "{{ plat__azure_xaccount_role_name }}"
+    assignable_scopes: "/subscriptions/{{ plat__azure_subscription_id }}"
+    permissions:
+      - actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('Actions') }}"
+        data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('DataActions') }}"
+        not_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('NotActions') }}"
+        not_data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('NotDataActions') }}"
+
+- name: Set Azure Cross Account Role URI
+  ansible.builtin.set_fact:
+    plat__azure_xaccount_role_uri: "{{ __azure_xaccount_role_info.id }}"
+
+- name: Request creation of Azure Managed Identities
+  when: ( __azure_identity_list_names is undefined ) or ( __azure_msi_item not in __azure_identity_list_names )
+  loop_control:
+    loop_var: __azure_msi_item
+  register: __azure_az_msi_info
+  command: "az identity create -g {{ plat__azure_metagroup_name }} -n {{ __azure_msi_item }}"
+  loop:
+    - "{{ plat__azure_idbroker_identity_name }}"
+    - "{{ plat__azure_datalakeadmin_identity_name }}"
+    - "{{ plat__azure_log_identity_name }}"
+    - "{{ plat__azure_ranger_audit_identity_name }}"
+
+- name: Wait for identities to be listed
+  command: "az identity list -g {{ plat__azure_metagroup_name }}"
+  register: __azure_identity_list
+  failed_when: __azure_identity_list.rc != 0
+  delay: 5
+  retries: 10
+  until:
+    - plat__azure_idbroker_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_datalakeadmin_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_log_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_ranger_audit_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+
+- name: Extract Azure Identity Principals
+  ansible.builtin.set_fact:
+    __azure_idbroker_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_idbroker_uuid) | first }}"
+    __azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_idbroker_uri) | first }}"
+    __azure_datalakeadmin_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_dtadmin_uuid) | first }}"
+    __azure_datalakeadmin_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_dtadmin_uri) | first }}"
+    __azure_log_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_log_rl_uuid) | first }}"
+    __azure_log_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_log_rl_uri) | first }}"
+    __azure_ranger_audit_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_rngr_rl_uuid) | first }}"
+    __azure_ranger_audit_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_rngr_rl_uri) | first }}"
+  vars:
+    jq_idbroker_uuid: "[?name=='{{ plat__azure_idbroker_identity_name }}'].principalId"
+    jq_idbroker_uri: "[?name=='{{ plat__azure_idbroker_identity_name }}'].id"
+    jq_dtadmin_uuid: "[?name=='{{ plat__azure_datalakeadmin_identity_name }}'].principalId"
+    jq_dtadmin_uri: "[?name=='{{ plat__azure_datalakeadmin_identity_name }}'].id"
+    jq_log_rl_uuid: "[?name=='{{ plat__azure_log_identity_name }}'].principalId"
+    jq_log_rl_uri: "[?name=='{{ plat__azure_log_identity_name }}'].id"
+    jq_rngr_rl_uuid: "[?name=='{{ plat__azure_ranger_audit_identity_name }}'].principalId"
+    jq_rngr_rl_uri: "[?name=='{{ plat__azure_ranger_audit_identity_name }}'].id"
+    
+- name: Refresh listing of Azure Role Definitions
+  register: __azure_role_definition_info
+  azure.azcollection.azure_rm_roledefinition_info:
+    scope: "{{ plat__azure_subscription_uri }}"
+
+- name: Extract Azure Role Definition URIs
+  ansible.builtin.set_fact:
+    __azure_xaccount_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_xaccount_uri_jq) | first }}"
+    __azure_virtualmachine_ctrb_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_vmcnt_uri_jq) | first }}"
+    __azure_managedidentity_optr_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_miop_uri_jq) | first }}"
+    __azure_storageblobdata_ownr_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_storown_uri_jq) | first }}"
+    __azure_storageblobdata_ctrb_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_storcnt_uri_jq) | first }}"
+    __azure_contributor_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_contrib_uri_jq) | first }}"
+  vars:
+    __azure_xaccount_uri_jq: "[?role_name=='{{ plat__azure_xaccount_role_name }}'].id"
+    __azure_vmcnt_uri_jq: "[?role_name=='{{ plat__azure_roles.vmcnt }}'].id"
+    __azure_miop_uri_jq: "[?role_name=='{{ plat__azure_roles.miop }}'].id"
+    __azure_storown_uri_jq: "[?role_name=='{{ plat__azure_roles.storown }}'].id"
+    __azure_storcnt_uri_jq: "[?role_name=='{{ plat__azure_roles.storcnt }}'].id"
+    __azure_contrib_uri_jq: "[?role_name=='{{ plat__azure_roles.contrib }}'].id"
+
+- name: Process Azure Role Assignments
+  azure.azcollection.azure_rm_roleassignment: # This Azure module is not idempotent on removals
+    state: present
+    scope: "{{ __azure_rl_assgn_item.scope }}"
+    name: "{{ __azure_rl_assgn_item.name }}"
+    assignee_object_id: "{{ __azure_rl_assgn_item.assignee }}"
+    role_definition_id: "{{ __azure_rl_assgn_item.role }}"
+  loop:
+    - role: "{{ __azure_virtualmachine_ctrb_role_uri }}"
+      name: "{{ plat__azure_vmcontributor_idbroker_assn_name }}"
+      scope: "{{ plat__azure_subscription_uri }}"
+      assignee: "{{ __azure_idbroker_identity_uuid }}"
+      desc: Assign VM Contributor Role to IDBroker Identity at Subscription Level
+    - role: "{{ __azure_managedidentity_optr_role_uri }}"
+      name: "{{ plat__azure_mgdidentop_idbroker_assn_name }}"
+      scope: "{{ plat__azure_subscription_uri }}"
+      assignee: "{{ __azure_idbroker_identity_uuid }}"
+      desc: Assign Managed Identity Operator Role to IDBroker Identity at Subscription Level
+    - role: "{{ __azure_storageblobdata_ownr_role_uri }}"
+      name: "{{ plat__azure_storageowner_datalakeadmin_logs_assn_name }}"
+      scope: "{{ plat__azure_logpath_uri }}"
+      assignee: "{{ __azure_datalakeadmin_identity_uuid }}"
+      desc: Assign Storage Blob Data Owner Role to Data Lake Admin Identity at Logs Container Level
+    - role: "{{ __azure_storageblobdata_ownr_role_uri }}"
+      name: "{{ plat__azure_storageowner_datalakeadmin_data_assn_name }}"
+      scope: "{{ plat__azure_datapath_uri }}"
+      assignee: "{{ __azure_datalakeadmin_identity_uuid }}"
+      desc: Assign Storage Blob Data Owner Role to Data Lake Admin Identity at Data Container Level
+    - role: "{{ __azure_storageblobdata_ctrb_role_uri }}"
+      name: "{{ plat__azure_storagecontr_log_assn_name }}"
+      scope: "{{ plat__azure_logpath_uri }}"
+      assignee: "{{ __azure_log_identity_uuid  }}"
+      desc: Assign Storage Blob Data Contributor Role to Log Role at Logs Container level
+    - role: "{{ __azure_storageblobdata_ctrb_role_uri }}"
+      name: "{{ plat__azure_storagecontr_ranger_audit_assn_name }}"
+      scope: "{{ plat__azure_datapath_uri }}"
+      assignee: "{{ __azure_ranger_audit_identity_uuid }}"
+      desc: Assign Storage Blob Data Contributor Role to Ranger Role at Data Container level
+    - role: "{{ __azure_contributor_role_uri }}"
+      name: "{{ plat__azure_xaccount_contributor_assn_name }}"
+      scope: "{{ plat__azure_subscription_uri }}"
+      assignee: "{{ plat__azure_application_service_principal_objuuid }}"
+      desc: Assign top level Contributor Role to Cross Account App
+    - role: "{{ __azure_xaccount_role_uri }}"
+      name: "{{ plat__azure_xaccount_role_assn_name }}"
+      scope: "{{ plat__azure_subscription_uri }}"
+      assignee: "{{ plat__azure_application_service_principal_objuuid }}"
+      desc: Assign Cross Account Role to Cross Account App
+  loop_control:
+    loop_var: __azure_rl_assgn_item

@@ -1,0 +1,37 @@
+---
+# vars file for setup
+
+infra__dynamic_inventory_vm_type_default:
+  aws:
+    sml: 'm5.large'
+    std: 'm5.2xlarge'
+    lrg: 'm5.4xlarge'
+  azure:
+    std: 'Standard_D8_v3'
+    lrg: 'Standard_D16_v3'
+  gcp:
+    std: 'e2-standard-8'
+    lrg: 'e2-standard-8'
+
+infra__dynamic_inventory_storage_type_default:
+  aws:
+    std: 'gp2'
+    fast: 'gp2'
+  azure:
+    std: 'StandardSSD_LRS'
+    fast: 'StandardSSD_LRS'
+  gcp:
+    std: 'pd-standard'
+    fast: 'pd-standard'
+
+infra__cdp_control_plane_cidr_default:  ['52.36.110.208/32', '52.40.165.49/32', '35.166.86.177/32']
+
+infra__dynamic_inventory_images_default:
+  aws:
+    centos7:
+      search: 'CentOS Linux 7 x86_64 HVM EBS*'
+      user: 'centos'
+
+infra__all_ports_security_rule:
+  aws: -1
+  azure: 0-65535

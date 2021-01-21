@@ -1,0 +1,33 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Set up CDP Environment Deployment on AWS
+  cloudera.cloud.env:
+    name: "{{ plat__env_name }}"
+    state: started
+    credential: "{{ plat__xacccount_credential_name }}"
+    cloud: "{{ plat__infra_type }}"
+    region: "{{ plat__region }}"
+    default_sg: "{{ plat__aws_security_group_default_id }}"
+    knox_sg: "{{ plat__aws_security_group_knox_id }}"
+    log_location: "{{ plat__aws_storage_location }}"
+    log_identity: "{{ plat__aws_log_instance_profile_arn }}"
+    public_key_id: "{{ plat__public_key_id }}"
+    workload_analytics: "{{ plat__workload_analytics }}"
+    vpc_id: "{{ plat__aws_vpc_id }}"
+    subnet_ids: "{{ plat__aws_subnet_ids }}"
+    s3_guard_name: "{{ plat__aws_dynamodb_table_name }}"
+    tags: "{{ plat__tags }}"

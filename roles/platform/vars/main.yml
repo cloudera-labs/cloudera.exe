@@ -1,0 +1,78 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Vars for platform
+
+plat__aws_policy_urls_default_root:    "https://github.com/hortonworks/cloudbreak/raw/master/cloud-aws/src/main/resources/definitions/cdp"
+plat__aws_policy_urls_default:
+  log:                "{{ plat__aws_policy_urls_default_root }}/aws-cdp-log-policy.json"
+  ranger_audit_s3:    "{{ plat__aws_policy_urls_default_root }}/aws-cdp-ranger-audit-s3-policy.json"
+  datalake_admin_s3:  "{{ plat__aws_policy_urls_default_root }}/aws-cdp-datalake-admin-s3-policy.json"
+  bucket_access:      "{{ plat__aws_policy_urls_default_root }}/aws-cdp-bucket-access-policy.json"
+  dynamodb:           "{{ plat__aws_policy_urls_default_root }}/aws-cdp-dynamodb-policy.json"
+
+plat__gcp_roles:
+  storage_admin: roles/storage.admin
+  storage_object_admin: roles/storage.objectAdmin
+  iam_workload_identity_user: roles/iam.workloadIdentityUser
+  iam_service_account_user: roles/iam.workloadIdentityUser
+  iam_service_account_token_creator: roles/iam.serviceAccountTokenCreator
+
+plat__cdp_iam_identities:
+  namespace: "crn:altus:iam:us-west-1:altus"
+  role_suffix: role
+  resource_role_suffix: resourceRole
+  env_admin: EnvironmentAdmin
+  env_user: EnvironmentUser
+  dw_admin: DWAdmin
+  dw_user: DWUser
+  ml_admin: MLAdmin
+  ml_user: MLUser
+
+plat__cdp_iam_admin_group_resource_roles_default:
+  - "{{ plat__cdp_iam_identities.env_admin }}"
+  - "{{ plat__cdp_iam_identities.env_user }}"
+  - "{{ plat__cdp_iam_identities.dw_admin }}"
+  - "{{ plat__cdp_iam_identities.dw_user }}"
+  - "{{ plat__cdp_iam_identities.ml_admin }}"
+  - "{{ plat__cdp_iam_identities.ml_user }}"
+
+plat__cdp_iam_user_group_resource_roles_default:
+  - "{{ plat__cdp_iam_identities.env_user }}"
+  - "{{ plat__cdp_iam_identities.dw_user }}"
+  - "{{ plat__cdp_iam_identities.ml_user }}"
+
+plat__gcp_xaccount_policy_bindings_default:
+  - "roles/compute.instanceAdmin.v1"
+  - "roles/compute.networkAdmin"
+  - "roles/compute.securityAdmin"
+  - "roles/compute.imageUser"
+  - "roles/compute.storageAdmin"
+  - "roles/runtimeconfig.admin"
+  - "roles/cloudkms.admin"
+  - "roles/owner"
+
+plat__gcp_log_policy_bindings_default:
+  - 'storage.buckets.get'
+  - 'storage.buckets.create'
+
+plat__azure_roles:
+  vmcnt: 'Virtual Machine Contributor'
+  miop: 'Managed Identity Operator'
+  storown: 'Storage Blob Data Owner'
+  storcnt: 'Storage Blob Data Contributor'
+  contrib: 'Contributor'
+  owner: 'Owner'

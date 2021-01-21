@@ -1,0 +1,48 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: List relevant Azure role assignments
+  register: __plat__azure_roles_discovered
+  when:
+    - plat__azure_metagroup_uri is defined
+    - plat__azure_metagroup_uri | length > 0
+  azure.azcollection.azure_rm_roleassignment_info:
+    name: "{{ __plat_azure_assn_item }}"
+    scope: "{{ plat__azure_subscription_uri }}"
+  loop_control:
+    loop_var: __plat_azure_assn_item
+  loop:
+    - "{{ plat__azure_vmcontributor_idbroker_assn_name }}"
+    - "{{ plat__azure_mgdidentop_idbroker_assn_name }}"
+    - "{{ plat__azure_storageowner_datalakeadmin_logs_assn_name }}"
+    - "{{ plat__azure_storageowner_datalakeadmin_data_assn_name }}"
+    - "{{ plat__azure_storagecontr_log_assn_name }}"
+    - "{{ plat__azure_storagecontr_ranger_audit_assn_name }}"
+    - "{{ plat__azure_xaccount_contributor_assn_name }}"
+    - "{{ plat__azure_xaccount_role_assn_name }}"
+
+- name: Set list of role assignment names to delete
+  ansible.builtin.set_fact:
+    __plat_azure_role_assignment_names_list: "{{ __plat__azure_roles_discovered.results | json_query('[*].roleassignments') | select() | json_query('[*][0].id') }}"
+
+- name: Remove Azure role assignments
+  azure.azcollection.azure_rm_roleassignment:
+    state: absent
+    id: "{{ __plat_azure_role_item }}"
+  loop_control:
+    loop_var: __plat_azure_role_item
+  loop:
+    "{{ __plat_azure_role_assignment_names_list }}"

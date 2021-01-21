@@ -1,0 +1,114 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create AWS VPC
+  amazon.aws.ec2_vpc_net:
+    region: "{{ infra__region }}"
+    name: "{{ infra__vpc_name }}"
+    cidr_block: "{{ infra__vpc_cidr }}"
+    tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
+    state: present
+  register: __aws_vpc_info
+
+- name: Set fact for AWS VPC ID
+  ansible.builtin.set_fact:
+    infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
+
+- name: Create IGW 
+  community.aws.ec2_vpc_igw:
+    vpc_id: "{{ infra__aws_vpc_id }}"
+    region: "{{ infra__region }}"
+    state: present
+    tags: "{{ infra__tags | combine({ 'Name': infra__aws_igw_name }, recursive=True) }}"
+  register: __aws_igw
+
+- name: Set fact for IGW ID
+  when: __aws_igw.gateway_id is defined
+  ansible.builtin.set_fact:
+    infra__aws_igw_id: "{{ __aws_igw.gateway_id }}"
+
+- name: Create AWS VPC Subnets
+  amazon.aws.ec2_vpc_subnet:
+    region: "{{ infra__region }}"
+    vpc_id: "{{ infra__aws_vpc_id }}"
+    cidr: "{{ __aws_subnet_cidr_item }}"
+    state: present
+    tags: "{{ infra__tags | combine({ 'Name': infra__namespace }, recursive=True) }}"
+    map_public: yes
+    az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
+  loop_control:
+    loop_var: __aws_subnet_cidr_item
+    index_var: __aws_subnet_index
+  loop: "{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) }}"
+  register: __aws_subnets
+
+- name: Set fact for AWS Subnet IDs
+  ansible.builtin.set_fact:
+    infra__aws_subnet_ids: "{{ infra__aws_subnet_ids | default([]) | union([__aws_subnet_item.subnet.id | default('')]) }}"
+  loop_control:
+    loop_var: __aws_subnet_item
+    label: "{{ __aws_subnet_item.subnet.id }}"
+  loop: "{{ __aws_subnets.results }}"
+
+- name: List the Route Tables for the VPC
+  community.aws.ec2_vpc_route_table_info:
+    region: "{{ infra__region }}"
+    filters:
+      vpc-id: "{{ infra__aws_vpc_id }}"
+  register: __aws_route_table_list
+
+- name: Configure the Route Table
+  community.aws.ec2_vpc_route_table:
+    region: "{{ infra__region }}"
+    vpc_id: "{{ infra__aws_vpc_id }}"
+    route_table_id: "{{ __aws_route_table_id }}"
+    lookup: id
+    state: present
+    tags: "{{ infra__tags | combine({ 'Name': infra__aws_route_table_name }, recursive=True) }}"
+    routes:
+      - dest: "0.0.0.0/0"
+        gateway_id: "{{ infra__aws_igw_id }}"
+    subnets: "{{ infra__aws_subnet_ids }}"
+  vars:
+    __aws_route_table_id: "{{ __aws_route_table_list.route_tables[0].associations[0].route_table_id }}"
+
+- name: Create Security Groups
+  amazon.aws.ec2_group:
+    state: present
+    region: "{{ infra__region }}"
+    vpc_id: "{{ infra__aws_vpc_id }}"
+    name: "{{ __security_group_name_item }}"
+    description: "{{ __security_group_name_item }}"
+    tags: "{{ infra__tags | combine({ 'Name': __security_group_name_item }, recursive=True) }}"
+    rules:  "{{ infra__aws_security_group_rules | union([rule])}}"
+  vars:
+    rule:
+      proto: all
+      group_name: "{{ __security_group_name_item }}"
+  loop_control:
+    loop_var: __security_group_name_item
+  loop:
+    - "{{ infra__security_group_knox_name }}"
+    - "{{ infra__security_group_default_name }}"
+  register: __aws_security_group_info
+
+- name: Set fact for Security Group IDs
+  ansible.builtin.set_fact:
+    infra__aws_security_group_knox_id: "{{ __aws_security_group_info | community.general.json_query(knox) | first }}"
+    infra__aws_security_group_default_id: "{{ __aws_security_group_info | community.general.json_query(default) | first }}"
+  vars:
+    knox: "results[?group_name=='{{ infra__security_group_knox_name }}'].group_id"
+    default: "results[?group_name=='{{ infra__security_group_default_name }}'].group_id"

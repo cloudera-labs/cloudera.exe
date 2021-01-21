@@ -1,0 +1,92 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Ensure artifacts directory exists
+  when: info__create_deployment_details and info__artifacts_directory | length > 0
+  block:
+    - name: Gather details on artifacts directory
+      ansible.builtin.stat:
+        path: "{{ info__artifacts_directory }}"
+      register: __artifacts_directory
+
+    - name: Create artifacts directory if it does not exist
+      when: not __artifacts_directory.stat.exists
+      block:
+        - name: Create the artifacts directory
+          ansible.builtin.file:
+            path: "{{ info__artifacts_directory }}"
+            state: directory
+          register: __artifacts_directory_create
+
+        - name: Set fact for the artifacts directory path
+          ansible.builtin.set_fact:
+            __artifacts_directory_path: "{{ __artifacts_directory_create.path }}"
+      
+    - name: Validate artifacts directory if it does exist
+      when: __artifacts_directory.stat.exists
+      block:
+        - name: Validate the artifacts directory
+          ansible.builtin.assert:
+            that:
+              - "{{ __artifacts_directory.stat.isdir }}"
+              - "{{ __artifacts_directory.stat.writeable }}"
+            fail_msg: "Artifacts directory is either not a directory or is not writeable"
+            quiet: yes
+
+        - name: Set fact for the artifacts directory path
+          ansible.builtin.set_fact:
+            __artifacts_directory_path: "{{ __artifacts_directory.stat.path }}"
+
+- name: Query CDP Environment
+  cloudera.cloud.env_info:
+    name: "{{ info__env_name }}"
+  register: __env_info
+
+- name: Query CDP Datalake
+  cloudera.cloud.datalake_info:
+    env: "{{ info__env_name }}"
+  register: __datalake_info
+
+- name: Query CDP Datahubs
+  cloudera.cloud.datahub_cluster_info:
+    env: "{{ info__env_name }}"
+  register: __datahubs_info
+
+- name: Query CDP ML Workspaces
+  cloudera.cloud.ml_info:
+    env: "{{ info__env_name }}"
+  register: __ml_info
+
+- name: Query CDP Operational DBs
+  cloudera.cloud.opdb_info:
+    env:  "{{ info__env_name }}"
+  register: __opdb_info
+
+- name: Set facts for the CDP deployment details
+  ansible.builtin.set_fact:
+    deployment:
+      environment: "{{ __env_info.environments | first | default({}) }}"
+      datalake: "{{ __datalake_info.datalakes | first | default({}) }}"
+      datahubs: "{{ __datahubs_info.datahubs }}"
+      workspaces: "{{ __ml_info.workspaces }}"
+      operational_dbs: "{{ __opdb_info.databases }}"
+
+- name: Save the CDP deployment details locally
+  when: info__create_deployment_details
+  ansible.builtin.copy:
+    content: "{{ { 'deployment': deployment } | to_nice_yaml(indent=2) }}"
+    dest: "{{ __artifacts_directory_path | default('.') }}/deployment_info.yml"
+  delegate_to: localhost

@@ -1,0 +1,54 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Prepare Azure Security Group Rules
+  ansible.builtin.set_fact:
+    infra__azure_security_group_rules:
+      - name: 'AllowCallerAccess'
+        protocol: Tcp
+        source_address_prefix:
+          - "{{ ipify_public_ip }}/32"
+        destination_port_range: "{{ infra__vpc_user_ports }}"
+        access: Allow
+        priority: 101
+        direction: Inbound
+
+- name: Add CDP Public security group rules for Azure
+  ansible.builtin.set_fact:
+    infra__azure_security_group_rules: "{{ infra__azure_security_group_rules | union(rule) }}"
+  vars:
+    rule:
+      - name: 'AllowCDPControlPlane'
+        protocol: Tcp
+        source_address_prefix: "{{ infra__cdp_control_plane_cidr }}"
+        destination_port_range: "{{ infra__cdp_control_plane_ports }}"
+        access: Allow
+        priority: 901
+        direction: Inbound
+
+- name: Add User and Extra security group rules for Azure
+  when: (infra__vpc_extra_cidr | length > 0) or (infra__vpc_user_cidr | length > 0)
+  ansible.builtin.set_fact:
+    infra__azure_security_group_rules: "{{ infra__azure_security_group_rules | union(rule) }}"
+  vars:
+    rule:
+      - name: 'AllowExtraAccess'
+        protocol: Tcp
+        source_address_prefix: "{{ infra__vpc_extra_cidr | union(infra__vpc_user_cidr) }}"
+        destination_port_range: "{{ infra__vpc_extra_ports | union(infra__vpc_user_ports) }}"
+        access: Allow
+        priority: 201
+        direction: Inbound

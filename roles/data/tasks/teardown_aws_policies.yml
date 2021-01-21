@@ -1,0 +1,71 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Outer loop variable: __data_storage
+
+- name: Tear down AWS external policy
+  when: __data_storage.policy.delete | default(data__teardown_deletes_policies)
+  block:
+    - name: Set fact for AWS external policy name
+      ansible.builtin.set_fact:
+        __data_aws_external_policy_name: "{{ __data_storage.policy.name | default([data__namespace, data__external_data_suffix, __data_storage_policy_label, __data_storage_policy_suffix] | join('-')) }}"
+      vars:
+        __data_storage_readonly: "{{ __data_storage['read_only'] | default(False) }}"
+        __data_storage_policy_label: "{{ __data_storage_readonly | ternary(data__aws_read_only_policy_suffix, data__aws_read_write_policy_suffix) }}"
+        __data_storage_policy_suffix: "{{ __data_storage.policy.suffix | default(data__aws_policy_suffix) }}"
+
+    - name: Set fact for external data AWS role name
+      ansible.builtin.set_fact:
+        __data_aws_access_role_name: "{{ __data_storage.role.name | default(__data_role_name) }}"
+      vars:
+        __data_role_name: "{{ __data_storage.role.datalake_admin | default(True) | ternary(data__aws_datalake_admin_role_name, __data_role_name_default) }}"
+        __data_role_name_default: "{{ [data__namespace, data__external_data_suffix, __data_storage.role.suffix | default(data__aws_role_suffix)] | join('-') }}"
+
+    - name: Query the external data AWS role 
+      community.aws.iam_role_info:
+        region: "{{ data__region }}"
+        name: "{{ __data_aws_access_role_name }}"
+      register: __data_aws_access_role_info
+        
+    - name: Set facts for existing managed policies for external data AWS role
+      when: __data_aws_access_role_info.iam_roles | length > 0
+      ansible.builtin.set_fact:
+        __data_aws_access_role_remaining_policies: "{{ __data_aws_access_role.managed_policies | rejectattr('policy_name', 'equalto', __data_aws_external_policy_name) | list }}"
+      vars:
+        __data_aws_access_role: "{{ __data_aws_access_role_info.iam_roles | first }}"
+
+    - name: Detach AWS external storage policy from external data AWS role
+      when: __data_aws_access_role_info.iam_roles | length > 0
+      community.aws.iam_role:
+        region: "{{ data__region }}"
+        name: "{{ __data_aws_access_role_name }}"
+        purge_policies: yes
+        purge_tags: no
+        assume_role_policy_document:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                AWS: "{{ __data_aws_idbroker_role_arn }}"
+              Action: "sts:AssumeRole"
+        managed_policies: "{{ __data_aws_access_role_remaining_policies | map(attribute='policy_arn') | list }}"
+        state: present
+
+    - name: Delete AWS external storage policy
+      community.aws.iam_managed_policy:
+        region: "{{ data__region }}"
+        policy_name: "{{ __data_aws_external_policy_name }}"
+        state: absent

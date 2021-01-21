@@ -1,0 +1,155 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create a temporary directory for Credentials
+  ansible.builtin.tempfile:
+    prefix: "gcp-creds-"
+    state: directory
+  register: __gcp_creds_tmpdir
+
+- name: Create GCP xaccount service account
+  register: __gcp_xaccount_sa_info
+  google.cloud.gcp_iam_service_account:
+    name: "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+    display_name: "{{ plat__gcp_xaccount_identity_name }}"
+    project: "{{ plat__gcp_project }}"
+    state: present
+
+- name: Set GCP Cross Account Bindings
+  register: __gcp_xaccount_bind_info
+  loop_control:
+    loop_var: __gcp_sa_binding_item
+  loop: "{{ plat__gcp_xaccount_policy_bindings }}"
+  command: >
+    gcloud projects
+    add-iam-policy-binding {{ plat__gcp_project }}
+    --member="serviceAccount:{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+    --role={{ __gcp_sa_binding_item |quote }}
+    --no-user-output-enabled
+    --condition=None
+
+- name: Generate Key for Google Cross Account Service Account
+  google.cloud.gcp_iam_service_account_key:
+    service_account: "{{ __gcp_xaccount_sa_info }}"
+    private_key_type: TYPE_GOOGLE_CREDENTIALS_FILE
+    path: "{{ __gcp_creds_tmpdir.path }}/{{ plat__gcp_xaccount_identity_name }}-gcp-cred.json"
+    project: "{{ plat__gcp_project }}"
+    state: present
+
+- name: Create Cross Account Google CDP Credential
+  cloudera.cloud.env_cred:
+    state: present
+    cloud: "{{ plat__infra_type }}"
+    name: "{{ plat__xacccount_credential_name }}"
+    secret: "{{ __gcp_creds_tmpdir.path }}/{{ plat__gcp_xaccount_identity_name }}-gcp-cred.json"
+
+- name: Create other GCP Roles
+  register: __gcp_role_creation_info
+  loop_control:
+    loop_var: __gcp_role_item
+  loop:
+    - name: "{{ plat__gcp_log_role_name }}"
+      perms: "{{ plat__gcp_log_role_perms }}"
+  google.cloud.gcp_iam_role:
+    name: "{{ __gcp_role_item.name }}"
+    title: "{{ __gcp_role_item.name }}"
+    description: "{{ __gcp_role_item.name }}"
+    included_permissions: "{{ __gcp_role_item.perms }}"
+    project: "{{ plat__gcp_project }}"
+    state: present
+
+- name: Undelete custom role if name is being reused before removal from GCP
+  loop: "{{ __gcp_role_creation_info.results }}"
+  loop_control:
+    loop_var: __gcp_role_undelete_item
+  when:
+    - __gcp_role_undelete_item.deleted is defined
+    - __gcp_role_undelete_item.deleted | bool
+  ansible.builtin.command: >
+    gcloud iam roles
+    undelete {{ plat__gcp_log_role_name }}
+    --project={{ plat__gcp_project }}
+
+- name: Create Operational GCP Service Accounts
+  register: __gcp_identity_info
+  loop_control:
+    loop_var: __gcp_identity_item
+    label: __gcp_identity_item
+  loop:
+    - "{{ plat__gcp_log_identity_name }}"
+    - "{{ plat__gcp_datalakeadmin_identity_name }}"
+    - "{{ plat__gcp_ranger_audit_identity_name }}"
+    - "{{ plat__gcp_idbroker_identity_name }}"
+  google.cloud.gcp_iam_service_account:
+    name: "{{ __gcp_identity_item }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+    display_name: "{{ __gcp_identity_item }}"
+    project: "{{ plat__gcp_project }}"
+    state: present
+
+- name: Set Operational Service Account Policy Bindings
+  loop_control:
+    loop_var: __gcp_binding_item
+    label: __gcp_binding_item.member
+  loop:
+    # Logs
+    - member: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "projects/{{ plat__gcp_project }}/roles/{{ plat__gcp_log_role_name }}"
+      condition: "expression=resource.name == '{{ plat__gcp_log_role_name }}',title='{{ plat__gcp_log_role_name }}'"
+    # Data Access
+    - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "{{ plat__gcp_roles.storage_admin }}"
+      condition: "expression=resource.name == '{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_datalakeadmin_identity_name }}'"
+    - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "{{ plat__gcp_roles.storage_admin }}"
+      condition: "expression=resource.name == '//storage.googleapis.com/projects/_/buckets/{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_datalakeadmin_identity_name }}-fulladmin'"
+    - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "{{ plat__gcp_roles.storage_object_admin }}"
+      condition: "expression=resource.name == '{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_ranger_audit_identity_name }}'"
+    # Ranger Audit
+    - member: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "{{ plat__gcp_roles.storage_object_admin }}"
+      condition: "expression=resource.name == '//storage.googleapis.com/projects/_/buckets/{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_ranger_audit_identity_name }}-fulladmin'"
+    # ID Broker  / Assumer Role
+    - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "{{ plat__gcp_roles.iam_workload_identity_user }}"
+      condition: "expression=resource.name.startsWith('{{ plat__namespace }}'),title='{{ plat__gcp_idbroker_identity_name }}'"
+    - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "{{ plat__gcp_roles.iam_service_account_user }}"
+      condition: "None"
+    - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+      role: "{{ plat__gcp_roles.iam_service_account_token_creator }}"
+      condition: "None"
+  command: >
+    gcloud projects
+    add-iam-policy-binding {{ plat__gcp_project }}
+    --member={{ __gcp_binding_item.member |quote }}
+    --role={{ __gcp_binding_item.role |quote }}
+    --condition={{ __gcp_binding_item.condition |quote }}
+
+- name: Add Service Accounts to Storage Policies for Buckets
+  loop_control:
+    loop_var: __gcp_pol_item
+  loop:
+    - account: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"
+      bucket: "{{ plat__gcp_storage_location_logs }}"
+    - account: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"
+      bucket: "{{ plat__gcp_storage_location_data }}"
+    - account: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"
+      bucket: "{{ plat__gcp_storage_location_data }}"
+  command: >
+    gsutil iam
+    ch {{ __gcp_pol_item.account |quote }}
+    gs://{{ __gcp_pol_item.bucket |quote }}

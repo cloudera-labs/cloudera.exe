@@ -1,0 +1,29 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Set public key text from file if not set
+  when: infra__public_key_text | trim | length < 1 and infra__public_key_file
+  ansible.builtin.set_fact:
+    infra__public_key_text: "{{ lookup('file', infra__public_key_file ) }}"
+
+- name: Check public key text
+  ansible.builtin.assert:
+    that:
+      - "infra__public_key_text is defined"
+      - "infra__public_key_text is string"
+      - "infra__public_key_text | trim | length > 0"
+    fail_msg: "GCP authentication parameter, 'infra__public_key_text', is invalid. Either set this variable or specify 'infra__public_key_file'."
+    quiet: yes
