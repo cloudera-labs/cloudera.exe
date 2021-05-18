@@ -80,6 +80,7 @@ plat__cdp_iam_user_group_roles:               "{{ env.cdp.user_group.roles | def
 plat__cdp_iam_user_group_resource_roles:      "{{ env.cdp.user_group.resource_roles | default(plat__cdp_iam_user_group_resource_roles_default) }}"
 
 plat__datalake_name:                          "{{ common__datalake_name }}"
+plat__datalake_version:                       "{{ env.datalake.version | default(omit) }}"
 plat__datalake_user_sync:                     "{{ env.datalake.user_sync | default(True) }}"
 
 plat__cdp_xaccount_external_id:               "{{ env.cdp.cross_account.external_id | default(False) }}"
