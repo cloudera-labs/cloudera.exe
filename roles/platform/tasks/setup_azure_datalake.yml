@@ -20,5 +20,6 @@
     env: "{{ plat__env_name }}"
     managed_identity: "{{ __azure_idbroker_identity_uri }}"
     storage: "{{ plat__azure_stor_data_uri }}"
+    runtime: "{{ plat__datalake_version | default(omit) }}"
     tags: "{{ plat__tags }}"
     state: present
