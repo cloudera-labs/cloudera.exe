@@ -43,6 +43,8 @@
     k8s_request: "{{ __ml_config_item.k8s_request if __ml_config_item.k8s_request.instanceGroups | length > 1 else omit }}"
     tls: "{{ __ml_config_item.raw.tls | default(omit) }}"
     monitoring: "{{ __ml_config_item.raw.monitoring | default(omit) }}"
+    governance: "{{ __ml_config_item.raw.governance | default(omit) }}"
+    metrics: "{{ __ml_config_item.raw.metrics | default(omit) }}"
     database: "{{ __ml_config_item.raw.database | default(omit) }}"
     nfs: "{{ __ml_config_item.raw.nfs | default(omit) }}"
     nfs_version: "{{ __ml_config_item.raw.nfs_version | default(omit) }}"
