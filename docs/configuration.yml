@@ -125,6 +125,8 @@ env:
     name:
     suffix:
     user_sync:
+    version:
+    scale:
   gcp:
     bindings:
       cross_account:

@@ -21,6 +21,7 @@
     instance_profile: "{{ plat__aws_idbroker_instance_profile_arn }}"
     storage: "{{ plat__aws_storage_location }}"
     runtime: "{{ plat__datalake_version | default(omit) }}"
+    scale: "{{ plat__datalake_scale | default(omit) }}"
     tags: "{{ plat__tags }}"
     state: present
 

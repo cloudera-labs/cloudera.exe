@@ -21,5 +21,6 @@
     managed_identity: "{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
     storage: "gs://{{ plat__gcp_storage_location_data }}"
     runtime: "{{ plat__datalake_version | default(omit) }}"
+    scale: "{{ plat__datalake_scale | default(omit) }}"
     tags: "{{ plat__tags }}"
     state: present
