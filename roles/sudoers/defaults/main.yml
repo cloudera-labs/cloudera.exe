@@ -1,0 +1,30 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# global file for sudoers
+
+# Role prefix is 'sudoers__'
+
+# Variables used as inputs in main.yml
+sudoers__env_admin_username:                     "{{ cdp_workload_user }}"
+sudoers__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
+
+sudoers__sudo_group_name:                        sudoers
+sudoers__sudo_group_users:                       []
+# Flag to determine if we want to remove (=True) or retain (=False) existing users in sudoers group
+sudoers__purge_users_in_group:                   False                         
+
+sudoers__sudorule_name:                          admin_all_rule
