@@ -1,0 +1,84 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Get the FreeIPA server details in order to find its public IP address
+- name: Query the FreeIPA status
+  cloudera.cloud.freeipa_info:
+    name: "{{ freeipa_host_group__env_name }}"
+  register: __freeipa_info
+
+# Extract the instance ID for the FreeIPA server
+- name: Set facts for FreeIPA server instance ID
+  ansible.builtin.set_fact:
+    __freeipa_server_instance_id: "{{ __freeipa_info.environments.instances.keys() | first }}"
+
+# Get instance details for specific infra_type - AWS
+- name: Gather FreeIPA instance details on AWS
+  when: freeipa_host_group__infra_type == "aws"
+  block:
+    - name: Gather EC2 instance information using ID
+      community.aws.ec2_instance_info:
+        region: "{{ freeipa_host_group__region }}"
+        instance_ids:
+          - "{{ __freeipa_server_instance_id }}"
+      register: __ec2_node_info
+
+    - name: Set facts for the FreeIPA server IP
+      ansible.builtin.set_fact:
+        __freeipa_server_public_ip: "{{ __ec2_node_info.instances | map(attribute='public_ip_address') }}"
+
+# TODO: A block per cloud provider - azure
+# Get instance details for specific infra_type - Azure
+# - name: Gather FreeIPA instance details on Azure
+#   when: freeipa_host_group__infra_type == "azure"
+#   block:
+
+# TODO: A block per cloud provider - GCP
+# Get instance details for specific infra_type - GCP
+# - name: Gather FreeIPA instance details on GCP
+#   when: freeipa_host_group__infra_type == "gcp"
+#   block:
+
+# Get the CDP environment details to find the loginUserName (required to SSH into FreeIPA server)
+- name: Query CDP Environment
+  cloudera.cloud.env_info:
+    name: "{{ freeipa_host_group__env_name }}"
+    descendants: true
+  register: __env_info
+
+- name: Set facts for the login user to the FreeIPA server
+  ansible.builtin.set_fact:
+    __freeipa_server_login_user: "{{ __env_info.environments[0].authentication.loginUserName }}"
+
+# Find the workload username (required for any calls to the freeipa.ansible_freeipa module)
+- name: Query CDP Caller
+  cloudera.cloud.iam_user_info:
+    current_user: yes
+  register: __cdp_iam_current_user_info
+
+- name: Set facts for CDP Caller Workload Username
+  ansible.builtin.set_fact:
+    __cdp_workload_username: "{{ __cdp_iam_current_user_info.users[0].workloadUsername }}"
+
+# Add the FreeIPA server and username to the inventory
+- name: Add FreeIPA servers to inventory
+  ansible.builtin.add_host:
+    name: "{{ item }}" 
+    groups: "{{ freeipa_host_group__host_group_name }}" 
+    ansible_user: "{{ __freeipa_server_login_user }}"
+    cdp_workload_user: "{{ __cdp_workload_username }}"
+  loop: "{{ __freeipa_server_public_ip }}"
+
