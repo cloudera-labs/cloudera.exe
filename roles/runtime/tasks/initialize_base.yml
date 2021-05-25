@@ -131,6 +131,18 @@
         env: "{{ run__env_name }}"
       register: run__opdb_list
 
+    - name: Construct OpDB Configurations
+      ansible.builtin.set_fact:
+        run__opdb_configs: "{{ run__opdb_configs | default([]) | union([config]) }}"
+      vars:
+        include: "{{ lookup('template', __opdb_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
+        config:
+          name: "{{ __opdb_config.name | default([run__namespace, __opdb_config.suffix | default(include.suffix) | default(run__opdb_suffix)] | join('-')) }}"
+      loop: "{{ run__opdb_definitions }}"
+      loop_control:
+        loop_var: __opdb_config
+        label: "{{ config.name }}"
+
 - name: Prepare for CDP ML Workspace experiences
   when: run__include_ml
   block:
