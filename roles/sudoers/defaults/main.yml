@@ -19,8 +19,7 @@
 # Role prefix is 'sudoers__'
 
 # Variables used as inputs in main.yml
-sudoers__env_admin_username:                     "{{ cdp_workload_user }}"
-sudoers__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
+sudoers__env_admin_password:                     "{{ common__env_admin_password }}"
 
 sudoers__sudo_group_name:                        sudoers
 sudoers__sudo_group_users:                       []

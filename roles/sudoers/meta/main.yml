@@ -15,7 +15,8 @@
 galaxy_info:
   author: Jim Enright (jenright@cloudera.com)
   description: >
-    Adding specified users to FreeIPA sudoers group and creation of a sudo rule to allow passwordless sudo for the group. Existing users in the sudoers can be purged or retained depending on the value of the sudoers__purge_users_in_group flag.
+    Add specified users to FreeIPA sudoers group and create a passwordless sudo rule for the group. 
+    Existing group members can be purged or retained depending on the value of the sudoers__purge_users_in_group flag.
   company: Cloudera
   license: Apache-2.0
 

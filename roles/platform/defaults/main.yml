@@ -63,7 +63,7 @@ plat__xacccount_credential_name:              "{{ common__xaccount_credential_na
 plat__workload_analytics:                     "{{ env.workload_analytics | default(True) }}"
 plat__tunnel:                                 "{{ env.tunnel | default(True) }}"
 
-plat__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
+plat__env_admin_password:                     "{{ common__env_admin_password }}"
 
 plat__vpc_public_subnet_cidrs:                "{{ common__vpc_public_subnet_cidrs }}"
 plat__vpc_private_subnet_cidrs:               "{{ common__vpc_private_subnet_cidrs }}"
