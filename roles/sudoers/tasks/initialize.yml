@@ -15,22 +15,18 @@
 # limitations under the License.
 
 # Find the current CDP username. 
-- name: Find and set env_admin_username
-  include_tasks: initialize.yml
+# This is used in the tasks to create the FreeIPA group and sudo rule.
+# Note - the user is required to have PowerUser role in the CDP environment.
+- name: Query CDP Caller to save user info
+  cloudera.cloud.iam_user_info:
+    current_user: yes
+  register: __cdp_iam_current_user_info
 
-# Remove the FreeIPA sudo rule
-- name: Remove sudo rule for passwordless sudo
-  community.general.ipa_sudorule:
-    ipa_user: "{{ sudoers__env_admin_username }}"
-    ipa_pass: "{{ sudoers__env_admin_password }}"
-    name: "{{ sudoers__sudorule_name }}"
-    state: absent
+- name: Set fact for CDP Environment Admin User
+  ansible.builtin.set_fact:
+    sudoers__env_admin_username: "{{ __cdp_iam_current_user_info.users[0].workloadUsername }}"
 
-# Remove the FreeIPA group for sudo
-- name: Remove sudoers group
-  community.general.ipa_group:
-    ipa_user: "{{ sudoers__env_admin_username }}"
-    ipa_pass: "{{ sudoers__env_admin_password }}"
-    name: "{{ sudoers__sudo_group_name }}"
-    state: absent
-  register: sudoers_group
+- name: Print Environment Admin Username
+  ansible.builtin.debug:
+    msg: "CDP Environment Admin Username is {{ sudoers__env_admin_username }}"
+    verbosity: 1
