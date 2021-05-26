@@ -74,6 +74,20 @@
   poll: 0
   register: __opdb_builds
 
+- name: Execute CDP Dataflow setup
+  when: run__include_df
+  cloudera.cloud.df:
+    name: "{{ run__env_name }}"
+    nodes_min: "{{ run__df_nodes_min }}"
+    nodes_max: "{{ run__df_nodes_max }}"
+    public_loadbalancer: "{{ run__df_public_loadbalancer }}"
+    ip_ranges: "{{ run__df_ip_ranges }}"
+    state: present
+    wait: yes
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __df_build
+
 - name: Wait for CDP Datahub deployments to complete
   when: run__include_datahub
   ansible.builtin.async_status:
@@ -110,5 +124,14 @@
   loop: "{{ __opdb_builds.results }}"
   register: __opdb_builds_async
   until: __opdb_builds_async.finished
+  retries: 120
+  delay: 30
+
+- name: Wait for CDP Dataflow deployment to complete
+  when: run__include_df
+  ansible.builtin.async_status:
+    jid: "{{ __df_build.ansible_job_id }}"
+  register: __df_build_async
+  until: __df_build_async.finished
   retries: 120
   delay: 30
