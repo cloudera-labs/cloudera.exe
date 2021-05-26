@@ -1,6 +1,6 @@
 # cloudera.exe - Runlevel Management and Utilities for Cloudera Data Platform (CDP)
 
-Readme last updated: 2021-05-03
+Readme last updated: 2021-05-26
 
 `cloudera.exe` is an Ansible collection enabling runlevel management of CDP Public Cloud deployments. The collection also contains a number of utilities for common scenarios encountered when managing a CDP deployment.
 
