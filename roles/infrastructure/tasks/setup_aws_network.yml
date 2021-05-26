@@ -52,6 +52,7 @@
   loop_control:
     loop_var: __aws_subnet_create_item
     index_var: __aws_subnet_index
+    label: __aws_subnet_create_item.name
   loop: "{{ infra__vpc_public_subnets_info | union(infra__vpc_private_subnets_info) }}"
   register: __aws_subnets
 
