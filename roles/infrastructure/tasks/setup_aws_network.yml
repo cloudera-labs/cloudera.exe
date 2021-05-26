@@ -44,15 +44,15 @@
   amazon.aws.ec2_vpc_subnet:
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
-    cidr: "{{ __aws_subnet_cidr_item }}"
+    cidr: "{{ __aws_subnet_create_item.cidr }}"
     state: present
-    tags: "{{ infra__tags | combine({ 'Name': infra__namespace }, recursive=True) }}"
+    tags: "{{ infra__tags | combine(__aws_subnet_create_item.tags, recursive=True) }}"
     map_public: yes
     az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
   loop_control:
-    loop_var: __aws_subnet_cidr_item
+    loop_var: __aws_subnet_create_item
     index_var: __aws_subnet_index
-  loop: "{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) }}"
+  loop: "{{ infra__vpc_public_subnets_info | union(infra__vpc_private_subnets_info) }}"
   register: __aws_subnets
 
 - name: Set fact for AWS Subnet IDs
