@@ -52,22 +52,10 @@
 #   when: freeipa_host_group__infra_type == "gcp"
 #   block:
 
-# Get the CDP environment details to find the loginUserName (required to SSH into FreeIPA server)
-- name: Query CDP Environment
-  cloudera.cloud.env_info:
-    name: "{{ freeipa_host_group__env_name }}"
-    descendants: true
-  register: __env_info
-
-- name: Set facts for the login user to the FreeIPA server
-  ansible.builtin.set_fact:
-    __freeipa_server_login_user: "{{ __env_info.environments[0].authentication.loginUserName }}"
-
 # Add the FreeIPA server and username to the inventory
 - name: Add FreeIPA servers to inventory
   ansible.builtin.add_host:
     name: "{{ item }}" 
     groups: "{{ freeipa_host_group__host_group_name }}" 
-    ansible_user: "{{ __freeipa_server_login_user }}"
   loop: "{{ __freeipa_server_public_ip }}"
 

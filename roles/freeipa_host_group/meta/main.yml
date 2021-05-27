@@ -15,7 +15,7 @@
 galaxy_info:
   author: Jim Enright (jenright@cloudera.com)
   description: >
-    Creation of FreeIPA host group and retrieving the login user name for these hosts.
+    Creation of FreeIPA host group.
   company: Cloudera
   license: Apache-2.0
 
