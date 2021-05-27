@@ -63,22 +63,11 @@
   ansible.builtin.set_fact:
     __freeipa_server_login_user: "{{ __env_info.environments[0].authentication.loginUserName }}"
 
-# Find the workload username (required for any calls to the freeipa.ansible_freeipa module)
-- name: Query CDP Caller
-  cloudera.cloud.iam_user_info:
-    current_user: yes
-  register: __cdp_iam_current_user_info
-
-- name: Set facts for CDP Caller Workload Username
-  ansible.builtin.set_fact:
-    __cdp_workload_username: "{{ __cdp_iam_current_user_info.users[0].workloadUsername }}"
-
 # Add the FreeIPA server and username to the inventory
 - name: Add FreeIPA servers to inventory
   ansible.builtin.add_host:
     name: "{{ item }}" 
     groups: "{{ freeipa_host_group__host_group_name }}" 
     ansible_user: "{{ __freeipa_server_login_user }}"
-    cdp_workload_user: "{{ __cdp_workload_username }}"
   loop: "{{ __freeipa_server_public_ip }}"
 
