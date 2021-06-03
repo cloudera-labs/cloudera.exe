@@ -91,6 +91,7 @@ infra__aws_vpc_az_count:            "{{ infra.aws.vpc.az_count | default(3) }}"
 infra__aws_igw_name:                "{{ infra.aws.vpc.internet_gateway.name | default([infra__namespace, infra__aws_igw_suffix] | join('-')) }}"
 infra__aws_igw_suffix:              "{{ infra.aws.vpc.internet_gateway.suffix | default(common__igw_suffix) }}"
 infra__aws_route_table_name:        "{{ infra.aws.vpc.labels.route_table | default([infra__namespace, infra__aws_route_table_suffix] | join('-')) }}"
+infra__aws_priv_route_table_name:   "{{ infra.aws.vpc.labels.route_table | default([infra__namespace, 'priv', infra__aws_route_table_suffix] | join('-')) }}"
 infra__aws_route_table_suffix:      "{{ infra.aws.vpc.route_table.suffix | default(common__route_table_suffix) }}"
 
 # GCP

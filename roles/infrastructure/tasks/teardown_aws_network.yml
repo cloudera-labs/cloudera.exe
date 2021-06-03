@@ -29,6 +29,36 @@
         - "{{ infra__security_group_knox_name }}"
         - "{{ infra__security_group_default_name }}"
 
+    - name: List the Route Tables for the VPC
+      community.aws.ec2_vpc_route_table_info:
+        region: "{{ infra__region }}"
+        filters:
+          vpc-id: "{{ infra__aws_vpc_id }}"
+      register: __aws_route_table_list
+
+    - name: delete route table
+      community.aws.ec2_vpc_route_table:
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        region: "{{ infra__region }}"
+        route_table_id: "{{ __aws_route_table_list.route_tables[1].route_table_id }}"
+        lookup: id
+        state: absent
+
+    - name: List all managed nat gateways
+      community.aws.ec2_vpc_nat_gateway_info:
+        region: "{{ infra__region }}"
+      register: all_ngws
+
+    - name: Delete nat gateway using discovered nat gateways from facts module.
+      community.aws.ec2_vpc_nat_gateway:
+        state: absent
+        region: "{{ infra__region }}"
+        wait: true
+        nat_gateway_id: "{{ item.nat_gateway_id }}"
+        release_eip: true
+      register: delete_nat_gateway_result
+      loop: "{{ all_ngws.result }}"
+
     - name: Remove VPC subnets
       amazon.aws.ec2_vpc_subnet:
         region: "{{ infra__region }}"

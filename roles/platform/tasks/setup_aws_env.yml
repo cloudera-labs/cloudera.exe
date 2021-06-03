@@ -31,3 +31,4 @@
     subnet_ids: "{{ plat__aws_subnet_ids }}"
     s3_guard_name: "{{ plat__aws_dynamodb_table_name }}"
     tags: "{{ plat__tags }}"
+    tunnel: true
