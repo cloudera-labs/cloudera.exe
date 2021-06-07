@@ -93,6 +93,8 @@ infra__aws_igw_suffix:              "{{ infra.aws.vpc.internet_gateway.suffix | 
 infra__aws_route_table_name:        "{{ infra.aws.vpc.labels.route_table | default([infra__namespace, infra__aws_route_table_suffix] | join('-')) }}"
 infra__aws_priv_route_table_name:   "{{ infra.aws.vpc.labels.route_table | default([infra__namespace, 'priv', infra__aws_route_table_suffix] | join('-')) }}"
 infra__aws_route_table_suffix:      "{{ infra.aws.vpc.route_table.suffix | default(common__route_table_suffix) }}"
+infra__aws_ngw_name:                "{{ infra.aws.vpc.nat_gateway.name | default([infra__namespace, infra__aws_ngw_suffix] | join('-')) }}"
+infra__aws_ngw_suffix:              "{{ infra.aws.vpc.nat_gateway.suffix | default(common__ngw_suffix) }}"
 
 # GCP
 infra__gcp_project:                 "{{ common__gcp_project }}"
