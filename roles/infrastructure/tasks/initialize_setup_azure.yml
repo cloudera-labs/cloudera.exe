@@ -19,6 +19,7 @@
     infra__azure_security_group_rules:
       - name: 'AllowCallerAccess'
         protocol: Tcp
+        # TODO Add back in infra__vpc_user_cidr as an union of source addresses
         source_address_prefix:
           - "{{ ipify_public_ip }}/32"
         destination_port_range: "{{ infra__vpc_user_ports }}"
@@ -40,15 +41,15 @@
         direction: Inbound
 
 - name: Add User and Extra security group rules for Azure
-  when: (infra__vpc_extra_cidr | length > 0) or (infra__vpc_user_cidr | length > 0)
+  when: infra__vpc_extra_cidr | length > 0
   ansible.builtin.set_fact:
     infra__azure_security_group_rules: "{{ infra__azure_security_group_rules | union(rule) }}"
   vars:
     rule:
       - name: 'AllowExtraAccess'
         protocol: Tcp
-        source_address_prefix: "{{ infra__vpc_extra_cidr | union(infra__vpc_user_cidr) }}"
-        destination_port_range: "{{ infra__vpc_extra_ports | union(infra__vpc_user_ports) }}"
+        source_address_prefix: "{{ infra__vpc_extra_cidr }}"
+        destination_port_range: "{{ infra__vpc_extra_ports }}"
         access: Allow
         priority: 201
         direction: Inbound
