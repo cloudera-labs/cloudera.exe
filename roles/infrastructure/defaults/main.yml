@@ -28,7 +28,7 @@ infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
 
 # Infra
 infra__type:                        "{{ common__infra_type }}"
-infra__network_type:                "{{ common__env_network_type }}"
+infra__tunnel:                      "{{ common__tunnel }}"
 
 # Dynamic Inventory for Clusters
 infra__private_key_file:                 "{{ globals.ssh.private_key_file | default('') }}"

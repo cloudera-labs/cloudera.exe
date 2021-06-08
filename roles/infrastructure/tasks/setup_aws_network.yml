@@ -85,12 +85,12 @@
     __aws_route_table_id: "{{ __aws_route_table_list.route_tables[0].associations[0].route_table_id }}"
 
 - name: Set the fact for Subnet Ids
-  when: infra__network_type == 'public'
+  when: not infra__tunnel
   ansible.builtin.set_fact:
     infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
 
 - name: Setup for private networking
-  when: infra__network_type == 'private'
+  when: infra__tunnel
   block:
     - name: Create AWS VPC Private Subnets
       amazon.aws.ec2_vpc_subnet:

@@ -31,8 +31,6 @@ plat__vpc_public_subnets_suffix:              "{{ common__vpc_public_subnets_suf
 plat__cdp_iam_role_suffix:                    "{{ plat__cdp_iam_identities.role_suffix }}"
 plat__cdp_iam_resource_suffix:                "{{ plat__cdp_iam_identities.resource_role_suffix }}"
 
-plat__enable_tunnel:                          "{{ common__env_network_type != 'public' }}"
-
 # Infra
 plat__tags:                                   "{{ common__tags }}"
 plat__env_name:                               "{{ common__env_name }}"
@@ -63,7 +61,7 @@ plat__teardown_deletes_user_group:            "{{ env.teardown.delete_user_group
 plat__xacccount_credential_name:              "{{ common__xaccount_credential_name }}"
 
 plat__workload_analytics:                     "{{ env.workload_analytics | default(True) }}"
-plat__tunnel:                                 "{{ env.tunnel | default(True) }}"
+plat__tunnel:                                 "{{ common__tunnel }}"
 
 plat__env_admin_password:                     "{{ common__env_admin_password }}"
 

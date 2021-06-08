@@ -30,7 +30,7 @@
         - "{{ infra__security_group_default_name }}"
 
     - name: Remove the private networking setup
-      when: infra__network_type == 'private'
+      when: infra__tunnel
       block:
         - name: Delete the private route tables
           community.aws.ec2_vpc_route_table:
@@ -48,7 +48,7 @@
             region: "{{ infra__region }}"
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
-          register: all_ngws
+          register: __all_ngws
 
         - name: Delete nat gateway using discovered nat gateways from facts module.
           community.aws.ec2_vpc_nat_gateway:
@@ -57,8 +57,7 @@
             wait: true
             nat_gateway_id: "{{ item.nat_gateway_id }}"
             release_eip: true
-          register: delete_nat_gateway_result
-          loop: "{{ all_ngws.result }}"
+          loop: "{{ __all_ngws.result }}"
 
     - name: Remove VPC subnets
       amazon.aws.ec2_vpc_subnet:

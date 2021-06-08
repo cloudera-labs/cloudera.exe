@@ -52,7 +52,6 @@ common__admin_suffix:                     "{{ globals.labels.admin | default('ad
 common__user_suffix:                      "{{ globals.labels.user | default('user') }}"
 common__ngw_suffix:                       "{{ globals.labels.nat_gateway | default('ngw') }}"
 
-common__env_network_type:                 "{{ globals.env_network_type | default('public') }}"
 common__unique_storage_name_suffix:       "{{ globals.storage.name | default((common__region + common__aws_profile) if 'aws' in common__infra_type else common__region) }}"
 
 # Infra
@@ -123,6 +122,7 @@ common__env_name_suffix:                  "{{ env.suffix | default(common__env_s
 
 common__datalake_name:                    "{{ env.datalake.name | default([common__namespace_cdp, common__datalake_name_suffix] | join('-')) }}"
 common__datalake_name_suffix:             "{{ env.datalake.suffix | default(common__datalake_suffix) }}"
+common__tunnel:                           "{{ env.tunnel | default(False) }}"
 
 common__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
 # Deploy
