@@ -52,6 +52,7 @@ common__admin_suffix:                     "{{ globals.labels.admin | default('ad
 common__user_suffix:                      "{{ globals.labels.user | default('user') }}"
 common__ngw_suffix:                       "{{ globals.labels.nat_gateway | default('ngw') }}"
 
+common__env_network_type:                 "{{ globals.env_network_type | default('public') }}"
 common__unique_storage_name_suffix:       "{{ globals.storage.name | default((common__region + common__aws_profile) if 'aws' in common__infra_type else common__region) }}"
 
 # Infra

@@ -31,6 +31,8 @@ plat__vpc_public_subnets_suffix:              "{{ common__vpc_public_subnets_suf
 plat__cdp_iam_role_suffix:                    "{{ plat__cdp_iam_identities.role_suffix }}"
 plat__cdp_iam_resource_suffix:                "{{ plat__cdp_iam_identities.resource_role_suffix }}"
 
+plat__enable_tunnel:                          "{{ common__env_network_type != 'public' }}"
+
 # Infra
 plat__tags:                                   "{{ common__tags }}"
 plat__env_name:                               "{{ common__env_name }}"

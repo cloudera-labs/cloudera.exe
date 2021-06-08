@@ -183,6 +183,7 @@ globals:
       count:
   gcloud_credential_file:
   infra_type:
+  env_network_type:
   labels:
     admin:
     app:
