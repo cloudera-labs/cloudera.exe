@@ -36,17 +36,22 @@
           vpc-id: "{{ infra__aws_vpc_id }}"
       register: __aws_route_table_list
 
-    - name: delete route table
+    - name: Delete the route tables
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
-        route_table_id: "{{ __aws_route_table_list.route_tables[1].route_table_id }}"
-        lookup: id
+        lookup: tag
+        tags: "{{ { 'Name': '-'.join([infra__aws_priv_route_table_name, __aws_private_subnet_id_index | string])} }}"
         state: absent
+      loop_control:
+        index_var: __aws_private_subnet_id_index
+      loop: "{{ infra__vpc_private_subnet_cidrs }}"
 
     - name: List all managed nat gateways
       community.aws.ec2_vpc_nat_gateway_info:
         region: "{{ infra__region }}"
+        filters:
+          vpc-id: "{{ infra__aws_vpc_id }}"
       register: all_ngws
 
     - name: Delete nat gateway using discovered nat gateways from facts module.
