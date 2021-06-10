@@ -94,23 +94,34 @@
       ansible.builtin.set_fact:
         run__datahub_available_templates: "{{ __datahub_template_info.templates | selectattr('productVersion', 'search', run__cdp_datalake_version) | map(attribute='clusterTemplateName') | list }}"
 
+    - name: Retrieve available CDP Datahub definitions
+      cloudera.cloud.datahub_definition_info:
+      register: __datahub_definition_info
+
+    - name: Set fact for available CDP Datahub definitions by Datalake version
+      ansible.builtin.set_fact:
+        run__datahub_available_definitions: "{{ __datahub_definition_info.definitions | selectattr('productVersion', 'search', run__cdp_datalake_version) | map(attribute='clusterDefinitionName') | list }}"
+
     - name: Construct CDP Datahub configurations
       ansible.builtin.set_fact:
         run__datahub_configs: "{{ run__datahub_configs | default([]) | union([config]) }}"
       vars:
         include: "{{ lookup('template', __datahub_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
-        overlay: "{{ __datahub_config.instance_groups | default(include.instance_groups) | mandatory }}"
+        overlay: "{{ __datahub_config.instance_groups | default(include.instance_groups | default([]) ) }}"
         base: "{{ run__datahub_instance_group_base }}"
         config:
           name: "{{ __datahub_config.name | default([run__namespace, __datahub_config.suffix | default(include.suffix) | default(run__datahub_suffix)] | join('-')) }}"
-          template: "{{ __datahub_config.template | default(include.template) | mandatory }}"
-          instance_groups: "{{ overlay | map('cloudera.exe.combine_onto', base, recursive=True) | list }}"
+          template: "{{ __datahub_config.template | default(include.template | default(omit) ) }}"
+          definition: "{{ __datahub_config.definition | default(include.definition | default(omit) ) }}"
+          instance_groups: "{{ (overlay | length > 0) | ternary(overlay | map('cloudera.exe.combine_onto', base, recursive=True) | list, omit) }}"
           tags: "{{ __datahub_config.tags | default(run__datahub_tags) }}"
       loop: "{{ run__datahub_definitions }}"
       loop_control:
         loop_var: __datahub_config
         label: "{{ config.name }}"
-      failed_when: run__datahub_available_templates | select('search', config.template) | list | length < 1
+      failed_when:
+        - "'template' in __datahub_config or 'template' in include"
+        - run__datahub_available_templates | select('search', config.template) | list | length < 1
 
     - name: Check CDP Datahub names
       ansible.builtin.assert:

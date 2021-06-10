@@ -23,8 +23,9 @@
     subnet: "{{ run__datahub_subnet_ids | first }}"
     image: "{{ run__datahub_image_catalog_entry.uuid }}"
     catalog: "{{ run__datahub_image_catalog_name }}"
-    template: "{{ run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template) | list | first }}"
-    groups: "{{ __datahub_config_item.instance_groups }}"
+    template: "{{ ('template' in __datahub_config_item) | ternary(run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template | default(omit)) | list | first, omit, omit) }}"
+    definition: "{{ ('definition' in __datahub_config_item) |  ternary(run__datahub_available_definitions | select('ansible.builtin.search', __datahub_config_item.definition | default(omit)) | list | first, omit, omit) }}"
+    groups: "{{ __datahub_config_item.instance_groups | default(omit) }}"
     tags: "{{ __datahub_config_item.tags }}"
     wait: yes
   loop_control:
