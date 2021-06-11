@@ -46,7 +46,7 @@
     vpc_id: "{{ infra__aws_vpc_id }}"
     cidr: "{{ __aws_subnet_cidr_item }}"
     state: present
-    tags: "{{ infra__tags | combine({ 'Name': infra__namespace }, recursive=True) }}"
+    tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__namespace, 'pub', __aws_subnet_index | string]) }, recursive=True) }}"
     map_public: yes
     az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
   loop_control:
@@ -98,7 +98,7 @@
         vpc_id: "{{ infra__aws_vpc_id }}"
         cidr: "{{ __aws_subnet_cidr_item }}"
         state: present
-        tags: "{{ infra__tags | combine({ 'Name': infra__namespace }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__namespace, 'priv', __aws_subnet_index | string]) }, recursive=True) }}"
         map_public: no
         az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
       loop_control:
