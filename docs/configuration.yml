@@ -17,8 +17,8 @@ datahub:
 de:
 df:
   suffix:
-  nodes_min:
-  nodes_max:
+  min_k8s_nodes:
+  max_k8s_nodes:
   public_loadbalancer:
   ip_ranges:
   teardown:

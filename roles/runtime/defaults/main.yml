@@ -55,7 +55,7 @@ run__dw_definitions:                "{{ dw.definitions | default([{}]) }}"
 run__dw_suffix:                     "{{ dw.suffix | default('dw') }}"
 
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
-run__df_nodes_max:                  "{{ df.min_k8s_nodes | default(5) }}"
+run__df_nodes_max:                  "{{ df.max_k8s_nodes | default(5) }}"
 run__df_public_loadbalancer:        "{{ df.public_loadbalancer | default(True) }}"
 run__df_ip_ranges:                  "{{ df.ip_ranges | default([]) }}"
 run__df_persist:                    "{{ df.teardown.persist | default(False) }}"
