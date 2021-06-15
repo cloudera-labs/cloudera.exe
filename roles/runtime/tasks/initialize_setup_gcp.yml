@@ -46,6 +46,6 @@
     - __gcp_subnets_discovered is defined
     - __gcp_subnets_discovered.resources is defined
     - __gcp_subnets_discovered.resources | length > 0
-    - __gcp_subnet_item.selfLink in run__gcp_vpc_discovered.subnetworks
+    #- __gcp_subnet_item.selfLink in run__gcp_vpc_discovered.subnetworks
   ansible.builtin.set_fact:
     run__datahub_subnet_ids: "{{ __gcp_subnets_discovered | json_query('resources[*].name') }}"
