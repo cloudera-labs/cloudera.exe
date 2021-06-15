@@ -170,6 +170,7 @@ env:
     delete_roles:
     delete_user_group:
   tunnel:
+  public_endpoint_access:
   workload_analytics:
 globals:
   admin_password:

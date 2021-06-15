@@ -92,6 +92,12 @@
   ansible.builtin.set_fact:
     plat__aws_subnet_ids: "{{ infra__aws_subnet_ids }}"
 
+- name: Set public subnets for public endpoint access
+  when: plat__public_endpoint_access
+  ansible.builtin.set_fact:
+    plat__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
+    plat__endpoint_access_scheme: "PUBLIC"
+
 - name: Discover AWS Security Group for Knox
   when: infra__aws_security_group_knox_id is undefined
   block:
