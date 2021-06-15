@@ -127,5 +127,6 @@ common__env_admin_password:                     "{{ globals.admin_password | man
 common__include_ml:                        "{{ ml is defined | bool }}"
 common__include_dw:                        "{{ dw is defined | bool }}"
 common__include_de:                        "{{ de is defined | bool }}"
+common__include_df:                        "{{ df is defined | bool }}"
 common__include_datahub:                   "{{ datahub is defined | bool }}"
 common__include_opdb:                      "{{ opdb is defined | bool }}"
