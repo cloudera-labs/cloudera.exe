@@ -122,9 +122,11 @@ common__env_name_suffix:                  "{{ env.suffix | default(common__env_s
 common__datalake_name:                    "{{ env.datalake.name | default([common__namespace_cdp, common__datalake_name_suffix] | join('-')) }}"
 common__datalake_name_suffix:             "{{ env.datalake.suffix | default(common__datalake_suffix) }}"
 
+common__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
 # Deploy
 common__include_ml:                        "{{ ml is defined | bool }}"
 common__include_dw:                        "{{ dw is defined | bool }}"
 common__include_de:                        "{{ de is defined | bool }}"
+common__include_df:                        "{{ df is defined | bool }}"
 common__include_datahub:                   "{{ datahub is defined | bool }}"
 common__include_opdb:                      "{{ opdb is defined | bool }}"

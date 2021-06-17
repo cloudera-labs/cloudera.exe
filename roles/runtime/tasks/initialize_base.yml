@@ -110,7 +110,7 @@
         overlay: "{{ __datahub_config.instance_groups | default(include.instance_groups | default([]) ) }}"
         base: "{{ run__datahub_instance_group_base }}"
         config:
-          name: "{{ __datahub_config.name | default([run__namespace, __datahub_config.suffix | default(include.suffix) | default(run__datahub_suffix)] | join('-')) }}"
+          name: "{{ __datahub_config.name | default([run__namespace_cdp, __datahub_config.suffix | default(include.suffix) | default(run__datahub_suffix)] | join('-')) }}"
           template: "{{ __datahub_config.template | default(include.template | default(omit) ) }}"
           definition: "{{ __datahub_config.definition | default(include.definition | default(omit) ) }}"
           instance_groups: "{{ (overlay | length > 0) | ternary(overlay | map('cloudera.exe.combine_onto', base, recursive=True) | list, omit) }}"

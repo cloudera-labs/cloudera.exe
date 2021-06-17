@@ -28,12 +28,21 @@
     fail_msg: "Azure authentication parameter, 'infra__public_key_text', is invalid.  Either set this variable or specify 'infra__public_key_file'."
     quiet: yes
 
-- name: Check storage name
+- name: Check Azure Region - {{ common__azure_region }}
+  ansible.builtin.assert:
+    that:
+      - "common__azure_region is match(regex1)"
+    fail_msg: "Azure region value 'common__azure_region' with value '{{ common__azure_region }}' is not valid, it is typically lowercase letters and numbers with no spaces. Consider running 'az account list-locations -o table' in Azure CLI for a current listing."
+    quiet: yes
+  vars:
+    regex1: '^([a-z0-9]+)$'
+
+- name: Check storage name - {{ infra__azure_storage_name }}
   ansible.builtin.assert:
     that: 
       - "infra__azure_storage_name | trim | length < 25"
       - "infra__azure_storage_name is match(regex1)"
-    fail_msg: "Azure storage name parameter, 'infra__azure_storage_name', is invalid. Azure requires lowercase letters and numbers only and 24 characters or less."
+    fail_msg: "Azure storage name parameter, 'infra__azure_storage_name' with value '{{ infra__azure_storage_name }}', is invalid. Azure requires lowercase letters and numbers only and 24 characters or less. Please check your name_prefix and any suffix modifications."
     quiet: yes
   vars:
     regex1: '^([a-z0-9]+)$'

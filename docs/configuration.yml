@@ -15,6 +15,14 @@ datahub:
   suffix:
   tags:
 de:
+df:
+  suffix:
+  min_k8s_nodes:
+  max_k8s_nodes:
+  public_loadbalancer:
+  ip_ranges:
+  teardown:
+    persist:
 dw:
   definitions:
   suffix:
