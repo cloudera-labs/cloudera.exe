@@ -108,14 +108,14 @@
       bucket: "{{ infra__storage_name }}"
       path: "{{ infra__ml_path }}"
     
-- name: Set fact to include DWX data location
+- name: Set fact to include DE data location
   when: infra__de_deploy
   ansible.builtin.set_fact:
     infra__aws_storage_locations: "{{ infra__aws_storage_locations | default([]) | union([storage_location]) }}"
   vars:
     storage_location:
       bucket: "{{ infra__storage_name }}"
-      path: "{{ infra__dwx_path }}"
+      path: "{{ infra__de_path }}"
 
 - name: Set facts for dynamic inventory metadata
   ansible.builtin.set_fact:
