@@ -98,9 +98,9 @@
       cloudera.cloud.datahub_definition_info:
       register: __datahub_definition_info
 
-    - name: Set fact for available CDP Datahub definitions by Datalake version
+    - name: Set fact for available CDP Datahub definitions by Datalake version and Cloud Platform
       ansible.builtin.set_fact:
-        run__datahub_available_definitions: "{{ __datahub_definition_info.definitions | selectattr('productVersion', 'search', run__cdp_datalake_version) | map(attribute='clusterDefinitionName') | list }}"
+        run__datahub_available_definitions: "{{ __datahub_definition_info.definitions | selectattr('productVersion', 'search', run__cdp_datalake_version) | selectattr('cloudPlatform', 'search', run__infra_type.upper()) | map(attribute='clusterDefinitionName') | list }}"
 
     - name: Construct CDP Datahub configurations
       ansible.builtin.set_fact:
