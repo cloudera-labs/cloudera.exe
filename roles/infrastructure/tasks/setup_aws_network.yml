@@ -60,6 +60,7 @@
     infra__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids | default([]) | union([__aws_subnet_item.subnet.id | default('')]) }}"
   loop_control:
     loop_var: __aws_subnet_item
+    label: "{{ __aws_subnet_item.subnet.id }}"
   loop: "{{ __aws_public_subnets.results }}"
 
 - name: List the Route Tables for the VPC
@@ -76,7 +77,7 @@
     route_table_id: "{{ __aws_route_table_id }}"
     lookup: id
     state: present
-    tags: "{{ infra__tags | combine({ 'Name': infra__aws_route_table_name }, recursive=True) }}"
+    tags: "{{ infra__tags | combine({ 'Name': infra__aws_public_route_table_name }, recursive=True) }}"
     routes:
       - dest: "0.0.0.0/0"
         gateway_id: "{{ infra__aws_igw_id }}"
@@ -104,6 +105,7 @@
       loop_control:
         loop_var: __aws_private_subnet_item
         index_var: __aws_subnet_index
+        label: "{{ __aws_private_subnet_item.name }}"
       loop: "{{ infra__vpc_private_subnets_info }}"
       register: __aws_private_subnets
 
@@ -112,6 +114,7 @@
         infra__aws_private_subnet_ids: "{{ infra__aws_private_subnet_ids | default([]) | union([__aws_subnet_item.subnet.id | default('')]) }}"
       loop_control:
         loop_var: __aws_subnet_item
+        label: "{{ __aws_subnet_item.subnet.id }}"
       loop: "{{ __aws_private_subnets.results }}"
 
     - name: Set fact for Subnet Ids
@@ -124,7 +127,7 @@
         subnet_id: "{{ __aws_public_subnet_id }}"
         wait: true
         region: "{{ infra__region }}"
-        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_ngw_name, __aws_public_subnet_index | string]) }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_nat_gateway_name, __aws_public_subnet_index | string]) }, recursive=True) }}"
       loop_control:
         loop_var: __aws_public_subnet_id
         index_var: __aws_public_subnet_index
@@ -135,7 +138,7 @@
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
-        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_priv_route_table_name, __aws_private_subnet_id_index | string]) }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_private_route_table_name, __aws_private_subnet_id_index | string]) }, recursive=True) }}"
         subnets: "{{ __aws_private_subnet_id_item }}"
         routes:
         - dest: "0.0.0.0/0"

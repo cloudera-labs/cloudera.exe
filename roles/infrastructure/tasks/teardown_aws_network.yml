@@ -37,7 +37,7 @@
             vpc_id: "{{ infra__aws_vpc_id }}"
             region: "{{ infra__region }}"
             lookup: tag
-            tags: "{{ { 'Name': '-'.join([infra__aws_priv_route_table_name, __aws_private_subnet_id_index | string])} }}"
+            tags: "{{ { 'Name': '-'.join([infra__aws_private_route_table_name, __aws_private_subnet_id_index | string])} }}"
             state: absent
           loop_control:
             index_var: __aws_private_subnet_id_index
@@ -48,7 +48,7 @@
             region: "{{ infra__region }}"
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
-          register: __all_ngws
+          register: __aws_all_ngws
 
         - name: Delete nat gateway using discovered nat gateways from facts module.
           community.aws.ec2_vpc_nat_gateway:
@@ -57,7 +57,9 @@
             wait: true
             nat_gateway_id: "{{ item.nat_gateway_id }}"
             release_eip: true
-          loop: "{{ __all_ngws.result }}"
+          loop_control:
+            label: "{{ item.nat_gateway_id }}"
+          loop: "{{ __aws_all_ngws.result }}"
 
     - name: Remove VPC subnets
       amazon.aws.ec2_vpc_subnet:

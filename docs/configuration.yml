@@ -169,7 +169,10 @@ env:
     delete_policies:
     delete_roles:
     delete_user_group:
+  # Setting tunnel option to true enables CCM gateway which removes the need for the environment hosts to have a public IP address
   tunnel:
+  # Setting public_endpoint_access to true enables public workload endpoint access gateway which lets user access workload from internet
+  # default is false. Needing when tunneling is enabled but dont have the direct connectivity with the VPC.
   public_endpoint_access:
   workload_analytics:
 globals:
@@ -206,7 +209,6 @@ globals:
     public:
     ranger_audit:
     role:
-    route_table:
     service_network:
     storage:
     subnet:
@@ -238,9 +240,10 @@ infra:
         name:
         suffix:
       labels:
-        route_table:
-      route_table:
-        suffix:
+        public_route_table:
+        private_route_table:
+        public_route_table_suffix:
+        private_route_table_suffix:
   azure:
     metagroup:
       name:
