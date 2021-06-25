@@ -90,6 +90,19 @@
         ports: "{{ infra__vpc_extra_ports }}"
         cidr_ip: "{{ infra__vpc_extra_cidr }}"
 
+- name: Prepare AWS Security Group Rules for on-prem based setups.
+  when: infra__tunnel
+  ansible.builtin.set_fact:
+    infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
+  loop_control:
+    loop_var: __onprem_cidr
+  loop: "{{ infra__aws_onprem_cidrs }}"
+  vars:
+    rule:
+      proto: all
+      ports: 0-65535
+      cidr_ip: "{{ __onprem_cidr }}"
+
 - name: Add CDP Public Cloud security group rules for AWS
   when: not infra__tunnel
   ansible.builtin.set_fact:
