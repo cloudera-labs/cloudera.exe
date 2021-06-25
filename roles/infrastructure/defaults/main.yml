@@ -29,6 +29,7 @@ infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
 # Infra
 infra__type:                        "{{ common__infra_type }}"
 infra__tunnel:                      "{{ common__tunnel }}"
+infra__public_endpoint_access:      "{{ common__public_endpoint_access }}"
 
 # Dynamic Inventory for Clusters
 infra__private_key_file:                 "{{ globals.ssh.private_key_file | default('') }}"
@@ -76,6 +77,11 @@ infra__vpc_extra_ports:             "{{ infra.vpc.extra_ports | default([22, 443
 infra__vpc_extra_cidr:              "{{ infra.vpc.extra_cidr | default([]) }}"
 infra__vpc_user_ports:              "{{ infra.vpc.user_ports | default([infra__all_ports_security_rule[infra__type]]) }}"
 infra__vpc_user_cidr:               "{{ infra.vpc.user_cidr | default([]) }}"
+
+infra__aws_vpc_id:                  "{{ infra.aws.vpc.existing.vpcId | default('') }}"
+infra__aws_public_subnet_ids:       "{{ infra.aws.vpc.existing.public_subnet_ids | default([]) }}"
+infra__aws_private_subnet_ids:      "{{ infra.aws.vpc.existing.private_subnet_ids | default([]) }}"
+infra__aws_onprem_cidrs:            "{{ infra.aws.vpc.existing.onprem_cidrs_for_security_groups | default([]) }}"
 
 infra__security_group_knox_name:    "{{ common__security_group_knox_name }}"
 infra__security_group_default_name: "{{ common__security_group_default_name }}"
