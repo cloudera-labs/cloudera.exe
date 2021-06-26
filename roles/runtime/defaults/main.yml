@@ -26,6 +26,8 @@ run__env_name:                      "{{ common__env_name }}"
 run__datalake_name:                 "{{ common__datalake_name }}"
 run__vpc_name:                      "{{ common__vpc_name }}"
 
+run__public_endpoint_access:        "{{ common__public_endpoint_access }}"
+
 run__gcp_project:                   "{{ common__gcp_project }}"
 
 run__datahub_image_catalog_url:     "{{ datahub.image_catalog.url | default('https://cloudbreak-imagecatalog.s3.amazonaws.com/v3-prod-cb-image-catalog.json') }}"
@@ -50,13 +52,14 @@ run__ml_definitions:                "{{ ml.definitions | default([{}]) }}"
 run__ml_suffix:                     "{{ ml.suffix | default('wksp') }}"
 run__ml_k8s_request_base:           "{{ ml.k8s_request_base | default(lookup('template', 'ml_k8s_request_base.j2') | from_yaml) }}"
 run__ml_tags:                       "{{ ml.tags | default(common__tags) }}"
+run__ml_public_loadbalancer:        "{{ ml.public_loadbalancer | default(run__public_endpoint_access) }}"
 
 run__dw_definitions:                "{{ dw.definitions | default([{}]) }}"
 run__dw_suffix:                     "{{ dw.suffix | default('dw') }}"
 
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
 run__df_nodes_max:                  "{{ df.max_k8s_nodes | default(5) }}"
-run__df_public_loadbalancer:        "{{ df.public_loadbalancer | default(True) }}"
+run__df_public_loadbalancer:        "{{ df.public_loadbalancer | default(run__public_endpoint_access) }}"
 run__df_ip_ranges:                  "{{ df.ip_ranges | default([]) }}"
 run__df_persist:                    "{{ df.teardown.persist | default(False) }}"
 

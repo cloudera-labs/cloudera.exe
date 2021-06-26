@@ -20,7 +20,6 @@
     name: "{{ __datahub_config_item.name }}"
     env: "{{ run__env_name }}"
     state: present
-    subnet: "{{ run__datahub_subnet_ids | first }}"
     image: "{{ run__datahub_image_catalog_entry.uuid }}"
     catalog: "{{ run__datahub_image_catalog_name }}"
     template: "{{ ('template' in __datahub_config_item) | ternary(run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template | default(omit)) | list | first, omit, omit) }}"
@@ -50,7 +49,7 @@
     nfs: "{{ __ml_config_item.raw.nfs | default(omit) }}"
     nfs_version: "{{ __ml_config_item.raw.nfs_version | default(omit) }}"
     ip_addresses: "{{ __ml_config_item.raw.ip_addresses | default(omit) }}"
-    public_loadbalancer: "{{ __ml_config_item.raw.public_loadbalancer | default(omit) }}"
+    public_loadbalancer: "{{ __ml_config_item.raw.public_loadbalancer | default(run__public_endpoint_access) | default(omit) }}"
     storage: "{{ __ml_config_item.raw.storage | default(omit) }}"
   loop_control:
     loop_var: __ml_config_item

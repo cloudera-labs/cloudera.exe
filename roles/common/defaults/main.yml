@@ -122,6 +122,7 @@ common__env_name_suffix:                  "{{ env.suffix | default(common__env_s
 common__datalake_name:                    "{{ env.datalake.name | default([common__namespace_cdp, common__datalake_name_suffix] | join('-')) }}"
 common__datalake_name_suffix:             "{{ env.datalake.suffix | default(common__datalake_suffix) }}"
 common__tunnel:                           "{{ env.tunnel | default(False) }}"
+common__public_endpoint_access:           "{{ env.public_endpoint_access | default(not common__tunnel) }}"
 
 common__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
 # Deploy

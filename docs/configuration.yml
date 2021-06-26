@@ -327,6 +327,7 @@ ml:
   k8s_request_base:
   suffix:
   tags:
+  public_loadbalancer:
 opdb:
   definitions:
   suffix:

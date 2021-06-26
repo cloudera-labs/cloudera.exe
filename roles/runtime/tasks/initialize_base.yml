@@ -179,6 +179,7 @@
             tags: "{{ overlay_tags }}"
             network: "{{ overlay_network }}"
           raw: "{{ __ml_config }}"
+          public_loadbalancer: "{{ run__ml_public_loadbalancer }}"
       loop: "{{ run__ml_definitions }}"
       loop_control:
         loop_var: __ml_config

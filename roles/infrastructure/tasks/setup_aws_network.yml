@@ -126,6 +126,7 @@
         state: present
         subnet_id: "{{ __aws_public_subnet_id }}"
         wait: true
+        if_exist_do_not_create: true
         region: "{{ infra__region }}"
         tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_nat_gateway_name, __aws_public_subnet_index | string]) }, recursive=True) }}"
       loop_control:
