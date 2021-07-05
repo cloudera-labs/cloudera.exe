@@ -25,6 +25,10 @@ run__namespace_cdp:                 "{{ common__namespace_cdp }}"
 run__env_name:                      "{{ common__env_name }}"
 run__datalake_name:                 "{{ common__datalake_name }}"
 run__vpc_name:                      "{{ common__vpc_name }}"
+run__vpc_public_subnets_suffix:     "{{ common__vpc_public_subnets_suffix }}"
+run__vpc_private_subnets_suffix:    "{{ common__vpc_private_subnets_suffix }}"
+run__vpc_public_subnets_name:       "{{ [run__namespace, run__vpc_public_subnets_suffix] | join('-') }}*"
+run__vpc_private_subnets_name:      "{{ [run__namespace, run__vpc_private_subnets_suffix] | join('-') }}*"
 
 run__public_endpoint_access:        "{{ common__public_endpoint_access }}"
 

@@ -114,7 +114,6 @@
         infra__aws_private_subnet_ids: "{{ infra__aws_private_subnet_ids | default([]) | union([__aws_subnet_item.subnet.id | default('')]) }}"
       loop_control:
         loop_var: __aws_subnet_item
-        label: "{{ __aws_subnet_item.subnet.id }}"
       loop: "{{ __aws_private_subnets.results }}"
 
     - name: Set fact for Subnet Ids
