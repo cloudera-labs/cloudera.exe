@@ -17,7 +17,50 @@
 - name: Tear down AWS Network
   when: infra__aws_vpc_id | length > 1 and infra__teardown_deletes_network
   block:
-    - name: Remove Security Groups
+    - name: Remove Elastic Load Balancers, if Discovered
+      when:
+        - __infra_ec2_elb_names is defined
+        - __infra_ec2_elb_names | length > 0
+        - infra__force_teardown | bool
+      loop: "{{ __infra_ec2_elb_names }}"
+      loop_control:
+        loop_var: __infra_elb_remove_item
+      amazon.aws.ec2_elb_lb:
+        name: "{{ __infra_elb_remove_item }}"
+        state: absent
+        wait: yes
+      async: 3600 # 1 hour timeout
+      poll: 0
+      register: __elb_teardowns_info
+
+    - name: Wait for ELB teardowns to complete
+      when:
+        - __elb_teardowns_info is defined
+        - __elb_teardowns_info.results is defined
+        - __elb_teardowns_info.results | length > 0
+      ansible.builtin.async_status:
+        jid: "{{ __elb_teardown.ansible_job_id }}"
+      loop_control:
+        loop_var: __elb_teardown
+      loop: "{{ __elb_teardowns_info.results }}"
+      register: __elb_teardowns_async
+      until: __elb_teardowns_async.finished
+      retries: 120
+      delay: 10
+
+    - name: Remove Network Adapters, if exists
+      when:
+        - __infra_vpc_enis is defined
+        - __infra_vpc_enis.network_interfaces | length > 0
+        - infra__force_teardown | bool
+      amazon.aws.ec2_eni:
+        eni_id: "{{ __eni_adapter.id }}"
+        state: absent
+      loop_control:
+        loop_var: __eni_adapter
+      loop: "{{ __infra_vpc_enis.network_interfaces }}"
+
+    - name: Remove Expected Security Groups
       amazon.aws.ec2_group:
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
@@ -28,6 +71,39 @@
       loop:
         - "{{ infra__security_group_knox_name }}"
         - "{{ infra__security_group_default_name }}"
+
+    - name: Handle Security Groups during Purge
+      when:
+        - __infra_aws_sgs is defined
+        - __infra_aws_sgs.security_groups | length > 0
+        - infra__force_teardown | bool
+      block:
+        - name: Clean Security Group rules during Purge
+          when: __security_group_rule_item.group_name != 'default'
+          amazon.aws.ec2_group:
+            region: "{{ infra__region }}"
+            vpc_id: "{{ infra__aws_vpc_id }}"
+            name: "{{ __security_group_rule_item.group_name }}"
+            description: "{{ __security_group_rule_item.description }}"
+            state: present
+            rules: []
+            rules_egress: []
+          loop_control:
+            loop_var: __security_group_rule_item
+            label: "{{ __security_group_rule_item.group_name }}"
+          loop: "{{ __infra_aws_sgs.security_groups }}"
+
+        - name: Remove Security groups during Purge
+          when: __security_group_purge_item.group_name != 'default'
+          amazon.aws.ec2_group:
+            region: "{{ infra__region }}"
+            vpc_id: "{{ infra__aws_vpc_id }}"
+            name: "{{ __security_group_purge_item.group_name }}"
+            state: absent
+          loop_control:
+            loop_var: __security_group_purge_item
+            label: "{{ __security_group_purge_item.group_name }}"
+          loop: "{{ __infra_aws_sgs.security_groups }}"
 
     - name: Remove the private networking setup
       when: infra__tunnel
@@ -70,6 +146,24 @@
           failed_when: item.rc is defined and item.rc != 1 and ('InvalidAllocationID.NotFound' in item.module_stderr)
           loop: "{{ __aws_ngw_teardown.results }}"
 
+    - name: Remove any NAT Gateways Discovered during Purge
+      register: __infra_aws_nat_remove_result
+      when:
+        - __infra_aws_nat_gateways is defined
+        - __infra_aws_nat_gateways.result | length > 0
+        - infra__force_teardown | bool
+      community.aws.ec2_vpc_nat_gateway:
+        state: absent
+        region: "{{ infra__region }}"
+        wait: true
+        nat_gateway_id: "{{ __infra_nat_gateway_remove_item.nat_gateway_id }}"
+        release_eip: true
+      loop_control:
+        label: "{{ __infra_nat_gateway_remove_item.nat_gateway_id }}"
+        loop_var: __infra_nat_gateway_remove_item
+      loop: "{{ __infra_aws_nat_gateways.result }}"
+      failed_when: __infra_aws_nat_remove_result.rc != 0 and 'InvalidAllocationID.NotFound' not in __infra_aws_nat_remove_result.module_stderr
+
     - name: Remove VPC subnets
       amazon.aws.ec2_vpc_subnet:
         region: "{{ infra__region }}"
@@ -88,6 +182,23 @@
         state: absent
         tags:
           Name: "{{ infra__aws_igw_name }}"
+
+    - name: Remove Route Tables
+      when:
+        - __infra_aws_rtbs is defined
+        - __infra_aws_rtbs.route_tables | length > 0
+        - infra__force_teardown | bool
+        - __infra_aws_rtb_item.associations | selectattr('main', 'equalto', True) | length == 0
+      loop: "{{ __infra_aws_rtbs.route_tables }}"
+      loop_control:
+        loop_var: __infra_aws_rtb_item
+        label: "{{ __infra_aws_rtb_item.id }}"
+      community.aws.ec2_vpc_route_table:
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        region: "{{ infra__region }}"
+        route_table_id: "{{ __infra_aws_rtb_item.id }}"
+        lookup: id
+        state: absent
 
     - name: Remove VPC, if exists
       amazon.aws.ec2_vpc_net:

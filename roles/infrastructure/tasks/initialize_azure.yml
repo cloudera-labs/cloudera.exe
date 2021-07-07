@@ -51,10 +51,10 @@
 
 - name: Set Azure Caller Information
   ansible.builtin.set_fact:
-    infra__azure_subscription_id: "{{ __azure_account_info.stdout | from_json | json_query('id') }}"
-    infra__azure_subscription_name: "{{ __azure_account_info.stdout | from_json | json_query('name') }}"
-    infra__azure_tenant_id: "{{ __azure_account_info.stdout | from_json | json_query('tenantId') }}"
-    infra__azure_calling_user: "{{ __azure_account_info.stdout | from_json | json_query('user.name') }}"
+    infra__azure_subscription_id: "{{ __azure_account_info.stdout | from_json | community.general.json_query('id') }}"
+    infra__azure_subscription_name: "{{ __azure_account_info.stdout | from_json | community.general.json_query('name') }}"
+    infra__azure_tenant_id: "{{ __azure_account_info.stdout | from_json | community.general.json_query('tenantId') }}"
+    infra__azure_calling_user: "{{ __azure_account_info.stdout | from_json | community.general.json_query('user.name') }}"
 
 - name: Print Azure Account Info
   ansible.builtin.debug:

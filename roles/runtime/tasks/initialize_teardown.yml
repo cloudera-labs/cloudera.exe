@@ -14,5 +14,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Refresh Environment Info with Descendants
+  cloudera.cloud.env_info:
+    name: "{{ run__env_name }}"
+    descendants: true
+  register: run__env_info
+
 - name: Initialize Runtime teardown
+  when: not run__force_teardown
   ansible.builtin.include_tasks: "initialize_base.yml"
+
+- name: Initialize Purge of all Runtimes in Environment
+  when:
+    - run__force_teardown | bool
+    - run__env_info.environments | length > 0
+  block:
+    - name: Prepare teardown list of all Datahubs in Environment
+      ansible.builtin.set_fact:
+        run__datahub_configs: "{{ run__datahub_configs | default([]) | union([config]) }}"
+      vars:
+        config:
+          name: "{{ __datahub_config.clusterName }}"
+      loop: "{{ run__env_info.environments[0].descendants.datahub }}"
+      loop_control:
+        loop_var: __datahub_config
+        label: "{{ __datahub_config.clusterName }}"
+
+    - name: Prepare teardown list of all OpDB Experiences in Environment
+      ansible.builtin.set_fact:
+        run__opdb_configs: "{{ run__opdb_configs | default([]) | union([config]) }}"
+      vars:
+        config:
+          name: "{{ __opdb_config.databaseName }}"
+          env: "{{ __opdb_config.environmentName }}"
+      loop: "{{ run__env_info.environments[0].descendants.opdb }}"
+      loop_control:
+        loop_var: __opdb_config
+        label: "{{ __opdb_config.databaseName }}"
+
+    - name: Prepare teardown list of all ML Experiences in Environment
+      ansible.builtin.set_fact:
+        run__ml_configs: "{{ run__ml_configs | default([]) | union([config]) }}"
+      vars:
+        config:
+          name: "{{ __ml_config.instanceName }}"
+          env: "{{ __ml_config.environmentName }}"
+      loop: "{{ run__env_info.environments[0].descendants.ml }}"
+      loop_control:
+        loop_var: __ml_config
+        label: "{{ __ml_config.instanceName }}"

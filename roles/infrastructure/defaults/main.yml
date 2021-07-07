@@ -129,3 +129,7 @@ infra__cdp_control_plane_cidr:      "{{ env.cdp.control_plane.cidr | default(inf
 # Utility Service for Download Mirror
 infra__create_utility_service:      "{{ globals.create_utility_service | default('no') | bool }}"
 infra__utlity_bucket_name:          "{{ globals.utility_bucket_name | default('') }}"
+
+# Teardown
+infra__force_teardown:              "{{ common__force_teardown }}"
+infra__env_name:                    "{{ common__env_name }}"  # Used for purge lookups

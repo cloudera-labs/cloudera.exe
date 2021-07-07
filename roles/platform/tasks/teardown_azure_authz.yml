@@ -46,7 +46,7 @@
   delay: 5
   retries: 10
   until:
-    - plat__azure_idbroker_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
-    - plat__azure_datalakeadmin_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
-    - plat__azure_log_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
-    - plat__azure_ranger_audit_identity_name not in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_idbroker_identity_name not in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    - plat__azure_datalakeadmin_identity_name not in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    - plat__azure_log_identity_name not in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    - plat__azure_ranger_audit_identity_name not in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )

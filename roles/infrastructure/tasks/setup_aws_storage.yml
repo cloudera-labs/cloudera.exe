@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Warn user about HeadBucket Forbidden errors
+  debug:
+    msg: >
+    "If the 'Create AWS Buckets' task below fails with HeadBucket Forbidden errors,
+    your bucket name is in use in another AWS account and you should use a different name_prefix"
+
 - name: Create AWS Buckets
   amazon.aws.aws_s3:
     region: "{{ infra__region }}"

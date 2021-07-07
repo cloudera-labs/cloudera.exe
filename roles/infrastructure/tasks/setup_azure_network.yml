@@ -48,8 +48,8 @@
 
 - name: Set fact for Azure Security Group IDs
   ansible.builtin.set_fact:
-    infra__azure_security_group_knox_uri: "{{ __azure_security_group_info | json_query(knox) | first }}"
-    infra__azure_security_group_default_uri: "{{ __azure_security_group_info | json_query(default) | first }}"
+    infra__azure_security_group_knox_uri: "{{ __azure_security_group_info | community.general.json_query(knox) | first }}"
+    infra__azure_security_group_default_uri: "{{ __azure_security_group_info | community.general.json_query(default) | first }}"
   vars:
     knox: "results[?__azure_network_security_group_name_item=='{{ infra__security_group_knox_name }}'].state.id"
     default: "results[?__azure_network_security_group_name_item=='{{ infra__security_group_default_name }}'].state.id"
