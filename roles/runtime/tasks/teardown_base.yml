@@ -67,6 +67,33 @@
   poll: 0
   register: __ml_teardowns_info
 
+- name: Execute CDP DE Workspace teardown
+  when: run__include_de
+  cloudera.cloud.de:
+    name: "{{ __de_config_item.name }}"
+    env: "{{ run__env_name }}"
+    state: absent
+  loop_control:
+    loop_var: __de_config_item
+    label: "{{ __de_config_item.name | default('ml') }}"
+  loop: "{{ run__de_configs }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __de_teardowns_info
+
+- name: Wait for CDP DE Workspace deployments to decommission
+  when: run__include_de
+  ansible.builtin.async_status:
+    jid: "{{ __de_teardown.ansible_job_id }}"
+  loop_control:
+    loop_var: __de_teardown
+    label: "{{ __de_teardown.__ml_config_item.name | default('ml') }}"
+  loop: "{{ __de_teardowns_info.results }}"
+  register: __de_teardowns_async
+  until: __de_teardowns_async.finished
+  retries: 120
+  delay: 30
+
 - name: Wait for CDP ML Workspace deployments to decommission
   when: run__include_ml
   ansible.builtin.async_status:

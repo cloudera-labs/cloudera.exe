@@ -54,6 +54,13 @@ run__ml_tags:                       "{{ ml.tags | default(common__tags) }}"
 run__dw_definitions:                "{{ dw.definitions | default([{}]) }}"
 run__dw_suffix:                     "{{ dw.suffix | default('dw') }}"
 
+run__de_definitions:                "{{ de.definitions | default([{}]) }}"
+run__de_suffix:                     "{{ de.suffix | default('de') }}"
+run__de_k8s_request_base:           "{{ ml.k8s_request_base | default(lookup('template', 'de_k8s_request_base.j2') | from_yaml) }}"
+run__de_tags:                       "{{ ml.tags | default(common__tags) }}"
+
+
+
 # Deploy
 run__include_ml:                     "{{ common__include_ml }}"
 run__include_dw:                     "{{ common__include_dw }}"
