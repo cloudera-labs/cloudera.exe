@@ -16,9 +16,10 @@
 
 - name: Warn user about HeadBucket Forbidden errors
   debug:
-    msg: >
-    "If the 'Create AWS Buckets' task below fails with HeadBucket Forbidden errors,
-    your bucket name is in use in another AWS account and you should use a different name_prefix"
+    msg:
+      - "If the 'Create AWS Buckets' task below fails. "
+      - "If you see HeadBucket Forbidden errors. "
+      - "Your bucket name is probably use in another AWS account and you should use a different name_prefix"
 
 - name: Create AWS Buckets
   amazon.aws.aws_s3:

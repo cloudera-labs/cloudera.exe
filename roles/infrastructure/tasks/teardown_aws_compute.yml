@@ -26,7 +26,6 @@
   loop_control:
     loop_var: __infra_asg_remove_item
 
-# TODO: Make async
 - name: Handle EKS Cluster removal if discovered
   when:
     - infra__force_teardown | bool
@@ -39,6 +38,24 @@
   loop: "{{ __infra_vpc_eks_cluster_names }}"
   loop_control:
     loop_var: __infra_eks_remove_item
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __eks_teardowns_info
+
+- name: Wait for EKS teardowns to complete
+  when:
+    - __eks_teardowns_info is defined
+    - __eks_teardowns_info.results is defined
+    - __eks_teardowns_info.results | length > 0
+  ansible.builtin.async_status:
+    jid: "{{ __eks_teardown.ansible_job_id }}"
+  loop_control:
+    loop_var: __eks_teardown
+  loop: "{{ __eks_teardowns_info.results }}"
+  register: __eks_teardowns_async
+  until: __eks_teardowns_async.finished
+  retries: 120
+  delay: 10
 
 - name: Handle Compute Removal if Discovered
   when: infra__discovered_compute_inventory | count > 0
