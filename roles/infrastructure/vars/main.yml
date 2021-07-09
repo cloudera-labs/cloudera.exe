@@ -31,6 +31,13 @@ infra__dynamic_inventory_images_default:
     centos7:
       search: 'CentOS Linux 7 x86_64 HVM EBS*'
       user: 'centos'
+      owners:
+        - 'aws-marketplace'
+    centos8:
+      search: 'CentOS 8.2*x86*'
+      user: 'centos'
+      owners:
+        - '125523088429'
 
 infra__all_ports_security_rule:
   aws: -1
