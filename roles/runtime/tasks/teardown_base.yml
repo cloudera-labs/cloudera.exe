@@ -38,7 +38,7 @@
   loop_control:
     loop_var: __opdb_config
     label: "{{ __opdb_config.name | default('opdb') }}"
-  loop: "{{ run__opdb_definitions }}"
+  loop: "{{ run__opdb_configs }}"
   async: 3600 # 1 hour timeout
   poll: 0
   register: __opdb_teardowns_info
