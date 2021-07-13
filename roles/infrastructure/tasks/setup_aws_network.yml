@@ -83,7 +83,8 @@
         gateway_id: "{{ infra__aws_igw_id }}"
     subnets: "{{ infra__aws_public_subnet_ids }}"
   vars:
-    __aws_route_table_id: "{{ __aws_route_table_list.route_tables[0].associations[0].route_table_id }}"
+    __aws_route_table_id: "{{ __aws_route_table_list.route_tables | json_query(__aws_rtb_jq) | flatten | first }}"
+    __aws_rtb_jq: "[*].associations[?main == `true` ].route_table_id"
 
 - name: Set the fact for Subnet Ids
   when: not infra__tunnel
