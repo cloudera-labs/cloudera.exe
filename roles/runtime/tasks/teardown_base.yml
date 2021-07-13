@@ -54,7 +54,9 @@
   register: __dw_teardowns_info
 
 - name: Execute CDP Dataflow teardown
-  when: run__include_df
+  when:
+    - run__include_df
+    - run__cdp_env_crn | length > 0
   cloudera.cloud.df:
     name: "{{ run__env_name }}"
     persist: "{{ run__df_persist }}"
@@ -131,7 +133,9 @@
   delay: 30
 
 - name: Wait for CDP Dataflow deployment to decommission
-  when: run__include_df
+  when:
+    - run__include_df
+    - run__cdp_env_crn | length > 0
   ansible.builtin.async_status:
     jid: "{{ __df_teardown_info.ansible_job_id }}"
   register: __df_teardown_async
