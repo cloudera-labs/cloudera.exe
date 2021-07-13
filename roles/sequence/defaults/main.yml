@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-sequence__setup_runtime:  "{{ ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined | default(False) | bool }}"
+sequence__setup_runtime:  "{{ ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined or df is defined | default(False) | bool }}"
 
 sequence__setup_plat:     "{{ env is defined or sequence__setup_runtime  | default(False) | bool }}"
 
