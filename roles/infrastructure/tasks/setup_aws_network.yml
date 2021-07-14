@@ -40,29 +40,28 @@
   ansible.builtin.set_fact:
     infra__aws_igw_id: "{{ __aws_igw.gateway_id }}"
 
-- name: Create AWS VPC Subnets
+- name: Create AWS VPC Public Subnets
   amazon.aws.ec2_vpc_subnet:
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
-    cidr: "{{ __aws_subnet_create_item.cidr }}"
+    cidr: "{{ __aws_public_subnet_item.cidr }}"
     state: present
-    tags: "{{ infra__tags | combine(__aws_subnet_create_item.tags, recursive=True) }}"
+    tags: "{{ infra__tags | combine(__aws_public_subnet_item.tags, recursive = true) }}"
     map_public: yes
     az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
   loop_control:
-    loop_var: __aws_subnet_create_item
+    loop_var: __aws_public_subnet_item
     index_var: __aws_subnet_index
-    label: __aws_subnet_create_item.name
-  loop: "{{ infra__vpc_public_subnets_info | union(infra__vpc_private_subnets_info) }}"
-  register: __aws_subnets
+  loop: "{{ infra__vpc_public_subnets_info }}"
+  register: __aws_public_subnets
 
-- name: Set fact for AWS Subnet IDs
+- name: Set fact for AWS Public Subnet IDs
   ansible.builtin.set_fact:
-    infra__aws_subnet_ids: "{{ infra__aws_subnet_ids | default([]) | union([__aws_subnet_item.subnet.id | default('')]) }}"
+    infra__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids | default([]) | union([__aws_subnet_item.subnet.id | default('')]) }}"
   loop_control:
     loop_var: __aws_subnet_item
     label: "{{ __aws_subnet_item.subnet.id }}"
-  loop: "{{ __aws_subnets.results }}"
+  loop: "{{ __aws_public_subnets.results }}"
 
 - name: List the Route Tables for the VPC
   community.aws.ec2_vpc_route_table_info:
@@ -71,20 +70,84 @@
       vpc-id: "{{ infra__aws_vpc_id }}"
   register: __aws_route_table_list
 
-- name: Configure the Route Table
+- name: Configure the Public Route Table
   community.aws.ec2_vpc_route_table:
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
     route_table_id: "{{ __aws_route_table_id }}"
     lookup: id
     state: present
-    tags: "{{ infra__tags | combine({ 'Name': infra__aws_route_table_name }, recursive=True) }}"
+    tags: "{{ infra__tags | combine({ 'Name': infra__aws_public_route_table_name }, recursive=True) }}"
     routes:
       - dest: "0.0.0.0/0"
         gateway_id: "{{ infra__aws_igw_id }}"
-    subnets: "{{ infra__aws_subnet_ids }}"
+    subnets: "{{ infra__aws_public_subnet_ids }}"
   vars:
-    __aws_route_table_id: "{{ __aws_route_table_list.route_tables[0].associations[0].route_table_id }}"
+    __aws_route_table_id: "{{ __aws_route_table_list.route_tables | json_query(__aws_rtb_jq) | flatten | first }}"
+    __aws_rtb_jq: "[*].associations[?main == `true` ].route_table_id"
+
+- name: Set the fact for Subnet Ids
+  when: not infra__tunnel
+  ansible.builtin.set_fact:
+    infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
+
+- name: Setup for private networking
+  when: infra__tunnel
+  block:
+    - name: Create AWS VPC Private Subnets
+      amazon.aws.ec2_vpc_subnet:
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        cidr: "{{ __aws_private_subnet_item.cidr }}"
+        state: present
+        tags: "{{ infra__tags | combine(__aws_private_subnet_item.tags, recursive = true) }}"
+        map_public: no
+        az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
+      loop_control:
+        loop_var: __aws_private_subnet_item
+        index_var: __aws_subnet_index
+        label: "{{ __aws_private_subnet_item.name }}"
+      loop: "{{ infra__vpc_private_subnets_info }}"
+      register: __aws_private_subnets
+
+    - name: Set fact for AWS Private Subnet IDs
+      ansible.builtin.set_fact:
+        infra__aws_private_subnet_ids: "{{ infra__aws_private_subnet_ids | default([]) | union([__aws_subnet_item.subnet.id | default('')]) }}"
+      loop_control:
+        loop_var: __aws_subnet_item
+      loop: "{{ __aws_private_subnets.results }}"
+
+    - name: Set fact for Subnet Ids
+      ansible.builtin.set_fact:
+        infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids | union(infra__aws_private_subnet_ids) }}"
+
+    - name: Creates NAT gateways and allocates EIPs
+      community.aws.ec2_vpc_nat_gateway:
+        state: present
+        subnet_id: "{{ __aws_public_subnet_id }}"
+        wait: true
+        if_exist_do_not_create: true
+        region: "{{ infra__region }}"
+        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_nat_gateway_name, __aws_public_subnet_index | string]) }, recursive=True) }}"
+      loop_control:
+        loop_var: __aws_public_subnet_id
+        index_var: __aws_public_subnet_index
+      loop: "{{ infra__aws_public_subnet_ids }}"
+      register: __aws_ngws
+
+    - name: Configure Private Route Tables
+      community.aws.ec2_vpc_route_table:
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        region: "{{ infra__region }}"
+        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_private_route_table_name, __aws_private_subnet_id_index | string]) }, recursive=True) }}"
+        subnets: "{{ __aws_private_subnet_id_item }}"
+        routes:
+        - dest: "0.0.0.0/0"
+          nat_gateway_id:  "{{ __aws_ngws.results[ __aws_private_subnet_id_index % __aws_ngws.results | length ].nat_gateway_id }}"
+      loop_control:
+        loop_var: __aws_private_subnet_id_item
+        index_var: __aws_private_subnet_id_index
+      loop: "{{ infra__aws_private_subnet_ids }}"
 
 - name: Create Security Groups
   amazon.aws.ec2_group:

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # Vars for platform
-plat__aws_policy_urls_default_root: "https://github.com/hortonworks/cloudbreak/raw/master/cloud-aws-common/src/main/resources/definitions/cdp"
+plat__aws_policy_urls_default_root: "https://raw.githubusercontent.com/hortonworks/cloudbreak/master/cloud-aws-common/src/main/resources/definitions/cdp"
 plat__aws_policy_urls_default:
   log:                "{{ plat__aws_policy_urls_default_root }}/aws-cdp-log-policy.json"
   ranger_audit_s3:    "{{ plat__aws_policy_urls_default_root }}/aws-cdp-ranger-audit-s3-policy.json"

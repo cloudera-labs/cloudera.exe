@@ -91,6 +91,7 @@
         cidr_ip: "{{ infra__vpc_extra_cidr }}"
 
 - name: Add CDP Public Cloud security group rules for AWS
+  when: not infra__tunnel
   ansible.builtin.set_fact:
     infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
   vars:

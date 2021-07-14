@@ -61,7 +61,8 @@ plat__teardown_deletes_user_group:            "{{ env.teardown.delete_user_group
 plat__xacccount_credential_name:              "{{ common__xaccount_credential_name }}"
 
 plat__workload_analytics:                     "{{ env.workload_analytics | default(True) }}"
-plat__tunnel:                                 "{{ env.tunnel | default(True) }}"
+plat__tunnel:                                 "{{ common__tunnel }}"
+plat__public_endpoint_access:                 "{{ common__public_endpoint_access }}"
 
 plat__env_admin_password:                     "{{ common__env_admin_password }}"
 

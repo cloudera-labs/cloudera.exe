@@ -42,8 +42,8 @@
         env: "{{ run__env_name }}"
         overlay: no
         # TODO - Allow direct assignment (will need to coordinate with infra role)
-        aws_public_subnets: "{{ run__datahub_subnet_ids[:3] }}"
-        aws_private_subnets: []
+        aws_public_subnets: "{{ run__datahub_public_subnet_ids }}"
+        aws_private_subnets: "{{ run__datahub_private_subnet_ids }}"
         state: present
         wait: yes
       async: 3600 # 1 hour timeout
