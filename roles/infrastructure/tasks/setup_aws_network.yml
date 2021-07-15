@@ -16,18 +16,45 @@
 
 - name: Set up AWS VPC
   when: not infra__aws_vpc_id
-  amazon.aws.ec2_vpc_net:
-    region: "{{ infra__region }}"
-    name: "{{ infra__vpc_name }}"
-    cidr_block: "{{ infra__vpc_cidr }}"
-    tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
-    state: present
-  register: __aws_vpc_info
+  block:
+    - name: Create AWS VPC
+      amazon.aws.ec2_vpc_net:
+        region: "{{ infra__region }}"
+        name: "{{ infra__vpc_name }}"
+        cidr_block: "{{ infra__vpc_cidr }}"
+        tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
+        state: present
+      register: __aws_vpc_info
 
-- name: Set fact for AWS VPC ID
-  when: not infra__aws_vpc_id
-  ansible.builtin.set_fact:
-    infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
+    - name: Set fact for AWS VPC ID
+      when: not infra__aws_vpc_id
+      ansible.builtin.set_fact:
+        infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
+
+- name: Update existing AWS VPC
+  when: infra__aws_vpc_id
+  block:
+    - name: Update AWS VPC
+      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
+      amazon.aws.ec2_vpc_net:
+        region: "{{ infra__region }}"
+        name: "{{ infra__vpc_name }}"
+        cidr_block: "{{ infra__vpc_cidr }}"
+        tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
+        state: present
+      register: __aws_vpc_info
+
+    - name: Prepare AWS VPC tags (CLI version)
+      ansible.builtin.set_fact:
+        __aws_vpc_tags: "{{ __aws_vpc_tags | default([]) | union([tag_entry]) }}"
+      vars:
+        tag_entry: "Key={{ __tag.key }},Value={{ __tag.value }}"
+      loop: "{{ infra__tags }}"
+      loop_control:
+        loop_var: __tag
+
+    - name: Update AWS VPC (CLI version)
+      ansible.builtin.command: "aws ec2 create-tags --region {{ infra__region }} --resources {{ infra__aws_vpc_id }} --tags {{ __aws_vpc_tags | join(' ') }}"
 
 - name: Update existing AWS VPC Public and Private Subnets
   when: infra__aws_subnet_ids is defined
