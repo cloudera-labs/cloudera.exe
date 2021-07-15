@@ -15,6 +15,7 @@
 # limitations under the License.
 
 - name: Set up AWS VPC
+  when: not infra__aws_vpc_id
   amazon.aws.ec2_vpc_net:
     region: "{{ infra__region }}"
     name: "{{ infra__vpc_name }}"
@@ -24,11 +25,12 @@
   register: __aws_vpc_info
 
 - name: Set fact for AWS VPC ID
+  when: not infra__aws_vpc_id
   ansible.builtin.set_fact:
     infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
 
 - name: Update existing AWS VPC Public and Private Subnets
-  when: infra__aws_subnet_ids
+  when: infra__aws_subnet_ids is defined
   amazon.aws.ec2_vpc_subnet:
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
@@ -41,7 +43,7 @@
   loop: "{{ infra__vpc_private_subnets_info | union(infra__vpc_public_subnets_info) }}"
 
 - name: Set up AWS Public Network infrastructure
-  when: (infra__tunnel == infra__public_endpoint_access) and not infra__aws_subnet_ids  # L0 (all public) or L1 (public/private)
+  when: not (infra__tunnel and not infra__public_endpoint_access) and infra__aws_subnet_ids is undefined # L0 (all public) or L1 (public/private)
   block:
     - name: Create AWS Internet Gateway (IGW)
       community.aws.ec2_vpc_igw:
@@ -107,7 +109,7 @@
         infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
 
 - name: Setup AWS Private Networking infrastructure
-  when: infra__tunnel and not infra__aws_subnet_ids # L1 (public/private) or L2 (all private)
+  when: infra__tunnel and infra__aws_subnet_ids is undefined # L1 (public/private) or L2 (all private)
   block:
     - name: Create AWS VPC Private Subnets
       amazon.aws.ec2_vpc_subnet:
