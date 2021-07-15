@@ -14,25 +14,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Tear down AWS Network
-  when: infra__aws_vpc_id | length > 1 and infra__teardown_deletes_network
-  block:
-    - name: Remove Security Groups
-      amazon.aws.ec2_group:
-        region: "{{ infra__region }}"
-        vpc_id: "{{ infra__aws_vpc_id }}"
-        name: "{{ __security_group_name_item }}"
-        state: absent
-      loop_control:
-        loop_var: __security_group_name_item
-      loop:
-        - "{{ infra__security_group_knox_name }}"
-        - "{{ infra__security_group_default_name }}"
+# When infra__aws_subnet_ids is True, then only delete SGs, because the network is not "owned"
+# Otherwise, delete it all unless told otherwise
+# Note that if the VPC is not shared, but is supplied via direct VpcId or discovered via Name/CIDR, the role will attempt to destroy it
 
-    - name: Remove the private networking setup
+- name: Tear down AWS Security Groups
+  when: infra__teardown_deletes_network and infra__aws_vpc_id
+  amazon.aws.ec2_group:
+    region: "{{ infra__region }}"
+    vpc_id: "{{ infra__aws_vpc_id }}"
+    name: "{{ __security_group_name_item }}"
+    state: absent
+  loop_control:
+    loop_var: __security_group_name_item
+  loop:
+    - "{{ infra__security_group_knox_name }}"
+    - "{{ infra__security_group_default_name }}"
+
+- name: Tear down AWS Network
+  when: infra__teardown_deletes_network and infra__aws_vpc_id and not infra__aws_subnet_ids
+  block:
+    - name: Remove the AWS Private Network
       when: infra__tunnel
       block:
-        - name: Delete the private route tables
+        - name: Delete the AWS Private Route Tables
           community.aws.ec2_vpc_route_table:
             vpc_id: "{{ infra__aws_vpc_id }}"
             region: "{{ infra__region }}"
@@ -43,14 +48,14 @@
             index_var: __aws_private_subnet_id_index
           loop: "{{ infra__vpc_private_subnet_cidrs }}"
 
-        - name: List all managed nat gateways within this VPC
+        - name: List all managed AWS NAT Gateways
           community.aws.ec2_vpc_nat_gateway_info:
             region: "{{ infra__region }}"
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
           register: __aws_all_ngws
 
-        - name: Delete nat gateway using discovered nat gateways from facts module.
+        - name: Delete associated AWS NAT Gateways
           community.aws.ec2_vpc_nat_gateway:
             state: absent
             region: "{{ infra__region }}"
@@ -63,14 +68,14 @@
           loop: "{{ __aws_all_ngws.result }}"
           ignore_errors: true
 
-        - name: Check if NAT gateways are deleted succesfully
+        - name: Check if AWS NAT Gateways deleted succesfully
           when: __aws_ngw_teardown is defined and __aws_ngw_teardown.results is defined and __aws_ngw_teardown.results | count > 0
           ansible.builtin.fail:
             msg: "Failed to delete a NAT gateway"
           failed_when: item.rc is defined and item.rc != 1 and ('InvalidAllocationID.NotFound' in item.module_stderr)
           loop: "{{ __aws_ngw_teardown.results }}"
 
-    - name: Remove VPC subnets
+    - name: Remove all AWS VPC Subnets
       amazon.aws.ec2_vpc_subnet:
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
@@ -81,7 +86,7 @@
         index_var: __aws_subnet_index
       loop: "{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) }}"
 
-    - name: Remove IGW
+    - name: Remove AWS Internet Gateway (IGW)
       community.aws.ec2_vpc_igw:
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
@@ -89,7 +94,7 @@
         tags:
           Name: "{{ infra__aws_igw_name }}"
 
-    - name: Remove VPC, if exists
+    - name: Remove AWS VPC
       amazon.aws.ec2_vpc_net:
         region: "{{ infra__region }}"
         name: "{{ infra__vpc_name }}"
