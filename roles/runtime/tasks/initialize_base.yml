@@ -14,25 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO Confirm design pattern for non-role internal variables
-- name: Discover CDP Environment CRN
-  when: plat__cdp_env_crn is undefined
-  block:
-    - name: Retrieve CDP Environment details
-      cloudera.cloud.env_info:
-        name: "{{ run__env_name }}"
-      register: __cdp_env_info
-      failed_when: __cdp_env_info.environments is not defined
+- name: Retrieve CDP Environment details
+  cloudera.cloud.env_info:
+    name: "{{ run__env_name }}"
+  register: __cdp_env_info
+  failed_when: __cdp_env_info.environments is not defined
 
-    - name: Set fact for CDP Environment CRN
-      when: __cdp_env_info.environments | length > 0
-      ansible.builtin.set_fact:
-        run__cdp_env_crn: "{{ __cdp_env_info.environments[0].crn }}"
-
-- name: Set fact for CDP Environment CRN by assignment
-  when: plat__cdp_env_crn is defined
+- name: Set fact for CDP Environment CRN
   ansible.builtin.set_fact:
-    run__cdp_env_crn: "{{ plat__cdp_env_crn }}"
+    run__cdp_env_crn: "{{ __cdp_env_info.environments[0].crn | d('') }}"
 
 - name: Discover CDP Datalake version
   when: plat__cdp_datalake_version is undefined
