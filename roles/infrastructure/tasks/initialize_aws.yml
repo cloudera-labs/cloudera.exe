@@ -124,7 +124,7 @@
         infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) }}"
 
 - name: Query existing AWS VPC if provided
-  when: infra__aws_vpc_id
+  when: infra__aws_vpc_id != ""
   block:
     - name: Confirm AWS VPC ID
       when: no # Skipped due to https://github.com/boto/boto3/issues/2929
@@ -157,7 +157,7 @@
         infra__vpc_cidr: "{{ (__aws_vpc_list.stdout | from_json)['Vpcs'] | map(attribute='CidrBlock') | list | first }}"
 
 - name: Discover possible existing AWS VPC details
-  when: not infra__aws_vpc_id
+  when: infra__aws_vpc_id == ""
   block:
     - name: Query AWS VPCs by unique name and CIDR
       when: no # Skipped due to https://github.com/boto/boto3/issues/2929
@@ -185,7 +185,7 @@
     - name: Query AWS VPC ID by unique name and CIDR (CLI version)
       ansible.builtin.command: "aws ec2 describe-vpcs --region {{ infra__region }} --filters Name=cidr,Values={{ infra__vpc_cidr }} Name=tag:Name,Values={{ infra__vpc_name }}"
       register: __aws_vpc_list_discovered
-      failed_when: not (__aws_vpc_list_discovered.stdout | from_json)['Vpcs']
+      #failed_when: not (__aws_vpc_list_discovered.stdout | from_json)['Vpcs']
 
     - name: Check VPC list for singular response (CLI version)
       when: (__aws_vpc_list_discovered.stdout | from_json)['Vpcs'] | count > 1
@@ -193,12 +193,11 @@
         msg: "Found more than one VPC matching name, {{ infra__vpc_name }}, and CIDR, {{ infra__vpc_cidr }}."
 
     - name: Set fact for AWS VPC ID parameter on a unique response (CLI version)
-      when: (__aws_vpc_list_discovered | from_json)['Vpcs'] | count == 1
+      when: (__aws_vpc_list_discovered.stdout | from_json)['Vpcs'] | count == 1
       ansible.builtin.set_fact:
-        infra__aws_vpc_id: "{{ (__aws_vpc_list_discovered | from_json)['Vpcs'] | map(attribute='VpcId') | list | first }}"
+        infra__aws_vpc_id: "{{ (__aws_vpc_list_discovered.stdout | from_json)['Vpcs'] | map(attribute='VpcId') | list | first }}"
         #infra__vpc_cidr: "{{ __aws_vpc_list_discovered.vpcs[0].cidr_block }}"
         #infra__vpc_name: "{{ __aws_vpc_list_discovered.vpcs[0].tags['Name'] }}"
-
 
 - name: Fetch EC2 Instance info for Dynamic Inventory Nodes
   register: __infra_dynamic_inventory_discovered

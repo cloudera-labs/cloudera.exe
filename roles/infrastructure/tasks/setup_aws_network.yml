@@ -14,25 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Set up AWS VPC
-  when: not infra__aws_vpc_id
-  block:
-    - name: Create AWS VPC
-      amazon.aws.ec2_vpc_net:
-        region: "{{ infra__region }}"
-        name: "{{ infra__vpc_name }}"
-        cidr_block: "{{ infra__vpc_cidr }}"
-        tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
-        state: present
-      register: __aws_vpc_info
-
-    - name: Set fact for AWS VPC ID
-      when: not infra__aws_vpc_id
-      ansible.builtin.set_fact:
-        infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
-
 - name: Update existing AWS VPC
-  when: infra__aws_vpc_id
+  when: infra__aws_vpc_id != ""
   block:
     - name: Update AWS VPC
       when: no # Skipped due to https://github.com/boto/boto3/issues/2929
@@ -48,13 +31,29 @@
       ansible.builtin.set_fact:
         __aws_vpc_tags: "{{ __aws_vpc_tags | default([]) | union([tag_entry]) }}"
       vars:
-        tag_entry: "Key={{ __tag.key }},Value={{ __tag.value }}"
-      loop: "{{ infra__tags }}"
+        tag_entry: "Key={{ __tag.key }},Value={{ __tag.value |quote}}"
+      loop: "{{ infra__tags | dict2items }}"
       loop_control:
         loop_var: __tag
 
     - name: Update AWS VPC (CLI version)
       ansible.builtin.command: "aws ec2 create-tags --region {{ infra__region }} --resources {{ infra__aws_vpc_id }} --tags {{ __aws_vpc_tags | join(' ') }}"
+
+- name: Set up AWS VPC
+  when: infra__aws_vpc_id == ""
+  block:
+    - name: Create AWS VPC
+      amazon.aws.ec2_vpc_net:
+        region: "{{ infra__region }}"
+        name: "{{ infra__vpc_name }}"
+        cidr_block: "{{ infra__vpc_cidr }}"
+        tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
+        state: present
+      register: __aws_vpc_info
+
+    - name: Set fact for AWS VPC ID
+      ansible.builtin.set_fact:
+        infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
 
 - name: Update existing AWS VPC Public and Private Subnets
   when: infra__aws_subnet_ids is defined
@@ -161,7 +160,17 @@
         loop_var: __aws_subnet_item
       loop: "{{ __aws_private_subnets.results }}"
 
-    - name: Create Network Gateways (NAT) and allocate Elastic IP Addresses (EIP) for the AWS VPC
+    - name: Configure Private Route Table for the AWS VPC
+      when: not infra__public_endpoint_access
+      community.aws.ec2_vpc_route_table:
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        region: "{{ infra__region }}"
+        tags: "{{ infra__tags | combine({ 'Name': infra__aws_private_route_table_name }, recursive=True) }}"
+        subnets: "{{ infra__aws_private_subnet_ids }}"
+        routes: []
+
+    - name: Create Network Gateways (NAT) and allocate Elastic IP Addresses (EIP) for Public Endpoint Access
+      when: infra__public_endpoint_access
       community.aws.ec2_vpc_nat_gateway:
         state: present
         subnet_id: "{{ __aws_public_subnet_id }}"
@@ -175,7 +184,8 @@
       loop: "{{ infra__aws_public_subnet_ids }}"
       register: __aws_ngws
 
-    - name: Configure Private Route Tables for the AWS VPC
+    - name: Configure Private Route Tables for the AWS VPC for Public Endpoint Access
+      when: infra__public_endpoint_access
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
@@ -188,10 +198,11 @@
         loop_var: __aws_private_subnet_id_item
         index_var: __aws_private_subnet_id_index
       loop: "{{ infra__aws_private_subnet_ids }}"
+      debugger: always
 
     - name: Set fact for AWS Subnet IDs
       ansible.builtin.set_fact:
-        infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids | union(infra__aws_private_subnet_ids) }}"
+        infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids | default([]) | union(infra__aws_private_subnet_ids) }}"
 
 - name: Create Security Groups
   amazon.aws.ec2_group:
