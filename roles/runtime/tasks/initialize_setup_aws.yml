@@ -63,7 +63,7 @@
 
     - name: Set fact for AWS Public Subnet IDs by assignment
       ansible.builtin.set_fact:
-        run__datahub_public_subnet_ids: "{{ infra__aws_public_subnet_ids | default(infra__aws_subnet_ids) }}"
+        run__datahub_public_subnet_ids: "{{ infra__aws_public_subnet_ids | default([]) }}"
 
     - name: Set fact for AWS Private Subnet IDs by assignment
       ansible.builtin.set_fact:
