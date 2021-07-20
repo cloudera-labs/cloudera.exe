@@ -28,6 +28,7 @@ infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
 
 # Infra
 infra__type:                        "{{ common__infra_type }}"
+infra__tunnel:                      "{{ common__tunnel }}"
 
 # Dynamic Inventory for Clusters
 infra__private_key_file:                 "{{ globals.ssh.private_key_file | default('') }}"
@@ -90,8 +91,14 @@ infra__aws_dynamodb_table_name:     "{{ common__aws_dynamodb_table_name }}"
 infra__aws_vpc_az_count:            "{{ infra.aws.vpc.az_count | default(3) }}"
 infra__aws_igw_name:                "{{ infra.aws.vpc.internet_gateway.name | default([infra__namespace, infra__aws_igw_suffix] | join('-')) }}"
 infra__aws_igw_suffix:              "{{ infra.aws.vpc.internet_gateway.suffix | default(common__igw_suffix) }}"
-infra__aws_route_table_name:        "{{ infra.aws.vpc.labels.route_table | default([infra__namespace, infra__aws_route_table_suffix] | join('-')) }}"
-infra__aws_route_table_suffix:      "{{ infra.aws.vpc.route_table.suffix | default(common__route_table_suffix) }}"
+
+infra__aws_public_route_table_suffix:  "{{ infra.aws.vpc.labels.public_route_table_suffix | default('public-rtb') }}"
+infra__aws_private_route_table_suffix: "{{ infra.aws.vpc.labels.private_route_table_suffix | default('private-rtb') }}"
+infra__aws_public_route_table_name: "{{ infra.aws.vpc.labels.public_route_table | default([infra__namespace, infra__aws_public_route_table_suffix] | join('-')) }}"
+infra__aws_private_route_table_name: "{{ infra.aws.vpc.labels.private_route_table | default([infra__namespace, infra__aws_private_route_table_suffix] | join('-')) }}"
+
+infra__aws_nat_gateway_name:        "{{ infra.aws.vpc.nat_gateway.name | default([infra__namespace, infra__aws_nat_gateway_suffix] | join('-')) }}"
+infra__aws_nat_gateway_suffix:      "{{ infra.aws.vpc.nat_gateway.suffix | default(common__ngw_suffix) }}"
 
 # GCP
 infra__gcp_project:                 "{{ common__gcp_project }}"

@@ -45,11 +45,11 @@ common__datalake_admin_suffix:            "{{ globals.labels.datalake_admin | de
 common__ranger_audit_suffix:              "{{ globals.labels.ranger_audit | default('audit') }}"
 common__cml_suffix:                       "{{ globals.labels.cml | default('cml') }}"
 common__igw_suffix:                       "{{ globals.labels.internet_gateway | default('igw') }}"
-common__route_table_suffix:               "{{ globals.labels.route_table | default('rtb') }}"
 common__app_suffix:                       "{{ globals.labels.app | default('app') }}"
 common__group_suffix:                     "{{ globals.labels.group | default('group') }}"
 common__admin_suffix:                     "{{ globals.labels.admin | default('admin') }}"
 common__user_suffix:                      "{{ globals.labels.user | default('user') }}"
+common__ngw_suffix:                       "{{ globals.labels.nat_gateway | default('ngw') }}"
 
 common__unique_storage_name_suffix:       "{{ globals.storage.name | default((common__region + common__aws_profile) if 'aws' in common__infra_type else common__region) }}"
 
@@ -121,6 +121,8 @@ common__env_name_suffix:                  "{{ env.suffix | default(common__env_s
 
 common__datalake_name:                    "{{ env.datalake.name | default([common__namespace_cdp, common__datalake_name_suffix] | join('-')) }}"
 common__datalake_name_suffix:             "{{ env.datalake.suffix | default(common__datalake_suffix) }}"
+common__tunnel:                           "{{ env.tunnel | default(False) }}"
+common__public_endpoint_access:           "{{ env.public_endpoint_access | default(not common__tunnel) }}"
 
 common__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
 # Deploy

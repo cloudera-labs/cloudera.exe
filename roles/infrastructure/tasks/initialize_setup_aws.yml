@@ -70,7 +70,7 @@
         region: "{{ infra__region }}"
         filters:
           name: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].search }}"
-          owner-alias: aws-marketplace
+        owners: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].owners }}"
       register: __infra_aws_ami_list
 
     - name:  Filter to latest Image
@@ -91,6 +91,7 @@
         cidr_ip: "{{ infra__vpc_extra_cidr }}"
 
 - name: Add CDP Public Cloud security group rules for AWS
+  when: not infra__tunnel
   ansible.builtin.set_fact:
     infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
   vars:
