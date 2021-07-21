@@ -48,13 +48,16 @@
   register: __df_teardown_info
   when:
     - run__include_df
-    - run__env_info.environments | length > 0
-    - run__env_info.environments[0].descendants.df | length > 0
+    - run__df_env_info.services | length > 0
   cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+    name: "{{ __df_teardown_req_item.crn }}"
     persist: "{{ run__df_persist }}"
+    force: "{{ run__df_force_delete }}"
     state: absent
     wait: no
+  loop_control:
+    loop_var: __df_teardown_req_item
+  loop: "{{ run__df_env_info.services }}"
 
 - name: Execute CDP ML Workspace teardown
   when:
@@ -128,8 +131,7 @@
 - name: Wait for CDP DW deployments to decommission
   when:
     - __dw_teardown_info is defined
-    - __dw_teardown_info.results is defined
-    - __dw_teardown_info.results | length > 0
+    - __dw_teardown_info.started | default(False)
   cloudera.cloud.dw_cluster:
     env: "{{ run__env_name }}"
     state: absent
@@ -154,11 +156,14 @@
 
 - name: Wait for CDP Dataflow deployment to decommission
   when:
-    - __df_teardown_info is defined
-    - __df_teardown_info.results is defined
-    - __df_teardown_info.started | default(False)
+    - run__include_df
+    - run__df_env_info.services | length > 0
   cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+    name: "{{ __df_teardown_wait_item.crn }}"
     persist: "{{ run__df_persist }}"
+    force: "{{ run__df_force_delete }}"
     state: absent
     wait: yes
+  loop_control:
+    loop_var: __df_teardown_wait_item
+  loop: "{{ run__df_env_info.services }}"

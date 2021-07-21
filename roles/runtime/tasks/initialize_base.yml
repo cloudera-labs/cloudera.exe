@@ -21,8 +21,9 @@
   failed_when: __cdp_env_info.environments is not defined
 
 - name: Set fact for CDP Environment CRN
+  when: __cdp_env_info.environments | length > 0
   ansible.builtin.set_fact:
-    run__cdp_env_crn: "{{ __cdp_env_info.environments[0].crn | d('') }}"
+    run__cdp_env_crn: "{{ __cdp_env_info.environments[0].crn }}"
 
 - name: Discover CDP Datalake version
   when: plat__cdp_datalake_version is undefined
