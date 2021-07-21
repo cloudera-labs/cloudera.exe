@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-sequence__setup_runtime:  "{{ ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined or df is defined | default(False) | bool }}"
+sequence__setup_runtime:  "{{ common__setup_runtime }}"
 
-sequence__setup_plat:     "{{ env is defined or sequence__setup_runtime  | default(False) | bool }}"
+sequence__setup_plat:     "{{ common__setup_plat }}"
 
-sequence__setup_infra:    "{{ infra is defined or sequence__setup_plat | default(False) | bool }}"
+sequence__setup_infra:    "{{ common__setup_infra }}"
 
 sequence_init:            "{{ sequence__setup_infra }}"
