@@ -14,10 +14,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Handle EC2 Autoscaling Groups removal if discovered
+  when:
+    - infra__force_teardown | bool
+    - __infra_aws_asg_names is defined
+    - __infra_aws_asg_names | length > 0
+  community.aws.ec2_asg:
+    name: "{{ __infra_asg_remove_item }}"
+    state: absent
+  loop: "{{ __infra_aws_asg_names }}"
+  loop_control:
+    loop_var: __infra_asg_remove_item
+
+- name: Handle EKS Cluster removal if discovered
+  when:
+    - infra__force_teardown | bool
+    - __infra_vpc_eks_cluster_names is defined
+    - __infra_vpc_eks_cluster_names | length > 0
+  community.aws.aws_eks_cluster:
+    name: "{{ __infra_eks_remove_item }}"
+    wait: yes
+    state: absent
+  loop: "{{ __infra_vpc_eks_cluster_names }}"
+  loop_control:
+    loop_var: __infra_eks_remove_item
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __eks_teardowns_info
+
+- name: Wait for EKS teardowns to complete
+  when:
+    - __eks_teardowns_info is defined
+    - __eks_teardowns_info.results is defined
+    - __eks_teardowns_info.results | length > 0
+  ansible.builtin.async_status:
+    jid: "{{ __eks_teardown.ansible_job_id }}"
+  loop_control:
+    loop_var: __eks_teardown
+  loop: "{{ __eks_teardowns_info.results }}"
+  register: __eks_teardowns_async
+  until: __eks_teardowns_async.finished
+  retries: 120
+  delay: 10
+
 - name: Handle Compute Removal if Discovered
   when: infra__discovered_compute_inventory | count > 0
   amazon.aws.ec2:
     region: "{{ infra__region }}"
     wait: yes
     state: absent
-    instance_ids: "{{ infra__discovered_compute_inventory | community.general.json_query('[*].instance_id') | list }}"
+    instance_ids: "{{ infra__discovered_compute_inventory | community.general.json_query('[*].instance_id') | list | unique }}"

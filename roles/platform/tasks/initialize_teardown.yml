@@ -14,6 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Refresh Environment Info with Descendants
+  cloudera.cloud.env_info:
+    name: "{{ plat__env_name }}"
+    descendants: true
+  register: plat__env_info
+
+- name: Check that Environment has no descendants before Platform teardown
+  when: plat__env_info.environments | length > 0
+  ansible.builtin.assert:
+    that:
+      - plat__env_info.environments[0].descendants.datahub | length == 0
+      - plat__env_info.environments[0].descendants.df | length == 0
+      - plat__env_info.environments[0].descendants.dw | length == 0
+      - plat__env_info.environments[0].descendants.opdb | length == 0
+    fail_msg: "Environment {{ plat__env_name }} has one or more child services registered, please check and try again"
+    quiet: yes
+
 - name: Include provider-specific initialization base
   ansible.builtin.include_tasks: "initialize_{{ plat__infra_type | lower }}.yml"
 

@@ -40,8 +40,8 @@
     - name: Register Azure Cross Account App info
       no_log: True
       set_fact:
-        __azure_xaccount_app_pword: "{{ __azure_xaccount_app_info.stdout | from_json | json_query('password')  }}"
-        plat__azure_xaccount_app_uuid: "{{ __azure_xaccount_app_info.stdout | from_json | json_query('appId')  }}"
+        __azure_xaccount_app_pword: "{{ __azure_xaccount_app_info.stdout | from_json | community.general.json_query('password')  }}"
+        plat__azure_xaccount_app_uuid: "{{ __azure_xaccount_app_info.stdout | from_json | community.general.json_query('appId')  }}"
 
     - name: Get Service Principal for Azure App
       when: ( plat__azure_xaccount_app_uuid is defined ) and ( plat__azure_xaccount_app_uuid | length > 0 )
@@ -54,7 +54,7 @@
 
         - name: Set Service Principal Object UUID for Azure App
           ansible.builtin.set_fact:
-            plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | json_query('[0].objectId') }}"
+            plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | community.general.json_query('[0].objectId') }}"
 
     - name: Create the CDP Cross Account Credential with the new Azure App details
       cloudera.cloud.env_cred:
@@ -73,10 +73,10 @@
     name: "{{ plat__azure_xaccount_role_name }}"
     assignable_scopes: "/subscriptions/{{ plat__azure_subscription_id }}"
     permissions:
-      - actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('Actions') }}"
-        data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('DataActions') }}"
-        not_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('NotActions') }}"
-        not_data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | json_query('NotDataActions') }}"
+      - actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('Actions') }}"
+        data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('DataActions') }}"
+        not_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotActions') }}"
+        not_data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotDataActions') }}"
 
 - name: Set Azure Cross Account Role URI
   ansible.builtin.set_fact:
@@ -101,21 +101,21 @@
   delay: 5
   retries: 10
   until:
-    - plat__azure_idbroker_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
-    - plat__azure_datalakeadmin_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
-    - plat__azure_log_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
-    - plat__azure_ranger_audit_identity_name in ( __azure_identity_list.stdout | from_json | json_query('[*].name') )
+    - plat__azure_idbroker_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    - plat__azure_datalakeadmin_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    - plat__azure_log_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    - plat__azure_ranger_audit_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
 
 - name: Extract Azure Identity Principals
   ansible.builtin.set_fact:
-    __azure_idbroker_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_idbroker_uuid) | first }}"
-    __azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_idbroker_uri) | first }}"
-    __azure_datalakeadmin_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_dtadmin_uuid) | first }}"
-    __azure_datalakeadmin_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_dtadmin_uri) | first }}"
-    __azure_log_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_log_rl_uuid) | first }}"
-    __azure_log_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_log_rl_uri) | first }}"
-    __azure_ranger_audit_identity_uuid: "{{ __azure_identity_list.stdout | from_json | json_query(jq_rngr_rl_uuid) | first }}"
-    __azure_ranger_audit_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_rngr_rl_uri) | first }}"
+    __azure_idbroker_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_idbroker_uuid) | first }}"
+    __azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_idbroker_uri) | first }}"
+    __azure_datalakeadmin_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_dtadmin_uuid) | first }}"
+    __azure_datalakeadmin_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_dtadmin_uri) | first }}"
+    __azure_log_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_log_rl_uuid) | first }}"
+    __azure_log_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_log_rl_uri) | first }}"
+    __azure_ranger_audit_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_rngr_rl_uuid) | first }}"
+    __azure_ranger_audit_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_rngr_rl_uri) | first }}"
   vars:
     jq_idbroker_uuid: "[?name=='{{ plat__azure_idbroker_identity_name }}'].principalId"
     jq_idbroker_uri: "[?name=='{{ plat__azure_idbroker_identity_name }}'].id"
@@ -133,12 +133,12 @@
 
 - name: Extract Azure Role Definition URIs
   ansible.builtin.set_fact:
-    __azure_xaccount_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_xaccount_uri_jq) | first }}"
-    __azure_virtualmachine_ctrb_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_vmcnt_uri_jq) | first }}"
-    __azure_managedidentity_optr_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_miop_uri_jq) | first }}"
-    __azure_storageblobdata_ownr_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_storown_uri_jq) | first }}"
-    __azure_storageblobdata_ctrb_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_storcnt_uri_jq) | first }}"
-    __azure_contributor_role_uri: "{{ __azure_role_definition_info.roledefinitions | json_query(__azure_contrib_uri_jq) | first }}"
+    __azure_xaccount_role_uri: "{{ __azure_role_definition_info.roledefinitions | community.general.json_query(__azure_xaccount_uri_jq) | first }}"
+    __azure_virtualmachine_ctrb_role_uri: "{{ __azure_role_definition_info.roledefinitions | community.general.json_query(__azure_vmcnt_uri_jq) | first }}"
+    __azure_managedidentity_optr_role_uri: "{{ __azure_role_definition_info.roledefinitions | community.general.json_query(__azure_miop_uri_jq) | first }}"
+    __azure_storageblobdata_ownr_role_uri: "{{ __azure_role_definition_info.roledefinitions | community.general.json_query(__azure_storown_uri_jq) | first }}"
+    __azure_storageblobdata_ctrb_role_uri: "{{ __azure_role_definition_info.roledefinitions | community.general.json_query(__azure_storcnt_uri_jq) | first }}"
+    __azure_contributor_role_uri: "{{ __azure_role_definition_info.roledefinitions | community.general.json_query(__azure_contrib_uri_jq) | first }}"
   vars:
     __azure_xaccount_uri_jq: "[?role_name=='{{ plat__azure_xaccount_role_name }}'].id"
     __azure_vmcnt_uri_jq: "[?role_name=='{{ plat__azure_roles.vmcnt }}'].id"

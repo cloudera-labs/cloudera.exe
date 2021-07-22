@@ -14,25 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO Confirm design pattern for non-role internal variables
-- name: Discover CDP Environment CRN
-  when: plat__cdp_env_crn is undefined
-  block:
-    - name: Retrieve CDP Environment details
-      cloudera.cloud.env_info:
-        name: "{{ run__env_name }}"
-      register: __cdp_env_info
-      failed_when: __cdp_env_info.environments is not defined
+- name: Retrieve CDP Environment details
+  cloudera.cloud.env_info:
+    name: "{{ run__env_name }}"
+  register: __cdp_env_info
+  failed_when: __cdp_env_info.environments is not defined
 
-    - name: Set fact for CDP Environment CRN
-      when: __cdp_env_info.environments | length > 0
-      ansible.builtin.set_fact:
-        run__cdp_env_crn: "{{ __cdp_env_info.environments[0].crn }}"
-
-- name: Set fact for CDP Environment CRN by assignment
-  when: plat__cdp_env_crn is defined
+- name: Set fact for CDP Environment CRN
+  when: __cdp_env_info.environments | length > 0
   ansible.builtin.set_fact:
-    run__cdp_env_crn: "{{ plat__cdp_env_crn }}"
+    run__cdp_env_crn: "{{ __cdp_env_info.environments[0].crn }}"
 
 - name: Discover CDP Datalake version
   when: plat__cdp_datalake_version is undefined
@@ -69,11 +60,6 @@
 - name: Prepare for CDP Datahub clusters
   when: run__include_datahub
   block:
-    - name: Retrieve CDP Datahub clusters
-      cloudera.cloud.datahub_cluster_info:
-        env: "{{ run__env_name }}"
-      register: run__datahub_list
-
     - name: Retrieve Image Catalog File
       ansible.builtin.uri:
         url: "{{ run__datahub_image_catalog_url }}"
@@ -137,11 +123,6 @@
 - name: Prepare for CDP OpDB experiences
   when: run__include_opdb
   block:
-    - name: Retrieve CDP OpDB experiences
-      cloudera.cloud.opdb_info:
-        env: "{{ run__env_name }}"
-      register: run__opdb_list
-
     - name: Construct OpDB Configurations
       ansible.builtin.set_fact:
         run__opdb_configs: "{{ run__opdb_configs | default([]) | union([config]) }}"
@@ -157,11 +138,6 @@
 - name: Prepare for CDP ML Workspace experiences
   when: run__include_ml
   block:
-    - name: Retrieve CDP ML Workspace experiences
-      cloudera.cloud.ml_info:
-        env: "{{ run__env_name }}"
-      register: run__ml_list
-
     - name: Construct CDP ML Workspace configurations
       ansible.builtin.set_fact:
         run__ml_configs: "{{ run__ml_configs | default([]) | union([config]) }}"
@@ -184,11 +160,3 @@
       loop_control:
         loop_var: __ml_config
         label: "{{ config.name }}"
-
-- name: Prepare for CDP DW experiences
-  when: run__include_dw
-  block:
-    - name: Retrieve CDP DW experiences
-      cloudera.cloud.dw_cluster_info:
-        env: "{{ run__env_name }}"
-      register: run__dw_list
