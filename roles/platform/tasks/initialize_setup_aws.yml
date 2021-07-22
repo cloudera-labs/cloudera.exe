@@ -92,6 +92,7 @@
   ansible.builtin.set_fact:
     plat__aws_subnet_ids: "{{ infra__aws_subnet_ids }}"
 
+# TODO: Discover AWS VPC Public Subnets if infra__ is not present
 - name: Set public subnets for public endpoint access
   when: plat__public_endpoint_access
   ansible.builtin.set_fact:

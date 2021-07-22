@@ -77,7 +77,7 @@
       ansible.builtin.set_fact:
         __infra_aws_ami_info: "{{ __infra_aws_ami_list.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}"
 
-- name: Prepare AWS Security Group Rules
+- name: Prepare user and extra AWS Security Group rules
   ansible.builtin.set_fact:
     infra__aws_security_group_rules:
       - proto: all
@@ -90,7 +90,20 @@
         ports: "{{ infra__vpc_extra_ports }}"
         cidr_ip: "{{ infra__vpc_extra_cidr }}"
 
-- name: Add CDP Public Cloud security group rules for AWS
+- name: Add CCM Tunneled deployment AWS Security Group rules 
+  when: infra__tunnel
+  ansible.builtin.set_fact:
+    infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
+  loop_control:
+    loop_var: __tunnel_cidr
+  loop: "{{ infra__vpc_tunneled_cidr }}"
+  vars:
+    rule:
+      proto: all
+      ports: 0-65535
+      cidr_ip: "{{ __tunnel_cidr }}"
+
+- name: Add CDP Public Cloud deployment AWS Security Group rules
   when: not infra__tunnel
   ansible.builtin.set_fact:
     infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"

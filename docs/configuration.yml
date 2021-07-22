@@ -244,6 +244,10 @@ infra:
         private_route_table:
         public_route_table_suffix:
         private_route_table_suffix:
+      existing:
+        vpc_id:
+        public_subnet_ids:
+        private_subnet_ids:
   azure:
     metagroup:
       name:
@@ -322,6 +326,7 @@ infra:
       subnet:
     user_cidr:
     user_ports:
+    tunneled_cidr:
 ml:
   definitions:
   k8s_request_base:
