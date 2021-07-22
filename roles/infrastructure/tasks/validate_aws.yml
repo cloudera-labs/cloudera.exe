@@ -30,56 +30,12 @@
 - name: Print AWS Profile to debug
   ansible.builtin.command: echo AWS_PROFILE is $AWS_PROFILE
 
-- name: Validate the vpcId and subnet Ids if provided for a private network
-  when: infra__aws_vpc_id != ""
+# TODO: Revisit this logic, we could just provide a blank VPC for L0, L1, or L2
+- name: Validate existing AWS Subnet details if provided for a private network
+  #when: infra__aws_vpc_id != "" 
+  when: no
   block:
-  - name: Validate the vpc Id
-    amazon.aws.ec2_vpc_net_info:
-      vpc_ids: "{{ infra__aws_vpc_id }}"
-    register: __aws_vpc_list
-    failed_when: __aws_vpc_list.vpcs is undefined
-
-  - name: Check for non-empty private subnets list
-    when: infra__aws_private_subnet_ids | unique | count < 3
-    ansible.builtin.fail:
-      msg: "At least 3 private subnets need to be provided."
-
-  - name: Fetch the private subnets info.
-    amazon.aws.ec2_vpc_subnet_info:
-      subnet_ids: "{{ infra__aws_private_subnet_ids }}"
-    register: __aws_private_subnets_info
-
-  - name: Derive the number of AZs the private subnets belong to
-    set_fact:
-      __private_subnets_azs_count : "{{ __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count }}"
-
-  - name: Validate the Private Subnets
-    when: (__private_subnets_azs_count < infra__aws_vpc_az_count) or
-          (True in (__aws_private_subnets_info.subnets | map(attribute='map_public_ip_on_launch')))
-    ansible.builtin.fail:
-      msg: "The private subnets should be provided from at least 2 AZs and should have public IP addressing disabled"
-
-  - name: Check for non-empty public subnets list
-    when: infra__public_endpoint_access and ((infra__aws_public_subnet_ids | unique | count) < (__private_subnets_azs_count | int))
-    ansible.builtin.fail:
-      msg: "There should be at least as many public subnets as the numbers of AZs the input private subnets reside in."
-
-  - name: Fetch the public subnets info.
-    when: infra__public_endpoint_access
-    amazon.aws.ec2_vpc_subnet_info:
-      subnet_ids: "{{ infra__aws_public_subnet_ids }}"
-    register: __aws_public_subnets_info
-
-  - name: Validate the Public Subnet
-    when: infra__public_endpoint_access and
-          (__aws_public_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count < (__private_subnets_azs_count | int))
-    ansible.builtin.fail:
-      msg: "The public subnets should be provided from at least 2 AZs and should have public IP addressing disabled"
-
-  # Set the facts for subsequent plays to pick them up.
-  - name: Set fact for VPC Id and subnet Ids.
-    ansible.builtin.set_fact:
-      infra__aws_vpc_id: "{{ infra__aws_vpc_id }}"
-      infra__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
-      infra__aws_subnet_ids: "{{ infra__aws_private_subnet_ids }}"
-      infra__vpc_cidr: "{{ __aws_vpc_list.vpcs[0].cidr_block }}"
+    - name: Check for non-empty AWS private subnets
+      when: infra__aws_private_subnet_ids | unique | count < 3
+      ansible.builtin.fail:
+        msg: "At least 3 private subnets need to be provided if specifying and existing AWS VPC."

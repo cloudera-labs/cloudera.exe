@@ -29,8 +29,112 @@
     - bucket: "{{ infra__storage_name }}"
       path: "{{ infra__ranger_audit_path }}"
 
-- name: Fetch the AWS VPC id
-  when: infra__aws_vpc_id == ""
+# Will discover VPC ID as well
+- name: Confirm existing AWS Public and Private Subnet details if provided
+  when: infra__aws_private_subnet_ids or infra__aws_public_subnet_ids
+  block:
+    - name: Handle existing AWS Private Subnets
+      when: infra__aws_private_subnet_ids
+      block:
+        - name: Fetch AWS private subnets info
+          amazon.aws.ec2_vpc_subnet_info:
+            subnet_ids: "{{ infra__aws_private_subnet_ids }}"
+          register: __aws_private_subnets_info
+
+        - name: Confirm AWS private subnet AZ count and public IP assignment
+          ansible.builtin.assert:
+            that:
+              - __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count
+              - __aws_private_subnets_info.subnets | map(attribute='map_public_ip_on_launch') | reject() | length > 0
+            fail_msg: "The private subnets should be provided from at least 2 AZs and should have public IP addressing disabled."
+            quiet: yes
+
+        - name: Generate Private Subnet details for update
+          ansible.builtin.set_fact:
+            infra__vpc_private_subnets_info: "{{ infra__vpc_private_subnets_info | default([]) | union([entry]) }}"
+          loop_control:
+            loop_var: __private_subnet_item
+            index_var: __private_subnet_idx
+          loop: "{{ __aws_private_subnets_info }}"
+          vars:
+            entry:
+              name: "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+              cidr: "{{ __private_subnet_item.cidr_block }}"
+              tags:
+                "kubernetes.io/role/internal-elb": "1"
+                "Name": "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+
+        - name: Set facts for existing AWS Private Subnet IDs and associate VPC ID
+          ansible.builtin.set_fact:
+            infra__aws_subnet_ids: "{{ infra__aws_private_subnet_ids }}"
+            infra__aws_vpc_id: "{{ __aws_private_subnets_info.subnets | map(attribute='vpc_id') | list | first }}"
+
+    - name: Handle existing AWS Public Subnets
+      when: infra__aws_public_subnet_ids
+      block:
+        - name: Fetch AWS Public Subnets info 
+          amazon.aws.ec2_vpc_subnet_info:
+            subnet_ids: "{{ infra__aws_public_subnet_ids }}"
+          register: __aws_public_subnets_info
+
+        - name: Confirm AWS Public Subnet AZ count and public IP assignment
+          ansible.builtin.assert:
+            that:
+              - __aws_public_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count
+              - __aws_public_subnets_info.subnets | map(attribute='map_public_ip_on_launch') | select() | length > 0
+            fail_msg: "The public subnets should be associated with at least 2 AZs and should have public IP addressing enabled."
+            quiet: yes
+
+        - name: Confirm additional AWS Public Subnet AZ count if providing Public Endpoint access
+          when: infra__public_endpoint_access
+          ansible.builtin.assert:
+            that: 
+              - infra__aws_private_subnet_ids
+              - infra__aws_public_subnet_ids | unique | count >= __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count
+            fail_msg: "The number of public subnets should be at least as many as the number of associated AZs of the private subnets."
+            quiet: yes
+
+        - name: Generate Public Subnet details for creation
+          ansible.builtin.set_fact:
+            infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) | union([entry]) }}"
+          loop_control:
+            loop_var: __public_subnet_item
+            index_var: __public_subnet_idx
+          loop: "{{ __aws_public_subnets_info }}"
+          vars:
+            entry:
+              name: "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+              cidr: "{{ __public_subnet_item.cidr_block }}"
+              tags:
+                "kubernetes.io/role/elb": "1"
+                "Name": "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+
+        - name: Set facts for existing AWS Public Subnet IDs
+          ansible.builtin.set_fact:
+            infra__aws_subnet_ids: "{{ infra__aws_subnet_ids | default([]) | union(infra__aws_private_subnet_ids) }}"
+            infra__aws_vpc_id: "{{ __aws_public_subnets_info.subnets | map(attribute='vpc_id') | list | first }}"
+
+    - name: Confirm facts for AWS Subnets
+      ansible.builtin.set_fact:
+        infra__vpc_private_subnets_info: "{{ infra__vpc_private_subnets_info | default([]) }}"
+        infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) }}"
+
+- name: Confirm existing AWS VPC if provided
+  when: infra__aws_vpc_id
+  block:
+    - name: Confirm AWS VPC ID
+      amazon.aws.ec2_vpc_net_info:
+        vpc_ids: "{{ infra__aws_vpc_id }}"
+      register: __aws_vpc_list
+      failed_when: not __aws_vpc_list.vpcs
+
+    - name: Set facts for existing AWS VPC CIDR block and Name
+      ansible.builtin.set_fact:
+        infra__vpc_cidr: "{{ __aws_vpc_list.vpcs[0].cidr_block }}"
+        infra__vpc_name: "{{ __aws_vpc_list.vpcs[0].tags['Name'] }}"
+
+- name: Discover possible existing AWS VPC details
+  when: not infra__aws_vpc_id
   block:
     - name: Query AWS VPCs by unique name and CIDR
       amazon.aws.ec2_vpc_net_info:
@@ -38,22 +142,19 @@
         filters:
           "tag:Name": "{{ infra__vpc_name }}*"
           cidr: "{{ infra__vpc_cidr }}"
-      register: __aws_vpc_list
+      register: __aws_vpc_list_discovered
 
     - name: Check VPC list for singular response
-      when: __aws_vpc_list.vpcs | count > 1
+      when: __aws_vpc_list_discovered.vpcs | count > 1
       ansible.builtin.fail:
-        msg: "Found more than one VPC matching name and CIDR"
+        msg: "Found more than one VPC matching name, {{ infra__vpc_name }}, and CIDR, {{ infra__vpc_cidr }}."
 
     - name: Set fact for AWS VPC ID parameter on a unique response
-      when: __aws_vpc_list.vpcs | count == 1
+      when: __aws_vpc_list_discovered.vpcs | count == 1
       ansible.builtin.set_fact:
-        infra__aws_vpc_id: "{{ __aws_vpc_list.vpcs[0].vpc_id }}"
-
-    - name: Reset and set fact for AWS VPC ID if none found
-      when: __aws_vpc_list.vpcs | count < 1
-      ansible.builtin.set_fact:
-        infra__aws_vpc_id: ""
+        infra__aws_vpc_id: "{{ __aws_vpc_list_discovered.vpcs[0].vpc_id }}"
+        infra__vpc_cidr: "{{ __aws_vpc_list_discovered.vpcs[0].cidr_block }}"
+        infra__vpc_name: "{{ __aws_vpc_list_discovered.vpcs[0].tags['Name'] }}"
 
 - name: Fetch EC2 Instance info for Dynamic Inventory Nodes
   register: __infra_dynamic_inventory_discovered
