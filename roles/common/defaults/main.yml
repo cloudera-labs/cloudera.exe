@@ -124,7 +124,8 @@ common__datalake_name_suffix:             "{{ env.datalake.suffix | default(comm
 common__tunnel:                           "{{ env.tunnel | default(False) }}"
 common__public_endpoint_access:           "{{ env.public_endpoint_access | default(not common__tunnel) }}"
 
-common__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
+common__env_admin_password:               "{{ globals.admin_password | mandatory }}"
+common__aws_policy_urls_default_root:     "https://raw.githubusercontent.com/hortonworks/cloudbreak/master/cloud-aws-common/src/main/resources/definitions/cdp"
 
 # Deploy
 common__setup_runtime:                    "{{ ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined or df is defined | default(False) | bool }}"
