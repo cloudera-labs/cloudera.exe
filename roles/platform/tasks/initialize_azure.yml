@@ -20,10 +20,10 @@
 
 - name: Set Azure Caller Information
   ansible.builtin.set_fact:
-    plat__azure_subscription_id: "{{ __azure_account_info.stdout | from_json | json_query('id') }}"
-    plat__azure_subscription_name: "{{ __azure_account_info.stdout | from_json | json_query('name') }}"
-    plat__azure_tenant_id: "{{ __azure_account_info.stdout | from_json | json_query('tenantId') }}"
-    plat__azure_calling_user: "{{ __azure_account_info.stdout | from_json | json_query('user.name') }}"
+    plat__azure_subscription_id: "{{ __azure_account_info.stdout | from_json | community.general.json_query('id') }}"
+    plat__azure_subscription_name: "{{ __azure_account_info.stdout | from_json | community.general.json_query('name') }}"
+    plat__azure_tenant_id: "{{ __azure_account_info.stdout | from_json | community.general.json_query('tenantId') }}"
+    plat__azure_calling_user: "{{ __azure_account_info.stdout | from_json | community.general.json_query('user.name') }}"
 
 - name: Set Azure Subscription URI
   ansible.builtin.set_fact:
@@ -44,7 +44,7 @@
 - name: Set fact Azure App UUID, if exists
   when: __azure_xaccount_app.stdout != "[]"
   ansible.builtin.set_fact:
-    plat__azure_xaccount_app_uuid: "{{ __azure_xaccount_app.stdout | from_json | json_query('[0].appId') }}"
+    plat__azure_xaccount_app_uuid: "{{ __azure_xaccount_app.stdout | from_json | community.general.json_query('[0].appId') }}"
 
 - name: Get Azure Resource Group matching Namespace, if exists
   azure.azcollection.azure_rm_resourcegroup_info:
@@ -66,7 +66,7 @@
 
     - name: Set Service Principal Object UUID for Azure App
       ansible.builtin.set_fact:
-        plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | json_query('[0].objectId') }}"
+        plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | community.general.json_query('[0].objectId') }}"
 
 - name: Get Azure Cross Account Role Info if exists
   azure.azcollection.azure_rm_roledefinition_info:
@@ -89,7 +89,7 @@
     - __azure_identity_list.stdout is defined
     - __azure_identity_list.stdout | count > 0
   ansible.builtin.set_fact:
-    __azure_identity_list_names: "{{ __azure_identity_list.stdout | from_json | json_query('[*].name') }}"
+    __azure_identity_list_names: "{{ __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') }}"
 
 - name: Fetch Azure Security Group Info
   register: __azure_sg_info
@@ -99,8 +99,8 @@
   when: __azure_sg_info | length > 0
   ignore_errors: True  # We do not want to fail if collecting facts and nsg are not already present
   ansible.builtin.set_fact:
-    __azure_sec_group_knox_uri: "{{ __azure_sg_info.stdout | from_json | json_query(__azure_jq_knox) | first }}"
-    __azure_sec_group_default_uri: "{{ __azure_sg_info.stdout | from_json | json_query(__azure_jq_default) | first }}"
+    __azure_sec_group_knox_uri: "{{ __azure_sg_info.stdout | from_json | community.general.json_query(__azure_jq_knox) | first }}"
+    __azure_sec_group_default_uri: "{{ __azure_sg_info.stdout | from_json | community.general.json_query(__azure_jq_default) | first }}"
   vars:
     __azure_jq_knox: "[?name=='{{ plat__security_group_knox_name }}'].id"
     __azure_jq_default: "[?name=='{{ plat__security_group_default_name }}'].id"
@@ -108,10 +108,10 @@
 - name: Extract Azure Identity Principals
   ignore_errors: True
   ansible.builtin.set_fact:
-    __azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_idbroker_uri) | first }}"
-    __azure_datalakeadmin_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_dtadmin_uri) | first }}"
-    __azure_log_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_log_rl_uri) | first }}"
-    __azure_ranger_audit_identity_uri: "{{ __azure_identity_list.stdout | from_json | json_query(jq_rngr_rl_uri) | first }}"
+    __azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_idbroker_uri) | first }}"
+    __azure_datalakeadmin_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_dtadmin_uri) | first }}"
+    __azure_log_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_log_rl_uri) | first }}"
+    __azure_ranger_audit_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_rngr_rl_uri) | first }}"
   vars:
     jq_idbroker_uri: "[?name=='{{ plat__azure_idbroker_identity_name }}'].id"
     jq_dtadmin_uri: "[?name=='{{ plat__azure_datalakeadmin_identity_name }}'].id"
@@ -131,7 +131,7 @@
 - name: Set Azure NetApp Volume Start IP if exists
   when: __azure_netapp_nfs_info.stdout != ''
   ansible.builtin.set_fact:
-    __azure_netapp_startip: "{{ __azure_netapp_nfs_info.stdout | from_json | json_query('mountTargets[0].ipAddress') }}"
+    __azure_netapp_startip: "{{ __azure_netapp_nfs_info.stdout | from_json | community.general.json_query('mountTargets[0].ipAddress') }}"
 
 - name: Set Azure NetApp Volume Info if exists
   when: __azure_netapp_startip is defined

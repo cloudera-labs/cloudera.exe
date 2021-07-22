@@ -36,4 +36,4 @@
 
 - name: Set list of role assignment names to delete
   ansible.builtin.set_fact:
-    __plat_azure_role_assignment_names_list: "{{ __plat__azure_roles_discovered.results | json_query('[*].roleassignments') | select() | json_query('[*][0].id') }}"
+    __plat_azure_role_assignment_names_list: "{{ __plat__azure_roles_discovered.results | community.general.json_query('[*].roleassignments') | select() | community.general.json_query('[*][0].id') }}"

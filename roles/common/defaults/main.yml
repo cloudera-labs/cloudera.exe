@@ -124,11 +124,21 @@ common__datalake_name_suffix:             "{{ env.datalake.suffix | default(comm
 common__tunnel:                           "{{ env.tunnel | default(False) }}"
 common__public_endpoint_access:           "{{ env.public_endpoint_access | default(not common__tunnel) }}"
 
-common__env_admin_password:                     "{{ globals.admin_password | mandatory }}"
+common__env_admin_password:               "{{ globals.admin_password | mandatory }}"
+common__aws_policy_urls_default_root:     "https://raw.githubusercontent.com/hortonworks/cloudbreak/master/cloud-aws-common/src/main/resources/definitions/cdp"
+
 # Deploy
+common__setup_runtime:                    "{{ ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined or df is defined | default(False) | bool }}"
+common__setup_plat:                       "{{ env is defined or sequence__setup_runtime  | default(False) | bool }}"
+common__setup_infra:                      "{{ infra is defined or sequence__setup_plat | default(False) | bool }}"
+common__setup_base:                       "{{ mgmt is defined or clusters is defined | default(False) | bool }}"
+
 common__include_ml:                        "{{ ml is defined | bool }}"
 common__include_dw:                        "{{ dw is defined | bool }}"
 common__include_de:                        "{{ de is defined | bool }}"
 common__include_df:                        "{{ df is defined | bool }}"
 common__include_datahub:                   "{{ datahub is defined | bool }}"
 common__include_opdb:                      "{{ opdb is defined | bool }}"
+
+# Teardown
+common__force_teardown:                    "{{ globals.force_teardown | default(False) }}"  # WARNING: This will purge your namespace and anything related to it, use with extreme caution
