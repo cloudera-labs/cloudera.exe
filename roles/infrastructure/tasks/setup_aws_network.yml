@@ -60,12 +60,15 @@
   amazon.aws.ec2_vpc_subnet:
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
-    cidr: "{{ __aws_subnet_item.cidr }}"
+    cidr: "{{ __aws_public_subnet_item.cidr }}"
+    map_public: "{{ __aws_public_subnet_item.map_public }}"
+    assign_instances_ipv6: "{{ __aws_public_subnet_item.assign_instances_ipv6 }}"
     state: present
-    tags: "{{ infra__tags | combine(__aws_subnet_item.tags, recursive=True) }}"
+    purge_tags: no
+    tags: "{{ infra__tags | combine(__aws_public_subnet_item.tags, recursive=True) }}"
   loop_control:
-    loop_var: __aws_subnet_item
-    index_var: __aws_subnet_index
+    loop_var: __aws_public_subnet_item
+    index_var: __aws_public_subnet_index
   loop: "{{ infra__vpc_public_subnets_info }}"
 
 - name: Update existing AWS VPC Private Subnets
@@ -73,12 +76,13 @@
   amazon.aws.ec2_vpc_subnet:
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
-    cidr: "{{ __aws_subnet_item.cidr }}"
+    cidr: "{{ __aws_private_subnet_item.cidr }}"
     state: present
-    tags: "{{ infra__tags | combine(__aws_subnet_item.tags, recursive=True) }}"
+    purge_tags: no
+    tags: "{{ infra__tags | combine(__aws_private_subnet_item.tags, recursive=True) }}"
   loop_control:
-    loop_var: __aws_subnet_item
-    index_var: __aws_subnet_index
+    loop_var: __aws_private_subnet_item
+    index_var: __aws_private_subnet_index
   loop: "{{ infra__vpc_private_subnets_info }}"
 
 - name: Set up AWS Public Network infrastructure

@@ -98,7 +98,6 @@
             quiet: yes
 
         - name: Generate Public Subnet details for creation
-          when: not __aws_public_subnets_info.subnets
           ansible.builtin.set_fact:
             infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) | union([entry]) }}"
           loop_control:
@@ -109,6 +108,8 @@
             entry:
               name: "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-')) }}"
               cidr: "{{ __public_subnet_item.cidr_block }}"
+              map_public: "{{ __public_subnet_item.map_public_ip_on_launch }}"
+              assign_instances_ipv6: "{{ __public_subnet_item.assign_ipv6_address_on_creation }}"
               tags:
                 "kubernetes.io/role/elb": "1"
                 "Name": "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-')) }}"
