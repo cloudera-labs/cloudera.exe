@@ -244,6 +244,11 @@ infra:
         private_route_table:
         public_route_table_suffix:
         private_route_table_suffix:
+      existing:
+        vpcId:
+        public_subnet_ids:
+        private_subnet_ids:
+        onprem_cidrs_for_security_groups:
   azure:
     metagroup:
       name:
