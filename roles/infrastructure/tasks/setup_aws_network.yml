@@ -14,23 +14,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Set up AWS Network Infrastructure if not provided
-  when: infra__aws_subnet_ids is undefined
+- name: Set up AWS VPC
+  amazon.aws.ec2_vpc_net:
+    region: "{{ infra__region }}"
+    name: "{{ infra__vpc_name }}"
+    cidr_block: "{{ infra__vpc_cidr }}"
+    tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
+    state: present
+  register: __aws_vpc_info
+
+- name: Set fact for AWS VPC ID
+  ansible.builtin.set_fact:
+    infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
+
+- name: Update existing AWS VPC Public and Private Subnets
+  when: infra__aws_subnet_ids
+  amazon.aws.ec2_vpc_subnet:
+    region: "{{ infra__region }}"
+    vpc_id: "{{ infra__aws_vpc_id }}"
+    cidr: "{{ __aws_subnet_item.cidr }}"
+    state: present
+    tags: "{{ infra__tags | combine(__aws_subnet_item.tags, recursive=True) }}"
+  loop_control:
+    loop_var: __aws_subnet_item
+    index_var: __aws_subnet_index
+  loop: "{{ infra__vpc_private_subnets_info | union(infra__vpc_public_subnets_info) }}"
+
+- name: Set up AWS Public Network infrastructure
+  when: (infra__tunnel == infra__public_endpoint_access) and not infra__aws_subnet_ids  # L0 (all public) or L1 (public/private)
   block:
-    - name: Create AWS VPC
-      amazon.aws.ec2_vpc_net:
-        region: "{{ infra__region }}"
-        name: "{{ infra__vpc_name }}"
-        cidr_block: "{{ infra__vpc_cidr }}"
-        tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
-        state: present
-      register: __aws_vpc_info
-
-    - name: Set fact for AWS VPC ID
-      ansible.builtin.set_fact:
-        infra__aws_vpc_id: "{{ __aws_vpc_info.vpc.id }}"
-
-    - name: Create IGW
+    - name: Create AWS Internet Gateway (IGW)
       community.aws.ec2_vpc_igw:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
@@ -38,7 +51,7 @@
         tags: "{{ infra__tags | combine({ 'Name': infra__aws_igw_name }, recursive=True) }}"
       register: __aws_igw
 
-    - name: Set fact for IGW ID
+    - name: Set fact for AWS IGW ID
       when: __aws_igw.gateway_id is defined
       ansible.builtin.set_fact:
         infra__aws_igw_id: "{{ __aws_igw.gateway_id }}"
@@ -49,7 +62,7 @@
         vpc_id: "{{ infra__aws_vpc_id }}"
         cidr: "{{ __aws_public_subnet_item.cidr }}"
         state: present
-        tags: "{{ infra__tags | combine(__aws_public_subnet_item.tags, recursive = true) }}"
+        tags: "{{ infra__tags | combine(__aws_public_subnet_item.tags, recursive=True) }}"
         map_public: yes
         az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
       loop_control:
@@ -65,14 +78,14 @@
         loop_var: __aws_subnet_item
       loop: "{{ __aws_public_subnets.results }}"
 
-    - name: List the Route Tables for the VPC
+    - name: List the Route Tables for the AWS VPC
       community.aws.ec2_vpc_route_table_info:
         region: "{{ infra__region }}"
         filters:
           vpc-id: "{{ infra__aws_vpc_id }}"
       register: __aws_route_table_list
 
-    - name: Configure the Public Route Table
+    - name: Configure the Public Route Table for the AWS VPC
       community.aws.ec2_vpc_route_table:
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
@@ -88,13 +101,13 @@
         __aws_route_table_id: "{{ __aws_route_table_list.route_tables | json_query(__aws_rtb_jq) | flatten | first }}"
         __aws_rtb_jq: "[*].associations[?main == `true` ].route_table_id"
 
-    - name: Set the fact for Subnet Ids
+    - name: Set facts for AWS Subnet IDs with Public Subnet details if not CCM Tunneled
       when: not infra__tunnel
       ansible.builtin.set_fact:
         infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
 
-- name: Setup for private networking when tunneling is enabled for a new infra setup.
-  when: infra__tunnel and (infra__aws_subnet_ids is undefined)
+- name: Setup AWS Private Networking infrastructure
+  when: infra__tunnel and not infra__aws_subnet_ids # L1 (public/private) or L2 (all private)
   block:
     - name: Create AWS VPC Private Subnets
       amazon.aws.ec2_vpc_subnet:
@@ -119,7 +132,7 @@
         loop_var: __aws_subnet_item
       loop: "{{ __aws_private_subnets.results }}"
 
-    - name: Creates NAT gateways and allocates EIPs
+    - name: Create Network Gateways (NAT) and allocate Elastic IP Addresses (EIP) for the AWS VPC
       community.aws.ec2_vpc_nat_gateway:
         state: present
         subnet_id: "{{ __aws_public_subnet_id }}"
@@ -133,7 +146,7 @@
       loop: "{{ infra__aws_public_subnet_ids }}"
       register: __aws_ngws
 
-    - name: Configure Private Route Tables
+    - name: Configure Private Route Tables for the AWS VPC
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
@@ -147,7 +160,7 @@
         index_var: __aws_private_subnet_id_index
       loop: "{{ infra__aws_private_subnet_ids }}"
 
-    - name: Set fact for Subnet Ids
+    - name: Set fact for AWS Subnet IDs
       ansible.builtin.set_fact:
         infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids | union(infra__aws_private_subnet_ids) }}"
 
