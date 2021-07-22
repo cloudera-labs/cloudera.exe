@@ -38,6 +38,7 @@
       block:
         - name: Fetch AWS private subnets info
           amazon.aws.ec2_vpc_subnet_info:
+            region: "{{ infra__region }}"
             subnet_ids: "{{ infra__aws_private_subnet_ids }}"
           register: __aws_private_subnets_info
 
@@ -74,6 +75,7 @@
       block:
         - name: Fetch AWS Public Subnets info 
           amazon.aws.ec2_vpc_subnet_info:
+            region: "{{ infra__region }}"
             subnet_ids: "{{ infra__aws_public_subnet_ids }}"
           register: __aws_public_subnets_info
 
@@ -121,24 +123,44 @@
         infra__vpc_private_subnets_info: "{{ infra__vpc_private_subnets_info | default([]) }}"
         infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) }}"
 
-- name: Confirm existing AWS VPC if provided
+- name: Query existing AWS VPC if provided
   when: infra__aws_vpc_id
   block:
     - name: Confirm AWS VPC ID
+      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
       amazon.aws.ec2_vpc_net_info:
+        region: "{{ infra__region }}"
         vpc_ids: "{{ infra__aws_vpc_id }}"
       register: __aws_vpc_list
       failed_when: not __aws_vpc_list.vpcs
 
     - name: Set facts for existing AWS VPC CIDR block and Name
+      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
       ansible.builtin.set_fact:
         infra__vpc_cidr: "{{ __aws_vpc_list.vpcs[0].cidr_block }}"
-        infra__vpc_name: "{{ __aws_vpc_list.vpcs[0].tags['Name'] }}"
+        # infra__vpc_name: "{{ __aws_vpc_list.vpcs[0].tags['Name'] }}"
+
+    - name: Confirm AWS VPC ID (CLI version)
+      ansible.builtin.command: "aws ec2 describe-vpcs --region {{ infra__region }} --vpc-id {{ infra__aws_vpc_id }}"
+      register: __aws_vpc_list
+      failed_when: not (__aws_vpc_list.stdout | from_json)['Vpcs']
+
+    - name: Set facts for existing AWS VPC CIDR block and Name (CLI version)
+      when: (__aws_vpc_list.stdout | from_json)['Vpcs']['Tags']
+      ansible.builtin.set_fact:
+        infra__vpc_cidr: "{{ (__aws_vpc_list.stdout | from_json)['Vpcs'] | map(attribute='CidrBlock') | list | first }}"
+        #infra__vpc_name: "{{ (__aws_vpc_list.stdout | from_json)['Vpcs'] | map(attribute='Tags') | flatten | selectattr('Key', 'eq', 'Name') | map(attribute='Value') | list | first }}"
+
+    - name: Set facts for existing AWS VPC Name (CLI version)
+      when: not (__aws_vpc_list.stdout | from_json)['Vpcs']['Tags']
+      ansible.builtin.set_fact:
+        infra__vpc_cidr: "{{ (__aws_vpc_list.stdout | from_json)['Vpcs'] | map(attribute='CidrBlock') | list | first }}"
 
 - name: Discover possible existing AWS VPC details
   when: not infra__aws_vpc_id
   block:
     - name: Query AWS VPCs by unique name and CIDR
+      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
       amazon.aws.ec2_vpc_net_info:
         region: "{{ infra__region }}"
         filters:
@@ -147,16 +169,36 @@
       register: __aws_vpc_list_discovered
 
     - name: Check VPC list for singular response
-      when: __aws_vpc_list_discovered.vpcs | count > 1
+      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
+      #when: __aws_vpc_list_discovered.vpcs | count > 1
       ansible.builtin.fail:
         msg: "Found more than one VPC matching name, {{ infra__vpc_name }}, and CIDR, {{ infra__vpc_cidr }}."
 
     - name: Set fact for AWS VPC ID parameter on a unique response
-      when: __aws_vpc_list_discovered.vpcs | count == 1
+      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
+      #when: __aws_vpc_list_discovered.vpcs | count == 1
       ansible.builtin.set_fact:
         infra__aws_vpc_id: "{{ __aws_vpc_list_discovered.vpcs[0].vpc_id }}"
-        infra__vpc_cidr: "{{ __aws_vpc_list_discovered.vpcs[0].cidr_block }}"
-        infra__vpc_name: "{{ __aws_vpc_list_discovered.vpcs[0].tags['Name'] }}"
+        #infra__vpc_cidr: "{{ __aws_vpc_list_discovered.vpcs[0].cidr_block }}"
+        #infra__vpc_name: "{{ __aws_vpc_list_discovered.vpcs[0].tags['Name'] }}"
+
+    - name: Query AWS VPC ID by unique name and CIDR (CLI version)
+      ansible.builtin.command: "aws ec2 describe-vpcs --region {{ infra__region }} --filters Name=cidr,Values={{ infra__vpc_cidr }} Name=tag:Name,Values={{ infra__vpc_name }}"
+      register: __aws_vpc_list_discovered
+      failed_when: not (__aws_vpc_list_discovered.stdout | from_json)['Vpcs']
+
+    - name: Check VPC list for singular response (CLI version)
+      when: (__aws_vpc_list_discovered.stdout | from_json)['Vpcs'] | count > 1
+      ansible.builtin.fail:
+        msg: "Found more than one VPC matching name, {{ infra__vpc_name }}, and CIDR, {{ infra__vpc_cidr }}."
+
+    - name: Set fact for AWS VPC ID parameter on a unique response (CLI version)
+      when: (__aws_vpc_list_discovered | from_json)['Vpcs'] | count == 1
+      ansible.builtin.set_fact:
+        infra__aws_vpc_id: "{{ (__aws_vpc_list_discovered | from_json)['Vpcs'] | map(attribute='VpcId') | list | first }}"
+        #infra__vpc_cidr: "{{ __aws_vpc_list_discovered.vpcs[0].cidr_block }}"
+        #infra__vpc_name: "{{ __aws_vpc_list_discovered.vpcs[0].tags['Name'] }}"
+
 
 - name: Fetch EC2 Instance info for Dynamic Inventory Nodes
   register: __infra_dynamic_inventory_discovered
