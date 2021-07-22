@@ -62,7 +62,7 @@
               cidr: "{{ __private_subnet_item.cidr_block }}"
               tags:
                 "kubernetes.io/role/internal-elb": "1"
-                "Name": "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+                "Name": "{{ __private_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-')) }}"
 
         - name: Set facts for existing AWS Private Subnet IDs and associate VPC ID
           ansible.builtin.set_fact:
@@ -108,7 +108,7 @@
               cidr: "{{ __public_subnet_item.cidr_block }}"
               tags:
                 "kubernetes.io/role/elb": "1"
-                "Name": "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+                "Name": "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-')) }}"
 
         - name: Set facts for existing AWS Public Subnet IDs
           ansible.builtin.set_fact:
