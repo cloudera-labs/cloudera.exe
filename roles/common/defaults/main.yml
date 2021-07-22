@@ -134,4 +134,4 @@ common__include_datahub:                   "{{ datahub is defined | bool }}"
 common__include_opdb:                      "{{ opdb is defined | bool }}"
 
 # Teardown
-common__force_teardown:                    "{{ purge | default(False) }}"  # WARNING: This will purge your namespace and anything related to it, use with extreme caution
+common__force_teardown:                    "{{ globals.force_teardown | default(False) }}"  # WARNING: This will purge your namespace and anything related to it, use with extreme caution
