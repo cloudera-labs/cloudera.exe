@@ -147,11 +147,10 @@
       register: __aws_vpc_list
       failed_when: not (__aws_vpc_list.stdout | from_json)['Vpcs']
 
-    - name: Set facts for existing AWS VPC CIDR block and Name (CLI version)
+    - name: Set facts for existing AWS VPC CIDR block (CLI version)
       when: (__aws_vpc_list.stdout | from_json)['Vpcs'] | count > 0
       ansible.builtin.set_fact:
         infra__vpc_cidr: "{{ (__aws_vpc_list.stdout | from_json)['Vpcs'][0]['CidrBlock'] }}"
-        infra__vpc_name: "{{ (__aws_vpc_list.stdout | from_json)['Vpcs'][0]['Tags'] | flatten | selectattr('Key', 'eq', 'Name') | map(attribute='Value') | list | first }}"
 
 - name: Discover possible existing AWS VPC details
   when: infra__aws_vpc_id == ""
