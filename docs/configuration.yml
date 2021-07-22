@@ -326,7 +326,7 @@ infra:
       subnet:
     user_cidr:
     user_ports:
-    tunneled_cidrs:
+    tunneled_cidr:
 ml:
   definitions:
   k8s_request_base:

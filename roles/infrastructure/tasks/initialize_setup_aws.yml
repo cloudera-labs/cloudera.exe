@@ -96,7 +96,7 @@
     infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
   loop_control:
     loop_var: __tunnel_cidr
-  loop: "{{ infra__vpc_tunneled_cidrs }}"
+  loop: "{{ infra__vpc_tunneled_cidr }}"
   vars:
     rule:
       proto: all
