@@ -44,7 +44,7 @@
         - name: Confirm AWS private subnet AZ count and public IP assignment
           ansible.builtin.assert:
             that:
-              - __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count
+              - __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count | int
               - __aws_private_subnets_info.subnets | map(attribute='map_public_ip_on_launch') | reject() | length > 0
             fail_msg: "The private subnets should be provided from at least 2 AZs and should have public IP addressing disabled."
             quiet: yes
@@ -55,10 +55,10 @@
           loop_control:
             loop_var: __private_subnet_item
             index_var: __private_subnet_idx
-          loop: "{{ __aws_private_subnets_info }}"
+          loop: "{{ __aws_private_subnets_info.subnets }}"
           vars:
             entry:
-              name: "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+              name: "{{ __private_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-')) }}"
               cidr: "{{ __private_subnet_item.cidr_block }}"
               tags:
                 "kubernetes.io/role/internal-elb": "1"
@@ -80,7 +80,7 @@
         - name: Confirm AWS Public Subnet AZ count and public IP assignment
           ansible.builtin.assert:
             that:
-              - __aws_public_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count
+              - __aws_public_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count | int
               - __aws_public_subnets_info.subnets | map(attribute='map_public_ip_on_launch') | select() | length > 0
             fail_msg: "The public subnets should be associated with at least 2 AZs and should have public IP addressing enabled."
             quiet: yes
@@ -95,15 +95,16 @@
             quiet: yes
 
         - name: Generate Public Subnet details for creation
+          when: not __aws_public_subnets_info.subnets
           ansible.builtin.set_fact:
             infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) | union([entry]) }}"
           loop_control:
             loop_var: __public_subnet_item
             index_var: __public_subnet_idx
-          loop: "{{ __aws_public_subnets_info }}"
+          loop: "{{ __aws_public_subnets_info.subnets }}"
           vars:
             entry:
-              name: "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+              name: "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-')) }}"
               cidr: "{{ __public_subnet_item.cidr_block }}"
               tags:
                 "kubernetes.io/role/elb": "1"
@@ -111,7 +112,8 @@
 
         - name: Set facts for existing AWS Public Subnet IDs
           ansible.builtin.set_fact:
-            infra__aws_subnet_ids: "{{ infra__aws_subnet_ids | default([]) | union(infra__aws_private_subnet_ids) }}"
+            infra__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
+            infra__aws_subnet_ids: "{{ infra__aws_subnet_ids | default([]) | union(infra__aws_public_subnet_ids) }}"
             infra__aws_vpc_id: "{{ __aws_public_subnets_info.subnets | map(attribute='vpc_id') | list | first }}"
 
     - name: Confirm facts for AWS Subnets
