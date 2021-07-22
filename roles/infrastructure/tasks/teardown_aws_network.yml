@@ -14,12 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# When infra__aws_subnet_ids is True, then only delete SGs, because the network is not "owned"
-# Otherwise, delete it all unless told otherwise
-# Note that if the VPC is not shared, but is supplied via direct VpcId or discovered via Name/CIDR, the role will attempt to destroy it
-
-- name: Tear down AWS Security Groups
-  when: infra__teardown_deletes_network and infra__aws_vpc_id != ""
+- name: Tear down AWS Security Groups associated with enviroment and datalake
+  when: infra__aws_vpc_id != ""
   amazon.aws.ec2_group:
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
