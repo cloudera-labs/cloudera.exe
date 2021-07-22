@@ -72,7 +72,11 @@ infra__vpc_svcnet_name:             "{{ infra.vpc.service_network.name | default
 infra__vpc_public_subnet_cidrs:     "{{ common__vpc_public_subnet_cidrs }}"
 infra__vpc_private_subnet_cidrs:    "{{ common__vpc_private_subnet_cidrs }}"
 
-infra__vpc_extra_ports:             "{{ infra.vpc.extra_ports | default([22, 443, 7180, 7183]) }}"
+infra__allow_ssh_access:            "{{ infra.vpc.enable_ssh | default(True) }}"
+infra__vpc_cloud_ports:             "{{ infra.vpc.cloud_ports | default([443]) }}"
+infra__vpc_base_ports:              "{{ infra.vpc.base_ports | default([7180, 7183]) }}"
+infra__vpc_ssh_ports:               "{{ infra.vpc.ssh_ports | default([22]) }}"
+infra__vpc_extra_ports:             "{{ infra.vpc.extra_ports | default(common__setup_base | ternary(infra__vpc_base_ports, []) | union( common__setup_plat | ternary(infra__vpc_cloud_ports, [])) | union(infra__allow_ssh_access | ternary(infra__vpc_ssh_ports, [])) ) }}"
 infra__vpc_extra_cidr:              "{{ infra.vpc.extra_cidr | default([]) }}"
 infra__vpc_user_ports:              "{{ infra.vpc.user_ports | default([infra__all_ports_security_rule[infra__type]]) }}"
 infra__vpc_user_cidr:               "{{ infra.vpc.user_cidr | default([]) }}"
