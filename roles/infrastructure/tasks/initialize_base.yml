@@ -37,7 +37,9 @@
     msg: "{{ infra__tags }}"
     verbosity: 1
 
-- name: Generate Public Subnet details
+# TODO: Consider option to make existing subnet details generic?
+- name: Generate Public Subnet details for creation
+  when: not infra__aws_public_subnet_ids
   ansible.builtin.set_fact:
     infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) | union([entry]) }}"
   loop_control:
@@ -52,7 +54,8 @@
         "kubernetes.io/role/elb": "1"
         "Name": "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
 
-- name: Generate Private Subnet Details
+- name: Generate Private Subnet Details for creation
+  when: not infra__aws_private_subnet_ids
   ansible.builtin.set_fact:
     infra__vpc_private_subnets_info: "{{ infra__vpc_private_subnets_info | default([]) | union([entry]) }}"
   loop_control:
