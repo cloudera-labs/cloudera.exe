@@ -17,17 +17,7 @@
 - name: Update existing AWS VPC
   when: infra__aws_vpc_id != ""
   block:
-    - name: Update AWS VPC
-      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
-      amazon.aws.ec2_vpc_net:
-        region: "{{ infra__region }}"
-        name: "{{ infra__vpc_name }}"
-        cidr_block: "{{ infra__vpc_cidr }}"
-        tags: "{{ infra__tags }}" # TODO - Filter out name, per module warning
-        state: present
-      register: __aws_vpc_info
-
-    - name: Prepare AWS VPC tags (CLI version)
+    - name: Prepare AWS VPC tags
       ansible.builtin.set_fact:
         __aws_vpc_tags: "{{ __aws_vpc_tags | default([]) | union([tag_entry]) }}"
       vars:
@@ -36,7 +26,8 @@
       loop_control:
         loop_var: __tag
 
-    - name: Update AWS VPC (CLI version)
+    # Using CLI due to hardcoded module behavior - see https://github.com/boto/boto3/issues/2929
+    - name: Update AWS VPC
       ansible.builtin.command: "aws ec2 create-tags --region {{ infra__region }} --resources {{ infra__aws_vpc_id }} --tags {{ __aws_vpc_tags | join(' ') }}"
 
 - name: Set up AWS VPC
@@ -220,7 +211,7 @@
       ansible.builtin.set_fact:
         infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids | default([]) | union(infra__aws_private_subnet_ids) }}"
 
-- name: Create Security Groups
+- name: Create AWS Security Groups
   amazon.aws.ec2_group:
     state: present
     region: "{{ infra__region }}"
