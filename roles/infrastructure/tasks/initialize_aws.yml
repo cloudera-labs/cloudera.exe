@@ -97,7 +97,7 @@
             fail_msg: "The number of public subnets should be at least as many as the number of associated AZs of the private subnets."
             quiet: yes
 
-        - name: Generate Public Subnet details for creation
+        - name: Generate Public Subnet details for update
           ansible.builtin.set_fact:
             infra__vpc_public_subnets_info: "{{ infra__vpc_public_subnets_info | default([]) | union([entry]) }}"
           loop_control:
@@ -128,20 +128,7 @@
 - name: Query existing AWS VPC if provided
   when: infra__aws_vpc_id != ""
   block:
-    - name: Confirm AWS VPC ID
-      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
-      amazon.aws.ec2_vpc_net_info:
-        region: "{{ infra__region }}"
-        vpc_ids: "{{ infra__aws_vpc_id }}"
-      register: __aws_vpc_list
-      failed_when: not __aws_vpc_list.vpcs
-
-    - name: Set facts for existing AWS VPC CIDR block and Name
-      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
-      ansible.builtin.set_fact:
-        infra__vpc_cidr: "{{ __aws_vpc_list.vpcs[0].cidr_block }}"
-        # infra__vpc_name: "{{ __aws_vpc_list.vpcs[0].tags['Name'] }}"
-
+    # Using CLI due to hardcoded module behavior - see https://github.com/boto/boto3/issues/2929
     - name: Confirm AWS VPC ID (CLI version)
       ansible.builtin.command: "aws ec2 describe-vpcs --region {{ infra__region }} --vpc-id {{ infra__aws_vpc_id }}"
       register: __aws_vpc_list
@@ -155,33 +142,10 @@
 - name: Discover possible existing AWS VPC details
   when: infra__aws_vpc_id == ""
   block:
-    - name: Query AWS VPCs by unique name and CIDR
-      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
-      amazon.aws.ec2_vpc_net_info:
-        region: "{{ infra__region }}"
-        filters:
-          "tag:Name": "{{ infra__vpc_name }}*"
-          cidr: "{{ infra__vpc_cidr }}"
-      register: __aws_vpc_list_discovered
-
-    - name: Check VPC list for singular response
-      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
-      #when: __aws_vpc_list_discovered.vpcs | count > 1
-      ansible.builtin.fail:
-        msg: "Found more than one VPC matching name, {{ infra__vpc_name }}, and CIDR, {{ infra__vpc_cidr }}."
-
-    - name: Set fact for AWS VPC ID parameter on a unique response
-      when: no # Skipped due to https://github.com/boto/boto3/issues/2929
-      #when: __aws_vpc_list_discovered.vpcs | count == 1
-      ansible.builtin.set_fact:
-        infra__aws_vpc_id: "{{ __aws_vpc_list_discovered.vpcs[0].vpc_id }}"
-        #infra__vpc_cidr: "{{ __aws_vpc_list_discovered.vpcs[0].cidr_block }}"
-        #infra__vpc_name: "{{ __aws_vpc_list_discovered.vpcs[0].tags['Name'] }}"
-
+    # Using CLI due to hardcoded module behavior - see https://github.com/boto/boto3/issues/2929
     - name: Query AWS VPC ID by unique name and CIDR (CLI version)
       ansible.builtin.command: "aws ec2 describe-vpcs --region {{ infra__region }} --filters Name=cidr,Values={{ infra__vpc_cidr }} Name=tag:Name,Values={{ infra__vpc_name }}"
       register: __aws_vpc_list_discovered
-      #failed_when: not (__aws_vpc_list_discovered.stdout | from_json)['Vpcs']
 
     - name: Check VPC list for singular response (CLI version)
       when: (__aws_vpc_list_discovered.stdout | from_json)['Vpcs'] | count > 1
@@ -192,8 +156,6 @@
       when: (__aws_vpc_list_discovered.stdout | from_json)['Vpcs'] | count == 1
       ansible.builtin.set_fact:
         infra__aws_vpc_id: "{{ (__aws_vpc_list_discovered.stdout | from_json)['Vpcs'] | map(attribute='VpcId') | list | first }}"
-        #infra__vpc_cidr: "{{ __aws_vpc_list_discovered.vpcs[0].cidr_block }}"
-        #infra__vpc_name: "{{ __aws_vpc_list_discovered.vpcs[0].tags['Name'] }}"
 
 - name: Fetch EC2 Instance info for Dynamic Inventory Nodes
   register: __infra_dynamic_inventory_discovered
@@ -215,7 +177,7 @@
       - key: "tag:Name"
         value: "{{ infra__namespace }}*"
 
-- name: Set discovered compute inventory for later action
+- name: Set fact for discovered EC2 Compute inventory
   ansible.builtin.set_fact:
     infra__discovered_compute_inventory: "{{ __infra_dynamic_inventory_discovered.instances + __infra_utility_compute_discovered.instances }}"
 
@@ -233,131 +195,4 @@
     infra__type: "{{ infra__type }}"
     infra__region: "{{ infra__region }}"
 
-- name: Discover VPC Dependencies during Purge cleanup
-  when:
-    - infra__force_teardown | bool
-    - infra__aws_vpc_id | length > 1
-  block:
-    - name: Fetch Network Interfaces in VPC
-      register: __infra_vpc_enis
-      amazon.aws.ec2_eni_info:
-        region: "{{ infra__region }}"
-        filters: "{{ __filters | items2dict }}"
-      vars:
-        __filters:
-          - key: "vpc-id"
-            value: "{{ infra__aws_vpc_id }}"
 
-    - name: List all EC2 instances in VPC
-      register: __infra_vpc_ec2_instances
-      community.aws.ec2_instance_info:
-        region: "{{ infra__region }}"
-        filters: "{{ __filters | items2dict }}"
-      vars:
-        __filters:
-          - key: "vpc-id"
-            value: "{{ infra__aws_vpc_id }}"
-
-    - name: Update discovered compute inventory for later action
-      ansible.builtin.set_fact:
-        infra__discovered_compute_inventory: "{{ infra__discovered_compute_inventory + __infra_vpc_ec2_instances.instances }}"
-
-    - name: List EKS Clusters
-      register: __infra_eks_cluster_list
-      command: "aws eks list-clusters"
-
-    - name: Describe all EKS Clusters
-      register: __infra_eks_cluster_details
-      ansible.builtin.command: "aws eks describe-cluster --name {{ __infra_eks_cluster_item }}"
-      loop_control:
-        loop_var: __infra_eks_cluster_item
-      loop: "{{ __infra_eks_cluster_list.stdout | from_json | community.general.json_query('clusters') }} "
-
-    - name: Filter EKS by this VPC
-      ansible.builtin.set_fact:
-        __infra_vpc_eks_cluster_names: "{{ __infra_vpc_eks_cluster_names | d([]) + [__infra_lookup_name] }}"
-      when: __infra_lookup_vpc == infra__aws_vpc_id
-      vars:
-        __infra_lookup_vpc: "{{ __infra_eks_cluster_detail_item.stdout | from_json | community.general.json_query('cluster.resourcesVpcConfig.vpcId') }}"
-        __infra_lookup_name: "{{ __infra_eks_cluster_detail_item.stdout | from_json | community.general.json_query('cluster.name') }}"
-      loop: "{{ __infra_eks_cluster_details.results }}"
-      loop_control:
-        loop_var: __infra_eks_cluster_detail_item
-
-    - name: List all ASGs in region
-      register: __infra_ec2_asg_list
-      community.aws.ec2_asg_info:
-        region: "{{ infra__region }}"
-
-    - name: Fetch list of all Subnets in VPC
-      register: __infra_disc_subnets
-      amazon.aws.ec2_vpc_subnet_info:
-        filters:
-          vpc-id: "{{ infra__aws_vpc_id }}"
-
-    - name: Filter ASGs by Subnets in this VPC
-      when:
-        - __infra_ec2_asg_list.results | length > 0
-        - __infra_asg_filter_item.vpc_zone_identifier in __infra_vpc_subnet_ids
-      ansible.builtin.set_fact:
-        __infra_aws_asg_names: "{{ __infra_aws_asg_names | default([]) + [__infra_asg_filter_item.auto_scaling_group_name] }}"
-      vars:
-        __infra_vpc_subnet_ids: "{{ __infra_disc_subnets.subnets | community.general.json_query('[*].id') | list | unique }}"
-        __infra_vpc_sg_ids: "{{ __infra_disc_sgs.security_groups | community.general.json_query('[*].group_id') | list | unique }}"
-      loop: "{{ __infra_ec2_asg_list.results }}"
-      loop_control:
-        loop_var: __infra_asg_filter_item
-
-    - name: List all AWS ELBs in region
-      community.aws.ec2_elb_info:
-        region: "{{ infra__region }}"
-      register: __infra_ec2_elbs
-
-    - name: Filter list of ELBS to match our VPC
-      when:
-        - __infra_ec2_elbs.elbs | length > 0
-        - __infra_ec2_elb_item.vpc_id == infra__aws_vpc_id
-      ansible.builtin.set_fact:
-        __infra_ec2_elb_names: "{{ __infra_ec2_elb_names | default([]) + [__infra_ec2_elb_item.name] }}"
-      loop: "{{ __infra_ec2_elbs.elbs }}"
-      loop_control:
-        loop_var: __infra_ec2_elb_item
-
-    - name: List NAT gatways in VPC
-      community.aws.ec2_vpc_nat_gateway_info:
-        region: "{{ infra__region }}"
-        filters:
-          vpc-id: "{{ infra__aws_vpc_id }}"
-      register: __infra_aws_nat_gateways
-
-    - name: List all Security Groups in VPC
-      register:  __infra_aws_sgs
-      amazon.aws.ec2_group_info:
-        region: "{{ infra__region }}"
-        filters:
-          vpc-id: "{{ infra__aws_vpc_id }}"
-
-    - name: List all Route tables in VPC
-      register: __infra_aws_rtbs
-      community.aws.ec2_vpc_route_table_info:
-        region: "{{ infra__region }}"
-        filters:
-          vpc-id: "{{ infra__aws_vpc_id }}"
-
-- name: Discover Storage during Purge cleanup
-  when:
-    - infra__force_teardown | bool
-  block:
-    - name: List AWS EBS Volumes
-      register: __infra_aws_ebs_vols
-      amazon.aws.ec2_vol_info:
-        region: "{{ infra__region }}"
-        filters:
-          status: available
-
-    - name: Check for Orphaned EFS matching Namespace
-      register: __infra_efs_fs
-      community.aws.efs_info:
-        region: "{{ infra__region }}"
-        tags:
-          Environment: "{{ infra__env_name }}"
