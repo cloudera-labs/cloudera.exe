@@ -175,7 +175,8 @@
         - not infra__force_teardown
       block:
         - name: Delete the AWS Private Route Table
-          when: not infra__public_endpoint_access
+          #when: not infra__public_endpoint_access
+          when: no
           community.aws.ec2_vpc_route_table:
             vpc_id: "{{ infra__aws_vpc_id }}"
             region: "{{ infra__region }}"
@@ -183,8 +184,8 @@
             tags: "{{ { 'Name': infra__aws_private_route_table_name } }}"
             state: absent
 
-        - name: Delete the AWS Private Route Tables for Public Endpoint Access
-          when: infra__public_endpoint_access
+        - name: Delete the AWS Private Route Tables # for Public Endpoint Access
+          # when: infra__public_endpoint_access
           community.aws.ec2_vpc_route_table:
             vpc_id: "{{ infra__aws_vpc_id }}"
             region: "{{ infra__region }}"
@@ -195,8 +196,8 @@
             index_var: __aws_private_subnet_id_index
           loop: "{{ infra__vpc_private_subnet_cidrs }}"
 
-        - name: List all managed AWS NAT Gateways for Public Endpoint Access
-          when: infra__public_endpoint_access 
+        - name: List all managed AWS NAT Gateways # for Public Endpoint Access
+          # when: infra__public_endpoint_access 
           community.aws.ec2_vpc_nat_gateway_info:
             region: "{{ infra__region }}"
             filters:
@@ -204,7 +205,7 @@
           register: __aws_all_ngws
 
         - name: Delete associated AWS NAT Gateways
-          when: infra__public_endpoint_access
+          # when: infra__public_endpoint_access
           community.aws.ec2_vpc_nat_gateway:
             state: absent
             region: "{{ infra__region }}"
@@ -225,7 +226,7 @@
           loop: "{{ __aws_ngw_teardown.results }}"
    
     - name: Remove AWS Public Network
-      when: no infra__force_teardown
+      when: not infra__force_teardown
       block:
         - name: Remove AWS VPC Subnets
           amazon.aws.ec2_vpc_subnet:
@@ -239,7 +240,7 @@
           loop: "{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) }}"
 
         - name: Remove AWS Internet Gateway (IGW)
-          when: infra__tunnel and infra__public_endpoint_access
+          #when: infra__tunnel and infra__public_endpoint_access
           community.aws.ec2_vpc_igw:
             region: "{{ infra__region }}"
             vpc_id: "{{ infra__aws_vpc_id }}"

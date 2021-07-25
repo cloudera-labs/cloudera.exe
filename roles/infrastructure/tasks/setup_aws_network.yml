@@ -77,7 +77,8 @@
   loop: "{{ infra__vpc_private_subnets_info }}"
 
 - name: Set up AWS Public Network infrastructure
-  when: not (infra__tunnel and not infra__public_endpoint_access) and infra__aws_subnet_ids is undefined # L0 (all public) or L1 (public/private)
+  when: infra__aws_subnet_ids is undefined  # L0 (fully public), L1 (semi-private), or L2 (fully-private), but not for existing network or L3 (outbound restricted)
+  # when: not (infra__tunnel and not infra__public_endpoint_access) and infra__aws_subnet_ids is undefined # L0 (all public) or L1 (public/private)
   block:
     - name: Create AWS Internet Gateway (IGW)
       community.aws.ec2_vpc_igw:
@@ -143,7 +144,7 @@
         infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
 
 - name: Setup AWS Private Networking infrastructure
-  when: infra__tunnel and infra__aws_subnet_ids is undefined # L1 (public/private) or L2 (all private)
+  when: infra__tunnel and infra__aws_subnet_ids is undefined # L1 (semi-private) or L2 (fully private), but not for existing network or L0 (fully public) or L3 (outbound restricted)
   block:
     - name: Create AWS VPC Private Subnets
       amazon.aws.ec2_vpc_subnet:
@@ -169,7 +170,8 @@
       loop: "{{ __aws_private_subnets.results }}"
 
     - name: Configure Private Route Table for the AWS VPC
-      when: not infra__public_endpoint_access
+      when: no
+      #when: not infra__public_endpoint_access
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
@@ -177,8 +179,9 @@
         subnets: "{{ infra__aws_private_subnet_ids }}"
         routes: []
 
-    - name: Create Network Gateways (NAT) and allocate Elastic IP Addresses (EIP) for Public Endpoint Access
-      when: infra__public_endpoint_access
+    - name: Create Network Gateways (NAT) # and allocate Elastic IP Addresses (EIP) for Public Endpoint Access
+      #when: infra__public_endpoint_access
+      # Might want a net new flag -- disconnected -- that will not set up any routes to outside, i.e. Level3
       community.aws.ec2_vpc_nat_gateway:
         state: present
         subnet_id: "{{ __aws_public_subnet_id }}"
@@ -192,8 +195,9 @@
       loop: "{{ infra__aws_public_subnet_ids }}"
       register: __aws_ngws
 
-    - name: Configure Private Route Tables for the AWS VPC for Public Endpoint Access
-      when: infra__public_endpoint_access
+    - name: Configure Private Route Tables #for the AWS VPC for Public Endpoint Access
+      #when: infra__public_endpoint_access
+      # See above
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
