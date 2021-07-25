@@ -15,13 +15,15 @@
 # limitations under the License.
 
 - name: Refresh Environment Info with Descendants
+  when: no
   cloudera.cloud.env_info:
     name: "{{ plat__env_name }}"
     descendants: true
   register: plat__env_info
 
 - name: Check that Environment has no descendants before Platform teardown
-  when: plat__env_info.environments | length > 0
+  when: no
+  #when: plat__env_info.environments | length > 0
   ansible.builtin.assert:
     that:
       - plat__env_info.environments[0].descendants.datahub | length == 0
