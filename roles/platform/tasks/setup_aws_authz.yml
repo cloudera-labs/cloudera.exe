@@ -119,9 +119,6 @@
     - key: bucket_access
       name: "{{ plat__aws_bucket_access_policy_name }}"
       description: CDP Bucket S3 Access
-    - key: dynamodb
-      name: "{{ plat__aws_dynamodb_policy_name }}"
-      description: AWS DynamoDB Table Access
 
 - name: Create AWS Service Roles
   community.aws.iam_role:
@@ -188,13 +185,11 @@
       policies:
         - "{{ plat__aws_datalake_admin_s3_policy_name }}"
         - "{{ plat__aws_bucket_access_policy_name }}"
-        - "{{ plat__aws_dynamodb_policy_name }}"
     - name: "{{ plat__aws_ranger_audit_role_name }}"
       description: CDP Ranger Audit
       policies:
         - "{{ plat__aws_ranger_audit_s3_policy_name }}"
         - "{{ plat__aws_bucket_access_policy_name }}"
-        - "{{ plat__aws_dynamodb_policy_name }}"
 
 - name: Ensure AWS Instance Profiles are attached to CDP Roles
   command: >

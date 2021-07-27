@@ -29,7 +29,6 @@
     workload_analytics: "{{ plat__workload_analytics }}"
     vpc_id: "{{ plat__aws_vpc_id }}"
     subnet_ids: "{{ plat__aws_subnet_ids }}"
-    s3_guard_name: "{{ plat__aws_dynamodb_table_name }}"
     tags: "{{ plat__tags }}"
     tunnel: "{{ plat__tunnel }}"
     endpoint_access_scheme: "{{ plat__endpoint_access_scheme | default(omit) }}"

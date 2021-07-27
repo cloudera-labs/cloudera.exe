@@ -97,7 +97,6 @@ infra__de_deploy:                   "{{ common__include_de }}"
 infra__de_path:                     "{{ common__de_path }}"
 
 infra__aws_profile:                 "{{ common__aws_profile }}"
-infra__aws_dynamodb_table_name:     "{{ common__aws_dynamodb_table_name }}"
 infra__aws_vpc_az_count:            "{{ infra.aws.vpc.az_count | default(3) }}"
 infra__aws_igw_name:                "{{ infra.aws.vpc.internet_gateway.name | default([infra__namespace, infra__aws_igw_suffix] | join('-')) }}"
 infra__aws_igw_suffix:              "{{ infra.aws.vpc.internet_gateway.suffix | default(common__igw_suffix) }}"
