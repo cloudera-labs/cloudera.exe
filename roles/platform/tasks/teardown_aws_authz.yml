@@ -75,7 +75,6 @@
         - "{{ plat__aws_ranger_audit_s3_policy_name }}"
         - "{{ plat__aws_datalake_admin_s3_policy_name }}"
         - "{{ plat__aws_bucket_access_policy_name }}"
-        - "{{ plat__aws_dynamodb_policy_name }}"
 
     - name: Remove CDP IDBroker Assume Role Policy
       community.aws.iam_managed_policy:

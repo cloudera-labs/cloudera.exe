@@ -36,5 +36,3 @@
       replace: "{{ plat__storage_name }}"
     - regexp: '\${DATALAKE_BUCKET}'
       replace: "{{ plat__storage_name }}"
-    - regexp: '\${DYNAMODB_TABLE_NAME}'
-      replace: "{{ plat__aws_dynamodb_table_name }}"

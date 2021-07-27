@@ -93,14 +93,12 @@ plat__aws_role_suffix:                        "{{ common__aws_role_suffix }}"
 plat__aws_policy_suffix:                      "{{ env.aws.policy.suffix | default(common__policy_suffix) }}"
 plat__aws_storage_suffix:                     "{{ env.aws.storage.suffix | default(common__storage_suffix) }}"
 
-plat__aws_dynamodb_table_suffix:              "{{ env.aws.dynamodb.table_suffix | default(common__table_suffix) }}"
 plat__aws_xaccount_suffix:                    "{{ env.aws.role.label.cross_account | default(common__xaccount_suffix) }}"
 plat__aws_idbroker_suffix:                    "{{ common__aws_idbroker_suffix }}"
 plat__aws_log_suffix:                         "{{ env.aws.role.label.log | default(common__logs_suffix) }}"
 plat__aws_datalake_admin_suffix:              "{{ common__aws_datalake_admin_suffix }}"
 plat__aws_ranger_audit_suffix:                "{{ env.aws.role.label.ranger_audit | default(common__ranger_audit_suffix) }}"
 
-plat__aws_dynamodb_table_name:                "{{ common__aws_dynamodb_table_name }}"
 plat__aws_xaccount_role_name:                 "{{ env.aws.role.name.cross_account | default([plat__namespace, plat__aws_xaccount_suffix, plat__aws_role_suffix] | join('-')) }}"
 plat__aws_idbroker_role_name:                 "{{ common__aws_idbroker_role_name }}"
 plat__aws_log_role_name:                      "{{ env.aws.role.name.log | default([plat__namespace, plat__aws_log_suffix, plat__aws_role_suffix] | join('-')) }}"
@@ -113,7 +111,6 @@ plat__aws_log_location_policy_name:           "{{ env.aws.policy.name.log | defa
 plat__aws_datalake_admin_s3_policy_name:      "{{ env.aws.policy.name.datalake_admin_s3 | default([plat__namespace, plat__aws_datalake_admin_suffix, plat__aws_policy_suffix] | join('-')) }}"
 plat__aws_ranger_audit_s3_policy_name:        "{{ env.aws.policy.name.ranger_audit_s3 | default([plat__namespace, plat__aws_ranger_audit_suffix, plat__aws_policy_suffix] | join('-')) }}"
 plat__aws_bucket_access_policy_name:          "{{ env.aws.policy.name.bucket_access | default([plat__namespace, plat__aws_storage_suffix, plat__aws_policy_suffix] | join('-')) }}"
-plat__aws_dynamodb_policy_name:               "{{ env.aws.policy.name.dynamodb | default([plat__namespace, plat__aws_dynamodb_table_suffix, plat__aws_policy_suffix] | join('-')) }}"
 
 plat__aws_policy_urls:                        "{{ plat__aws_policy_urls_default | combine(env.aws.policy.url | default({})) }}"
 

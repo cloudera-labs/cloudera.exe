@@ -28,14 +28,11 @@ dw:
   suffix:
 env:
   aws:
-    dynamodb:
-      table_suffix:
     policy:
       name:
         bucket_access:
         cross_account:
         datalake_admin_s3:
-        dynamodb:
         idbroker:
         log:
         ranger_audit_s3:
@@ -230,8 +227,6 @@ globals:
   utility_bucket_name:
 infra:
   aws:
-    dynamodb:
-      table_name:
     profile:
     region:
     vpc:
