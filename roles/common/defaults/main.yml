@@ -21,6 +21,7 @@
 # Labels
 common__namespace:                        "{{ globals.name_prefix | default([globals.namespace_root | default('cdp'), globals.namespace_uid | default(ansible_date_time.date | replace('-',''))] | join('-')) }}"
 
+common__namespace_unique_suffix:          "{{ globals.labels.namespace_suffix | default(common__infra_type[:2]) }}"
 common__xaccount_suffix:                  "{{ globals.labels.cross_account | default('xaccount') }}"
 common__credential_suffix:                "{{ globals.labels.credential | default('cred') }}"
 common__env_suffix:                       "{{ globals.labels.env | default('env') }}"
@@ -56,7 +57,7 @@ common__unique_storage_name_suffix:       "{{ globals.storage.name | default((co
 # Infra
 common__infra_type:                       "{{ globals.infra_type | default('aws') }}"
 common__public_key_file:                  "{{ globals.ssh.public_key_file | default('') }}"
-common__namespace_cdp:                    "{{ globals.namespace_cdp | default([common__namespace, common__infra_type[:2]] | join('-')) }}"
+common__namespace_cdp:                    "{{ globals.namespace_cdp | default([common__namespace, common__namespace_unique_suffix] | join('-')) }}"
 common__tags:                             "{{ globals.tags | default({}) }}"
 common__public_key_id:                    "{{ globals.ssh.public_key_id | default('') }}"
 common__public_key_text:                  "{{ globals.ssh.public_key_text | default('') }}"

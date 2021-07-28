@@ -15,8 +15,8 @@
 # limitations under the License.
 
 - name: Tear down AWS Security Groups associated with enviroment and datalake
-  when: 
-    - infra__teardown_deletes_network 
+  when:
+    - infra__teardown_deletes_network
     - infra__aws_vpc_id != ""
     - not infra__force_teardown
   amazon.aws.ec2_group:
@@ -31,8 +31,8 @@
     - "{{ infra__security_group_default_name }}"
 
 - name: Tear down AWS Network
-  when: 
-    - infra__teardown_deletes_network 
+  when:
+    - infra__teardown_deletes_network
     - infra__aws_vpc_id != ""
     - infra__aws_subnet_ids is undefined
   block:
@@ -69,8 +69,8 @@
               until: __elb_teardowns_async.finished
               retries: 120
               delay: 10
-        
-        - name: Remove discovered AWS Network Adapters 
+
+        - name: Remove discovered AWS Network Adapters
           when:
             - __infra_vpc_enis is defined
             - __infra_vpc_enis.network_interfaces is defined
@@ -170,7 +170,7 @@
             state: absent
 
     - name: Remove AWS Private Network
-      when: 
+      when:
         - infra__tunnel
         - not infra__force_teardown
       block:
@@ -197,7 +197,7 @@
           loop: "{{ infra__vpc_private_subnet_cidrs }}"
 
         - name: List all managed AWS NAT Gateways # for Public Endpoint Access
-          # when: infra__public_endpoint_access 
+          # when: infra__public_endpoint_access
           community.aws.ec2_vpc_nat_gateway_info:
             region: "{{ infra__region }}"
             filters:
@@ -224,7 +224,7 @@
             msg: "Failed to delete a NAT gateway"
           failed_when: item.rc is defined and item.rc != 1 and ('InvalidAllocationID.NotFound' in item.module_stderr)
           loop: "{{ __aws_ngw_teardown.results }}"
-   
+
     - name: Remove AWS Public Network
       when: not infra__force_teardown
       block:

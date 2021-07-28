@@ -34,14 +34,13 @@
 - name: Remove AWS EFS File Systems, if Discovered during Purge
   when:
     - infra__force_teardown | bool
-    - __infra_efs_fs is defined
-    - __infra_efs_fs.efs | length > 0
+    - __infra_efs_fs is defined and __infra_efs_fs.results is defined
+    - __infra_efs_fs.results | community.general.json_query('[*].efs') | flatten | length > 0
   community.aws.efs:
     state: absent
-    name: "{{ __infra_efs_item.name }}"
+    id: "{{ __infra_efs_item.file_system_id }}"
     wait: yes
-  loop:
-    "{{ __infra_efs_fs.efs }}"
+  loop: "{{ __infra_efs_fs.results | community.general.json_query('[*].efs') | flatten }}"
   loop_control:
     loop_var: __infra_efs_item
 
