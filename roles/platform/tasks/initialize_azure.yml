@@ -81,10 +81,6 @@
         that: plat__azure_application_service_principal_objuuid | length > 0
         fail_msg: "Azure Service Principal Object ID appears to be length 0, please check and try again"
 
-- name: Print current plat__azure_application_service_principal_objuuid
-  debug:
-    msg: "{{ plat__azure_application_service_principal_objuuid | d('not set') }}"
-
 - name: Get Azure Cross Account Role Info if exists
   azure.azcollection.azure_rm_roledefinition_info:
     scope: "{{ plat__azure_subscription_uri }}"
