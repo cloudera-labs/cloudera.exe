@@ -52,15 +52,15 @@
       ansible.builtin.command: "aws eks describe-cluster --name {{ __infra_eks_cluster_item }} --region {{ infra__region }}"
       loop_control:
         loop_var: __infra_eks_cluster_item
-      loop: "{{ (__infra_eks_cluster_list.stdout | from_json)['clusters'] }} "
+      loop: "{{ __infra_eks_cluster_list.stdout | from_json | community.general.json_query('clusters') }}"
 
     - name: Filter AWS EKS clusters by AWS VPC
       ansible.builtin.set_fact:
         __infra_vpc_eks_cluster_names: "{{ __infra_vpc_eks_cluster_names | d([]) + [__infra_lookup_name] }}"
       when: __infra_lookup_vpc == infra__aws_vpc_id
       vars:
-        __infra_lookup_vpc: "{{ (__infra_eks_cluster_detail_item.stdout | from_json)['cluster']['resourcesVpcConfig']['vpcId'] }}"
-        __infra_lookup_name: "{{ (__infra_eks_cluster_detail_item.stdout | from_json)['cluster']['name'] }}"
+        __infra_lookup_vpc: "{{ __infra_eks_cluster_detail_item.stdout | from_json | community.general.json_query('cluster.resourcesVpcConfig.vpcId') }}"
+        __infra_lookup_name: "{{ __infra_eks_cluster_detail_item.stdout | from_json | community.general.json_query('cluster.name') }}"
       loop: "{{ __infra_eks_cluster_details.results }}"
       loop_control:
         loop_var: __infra_eks_cluster_detail_item
@@ -87,7 +87,7 @@
     - name: Filter Autoscaling Groups by discovered AWS VPC Subnets
       when:
         - __infra_ec2_asg_list.results | length > 0
-        - __infra_asg_filter_item.vpc_zone_identifier in __infra_vpc_subnet_ids
+        - __infra_asg_filter_item.vpc_zone_identifier.split(",")[0] in __infra_vpc_subnet_ids
       ansible.builtin.set_fact:
         __infra_aws_asg_names: "{{ __infra_aws_asg_names | default([]) + [__infra_asg_filter_item.auto_scaling_group_name] }}"
       vars:
@@ -133,7 +133,21 @@
         filters:
           vpc-id: "{{ infra__aws_vpc_id }}"
 
-- name: Discover AWS Storage for forced teardown
+- name: Discover AWS RDS for forced teardown
+  when: infra__force_teardown | bool
+  block:
+    - name: list AWS RDS Instances in region
+      community.aws.rds_instance_info:
+        region: "{{ infra__region }}"
+      register: __infra_aws_rds_list
+
+    - name: Filter RDS instances by AWS VPC
+      ansible.builtin.set_fact:
+        __infra_aws_rds_instances: "{{ __infra_aws_rds_list | json_query(__aws_rds_jq) }}"
+      vars:
+        __aws_rds_jq: "instances[?db_subnet_group.vpc_id == '{{ infra__aws_vpc_id }}']"
+
+- name: Discover AWS Elastic Block Storage for forced teardown
   when:
     - infra__force_teardown | bool
   block:
@@ -148,5 +162,13 @@
       register: __infra_efs_fs
       community.aws.efs_info:
         region: "{{ infra__region }}"
-        tags:
-          Environment: "{{ infra__env_name }}"
+        tags: "{{ __tag | items2dict }}"
+      vars:
+        __tag:
+          - key: "{{ __efs_disc_item }}"
+            value: "{{ infra__env_name }}"
+      loop:
+        - Environment
+        - clusterName
+      loop_control:
+        loop_var: __efs_disc_item

@@ -74,7 +74,7 @@
     - name: Handle existing AWS Public Subnets
       when: infra__aws_public_subnet_ids
       block:
-        - name: Fetch AWS Public Subnets info 
+        - name: Fetch AWS Public Subnets info
           amazon.aws.ec2_vpc_subnet_info:
             region: "{{ infra__region }}"
             subnet_ids: "{{ infra__aws_public_subnet_ids }}"
@@ -91,7 +91,7 @@
         - name: Confirm additional AWS Public Subnet AZ count if providing Public Endpoint access
           when: infra__public_endpoint_access
           ansible.builtin.assert:
-            that: 
+            that:
               - infra__aws_private_subnet_ids
               - infra__aws_public_subnet_ids | unique | count >= __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count
             fail_msg: "The number of public subnets should be at least as many as the number of associated AZs of the private subnets."
@@ -194,5 +194,3 @@
   ansible.builtin.set_fact:
     infra__type: "{{ infra__type }}"
     infra__region: "{{ infra__region }}"
-
-
