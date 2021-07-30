@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Initialize CDP Runtime setup
-  ansible.builtin.include_tasks: "initialize_base.yml"
-
 - name: Include provider-specific tasks to initialize Runtime setup
   ansible.builtin.include_tasks: "initialize_setup_{{ run__infra_type }}.yml"
+
+- name: Initialize CDP Runtime setup
+  ansible.builtin.include_tasks: "initialize_base.yml"

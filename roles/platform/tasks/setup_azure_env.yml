@@ -28,7 +28,8 @@
     public_key_text: "{{ plat__public_key_text }}"
     workload_analytics: "{{ plat__workload_analytics }}"
     vpc_id: "{{ plat__vpc_name }}"
+    tunnel: "{{ plat__tunnel }}"
     resource_gp: "{{ plat__azure_metagroup_name }}"
     subnet_ids: "{{ plat__azure_subnets }}"
-    public_ip: yes
+    public_ip: "{{ plat__public_endpoint_access }}"
     tags: "{{ plat__tags }}"

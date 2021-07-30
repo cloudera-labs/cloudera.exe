@@ -16,7 +16,7 @@
 
 - name: Execute CDP OpDB teardown
   when:
-    - run__include_opdb
+    - run__include_opdb or run__force_teardown | bool
     - run__opdb_configs is defined
     - run__opdb_configs | length > 0
   cloudera.cloud.opdb:
@@ -35,7 +35,7 @@
 - name: Execute CDP DW cluster teardown
   register: __dw_teardown_info
   when:
-    - run__include_dw
+    - run__include_dw or run__force_teardown | bool
     - run__env_info.environments | length > 0
     - run__env_info.environments[0].descendants.dw | length > 0
   cloudera.cloud.dw_cluster:
@@ -47,7 +47,8 @@
 - name: Execute CDP Dataflow teardown
   register: __df_teardown_info
   when:
-    - run__include_df
+    - run__include_df or run__force_teardown | bool
+    - run__df_env_info is defined and run__df_env_info.services is defined
     - run__df_env_info.services | length > 0
   cloudera.cloud.df:
     name: "{{ __df_teardown_req_item.crn }}"
@@ -61,7 +62,7 @@
 
 - name: Execute CDP ML Workspace teardown
   when:
-    - run__include_ml
+    - run__include_ml or run__force_teardown | bool
     - run__ml_configs is defined
     - run__ml_configs | length > 0
   cloudera.cloud.ml:
@@ -80,7 +81,7 @@
 
 - name: Execute CDP Datahub teardown
   when:
-    - run__include_datahub
+    - run__include_datahub or run__force_teardown | bool
     - run__datahub_configs is defined
     - run__datahub_configs | length > 0
   cloudera.cloud.datahub_cluster:
