@@ -134,6 +134,9 @@
           failed_when: __infra_aws_nat_remove_result.rc != 0 and 'InvalidAllocationID.NotFound' not in __infra_aws_nat_remove_result.module_stderr
 
         - name: Remove discovered AWS VPC Subnets
+          when:
+            - __infra_disc_subnet_cidrs is defined
+            - __infra_disc_subnet_cidrs | length > 0
           amazon.aws.ec2_vpc_subnet:
             region: "{{ infra__region }}"
             vpc_id: "{{ infra__aws_vpc_id }}"
@@ -144,7 +147,7 @@
           loop: "{{ __infra_disc_subnet_cidrs }}"
 
         - name: Remove AWS Internet Gateway (IGW)
-          when: infra__tunnel and infra__public_endpoint_access
+          when: (infra__tunnel and infra__public_endpoint_access) or infra__force_teardown | bool
           community.aws.ec2_vpc_igw:
             region: "{{ infra__region }}"
             vpc_id: "{{ infra__aws_vpc_id }}"
@@ -240,7 +243,6 @@
           loop: "{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) }}"
 
         - name: Remove AWS Internet Gateway (IGW)
-          #when: infra__tunnel and infra__public_endpoint_access
           community.aws.ec2_vpc_igw:
             region: "{{ infra__region }}"
             vpc_id: "{{ infra__aws_vpc_id }}"
