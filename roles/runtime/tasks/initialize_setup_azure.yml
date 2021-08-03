@@ -16,3 +16,8 @@
   when: infra__azure_subnets is defined
   ansible.builtin.set_fact:
     run__datahub_subnet_ids: "{{ infra__azure_subnets }}"
+
+- name: Set fact for Azure NFS Mount
+  when: infra__azure_nfs_mount is defined
+  ansible.builtin.set_fact:
+    run__azure_nfs_mount: "{{ infra__azure_nfs_mount }}"

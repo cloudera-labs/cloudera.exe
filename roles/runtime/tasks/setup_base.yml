@@ -46,10 +46,10 @@
     governance: "{{ __ml_config_item.raw.governance | default(omit) }}"
     metrics: "{{ __ml_config_item.raw.metrics | default(omit) }}"
     database: "{{ __ml_config_item.raw.database | default(omit) }}"
-    nfs: "{{ __ml_config_item.raw.nfs | default(omit) }}"
+    nfs: "{{ __ml_config_item.nfs | default(omit) }}"
     nfs_version: "{{ __ml_config_item.raw.nfs_version | default(omit) }}"
     ip_addresses: "{{ __ml_config_item.raw.ip_addresses | default(omit) }}"
-    public_loadbalancer: "{{ __ml_config_item.raw.public_loadbalancer | default(run__public_endpoint_access) | default(omit) }}"
+    public_loadbalancer: "{{ __ml_config_item.raw.public_loadbalancer | default(omit) }}"
     storage: "{{ __ml_config_item.raw.storage | default(omit) }}"
   loop_control:
     loop_var: __ml_config_item

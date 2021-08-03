@@ -93,14 +93,12 @@ plat__aws_role_suffix:                        "{{ common__aws_role_suffix }}"
 plat__aws_policy_suffix:                      "{{ env.aws.policy.suffix | default(common__policy_suffix) }}"
 plat__aws_storage_suffix:                     "{{ env.aws.storage.suffix | default(common__storage_suffix) }}"
 
-plat__aws_dynamodb_table_suffix:              "{{ env.aws.dynamodb.table_suffix | default(common__table_suffix) }}"
 plat__aws_xaccount_suffix:                    "{{ env.aws.role.label.cross_account | default(common__xaccount_suffix) }}"
 plat__aws_idbroker_suffix:                    "{{ common__aws_idbroker_suffix }}"
 plat__aws_log_suffix:                         "{{ env.aws.role.label.log | default(common__logs_suffix) }}"
 plat__aws_datalake_admin_suffix:              "{{ common__aws_datalake_admin_suffix }}"
 plat__aws_ranger_audit_suffix:                "{{ env.aws.role.label.ranger_audit | default(common__ranger_audit_suffix) }}"
 
-plat__aws_dynamodb_table_name:                "{{ common__aws_dynamodb_table_name }}"
 plat__aws_xaccount_role_name:                 "{{ env.aws.role.name.cross_account | default([plat__namespace, plat__aws_xaccount_suffix, plat__aws_role_suffix] | join('-')) }}"
 plat__aws_idbroker_role_name:                 "{{ common__aws_idbroker_role_name }}"
 plat__aws_log_role_name:                      "{{ env.aws.role.name.log | default([plat__namespace, plat__aws_log_suffix, plat__aws_role_suffix] | join('-')) }}"
@@ -113,7 +111,6 @@ plat__aws_log_location_policy_name:           "{{ env.aws.policy.name.log | defa
 plat__aws_datalake_admin_s3_policy_name:      "{{ env.aws.policy.name.datalake_admin_s3 | default([plat__namespace, plat__aws_datalake_admin_suffix, plat__aws_policy_suffix] | join('-')) }}"
 plat__aws_ranger_audit_s3_policy_name:        "{{ env.aws.policy.name.ranger_audit_s3 | default([plat__namespace, plat__aws_ranger_audit_suffix, plat__aws_policy_suffix] | join('-')) }}"
 plat__aws_bucket_access_policy_name:          "{{ env.aws.policy.name.bucket_access | default([plat__namespace, plat__aws_storage_suffix, plat__aws_policy_suffix] | join('-')) }}"
-plat__aws_dynamodb_policy_name:               "{{ env.aws.policy.name.dynamodb | default([plat__namespace, plat__aws_dynamodb_table_suffix, plat__aws_policy_suffix] | join('-')) }}"
 
 plat__aws_policy_urls:                        "{{ plat__aws_policy_urls_default | combine(env.aws.policy.url | default({})) }}"
 
@@ -167,9 +164,10 @@ plat__azure_assignment_name_suffix:           "{{ env.azure.role.name_suffix.ass
 plat__azure_metagroup_name:                   "{{ common__azure_metagroup_name }}"
 plat__azure_storage_name:                     "{{ common__azure_storage_name }}"
 
+plat__azure_consistency_wait:                 "{{ env.azure.app.wait | default(10) }}"
 plat__azure_xaccount_app_name:                "{{ env.azure.app.name | default([plat__namespace, plat__azure_xaccount_suffix, plat__azure_app_suffix] | join('-')) }}"
 plat__azure_xaccount_role_name:               "{{ env.azure.role.name.cross_account | default([plat__namespace, plat__azure_xaccount_suffix, plat__azure_role_suffix] | join('-')) }}"
-plat__azure_policy_url:                       "{{ env.azure.policy.url | default('https://gist.github.com/gergopapi2/7b82e777624541ebf05114c57ad386cb/raw/bc9dd3927be0f205547f33ca15d00d2b71f72664/Cloudbreak%2520minimal%2520permissions,%2520azure,%2520for%2520multiple%2520RGs.%2520All%2520globs%2520resolved.') }}"
+plat__azure_policy_url:                       "{{ env.azure.policy.url | default('https://raw.githubusercontent.com/cloudera-labs/snippets/main/policies/azure/cloudbreak_minimal_multiple_rgs_v1.json') }}"
 
 plat__azure_log_identity_name:                "{{ env.azure.role.name.log | default([plat__namespace, plat__azure_log_suffix, plat__azure_identity_suffix] | join('-')) }}"
 plat__azure_datalakeadmin_identity_name:      "{{ env.azure.role.name.datalake_admin | default([plat__namespace, plat__azure_datalake_admin_suffix, plat__azure_identity_suffix] | join('-')) }}"

@@ -29,3 +29,13 @@
 
 - name: Print AWS Profile to debug
   ansible.builtin.command: echo AWS_PROFILE is $AWS_PROFILE
+
+# TODO: Revisit this logic, we could just provide a blank VPC for L0, L1, or L2
+- name: Validate existing AWS Subnet details if provided for a private network
+  #when: infra__aws_vpc_id != "" 
+  when: no
+  block:
+    - name: Check for non-empty AWS private subnets
+      when: infra__aws_private_subnet_ids | unique | count < 3
+      ansible.builtin.fail:
+        msg: "At least 3 private subnets need to be provided if specifying and existing AWS VPC."

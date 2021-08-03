@@ -15,6 +15,8 @@
 # limitations under the License.
 
 - name: Request Azure Storage Account Creation with HNS
+  register: __infra_az_stor_acccount_test
+  ignore_errors: yes
   azure.azcollection.azure_rm_resource:
     state: present
     resource_group: "{{ infra__azure_metagroup_name }}"
@@ -31,6 +33,23 @@
         isHnsEnabled: yes
       location:  "{{ infra__region }}"
       tags: "{{ infra__tags }}"
+
+- name: Check Storage Account creation result for failure
+  when:
+    - __infra_az_stor_acccount_test.rc is defined
+    - __infra_az_stor_acccount_test.rc == 1
+  block:
+    - name: Test Azure Storage Account creation for StorageAccountAlreadyTaken
+      ansible.builtin.assert:
+        quiet: yes
+        that: '"StorageAccountAlreadyTaken" not in __infra_az_stor_acccount_test.module_stderr'
+        fail_msg: "Your proposed Storage Account Name {{ infra__azure_storage_name }} is already taken, please use another"
+
+    - name: Fail on any other Azure Storage Account Creation Error
+      ansible.builtin.assert:
+        quiet: yes
+        that: '"StorageAccountAlreadyTaken" in __infra_az_stor_acccount_test.module_stderr'
+        fail_msg: "Failed to Create Azure Storage Account with unanticipated error: {{ __infra_az_stor_acccount_test }}"
 
 - name: Wait for Azure Storage Account Creation
   register: __azure_storage_account_info
@@ -56,7 +75,7 @@
 - name: Handle Azure NetApp Storage if deploying CML
   when:
     - infra__ml_deploy
-    - __azure_netapp_vol_info is undefined or __azure_netapp_vol_info == ''
+    - infra__azure_nfs_mount is undefined or infra__azure_nfs_mount == ''
   block:
     - name: Handle Netapp Storage Account
       netapp.azure.azure_rm_netapp_account:
@@ -76,7 +95,7 @@
         service_level: "{{ infra__azure_netapp_pool_type }}"
 
     - name: Handle Azure NetApp Volume
-      register: __azure_netapp_vol_info
+      register: __azure_netapp_vol_details
       netapp.azure.azure_rm_netapp_volume:
         resource_group: "{{ infra__azure_metagroup_name }}"
         account_name: "{{ infra__azure_netapp_account_name }}"
@@ -90,6 +109,13 @@
         service_level: "{{ infra__azure_netapp_vol_type }}"
         size: "{{ infra__azure_netapp_vol_size }}"
 
-    - name: Prepare netapp vol info for submission
+    - name: Prepare netapp vol info for submission during initial creation
+      when: __azure_netapp_vol_details.msg is defined
       set_fact:
-        __azure_netapp_vol_info: "{{ __azure_netapp_vol_info.msg }}"
+        infra__azure_nfs_mount: "{{ __azure_netapp_vol_details.msg }}"
+
+    # Yay for Azure consistency
+    - name: Prepare netapp vol info for submission during recreation
+      when: __azure_netapp_vol_details.mount_path is defined
+      set_fact:
+        infra__azure_nfs_mount: "{{ __azure_netapp_vol_details.mount_path }}"

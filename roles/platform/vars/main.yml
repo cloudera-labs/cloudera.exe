@@ -21,7 +21,6 @@ plat__aws_policy_urls_default:
   ranger_audit_s3:    "{{ plat__aws_policy_urls_default_root }}/aws-cdp-ranger-audit-s3-policy.json"
   datalake_admin_s3:  "{{ plat__aws_policy_urls_default_root }}/aws-cdp-datalake-admin-s3-policy.json"
   bucket_access:      "{{ plat__aws_policy_urls_default_root }}/aws-cdp-bucket-access-policy.json"
-  dynamodb:           "{{ plat__aws_policy_urls_default_root }}/aws-cdp-dynamodb-policy.json"
 
 plat__gcp_roles:
   storage_admin: roles/storage.admin
