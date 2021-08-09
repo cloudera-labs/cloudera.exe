@@ -66,8 +66,6 @@ run__de_suffix:                     "{{ de.suffix | default('de') }}"
 run__de_k8s_request_base:           "{{ ml.k8s_request_base | default(lookup('template', 'de_k8s_request_base.j2') | from_yaml) }}"
 run__de_tags:                       "{{ ml.tags | default(common__tags) }}"
 
-
-
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
 run__df_nodes_max:                  "{{ df.max_k8s_nodes | default(5) }}"
 run__df_public_loadbalancer:        "{{ df.public_loadbalancer | default(run__public_endpoint_access) }}"

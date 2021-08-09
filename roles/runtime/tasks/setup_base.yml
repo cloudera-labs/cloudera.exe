@@ -85,6 +85,30 @@
     state: present
     wait: no
 
+- name: Execute CDP DE Workspace experiences setup
+  when: run__include_de
+  cloudera.cloud.de:
+    name: "{{ __de_config_item.name }}"
+    env: "{{ run__env_name }}"
+    k8s_request: "{{ __de_config_item.k8s_request if __ml_config_item.k8s_request.instanceGroups | length > 1 else omit }}"
+    tls: "{{ __de_config_item.raw.tls | default(omit) }}"
+    monitoring: "{{ __de_config_item.raw.monitoring | default(omit) }}"
+    governance: "{{ __de_config_item.raw.governance | default(omit) }}"
+    metrics: "{{ __de_config_item.raw.metrics | default(omit) }}"
+    database: "{{ __de_config_item.raw.database | default(omit) }}"
+    nfs: "{{ __de_config_item.raw.nfs | default(omit) }}"
+    nfs_version: "{{ __de_config_item.raw.nfs_version | default(omit) }}"
+    ip_addresses: "{{ __de_config_item.raw.ip_addresses | default(omit) }}"
+    public_loadbalancer: "{{ __de_config_item.raw.public_loadbalancer | default(omit) }}"
+    storage: "{{ __de_config_item.raw.storage | default(omit) }}"
+  loop_control:
+    loop_var: __de_config_item
+    label: "{{ __de_config_item.name | default ('None') }}"
+  loop: "{{ run__de_configs }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __de_builds
+
 - name: Wait for CDP Datahub deployments to complete
   when: run__include_datahub
   ansible.builtin.async_status:
@@ -121,6 +145,19 @@
   loop: "{{ __opdb_builds.results }}"
   register: __opdb_builds_async
   until: __opdb_builds_async.finished
+  retries: 120
+  delay: 30
+
+- name: Wait for CDP DE Workspace experiences to complete
+  when: run__include_de
+  ansible.builtin.async_status:
+    jid: "{{ __de_build.ansible_job_id }}"
+  loop_control:
+    loop_var: __de_build
+    label: "{{ __de_build.__ml_config_item.name | default ('None') }}"
+  loop: "{{ __de_builds.results }}"
+  register: __de_builds_async
+  until: __de_builds_async.finished
   retries: 120
   delay: 30
 
