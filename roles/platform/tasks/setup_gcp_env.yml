@@ -32,3 +32,5 @@
     tunnel: "{{ plat__tunnel }}"
     workload_analytics: "{{ plat__workload_analytics }}"
     tags: "{{ plat__tags }}"
+    freeipa:
+      instanceCountByGroup: "{{ plat__env_freeipa }}"

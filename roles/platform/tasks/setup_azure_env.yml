@@ -33,3 +33,5 @@
     subnet_ids: "{{ plat__azure_subnets }}"
     public_ip: "{{ plat__public_endpoint_access }}"
     tags: "{{ plat__tags }}"
+    freeipa:
+      instanceCountByGroup: "{{ plat__env_freeipa }}"
