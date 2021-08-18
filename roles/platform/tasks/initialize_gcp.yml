@@ -58,6 +58,7 @@
   failed_when:
     - __gcp_xaccount_sa_discovered.rc == 1
     - "'NOT_FOUND:' not in __gcp_xaccount_sa_discovered.stderr"
+    - "'Permission iam.serviceAccountKeys.list' not in __gcp_xaccount_sa_discovered.stderr"
   command: >
     gcloud iam service-accounts keys list
     --iam-account "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
