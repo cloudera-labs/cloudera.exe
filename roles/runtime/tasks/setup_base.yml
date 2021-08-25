@@ -85,6 +85,19 @@
     state: present
     wait: no
 
+- name: Execute CDP DE Workspace experiences setup
+  when: run__include_de
+  cloudera.cloud.de:
+    name: "{{ __de_config_item.name }}"
+    env: "{{ run__env_name }}"
+  loop_control:
+    loop_var: __de_config_item
+    label: "{{ __de_config_item.name | default ('None') }}"
+  loop: "{{ run__de_configs }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __de_builds
+
 - name: Wait for CDP Datahub deployments to complete
   when: run__include_datahub
   ansible.builtin.async_status:
