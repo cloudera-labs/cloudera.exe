@@ -161,3 +161,19 @@
       loop_control:
         loop_var: __ml_config
         label: "{{ config.name }}"
+
+- name: Prepare for CDP DE experiences
+  when: run__include_de
+  block:
+    - name: Retrieve CDP DE experiences
+      cloudera.cloud.de_info:
+        env: "{{ run__env_name }}"
+      register: run__de_list
+
+- name: Prepare for CDP DW experiences
+  when: run__include_dw
+  block:
+    - name: Retrieve CDP DW experiences
+      cloudera.cloud.dw_cluster_info:
+        env: "{{ run__env_name }}"
+      register: run__dw_list
