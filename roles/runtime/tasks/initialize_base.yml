@@ -193,29 +193,6 @@
         env: "{{ run__env_name }}"
       register: run__de_list
 
-    - name: Construct CDP DE configurations
-      ansible.builtin.set_fact:
-        run__de_configs: "{{ run__de_configs | default([]) | union([config]) }}"
-      vars:
-        include: "{{ lookup('template', __de_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
-        overlay_instance_groups: "{{ __de_config.instance_groups | default(include.instance_groups) | default([]) }}"
-        overlay_tags: "{{ __de_config.tags | default(include.tags) | default(run__de_tags) }}"
-        overlay_network: "{{ __ml_config.network | default(include.network) | default({}) }}"
-        base_instance_group: "{{ run__de_k8s_request_base }}"
-        config:
-          name: "{{ __de_config.name | default([run__namespace, __de_config.suffix | default(include.suffix) | default(run__de_suffix)] | join('-')) }}"
-          k8s_request:
-            environmentName: "{{ run__env_name }}"
-            instanceGroups: "{{ overlay_instance_groups | map('cloudera.exe.combine_onto', base_instance_group, recursive=True) | list }}"
-            tags: "{{ overlay_tags }}"
-            network: "{{ overlay_network }}"
-          raw: "{{ __de_config }}"
-      loop: "{{ run__de_definitions }}"
-      loop_control:
-        loop_var: __de_config
-        label: "{{ config.name }}"
-
-
 - name: Prepare for CDP DW experiences
   when: run__include_dw
   block:
