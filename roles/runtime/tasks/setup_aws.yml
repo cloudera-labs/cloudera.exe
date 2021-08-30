@@ -67,6 +67,19 @@
         env: "{{ run__env_name }}"
       register: run__dw_list
 
+    - name: Fetch all the Database Catalogs under the cluster
+      cloudera.cloud.dw_database_catalog_info:
+        cluster_id: "{{ run__dw_list.clusters[0].id }}"
+      register: __dbc_list
+
+    - name: Set default Database catalog id for the cluster
+      when: __dw_dbc.name | regex_search('.*'+run__dw_default_dbc_suffix+'$')
+      ansible.builtin.set_fact:
+        __default_dbc_id: "{{ __dw_dbc.id }}"
+      loop: "{{ __dbc_list.database_catalogs }}"
+      loop_control:
+        loop_var: __dw_dbc
+
     - name: Create CDP DW Database catalogs
       when: not __dw_dbc_config.use_default_dbc
       cloudera.cloud.dw_database_catalog:
@@ -97,9 +110,9 @@
         label: "{{ __dw_dbc_build.__dw_dbc_config.name }}"
 
     - name: Set CDP DW Database catalog name to id map
-      when: __dw_dbc_build_async.database_catalogs is defined
+      when: __dw_dbc_build_async.database_catalog is defined
       ansible.builtin.set_fact:
-        run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({ __dw_dbc_build_async.database_catalogs[0].name : __dw_dbc_build_async.database_catalogs[0].id}) }}"
+        run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({ __dw_dbc_build_async.database_catalog.name : __dw_dbc_build_async.database_catalog.id}) }}"
       loop: "{{ __dw_dbc_builds_async.results }}"
       loop_control:
         loop_var: __dw_dbc_build_async
@@ -107,12 +120,12 @@
     - name: Create CDP DW Virtual warehouse
       cloudera.cloud.dw_virtual_warehouse:
         cluster_id: "{{ run__dw_list.clusters[0].id }}"
-        dbc_id: "{{ run__dw_dbc_ids[__dw_vw_config.dbc_name] if not __dw_vw_config.use_default_dbc else run__dw_list.clusters[0].dbcs[0].id}}"
+        dbc_id: "{{ __dw_vw_config.use_default_dbc | ternary(__default_dbc_id, run__dw_dbc_ids[__dw_vw_config.dbc_name]) }}"
         type: "{{ __dw_vw_config.type }}"
         name: "{{ __dw_vw_config.name }}"
         template: "{{ __dw_vw_config.template }}"
-        autoscaling_min_nodes: "{{ __dw_vw_config.autoscaling_min_nodes | int }}"
-        autoscaling_max_nodes: "{{ __dw_vw_config.autoscaling_max_nodes | int }}"
+        autoscaling_min_nodes: "{{ __dw_vw_config.autoscaling_min_nodes }}"
+        autoscaling_max_nodes: "{{ __dw_vw_config.autoscaling_max_nodes }}"
         common_configs: "{{ __dw_vw_config.common_configs }}"
         application_configs: "{{ __dw_vw_config.application_configs }}"
         ldap_groups: "{{ __dw_vw_config.ldap_groups }}"

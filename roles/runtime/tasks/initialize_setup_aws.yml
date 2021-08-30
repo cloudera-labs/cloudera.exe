@@ -15,7 +15,7 @@
 # limitations under the License.
 
 - name: Discover AWS Public and Private VPC Subnets
-  when: not infra__aws_subnet_ids
+  when: infra__aws_subnet_ids is undefined
   block:
     - name: Query AWS Public Subnets
       amazon.aws.ec2_vpc_subnet_info:
@@ -49,18 +49,17 @@
         label: "{{ __aws_private_subnet_item.subnet_id }}"
       loop: "{{ __aws_private_subnets_info.subnets }}"
 
-    - name: Assign AWS Private Subnet IDs in not assinged
-      when: run__datahub_private_subnet_ids is undefined
+    - name: Set default AWS Private Subnet if there are no Private Subnets
       ansible.builtin.set_fact:
-        run__datahub_private_subnet_ids: "{{ [] }}"
+        run__datahub_private_subnet_ids: "{{ run__datahub_private_subnet_ids | default([]) }}"
 
     - name: Set fact for AWS Subnet IDs
       when: __aws_public_subnets_info is defined or __aws_private_subnets_info is defined
       ansible.builtin.set_fact:
-        run__datahub_subnet_ids: "{{ run__datahub_private_subnet_ids | default([]) | union(run__datahub_public_subnet_ids) }}"
+        run__datahub_subnet_ids: "{{ run__datahub_private_subnet_ids | union(run__datahub_public_subnet_ids) }}"
 
 - name: Set fact for AWS Subnet IDs by assignment
-  when: infra__aws_subnet_ids
+  when: infra__aws_subnet_ids is defined
   block:
     - name: Set fact for All AWS Subnet IDs by assignment
       ansible.builtin.set_fact:
