@@ -70,6 +70,27 @@
               retries: 120
               delay: 10
 
+        - name: Remove discovered AWS NAT Gateways
+          register: __infra_aws_nat_remove_result
+          when:
+            - __infra_aws_nat_gateways is defined
+            - __infra_aws_nat_gateways.result is defined
+            - __infra_aws_nat_gateways.result | length > 0
+          community.aws.ec2_vpc_nat_gateway:
+            state: absent
+            region: "{{ infra__region }}"
+            wait: true
+            nat_gateway_id: "{{ __infra_nat_gateway_remove_item.nat_gateway_id }}"
+            release_eip: true
+          loop_control:
+            label: "{{ __infra_nat_gateway_remove_item.nat_gateway_id }}"
+            loop_var: __infra_nat_gateway_remove_item
+          loop: "{{ __infra_aws_nat_gateways.result }}"
+          failed_when:
+            - "'rc' in __infra_aws_nat_remove_result"
+            - __infra_aws_nat_remove_result.rc != 0
+            - "'InvalidAllocationID.NotFound' not in __infra_aws_nat_remove_result.module_stderr"
+
         - name: Remove discovered AWS Network Adapters
           when:
             - __infra_vpc_enis is defined
@@ -114,24 +135,6 @@
                 loop_var: __security_group_purge_item
                 label: "{{ __security_group_purge_item.group_name }}"
               loop: "{{ __infra_aws_sgs.security_groups }}"
-
-        - name: Remove discovered AWS NAT Gateways
-          register: __infra_aws_nat_remove_result
-          when:
-            - __infra_aws_nat_gateways is defined
-            - __infra_aws_nat_gateways.result is defined
-            - __infra_aws_nat_gateways.result | length > 0
-          community.aws.ec2_vpc_nat_gateway:
-            state: absent
-            region: "{{ infra__region }}"
-            wait: true
-            nat_gateway_id: "{{ __infra_nat_gateway_remove_item.nat_gateway_id }}"
-            release_eip: true
-          loop_control:
-            label: "{{ __infra_nat_gateway_remove_item.nat_gateway_id }}"
-            loop_var: __infra_nat_gateway_remove_item
-          loop: "{{ __infra_aws_nat_gateways.result }}"
-          failed_when: __infra_aws_nat_remove_result.rc != 0 and 'InvalidAllocationID.NotFound' not in __infra_aws_nat_remove_result.module_stderr
 
         - name: Remove discovered AWS VPC Subnets
           when:
