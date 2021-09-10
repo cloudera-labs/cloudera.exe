@@ -40,7 +40,7 @@
   cloudera.cloud.ml:
     name: "{{ __ml_config_item.name }}"
     env: "{{ run__env_name }}"
-    k8s_request: "{{ __ml_config_item.k8s_request if __ml_config_item.k8s_request.instanceGroups | length > 1 else omit }}"
+    k8s_request: "{{ __ml_config_item.k8s_request if __ml_config_item.k8s_request.instanceGroups | length > 0 else omit }}"
     tls: "{{ __ml_config_item.raw.tls | default(omit) }}"
     monitoring: "{{ __ml_config_item.raw.monitoring | default(omit) }}"
     governance: "{{ __ml_config_item.raw.governance | default(omit) }}"
