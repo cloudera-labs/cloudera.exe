@@ -149,6 +149,7 @@
       service: ec2.amazonaws.com
       policies:
         - "{{ plat__aws_idbroker_policy_name }}"
+        - "{{ plat__aws_log_location_policy_name }}"
     - name: "{{ plat__aws_log_role_name }}"
       description: CDP Log
       service: ec2.amazonaws.com
