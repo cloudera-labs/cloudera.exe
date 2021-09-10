@@ -14,10 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Find the current CDP username. 
-- name: Find and set env_admin_username
-  include_tasks: initialize.yml
-
 # If don't want to purge existing users from the FreeIPA group,
 # we'll query the group to get current users 
 - name: Query sudoers group for list of users

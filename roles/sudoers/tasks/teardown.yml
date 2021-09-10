@@ -14,10 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Find the current CDP username. 
-- name: Find and set env_admin_username
-  include_tasks: initialize.yml
-
 # Remove the FreeIPA sudo rule
 - name: Remove sudo rule for passwordless sudo
   community.general.ipa_sudorule:
