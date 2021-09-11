@@ -53,6 +53,7 @@ plat__vpc_private_subnets:                    "{{ common__vpc_private_subnet_cid
 # Plat
 plat__teardown_deletes_policies:              "{{ env.teardown.delete_policies | default(True) }}"
 plat__teardown_deletes_roles:                 "{{ env.teardown.delete_roles | default(True) }}"
+plat__teardown_deletes_gcp_custom_roles:      "{{ env.teardown.delete_gcp_custom_roles | default(plat__teardown_deletes_roles) }}"
 plat__teardown_deletes_xaccount:              "{{ env.teardown.delete_cross_account | default(True) }}"
 plat__teardown_deletes_credential:            "{{ env.teardown.delete_credential | default(True) }}"
 plat__teardown_deletes_admin_group:           "{{ env.teardown.delete_admin_group | default(True) }}"
