@@ -76,12 +76,15 @@
 
 - name: Execute CDP Dataflow setup
   when: run__include_df
-  cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+  cloudera.cloud.df_service:
+    env_crn: "{{ run__cdp_env_crn }}"
     nodes_min: "{{ run__df_nodes_min }}"
     nodes_max: "{{ run__df_nodes_max }}"
     public_loadbalancer: "{{ run__df_public_loadbalancer }}"
-    ip_ranges: "{{ run__df_ip_ranges }}"
+    loadbalancer_ip_ranges: "{{ run__df_lb_ip_ranges }}"
+    kube_ip_ranges: "{{ run__df_kube_ip_ranges }}"
+    cluster_subnets: "{{ run__df_cluster_subnets }}"
+    loadbalancer_subnets: "{{ run__df_lb_subnets }}"
     state: present
     wait: no
 
@@ -126,6 +129,6 @@
 
 - name: Wait for CDP Dataflow deployment to complete
   when: run__include_df
-  cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+  cloudera.cloud.df_service:
+    env_crn: "{{ run__cdp_env_crn }}"
     wait: yes

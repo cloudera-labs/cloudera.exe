@@ -25,7 +25,7 @@
   ansible.builtin.include_tasks: "initialize_base.yml"
 
 - name: Discover CDP DF Deployments
-  register: run__df_env_info
+  register: run__df_service_info
   when: run__include_df
   cloudera.cloud.df_info:
     name: "{{ run__env_name }}"
