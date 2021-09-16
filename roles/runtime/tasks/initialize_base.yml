@@ -161,3 +161,46 @@
       loop_control:
         loop_var: __ml_config
         label: "{{ config.name }}"
+
+- name: Prepare for CDP DW experiences
+  when: run__include_dw
+  block:
+    - name: Construct CDP DW Data catalog configurations
+      ansible.builtin.set_fact:
+        run__dw_dbc_configs: "{{ run__dw_dbc_configs | default([]) | union([config]) }}"
+      vars:
+        include: "{{ lookup('template', __dw_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
+        use_default_dbc: "{{ __dw_config.use_default_dbc | default(False) | bool }}"
+        default_dbc_name: "{{ None if use_default_dbc else [run__namespace, run__dw_dbc_suffix, __dw_config_index] | join('-') }}"
+        config:
+          name: "{{ __dw_config.name | default(default_dbc_name) }}"
+          load_demo_data: "{{ __dw_config.load_demo_data | default(False) | bool }}"
+          use_default_dbc: "{{ use_default_dbc }}"
+          virtual_warehouses: "{{ __dw_config.virtual_warehouses | default([]) }}"
+      loop: "{{ run__dw_definitions }}"
+      loop_control:
+        loop_var: __dw_config
+        index_var: __dw_config_index
+
+    - name: Construct CDP DW Virtual warehouse configurations
+      ansible.builtin.set_fact:
+        run__dw_vw_configs: "{{ run__dw_vw_configs | default([]) | union([config]) }}"
+      vars:
+        dbc_name: "{{ item.0.name }}"
+        use_default_dbc: "{{ item.0.use_default_dbc }}"
+        config:
+          name: "{{ item.1.name | default([dbc_name, run__dw_vw_suffix ,__dw_dbc_index] | join('-')) }}"
+          dbc_name: "{{ dbc_name }}"
+          use_default_dbc: "{{ use_default_dbc }}"
+          vw_type: "{{ item.1.vw_type | default('hive') }}"
+          template: "{{ item.1.template | default('xsmall') }}"
+          autoscaling_min_cluster: "{{ item.1.autoscaling.min_cluster | default(None) }}"
+          autoscaling_max_cluster: "{{ item.1.autoscaling.max_cluster | default(None) }}"
+          common_configs: "{{ item.1.configs.common_configs | default({}) }}"
+          application_configs: "{{ item.1.configs.application_configs | default({}) }}"
+          ldap_groups: "{{ item.1.configs.ldap_groups | default(None) }}"
+          enable_sso: "{{ item.1.configs.enable_sso | default(None) }}"
+          tags: "{{ item.1.tags | default({}) | combine(run__dw_tags) }}"
+      loop: "{{ run__dw_dbc_configs | subelements('virtual_warehouses')}}"
+      loop_control:
+        index_var: __dw_dbc_index
