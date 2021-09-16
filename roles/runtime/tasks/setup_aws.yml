@@ -37,29 +37,29 @@
 - name: Setup CDP DW cluster on AWS
   when: run__include_dw
   block:
-#    - name: Execute CDP DW cluster setup
-#      cloudera.cloud.dw_cluster:
-#        env: "{{ run__env_name }}"
-#        overlay: "{{ run__dw_overlay_network }}"
-#        aws_public_subnets: "{{ run__datahub_public_subnet_ids }}"
-#        aws_private_subnets: "{{ run__datahub_private_subnet_ids }}"
-#        state: present
-#        wait: yes
-#      async: 3600 # 1 hour timeout
-#      poll: 0
-#      register: __dw_builds
-#
-#    - name: Wait for CDP DW cluster setup to complete
-#      ansible.builtin.async_status:
-#        jid: "{{ __dw_builds.ansible_job_id }}"
-#      #loop_control:
-#      #  loop_var: __opdb_build
-#      #  label: "{{ __opdb_build.__opdb_config.name }}"
-#      #loop: "{{ __opdb_builds.results }}"
-#      register: __dw_builds_async
-#      until: __dw_builds_async.finished
-#      retries: 120
-#      delay: 30
+    - name: Execute CDP DW cluster setup
+      cloudera.cloud.dw_cluster:
+        env: "{{ run__env_name }}"
+        overlay: "{{ run__dw_overlay_network }}"
+        aws_public_subnets: "{{ run__datahub_public_subnet_ids }}"
+        aws_private_subnets: "{{ run__datahub_private_subnet_ids }}"
+        state: present
+        wait: yes
+      async: 3600 # 1 hour timeout
+      poll: 0
+      register: __dw_builds
+
+    - name: Wait for CDP DW cluster setup to complete
+      ansible.builtin.async_status:
+        jid: "{{ __dw_builds.ansible_job_id }}"
+      #loop_control:
+      #  loop_var: __opdb_build
+      #  label: "{{ __opdb_build.__opdb_config.name }}"
+      #loop: "{{ __opdb_builds.results }}"
+      register: __dw_builds_async
+      until: __dw_builds_async.finished
+      retries: 120
+      delay: 30
 
     - name: Retrieve CDP DW experiences
       cloudera.cloud.dw_cluster_info:
