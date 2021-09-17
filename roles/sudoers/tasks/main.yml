@@ -14,38 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# If don't want to purge existing users from the FreeIPA group,
-# we'll query the group to get current users 
+# If don't want to purge existing users (and groups) from the FreeIPA sudo rule,
+# we'll query the rule to get current users (and groups)
 - name: Query sudoers group for list of users
-  when: not sudoers__purge_users_in_group
+  when: (not sudoers__purge_users) or (not sudoers__purge_groups)
   block:
-    # Note - below creates the group if it doesn't already exist
-    - name: Create or query the sudoers group
-      community.general.ipa_group:
+    # Note - below creates the rule if it doesn't already exist
+    - name: Create or query the sudo rule
+      community.general.ipa_sudorule:
         ipa_user: "{{ sudoers__env_admin_username }}"
         ipa_pass: "{{ sudoers__env_admin_password }}"
-        name: "{{ sudoers__sudo_group_name }}"
+        name: "{{ sudoers__sudorule_name }}"
         state: present
-      register: sudoers_group
+      register: sudo_rule_details
 
-    - name: Set facts for current user members of the group
+    - name: Set facts for current user and group members of the sudo rule
       ansible.builtin.set_fact:
-        __sudo_existing_group_users: "{{ sudoers_group.group.member_user | default([]) }}"
+        __sudo_existing_users: "{{ sudo_rule_details.sudorule.memberuser_user | default([]) }}"
+        __sudo_existing_groups: "{{ sudo_rule_details.sudorule.memberuser_group | default([]) }}"
 
-# Final list of users to add to sudoers group -
+# Final list of users and groups to add to sudoers group -
 # either combined with existing group members or overrides
 - name: Create list of users to add to sudoers group
   ansible.builtin.set_fact:
-    __sudo_group_users: "{{ sudoers__sudo_group_users | union(__sudo_existing_group_users) if not sudoers__purge_users_in_group else sudoers__sudo_group_users }}"
-
-# Create a FreeIPA group for sudo and add users
-- name: Add users to the sudoers group
-  community.general.ipa_group:
-    ipa_user: "{{ sudoers__env_admin_username }}"
-    ipa_pass: "{{ sudoers__env_admin_password }}"
-    name: "{{ sudoers__sudo_group_name }}"
-    user: "{{ __sudo_group_users }}"
-    state: present
+    __sudo_users: "{{ sudoers__sudo_users | union(__sudo_existing_users) if not sudoers__purge_users else sudoers__sudo_users }}"
+    __sudo_groups: "{{ sudoers__sudo_groups | union(__sudo_existing_groups) if not sudoers__purge_groups else sudoers__sudo_groups }}"
 
 # Create FreeIPA sudo rule
 - name: Add sudo rule for passwordless sudo
@@ -56,6 +49,6 @@
     cmdcategory: all
     hostcategory: all
     sudoopt: "!authenticate"
-    usergroup:
-      - "{{ sudoers__sudo_group_name }}"
+    user: "{{ __sudo_users }}"
+    usergroup: "{{ __sudo_groups }}"
     state: present
