@@ -21,12 +21,3 @@
     ipa_pass: "{{ sudoers__env_admin_password }}"
     name: "{{ sudoers__sudorule_name }}"
     state: absent
-
-# Remove the FreeIPA group for sudo
-- name: Remove sudoers group
-  community.general.ipa_group:
-    ipa_user: "{{ sudoers__env_admin_username }}"
-    ipa_pass: "{{ sudoers__env_admin_password }}"
-    name: "{{ sudoers__sudo_group_name }}"
-    state: absent
-  register: sudoers_group
