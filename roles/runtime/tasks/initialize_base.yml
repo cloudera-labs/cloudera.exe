@@ -190,13 +190,9 @@
           use_default_dbc: "{{ __dw_config.0.use_default_dbc }}"
           type: "{{ __dw_config.1.type | default(run__dw_default_vw_type) }}"
           template: "{{ __dw_config.1.template | default(run__dw_default_template_type) }}"
-          autoscaling_min_nodes: "{{ __dw_config.1.autoscaling.min_nodes | default(omit) }}"
-          autoscaling_max_nodes: "{{ __dw_config.1.autoscaling.max_nodes | default(omit) }}"
-          common_configs: "{{ __dw_config.1.configs.common_configs | default(omit) }}"
-          application_configs: "{{ __dw_config.1.configs.application_configs | default(omit) }}"
-          ldap_groups: "{{ __dw_config.1.configs.ldap_groups | default(omit) }}"
-          enable_sso: "{{ __dw_config.1.configs.enable_sso | default(omit) }}"
           tags: "{{ __dw_config.1.tags | default({}) | combine(run__dw_tags) }}"
+          autoscaling: "{{ __dw_config.1.autoscaling | default({}) }}"
+          configs: "{{ __dw_config.1.configs | default({}) }}"
       loop: "{{ run__dw_dbc_configs | subelements('virtual_warehouses')}}"
       loop_control:
         loop_var: __dw_config
