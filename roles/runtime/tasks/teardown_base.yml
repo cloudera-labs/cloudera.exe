@@ -32,17 +32,33 @@
   poll: 0
   register: __opdb_teardowns_info
 
-- name: Execute CDP DW cluster teardown
-  register: __dw_teardown_info
-  when:
-    - run__include_dw or run__force_teardown | bool
-    - run__env_info.environments | length > 0
-    - run__env_info.environments[0].descendants.dw | length > 0
+- name: Execute CDP DW teardown
+  when: run__dw_teardown is not defined
   cloudera.cloud.dw_cluster:
     env: "{{ run__env_name }}"
     state: absent
-    wait: no
+    wait: yes
     force: "{{ run__dw_force_delete }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __dw_cluster_teardown_info
+
+- name: Execute CDP virtual warehouse partial teardown
+  when:
+       - run__dw_teardown is defined
+       - run__dw_vw_ids is defined
+       - run__dw_vw_ids | length > 0
+  cloudera.cloud.dw_virtual_warehouse:
+    cluster_id: "{{ run__dw_cluster_id }}"
+    id: "{{ __vw_id }}"
+    state: absent
+    wait: yes
+  loop: "{{ run__dw_vw_ids }}"
+  loop_control:
+    loop_var: __vw_id
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __dw_vw_teardown_info
 
 - name: Execute CDP Dataflow teardown
   register: __df_teardown_info
@@ -129,15 +145,58 @@
   retries: 120
   delay: 30
 
-- name: Wait for CDP DW deployments to decommission
+- name: Wait for CDP DW virtual warehouse to decommission
   when:
-    - __dw_teardown_info is defined
-    - __dw_teardown_info.started | default(False)
-  cloudera.cloud.dw_cluster:
-    env: "{{ run__env_name }}"
-    state: absent
-    wait: yes
-    force: "{{ run__dw_force_delete }}"
+       - __dw_vw_teardown_info is defined
+       - __dw_vw_teardown_info.results is defined
+       - __dw_vw_teardown_info.results | length > 0
+  ansible.builtin.async_status:
+    jid: "{{ __dw_vw_teardown.ansible_job_id }}"
+  loop_control:
+    loop_var: __dw_vw_teardown
+  loop: "{{ __dw_vw_teardown_info.results }}"
+  register: __dw_vw_teardown_async
+  until: __dw_vw_teardown_async.finished
+  retries: 120
+  delay: 30
+
+- name: Execute CDP DW Database Catalogs partial teardown
+  when: run__dw_teardown.database_catalogs is defined
+  cloudera.cloud.dw_database_catalog:
+     cluster_id: "{{ run__dw_cluster_id }}"
+     id: "{{ __dbc_id }}"
+     state: absent
+     wait: yes
+  loop: "{{ run__dw_dbc_ids }}"
+  loop_control:
+     loop_var: __dbc_id
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __dw_dbc_teardown_info
+
+- name: Wait for CDW Database Catalog to decommision
+  when:
+       - __dw_dbc_teardown_info is defined
+       - __dw_dbc_teardown_info.results is defined
+       - __dw_dbc_teardown_info.results | length > 0
+  ansible.builtin.async_status:
+    jid: "{{ __dw_dbc_teardown.ansible_job_id }}"
+  loop_control:
+    loop_var: __dw_dbc_teardown
+  loop: "{{ __dw_dbc_teardown_info.results }}"
+  register: __dw_dbc_teardown_async
+  until: __dw_dbc_teardown_async.finished
+  retries: 120
+  delay: 30
+
+- name: Wait for CDW cluster to decommision
+  when: __dw_cluster_teardown_info.ansible_job_id is defined
+  ansible.builtin.async_status:
+    jid: "{{ __dw_cluster_teardown_info.ansible_job_id }}"
+  register: __dw_cluster_teardown_async
+  until: __dw_cluster_teardown_async.finished
+  retries: 120
+  delay: 30
 
 - name: Wait for CDP OpDB deployments to decommission
   when:

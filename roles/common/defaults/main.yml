@@ -132,6 +132,9 @@ common__setup_runtime:                    "{{ ml is defined or de is defined or 
 common__setup_plat:                       "{{ env is defined or sequence__setup_runtime  | default(False) | bool }}"
 common__setup_infra:                      "{{ infra is defined or sequence__setup_plat | default(False) | bool }}"
 common__setup_base:                       "{{ mgmt is defined or clusters is defined | default(False) | bool }}"
+common__teardown_runtime:                 "{{ common__setup_runtime }}"
+common__teardown_plat:                    "{{ common__setup_plat and dw.teardown is undefined }}"
+common__teardown_infra:                   "{{ common__setup_infra and dw.teardown is undefined }}"
 
 common__include_ml:                        "{{ ml is defined | bool }}"
 common__include_dw:                        "{{ dw is defined | bool }}"
