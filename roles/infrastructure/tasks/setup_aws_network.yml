@@ -28,6 +28,7 @@
 
     # Using CLI due to hardcoded module behavior - see https://github.com/boto/boto3/issues/2929
     - name: Update AWS VPC
+      when: __aws_vpc_tags is defined and __aws_vpc_tags | length > 0
       ansible.builtin.command: "aws ec2 create-tags --region {{ infra__region }} --resources {{ infra__aws_vpc_id }} --tags {{ __aws_vpc_tags | join(' ') }}"
 
 - name: Set up AWS VPC
