@@ -49,10 +49,15 @@
         label: "{{ __aws_private_subnet_item.subnet_id }}"
       loop: "{{ __aws_private_subnets_info.subnets }}"
 
+    - name: Assign AWS Private Subnet IDs in not assinged
+      when: run__datahub_private_subnet_ids is undefined
+      ansible.builtin.set_fact:
+        run__datahub_private_subnet_ids: "{{ [] }}"
+
     - name: Set fact for AWS Subnet IDs
       when: __aws_public_subnets_info is defined or __aws_private_subnets_info is defined
       ansible.builtin.set_fact:
-        run__datahub_subnet_ids: "{{ run__datahub_public_subnet_ids | default([]) | union(run__datahub_private_subnet_ids) }}"
+        run__datahub_subnet_ids: "{{ run__datahub_private_subnet_ids | default([]) | union(run__datahub_public_subnet_ids) }}"
 
 - name: Set fact for AWS Subnet IDs by assignment
   when: infra__aws_subnet_ids
