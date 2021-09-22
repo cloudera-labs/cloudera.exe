@@ -51,12 +51,9 @@
       register: __dw_builds
 
     - name: Wait for CDP DW cluster setup to complete
+      when: false
       ansible.builtin.async_status:
         jid: "{{ __dw_builds.ansible_job_id }}"
-      #loop_control:
-      #  loop_var: __opdb_build
-      #  label: "{{ __opdb_build.__opdb_config.name }}"
-      #loop: "{{ __opdb_builds.results }}"
       register: __dw_builds_async
       until: __dw_builds_async.finished
       retries: 120
