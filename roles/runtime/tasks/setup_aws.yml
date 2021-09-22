@@ -41,8 +41,9 @@
       cloudera.cloud.dw_cluster:
         env: "{{ run__env_name }}"
         overlay: "{{ run__dw_overlay_network }}"
+        private_load_balancer: "{{ run__dw_private_load_balancer }}"
         aws_public_subnets: "{{ run__datahub_public_subnet_ids }}"
-        aws_private_subnets: "{{ run__datahub_private_subnet_ids }}"
+        aws_private_subnets: "{{ run__datahub_private_subnet_ids if run__dw_private_worker_nodes else [] }}"
         state: present
         wait: yes
       async: 3600 # 1 hour timeout
@@ -79,6 +80,7 @@
       loop: "{{ run__dw_dbc_configs }}"
       loop_control:
         loop_var: __dw_dbc_config
+        label: "{{ __dw_dbc_config.name }}"
       register: __dw_dbc_builds
 
     - name: Wait for CDP DW Database catalogs setup to complete
@@ -92,6 +94,7 @@
       loop: "{{ __dw_dbc_builds.results }}"
       loop_control:
         loop_var: __dw_dbc_build
+        label: "{{ __dw_dbc_build.__dw_dbc_config.name }}"
 
     - name: Set CDP DW Database catalog name to id map
       when: __dw_dbc_build_async.dbcs is defined
@@ -122,6 +125,7 @@
       loop: "{{ run__dw_vw_configs }}"
       loop_control:
         loop_var: __dw_vw_config
+        label: "{{ __dw_vw_config.name }}"
 
     - name: Wait for CDP DW Virtual warehouse setup to complete
       when: __dw_vw_build.ansible_job_id is defined
@@ -134,7 +138,4 @@
       loop: "{{ __dw_vw_builds.results }}"
       loop_control:
         loop_var: __dw_vw_build
-
-    - name: Print Virtual Warehouses
-      ansible.builtin.debug:
-        msg: "Database Cluster : {{ __dw_vw_builds_async }}"
+        label: "{{ __dw_vw_build.__dw_vw_config.name }}"
