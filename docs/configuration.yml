@@ -25,7 +25,33 @@ df:
     persist:
 dw:
   definitions:
+    - name:
+      use_default_dbc:
+      load_demo_data:
+      virtual_warehouses:
+        - name:
+          vw_type:
+          template:
+          autoscaling:
+            min_cluster:
+            max_cluster:
+          tags:
+          configs:
+            common_configs:
+            application_configs:
+            enable_sso:
+            ldap_groups:
   suffix:
+  vw:
+    suffix:
+  tags:
+  overlay_network:
+  private_load_balancer:
+  private_worker_nodes:
+  force_delete:
+  default_vw_type:
+  default_template_type:
+  default_dbc_suffix:
 env:
   aws:
     policy:
