@@ -59,6 +59,7 @@
     - run
 
 - name: Initialize Runtime Teardown
+  when: sequence__teardown_runtime | bool
   ansible.builtin.include_role:
     name: cloudera.exe.runtime
     tasks_from: initialize_teardown
@@ -74,6 +75,7 @@
     - never
 
 - name: Teardown Runtime
+  when: sequence__teardown_runtime | bool
   ansible.builtin.include_role:
     name: cloudera.exe.runtime
     tasks_from: teardown
@@ -88,7 +90,12 @@
     - plat
     - never
 
+- name: CDW cluster teardown info
+  debug:
+     msg: "Sequence teardown platform : {{ sequence__teardown_plat }}"
+
 - name: Initialize Platform Teardown
+  when: sequence__teardown_plat | bool
   ansible.builtin.include_role:
     name: cloudera.exe.platform
     tasks_from: initialize_teardown
@@ -102,6 +109,7 @@
     - never
 
 - name: Teardown Platform
+  when: sequence__teardown_plat | bool
   ansible.builtin.include_role:
     name: cloudera.exe.platform
     tasks_from: teardown
@@ -115,6 +123,7 @@
     - never
 
 - name: Initialize Infrastructure Teardown
+  when: sequence__teardown_infra | bool
   ansible.builtin.include_role:
     name: cloudera.exe.infrastructure
     tasks_from: initialize_teardown
@@ -126,6 +135,7 @@
     - never
 
 - name: Teardown Infrastructure
+  when: sequence__teardown_infra | bool
   ansible.builtin.include_role:
     name: cloudera.exe.infrastructure
     tasks_from: teardown

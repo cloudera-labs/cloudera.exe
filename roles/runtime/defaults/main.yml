@@ -75,6 +75,7 @@ run__dw_force_delete:               "{{ dw.force_delete | default (run__force_te
 run__dw_default_vw_type:            "{{ dw.default_vw_type | default('hive') }}"
 run__dw_default_template_type:      "{{ dw.default_template_type | default('xsmall') }}"
 run__dw_default_dbc_suffix:         "{{ dw.default_dbc_suffix | default('-dl-default') }}"
+run__dw_teardown:                   "{{ dw.teardown | default(omit) }}"
 
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
 run__df_nodes_max:                  "{{ df.max_k8s_nodes | default(5) }}"

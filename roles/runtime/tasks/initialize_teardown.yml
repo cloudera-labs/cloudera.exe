@@ -69,3 +69,110 @@
       loop_control:
         loop_var: __ml_config
         label: "{{ __ml_config.instanceName }}"
+
+- name: Discover CDW deployments
+  when: run__include_dw
+  block:
+    - name: Retrieve CDP DW experiences
+      cloudera.cloud.dw_cluster_info:
+        env: "{{ run__env_name }}"
+      register: __dw_list
+
+    - name: Initialize CDP DW cluster id
+      ansible.builtin.set_fact:
+        run__dw_cluster_id: "{{ __dw_list.clusters[0].id }}"
+
+    - name: Prepare partial teardown for CDW resources
+      when: run__dw_teardown is defined
+      block:
+        - name: Initialize list of CDW database catalogs to be decommissioned
+          ansible.builtin.set_fact:
+            run__dw_dbc_ids: "{{ [] }}"
+
+        - name: Initialize list of CDW virtual warehouses to be decommissioned
+          ansible.builtin.set_fact:
+            run__dw_vw_ids: "{{ [] }}"
+
+        - name: Populate CDW database catalogs defined with its id to the teardown list
+          when: __dbc.id is defined
+          ansible.builtin.set_fact:
+            run__dw_dbc_ids: "{{ run__dw_dbc_ids + [ __dbc.id ] }}"
+          loop: "{{ run__dw_teardown.database_catalogs }}"
+          loop_control:
+            loop_var: __dbc
+            label: "{{ __dbc.id }}"
+
+        - name: Fetch the ids of all the CDW database catalogs defined with its name
+          when: __dbc.name is defined
+          cloudera.cloud.dw_database_catalog_info:
+             name: "{{ __dbc.name }}"
+             cluster_id: "{{ run__dw_cluster_id }}"
+          loop: "{{ run__dw_teardown.database_catalogs }}"
+          loop_control:
+            loop_var: __dbc
+            label: "{{ __dbc.name }}"
+          register: __dbc_name_list
+
+        - name: Populate CDW database catalogs defined with its name to the teardown list
+          when:
+              - __dbc_result.database_catalogs is defined
+              - __dbc_result.database_catalogs | length > 0
+              - __dbc_result.database_catalogs[0].id not in run__dw_dbc_ids
+          ansible.builtin.set_fact:
+            run__dw_dbc_ids: "{{ run__dw_dbc_ids + [ __dbc_result.database_catalogs[0].id ] }}"
+          loop: "{{ __dbc_name_list.results }}"
+          loop_control:
+            loop_var: __dbc_result
+            label: "{{ __dbc_result.database_catalogs[0].id }}"
+
+        - name: Fetch all the CDW virtual warehouses under a CDW cluster
+          cloudera.cloud.dw_virtual_warehouse_info:
+            cluster_id: "{{ run__dw_cluster_id }}"
+          register: __all_vw_list
+
+        - name: Populate all the CDW virtual warehouses of database catalogs scheduled for teardown to the teardown list
+          when:
+              - run__dw_dbc_ids is defined
+              - __vw.dbcId in run__dw_dbc_ids
+          ansible.builtin.set_fact:
+            run__dw_vw_ids: "{{ run__dw_vw_ids + [ __vw.id ] }}"
+          loop: "{{ __all_vw_list.virtual_warehouses }}"
+          loop_control:
+            loop_var: __vw
+            label: "{{ __vw.id }}"
+
+        - name: Fetch the ids of all the CDW virtual warehouses defined with its name
+          when:
+               - run__dw_teardown.virtual_warehouses is defined
+               - __vw.name is defined
+          cloudera.cloud.dw_virtual_warehouse_info:
+            name: "{{ __vw.name }}"
+            cluster_id: "{{ run__dw_cluster_id }}"
+          loop: "{{ run__dw_teardown.virtual_warehouses }}"
+          loop_control:
+            loop_var: __vw
+            label: "{{ __vw.name }}"
+          register: __vw_name_list
+
+        - name: Populate CDW virtual warehouses defined with its id to the teardown list
+          when:
+               - __vw.id is defined
+               - __vw.id not in run__dw_vw_ids
+          ansible.builtin.set_fact:
+            run__dw_vw_ids: "{{ run__dw_vw_ids + [ __vw.id ]}}"
+          loop: "{{ run__dw_teardown.virtual_warehouses }}"
+          loop_control:
+            loop_var: __vw
+            label: "{{ __vw.id }}"
+
+        - name: Populate CDW virtual warehouses defined with its name to the teardown list
+          when:
+               - __vw_result.virtual_warehouses is defined
+               - __vw_result.virtual_warehouses | length > 0
+               - __vw_result.virtual_warehouses[0].id not in run__dw_vw_ids
+          ansible.builtin.set_fact:
+            run__dw_vw_ids: "{{ run__dw_vw_ids + [ __vw_result.virtual_warehouses[0].id ]}}"
+          loop: "{{ __vw_name_list.results }}"
+          loop_control:
+            loop_var: __vw_result
+            label: "{{ __vw_result.virtual_warehouses[0].id }}"
