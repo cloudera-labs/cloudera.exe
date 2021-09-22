@@ -90,10 +90,6 @@
     - plat
     - never
 
-- name: CDW cluster teardown info
-  debug:
-     msg: "Sequence teardown platform : {{ sequence__teardown_plat }}"
-
 - name: Initialize Platform Teardown
   when: sequence__teardown_plat | bool
   ansible.builtin.include_role:
