@@ -142,3 +142,16 @@
   cloudera.cloud.df:
     name: "{{ run__cdp_env_crn }}"
     wait: yes
+
+- name: Wait for CDP DE Workspace experiences to complete
+  when: run__include_de
+  ansible.builtin.async_status:
+    jid: "{{ __de_build.ansible_job_id }}"
+  loop_control:
+    loop_var: __de_build
+    label: "{{ __de_build.__de_config_item.name | default ('None') }}"
+  loop: "{{ __de_builds.results }}"
+  register: __de_builds_async
+  until: __de_builds_async.finished
+  retries: 120
+  delay: 30
