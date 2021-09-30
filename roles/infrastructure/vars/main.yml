@@ -47,3 +47,17 @@ infra__dynamic_inventory_images_default:
 infra__all_ports_security_rule:
   aws: -1
   azure: 0-65535
+
+infra__aws_gateway_vpc_private_endpoints: 
+  - 'com.amazonaws.{{infra__region}}.s3'
+
+infra__aws_interface_vpc_private_endpoints:
+  - 'com.amazonaws.{{infra__region}}.elasticfilesystem'
+  - 'com.amazonaws.{{infra__region}}.ecr.dkr'
+  - 'com.amazonaws.{{infra__region}}.rds'
+  - 'com.amazonaws.{{infra__region}}.ecr.api'
+  - 'com.amazonaws.{{infra__region}}.sts'
+  - 'com.amazonaws.{{infra__region}}.ec2'
+  - 'com.amazonaws.{{infra__region}}.cloudformation'
+  - 'com.amazonaws.{{infra__region}}.elasticloadbalancing'
+  - 'com.amazonaws.{{infra__region}}.autoscaling'

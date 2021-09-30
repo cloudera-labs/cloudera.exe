@@ -89,6 +89,7 @@ infra__aws_private_subnet_ids:      "{{ infra.aws.vpc.existing.private_subnet_id
 
 infra__security_group_knox_name:    "{{ common__security_group_knox_name }}"
 infra__security_group_default_name: "{{ common__security_group_default_name }}"
+infra__security_group_vpce_name:    "{{ common__security_group_vpce_name }}"
 
 infra__ml_deploy:                   "{{ common__include_ml }}"
 infra__ml_path:                     "{{ common__ml_path }}"

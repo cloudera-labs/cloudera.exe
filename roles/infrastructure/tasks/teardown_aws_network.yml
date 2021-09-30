@@ -39,6 +39,33 @@
     - name: Remove all AWS VPC networking resources
       when: infra__force_teardown | bool
       block:
+        - name: List VPC Endpoints
+          community.aws.ec2_vpc_endpoint_info:
+            region: "{{ infra__region }}"
+            filters:
+              vpc-id: "{{ infra__aws_vpc_id }}"
+          register: existing_endpoints
+        
+        - name: Delete VPC Endpoints
+          community.aws.ec2_vpc_endpoint:
+            state: absent
+            vpc_endpoint_id: "{{ endpoint.vpc_endpoint_id }}"
+            region: "{{ infra__region }}"
+          loop: "{{ existing_endpoints.vpc_endpoints }}"
+          loop_control:
+            loop_var: endpoint
+            label: "{{ endpoint.vpc_endpoint_id }}"
+
+        - name: Wait for VPC Endpoint Deletion
+          community.aws.ec2_vpc_endpoint_info:
+            region: "{{ infra__region }}"
+            filters:
+              vpc-id: "{{ infra__aws_vpc_id }}"
+          register: existing_endpoints_wait
+          until: existing_endpoints_wait.vpc_endpoints | length == 0
+          retries: 15
+          delay: 10
+
         - name: Handle AWS Elastic Loadbalancers
           when:
             - __infra_ec2_elb_names is defined
@@ -174,6 +201,36 @@
             region: "{{ infra__region }}"
             route_table_id: "{{ __infra_aws_rtb_item.id }}"
             lookup: id
+            state: absent
+
+    - name: Teardown VPC Endpoints
+      when: infra__aws_private_endpoints | bool
+      block:
+        - name: Delete VPC Endpoints
+          community.aws.ec2_vpc_endpoint:
+            state: absent
+            vpc_endpoint_id: "{{ __infra_vpc_endpoint.vpc_endpoint_id }}"
+            region: "{{ infra__region }}"
+          loop: "{{ __infra_vpc_existing_endpoints.vpc_endpoints }}"
+          loop_control:
+            loop_var: __infra_vpc_endpoint
+            label: "{{ __infra_vpc_endpoint.vpc_endpoint_id }}"
+
+        - name: Wait for VPC Endpoint Deletion
+          community.aws.ec2_vpc_endpoint_info:
+            region: "{{ infra__region }}"
+            filters:
+              vpc-id: "{{ infra__aws_vpc_id }}"
+          register: __infra_existing_endpoints_wait
+          until: __infra_existing_endpoints_wait.vpc_endpoints | length == 0
+          retries: 15
+          delay: 10
+
+        - name: Delete VPC Endpoint Security Group
+          amazon.aws.ec2_group:
+            region: "{{ infra__region }}"
+            vpc_id: "{{ infra__aws_vpc_id }}"
+            name: "{{ infra__security_group_vpce_name }}"
             state: absent
 
     - name: Remove AWS Private Network
