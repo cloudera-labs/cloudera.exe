@@ -32,4 +32,4 @@
 
 - name: Print Executing Terraform message
   ansible.builtin.debug: 
-    msg: "Executing Terraform. Value of infra__deployment = {{ infra__deployment }}"
+    msg: "Executing Terraform. Value of infra__deployment_engine = {{ infra__deployment_engine }}"

@@ -40,3 +40,7 @@
         src: 'template/{{ infra__type }}/infra_{{ infra__type }}_compute.tf.j2'
         dest: "{{ infra__terraform_tmp_dir }}/infra/infra_compute.tf"
       no_log: false
+
+    - name: Prompt added by jenright 
+      pause:
+        prompt: "Terraform infra files created in {{ infra__terraform_tmp_dir }}/infra"
