@@ -15,26 +15,27 @@
 # limitations under the License.
 
 - name: Create terraform template .tf files
-  when: plat__terraform_tmp_dir is defined # TODO: Is this needed?
+  when: plat__terraform_template_dir is defined # TODO: Is this needed?
   block:
     - name: Create terraform template dir
       file:
-        path: "{{ plat__terraform_tmp_dir }}/plat"
+        path: "{{ plat__terraform_template_dir }}/plat"
         state: directory
 
     # Apply template for Terraform provider
     - name: Generate Terraform Provider
       template:
         src: 'template/{{ plat__infra_type }}/provider.tf.j2'
-        dest: "{{ plat__terraform_tmp_dir }}/plat/provider.tf"
+        dest: "{{ plat__terraform_template_dir }}/plat/provider.tf"
 
     # Apply template for Terraform variables
     - name: Generate Terraform Variables
       template:
         src: 'template/{{ plat__infra_type }}/terraform_variables.tf.j2'
-        dest: "{{ plat__terraform_tmp_dir }}/plat/variables.tf"
+        dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
       no_log: false
 
     - name: Prompt added by jenright 
       pause:
-        prompt: "PART 1 - Terraform role & policy files created in {{ plat__terraform_tmp_dir }}/plat"
+        prompt: "PART 1 - Terraform role & policy files created in {{ plat__terraform_template_dir }}/plat"
+      when: debug_terraform | default(false) | bool

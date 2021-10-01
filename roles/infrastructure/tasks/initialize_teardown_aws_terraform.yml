@@ -13,24 +13,24 @@
 # limitations under the License.
 
 - name: Create terraform template .tf files
-  when: infra__terraform_tmp_dir is defined # TODO: Is this needed?
+  when: infra__terraform_template_dir is defined # TODO: Is this needed?
   block:
     - name: Create terraform template dir
       file:
-        path: "{{ infra__terraform_tmp_dir }}/infra"
+        path: "{{ infra__terraform_template_dir }}/infra"
         state: directory
 
     # Apply template for Terraform provider
     - name: Generate Terraform Provider
       template:
         src: 'template/{{ infra__type }}/provider.tf.j2'
-        dest: "{{ infra__terraform_tmp_dir }}/infra/provider.tf"
+        dest: "{{ infra__terraform_template_dir }}/infra/provider.tf"
 
     # Apply template for Terraform variables
     - name: Generate Terraform Variables
       template:
         src: 'template/{{ infra__type }}/terraform_variables.tf.j2'
-        dest: "{{ infra__terraform_tmp_dir }}/infra/variables.tf"
+        dest: "{{ infra__terraform_template_dir }}/infra/variables.tf"
       no_log: false
 
     # NOTE: These don't work because not all variables are defined during teardown
@@ -39,23 +39,24 @@
     # - name: Generate Terraform infra file for network resources
     #   template:
     #     src: 'template/{{ infra__type }}/infra_{{ infra__type }}_network.tf.j2'
-    #     dest: "{{ infra__terraform_tmp_dir }}/infra/infra_network.tf"
+    #     dest: "{{ infra__terraform_template_dir }}/infra/infra_network.tf"
     #   no_log: false
 
     # # ...storage resources
     # - name: Generating Terraform infra file for storage resources
     #   template:
     #     src: 'template/{{ infra__type }}/infra_{{ infra__type }}_storage.tf.j2'
-    #     dest: "{{ infra__terraform_tmp_dir }}/infra/infra_storage.tf"
+    #     dest: "{{ infra__terraform_template_dir }}/infra/infra_storage.tf"
     #   no_log: false
 
     # # ...compute resources
     # - name: Generating Terraform infra file for compute resources
     #   template:
     #     src: 'template/{{ infra__type }}/infra_{{ infra__type }}_compute.tf.j2'
-    #     dest: "{{ infra__terraform_tmp_dir }}/infra/infra_compute.tf"
+    #     dest: "{{ infra__terraform_template_dir }}/infra/infra_compute.tf"
     #   no_log: false
 
     - name: Prompt added by jenright 
       pause:
-        prompt: "Terraform infra files for Teardown created in {{ infra__terraform_tmp_dir }}/infra"
+        prompt: "Terraform infra files for Teardown created in {{ infra__terraform_template_dir }}/infra"
+      when: debug_terraform | default(false) | bool

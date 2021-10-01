@@ -34,7 +34,7 @@
 
         - name: Ensure the workspace directory exists
           copy:
-            src: "{{ infra__terraform_tmp_dir }}/infra/"
+            src: "{{ infra__terraform_template_dir }}/infra/"
             # TODO: Fix workspace_dir_path
             # dest: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
             dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
@@ -43,6 +43,7 @@
         - name: Prompt added by jenright 
           pause:
             prompt: "Ready to do Terraform apply on infra files in {{ infra__terraform_workspace_dir }}/workspace/infra"
+          when: debug_terraform | default(false) | bool
 
         - name: Applying terraform
           community.general.terraform:
@@ -59,3 +60,9 @@
         - name: Prompt added by jenright 
           pause:
             prompt: "Terraform apply on infra files complete. Check AWS Console."
+          when: debug_terraform | default(false) | bool
+
+        - name: Remove the terraform template directory
+          file:
+            path: "{{ infra__terraform_template_dir }}/infra"
+            state: absent

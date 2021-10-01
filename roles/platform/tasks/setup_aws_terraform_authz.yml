@@ -50,24 +50,32 @@
 # ***************** TERRAFORM TEMPLATE PART 2 ***********************
 # Needed here because the policy documents are only available after above tasks
 # QUESTION: HOW CAN WE REARRANGE THIS?
+
+# Copy the AWS policy documents
+- name: Copy AWS policy documents to Terraform workspace_dir_path
+  copy:  
+    src: "{{ __aws_policy_tmpdir.path }}/"
+    dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
+
 # Apply template for Terraform auth resources....
 # ...policies
 - name: Generate Terraform authz file for policies 
   template:
     src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf.j2'
-    dest: "{{ plat__terraform_tmp_dir }}/plat/plat_authz_policies.tf"
+    dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_policies.tf"
   no_log: false
 
 # ...roles
 - name: Generate Terraform authz file for roles 
   template:
     src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
-    dest: "{{ plat__terraform_tmp_dir }}/plat/plat_authz_roles.tf"
+    dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"
   no_log: false
 
 - name: Prompt added by jenright 
   pause:
-    prompt: "PART 2 - Terraform role & policy files created in {{ plat__terraform_tmp_dir }}/plat"
+    prompt: "PART 2 - Terraform role & policy files created in {{ plat__terraform_template_dir }}/plat"
+  when: debug_terraform | default(false) | bool
 # ***************** END TERRAFORM TEMPLATE PART 2 ***********************
 
 # ***************** TERRAFORM APPLY ***********************
@@ -82,7 +90,7 @@
 
     - name: Ensure the workspace directory exists
       copy:
-        src: "{{ plat__terraform_tmp_dir }}/plat/"
+        src: "{{ plat__terraform_template_dir }}/plat/"
         # TODO: Fix workspace_dir_path
         # dest: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
         dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
@@ -91,6 +99,7 @@
     - name: Prompt added by jenright 
       pause:
         prompt: "Ready to do Terraform apply on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+      when: debug_terraform | default(false) | bool
 
     - name: Applying terraform
       community.general.terraform:
@@ -107,6 +116,12 @@
     - name: Prompt added by jenright 
       pause:
         prompt: "Terraform apply on role files complete. Check AWS Console."
+      when: debug_terraform | default(false) | bool
+
+    - name: Remove the terraform template directory
+      file:
+        path: "{{ plat__terraform_template_dir }}/plat/"
+        state: absent
 
 # ***************** END TERRAFORM APPLY ***********************
 
@@ -132,8 +147,7 @@
     role: "{{ __aws_xaccount_role_info.iam_roles[0].arn }}"
     state: present
 
-# TODO: Need to figure out how to handle this with Terraform
-# - name: Remove temporary directory for policy documents
-#   ansible.builtin.file:
-#     path: "{{ __aws_policy_tmpdir.path }}"
-#     state: absent
+- name: Remove temporary directory for policy documents
+  ansible.builtin.file:
+    path: "{{ __aws_policy_tmpdir.path }}"
+    state: absent

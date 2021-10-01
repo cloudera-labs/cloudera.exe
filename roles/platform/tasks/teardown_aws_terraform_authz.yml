@@ -35,12 +35,12 @@
         - name: Check if workspace directory exists
           # TODO: Fix workspace_dir_path
           # stat: path={{ infra__terraform_workspace_dir }}/workspace_dir_path/plat
-          stat: path={{ plat__terraform_tmp_dir }}/workspace/plat
+          stat: path={{ plat__terraform_template_dir }}/workspace/plat
           register: workdir
 
         - name: Ensure the workspace directory exists
           copy:
-            src: "{{ plat__terraform_tmp_dir }}/plat/"
+            src: "{{ plat__terraform_template_dir }}/plat/"
             # TODO: Fix workspace_dir_path
             # dest: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
             dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
@@ -49,6 +49,7 @@
         - name: Prompt added by jenright 
           pause:
             prompt: "Ready to do Terraform destroy on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+          when: debug_terraform | default(false) | bool
 
         - name: Destroy terraform authz resources
           community.general.terraform:
@@ -65,7 +66,12 @@
         - name: Prompt added by jenright 
           pause:
             prompt: "Terraform destroy on role files complete. Check AWS Console."
+          when: debug_terraform | default(false) | bool
 
+        - name: Remove the terraform template directory
+          file:
+            path: "{{ plat__terraform_template_dir }}/plat/"
+            state: absent
 
 # TODO: Figure out how to handle below conditional with Terraform
 # - name: Tear down AWS Cross Acount

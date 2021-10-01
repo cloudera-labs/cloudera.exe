@@ -30,7 +30,7 @@ infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
 # Deployment type
 infra__deployment_engine:           "{{ common__infra_deployment_engine }}"
 # Location of output from template module which creates Terraform
-infra__terraform_tmp_dir:           "{{ common__terraform_tmp_dir | default('./jenright_tmp_terraform_code') }}"
+infra__terraform_template_dir:           "{{ common__terraform_template_dir | default('./terraform_processed_template_code') }}"
 infra__terraform_workspace_dir:     "{{ common__terraform_workspace_dir | default( playbook_dir + '/.namespaces') }}"      
 
 # Infra

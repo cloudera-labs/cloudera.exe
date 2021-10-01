@@ -23,7 +23,7 @@
 # Deployment type
 plat__infra_deployment_engine:                "{{ common__infra_deployment_engine }}"
 # Location of output from template module which creates Terraform
-plat__terraform_tmp_dir:                      "{{ common__terraform_tmp_dir | default('./jenright_tmp_terraform_code') }}"
+plat__terraform_template_dir:                      "{{ common__terraform_template_dir | default('./terraform_processed_template_code') }}"
 plat__terraform_workspace_dir:                "{{ common__terraform_workspace_dir | default( playbook_dir + '/.namespaces') }}"
 
 plat__infra_type:                             "{{ common__infra_type }}"
