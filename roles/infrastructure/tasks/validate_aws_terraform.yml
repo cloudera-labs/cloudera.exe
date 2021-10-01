@@ -14,14 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# tasks file for validate
-
-- name: Validate SSH private Key file for dynamic infrastructure if supplied
+- name: Check public key ID
   ansible.builtin.assert:
-    that:
-      - infra__private_key_file is string
-    fail_msg: "Invalid SSH private key file for Dynamic Inventory. Key file must be a string."
+    that: 
+      - "__auth_item is defined"
+      - "__auth_item is string"
+      - "__auth_item | trim | length > 0"
+    fail_msg: "AWS authentication parameter, '{{ __auth_item }}', is invalid."
+    quiet: yes
+  loop_control:
+    loop_var: __auth_item
+  loop:
+    - "{{ infra__public_key_id }}"
 
-- name: Validate provider-specific Infrastructure parameters
-  ansible.builtin.include_tasks: "validate_{{ infra__type | lower }}_{{ infra_deployment }}.yml"
-  # ansible.builtin.include_tasks: "validate_{{ infra__type | lower }}_terraform.yml"
+- name: Print AWS Profile to debug
+  ansible.builtin.command: echo AWS_PROFILE is $AWS_PROFILE
+
+- name: Print Executing Terraform message
+  ansible.builtin.debug: 
+    msg: "Executing Terraform. Value of infra__deployment = {{ infra__deployment }}"

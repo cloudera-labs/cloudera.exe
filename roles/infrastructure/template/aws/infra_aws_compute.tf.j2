@@ -1,0 +1,63 @@
+# ------- Dynamic Inventory VMs -------
+{% for __infra_compute_instance_item in range(0, infra__dynamic_inventory_count | int ) | list %}
+resource "aws_instance" "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, '%02d' | format(__infra_compute_instance_item)]) }}" {
+  # NOTE: Security group...taken directly from infra__security_group_default_name variable rather than infra__aws_security_group_default_id fact
+  vpc_security_group_ids      = [aws_security_group.{{ infra__security_group_default_name }}.id]
+  # DONE: key pair
+  key_name                    = "{{ infra__public_key_id }}"
+  # DONE: instance type
+  instance_type               = "{{ infra__dynamic_inventory_vm_type_default[infra__type][infra__dynamic_inventory_vm_type] }}"
+  # DONE: image
+  ami                         = "{{ __infra_aws_ami_info.image_id }}"
+  # DONE: EBS ebs_optimized
+  ebs_optimized               = true
+  # NOTE: VPC vpc_subnet_id....direct
+  # subnet_id                 = aws_subnet.{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) | first }}.id
+  subnet_id                   = aws_subnet.{{ infra__namespace }}_subnet1.id
+  # DONE: Public IP
+  associate_public_ip_address = true
+  # DONE: Tag
+  {#     to_json is used to convert single quotes around IP to double #}
+  tags                        = merge({{ infra__dynamic_inventory_tags  | to_json }},{Name = "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, '%02d' | format(__infra_compute_instance_item)]) }}"}) 
+  # TODO: Volume / root_block_device
+  root_block_device {
+    # NOTE: Need to cast from string (yes) to bool, option 1
+    delete_on_termination  = {{ infra__dynamic_inventory_delete_storage | bool | lower }}
+    # NOTE: Need to cast from string (yes) to bool, option 2
+    # delete_on_termination = {{ true if infra__dynamic_inventory_delete_storage in ['yes', 1, "True", "true"] else false }}
+    volume_size            = "{{ infra__dynamic_inventory_storage_size }}"
+    volume_type            = "{{ infra__dynamic_inventory_storage_type_default[infra__type][infra__dynamic_inventory_storage_type] }}"
+  }
+}
+{% endfor %}
+
+{% if infra__create_utility_service %}
+# ------- Localised Utility VM Instance -------
+resource "aws_instance" "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}" {
+  # NOTE: Security group...taken directly from infra__security_group_default_name variable rather than infra__aws_security_group_default_id fact
+  vpc_security_group_ids      = [aws_security_group.{{ infra__security_group_default_name }}.id]
+  # DONE: key pair
+  key_name                    = "{{ infra__public_key_id }}"
+  # DONE: instance type
+  instance_type               = "{{ infra__dynamic_inventory_vm_type_default[infra__type]['sml'] }}"
+  # DONE: image
+  ami                         = "{{ __infra_aws_ami_info.image_id }}"
+  # DONE: EBS ebs_optimized
+  ebs_optimized               = true
+  # NOTE: VPC vpc_subnet_id....direct
+  subnet_id                   = aws_subnet.{{ infra__namespace }}_subnet1.id
+  # DONE: Public IP
+  associate_public_ip_address = true
+  # DONE: Tag
+  {#     to_json is used to convert single quotes around IP to double #}
+  tags                        = merge({{ infra__dynamic_inventory_tags  | to_json }},{Name = "{{ '-'.join([infra__namespace, infra_region, 'utility_vm' ]) }}"}) 
+
+  # TODO: Volume / root_block_device
+  root_block_device {
+    # NOTE: Need to cast from string (yes) to bool, option 1
+    delete_on_termination  = {{ infra__dynamic_inventory_delete_storage | bool | lower }}
+    volume_size            = 100
+    volume_type            = "{{ infra__dynamic_inventory_storage_type_default[infra__type]['std'] }}"
+  }
+}
+{% endif %}

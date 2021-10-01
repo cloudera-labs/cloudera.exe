@@ -57,6 +57,7 @@ common__ngw_suffix:                       "{{ globals.labels.nat_gateway | defau
 common__unique_storage_name_suffix:       "{{ globals.storage.name | default((common__region + common__aws_profile) if 'aws' in common__infra_type else common__region) }}"
 
 # Infra
+common__infra_deployment:                 "{{ globals.infra_deployment | default() }}"
 common__infra_type:                       "{{ globals.infra_type | default('aws') }}"
 common__public_key_file:                  "{{ globals.ssh.public_key_file | default('') }}"
 common__namespace_cdp:                    "{{ globals.namespace_cdp | default([common__namespace, common__namespace_unique_suffix] | join('-')) }}"

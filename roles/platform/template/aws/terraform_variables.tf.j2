@@ -1,0 +1,29 @@
+# NOTE: We no longer have access & secret key readily available
+# variable "access_key" {
+#   default = " access_key "
+# }
+# variable "secret_key" {
+#   default = " secret_key "
+# }
+
+# NOTE: Added by jenright because we have profile and not access & secret key
+variable "aws_profile" {
+  # TODO: How to make this default if blank
+  # default = "{{ infra__aws_profile | default('default') }}"
+  default = "default"
+}
+
+# Region
+variable "region" {
+  default = "{{ plat__region }}"
+}
+
+
+variable "env_tags" {
+  default = {
+    {% for key, value in plat__tags.items() %}
+    {{ key }} = "{{ value }}"
+    {% endfor %}
+    comment = "Created with Terraform by cloudera-deploy"
+  }
+}

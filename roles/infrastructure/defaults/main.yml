@@ -26,6 +26,13 @@ infra__vpc_svcnet_suffix:           "{{ common__vpc_svcnet_suffix }}"
 infra__vpc_private_subnets_suffix:  "{{ common__vpc_private_subnets_suffix }}"
 infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
 
+# NOTE: Added by jenright for Terraform
+# Deployment type
+infra__deployment:                  "{{ common__infra_deployment }}"
+# Location of output from template module which creates Terraform
+infra__terraform_tmp_dir:           "{{ common__terraform_tmp_dir | default('./jenright_tmp_terraform_code') }}"
+infra__terraform_workspace_dir:     "{{ common__terraform_workspace_dir | default( playbook_dir + '/.namespaces') }}"      
+
 # Infra
 infra__type:                        "{{ common__infra_type }}"
 infra__tunnel:                      "{{ common__tunnel }}"

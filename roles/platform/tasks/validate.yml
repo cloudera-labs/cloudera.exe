@@ -73,4 +73,5 @@
   ansible.builtin.command: echo CDP_PROFILE is $CDP_PROFILE
 
 - name: Include provider-specific Platform validation Tasks
-  ansible.builtin.include_tasks: "validate_{{ plat__infra_type | lower }}.yml"
+  ansible.builtin.include_tasks: "validate_{{ plat__infra_type | lower }}_{{ plat__infra_deployment }}.yml"
+  # ansible.builtin.include_tasks: "validate_{{ plat__infra_type | lower }}.yml"

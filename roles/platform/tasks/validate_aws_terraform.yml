@@ -14,14 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# tasks file for validate
-
-- name: Validate SSH private Key file for dynamic infrastructure if supplied
+- name: Mandatory auth parameters for AWS
   ansible.builtin.assert:
     that:
-      - infra__private_key_file is string
-    fail_msg: "Invalid SSH private key file for Dynamic Inventory. Key file must be a string."
+      - "{{ __auth_fact_item }} is defined"
+      - "{{ __auth_fact_item }} is string"
+      - "{{ __auth_fact_item }} | trim | length > 0"
+    fail_msg: "Authentication parameter, '{{ __auth_fact_item }}', is invalid."
+    quiet: yes
+  loop_control:
+    loop_var: __auth_fact_item
+  loop:
+    - plat__public_key_id
 
-- name: Validate provider-specific Infrastructure parameters
-  ansible.builtin.include_tasks: "validate_{{ infra__type | lower }}_{{ infra_deployment }}.yml"
-  # ansible.builtin.include_tasks: "validate_{{ infra__type | lower }}_terraform.yml"
+- name: Print Executing Terraform message
+  ansible.builtin.debug: 
+    msg: "Executing Terraform. Value of plat__infra_deployment = {{ plat__infra_deployment }}"

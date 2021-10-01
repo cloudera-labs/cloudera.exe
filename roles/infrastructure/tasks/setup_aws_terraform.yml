@@ -1,0 +1,37 @@
+- name: Deploy terraform infrastructure
+  block:
+
+    - name: Confirm I got to setup_aws_terraform
+      ansible.builtin.debug:
+        msg: 
+          - "I'm here doing to terraform apply"
+          - "Here's the workspace: {{ infra__terraform_workspace_dir }}"
+
+    - name: Terraform local state
+      # when: terraform_state == "local" # TODO: Handle state
+      block:
+        - name: Check if workspace directory exists
+          # TODO: Fix workspace_dir_path
+          # stat: path={{ infra__terraform_workspace_dir }}/workspace_dir_path
+          stat: path={{ infra__terraform_workspace_dir }}/workspace/infra
+          register: workdir
+
+        - name: Ensure the workspace directory exists
+          copy:
+            src: "{{ infra__terraform_tmp_dir }}/infra/"
+            # TODO: Fix workspace_dir_path
+            # dest: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
+            dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+          # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+
+        - name: Applying terraform
+          community.general.terraform:
+            # TODO: Fix workspace_dir_path
+            # project_path: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
+            project_path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+            state: "present"
+            force_init: yes
+          register: tf_result
+          retries: 3
+          delay: 10
+          until: tf_result is succeeded

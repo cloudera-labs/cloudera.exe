@@ -17,18 +17,18 @@
 # tasks file for setup
 
 - name: Set up provider-specific Infrastructure artifacts
-  ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}.yml"
+  ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_{{ infra_deployment }}.yml"
 
-- name: Set up provider-specific Infrastructure network
-  ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_network.yml"
+# - name: Set up provider-specific Infrastructure network
+#   ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_network.yml"
 
-- name: Set up provider-specific Infrastructure storage
-  ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_storage.yml"
+# - name: Set up provider-specific Infrastructure storage
+#   ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_storage.yml"
 
-- name: Set Up localised provider-specific Storage Utility Service
-  when: infra__create_utility_service
-  ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_utility_service.yml"
+# - name: Set Up localised provider-specific Storage Utility Service
+#   when: infra__create_utility_service
+#   ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_utility_service.yml"
 
-- name: Set up provider-specific Infrastructure Compute
-  when: infra__dynamic_inventory_count
-  ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_compute.yml"
+# - name: Set up provider-specific Infrastructure Compute
+#   when: infra__dynamic_inventory_count
+#   ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_compute.yml"
