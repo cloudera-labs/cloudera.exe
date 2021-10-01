@@ -14,11 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Include provider-specific CDP Public Roles and Policies setup tasks
+- name: Include Ansible deployment engine provider-specific CDP Public Roles and Policies setup tasks
   ansible.builtin.include_tasks: "setup_{{ plat__infra_type | lower }}_authz.yml"
+  when: plat__infra_deployment_engine == 'ansible'
 
-# - name: Include provider-specific CDP Environment setup tasks
-#   ansible.builtin.include_tasks: "setup_{{ plat__infra_type | lower }}_env.yml"
+# NOTE: Could make this generic if we didn't have the template and policy download
+- name: Include Terraform deployment engine provider-specific CDP Public Roles and Policies setup tasks
+  ansible.builtin.include_tasks: "setup_{{ plat__infra_type | lower }}_{{ plat__infra_deployment_engine }}_authz.yml"
+  when: plat__infra_deployment_engine == 'terraform'
 
-# - name: Include shared CDP Public Environment Setup Tasks
-#   ansible.builtin.include_tasks: "setup_base.yml"
+- name: Include provider-specific CDP Environment setup tasks
+  ansible.builtin.include_tasks: "setup_{{ plat__infra_type | lower }}_env.yml"
+
+- name: Include shared CDP Public Environment Setup Tasks
+  ansible.builtin.include_tasks: "setup_base.yml"

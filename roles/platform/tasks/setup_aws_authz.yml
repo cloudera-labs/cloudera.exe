@@ -30,10 +30,6 @@
   loop: "{{ plat__aws_policy_urls | dict2items }}"
   register: __aws_policy_documents
 
-- name: JE Debug Print __aws_policy_tmpdir
-  ansible.builtin.debug:
-    var: __aws_policy_tmpdir
-
 - name: Process AWS default policy documents
   ansible.builtin.include_tasks: aws_policy_regex.yml
   loop: "{{ __aws_policy_documents.results }}"

@@ -19,22 +19,22 @@
   block:
     - name: Create terraform template dir
       file:
-        path: "{{ plat__terraform_tmp_dir }}/roles"
+        path: "{{ plat__terraform_tmp_dir }}/plat"
         state: directory
 
     # Apply template for Terraform provider
     - name: Generate Terraform Provider
       template:
         src: 'template/{{ plat__infra_type }}/provider.tf.j2'
-        dest: "{{ plat__terraform_tmp_dir }}/roles/provider.tf"
+        dest: "{{ plat__terraform_tmp_dir }}/plat/provider.tf"
 
     # Apply template for Terraform variables
     - name: Generate Terraform Variables
       template:
         src: 'template/{{ plat__infra_type }}/terraform_variables.tf.j2'
-        dest: "{{ plat__terraform_tmp_dir }}/roles/variables.tf"
+        dest: "{{ plat__terraform_tmp_dir }}/plat/variables.tf"
       no_log: false
 
     - name: Prompt added by jenright 
       pause:
-        prompt: "PART 1 - Terraform role & policy files created in {{ plat__terraform_tmp_dir }}/roles"
+        prompt: "PART 1 - Terraform role & policy files created in {{ plat__terraform_tmp_dir }}/plat"
