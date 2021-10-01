@@ -9,27 +9,28 @@ resource "aws_vpc" "{{ infra__vpc_name }}" {
   #enable_dns_hostnames = "aws.vpc.vpc_enable_dns_hostnames"
 }
 
-# ------- Internet Gateway -------
-# NOTE: In EDU code there's a loop over internet_gateways
+{# *** START Create AWS Public Network infrastructure  ****#}
+{% if infra__aws_subnet_ids is not defined %}
+# ------- AWS Public Network infrastructure -------
+# Internet Gateway
 resource "aws_internet_gateway" "{{ infra__aws_igw_name }}" {
   vpc_id = aws_vpc.{{ infra__vpc_name }}.id
   tags = merge(var.env_tags,{Name = "{{ infra__aws_igw_name }}"})
 }
 
-# ------- VPC Subnets -------
-{% for __aws_subnet_cidr_item in infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) %}
-resource "aws_subnet" "{{ infra__namespace }}_subnet{{ loop.index }}" {
+# AWS VPC Public Subnets 
+{% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}
+resource "aws_subnet" "{{ __aws_public_subnet_item.name }}" {
     vpc_id = aws_vpc.{{ infra__vpc_name }}.id
-    cidr_block = "{{ __aws_subnet_cidr_item }}"
+    cidr_block = "{{ __aws_public_subnet_item.cidr }}"
     map_public_ip_on_launch = true
     availability_zone = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}"
-    tags = merge(var.env_tags,{Name = "{{ infra__namespace }}"})
+    tags = merge(var.env_tags,{% for key, value in __aws_public_subnet_item.tags.items() %}{ "{{ key }}" = "{{ value }}" },{% endfor %})
 }
 {% endfor %}
 
-# ------- Route Table -------
-# NOTE: In EDU code a new route table is created; in Ansible main is reused & updated.
-resource "aws_default_route_table" "{{ infra__aws_route_table_name }}" {
+# Public Route Table
+resource "aws_default_route_table" "{{ infra__aws_public_route_table_name }}" {
   default_route_table_id = aws_vpc.{{ infra__vpc_name }}.default_route_table_id
 
   route {
@@ -37,17 +38,88 @@ resource "aws_default_route_table" "{{ infra__aws_route_table_name }}" {
     gateway_id = aws_internet_gateway.{{ infra__aws_igw_name }}.id
   }
 
+  tags = merge(var.env_tags,{Name = "{{ infra__aws_public_route_table_name }}"})
 
-  tags = merge(var.env_tags,{Name = "{{ infra__aws_route_table_name }}"})
 }
 
-# Associate the Route Table with the Subnet
-{% for subnet in infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) %}
-resource "aws_route_table_association" "{{ infra__namespace }}_subnet{{ loop.index }}-association" {
-   subnet_id      = aws_subnet.{{ infra__namespace }}_subnet{{ loop.index }}.id
+# Associate the Public Route Table with the Public Subnets
+{% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}
+resource "aws_route_table_association" "{{ __aws_public_subnet_item.name }}-association" {
+   subnet_id      = aws_subnet.{{ __aws_public_subnet_item.name }}.id
    route_table_id = aws_vpc.{{ infra__vpc_name }}.default_route_table_id
 }
 {% endfor %}
+
+{% endif %}
+{# *** END Create AWS Public Network infrastructure  ****#}
+
+
+{# *** START Create AWS Private Network infrastructure  ****#}
+{% if ( infra__tunnel ) and ( infra__aws_subnet_ids is not defined ) %}
+
+# ------- AWS Private Networking infrastructure -------
+# TODO: Conditional when: infra__tunnel and infra__aws_subnet_ids is undefined
+
+# AWS VPC Private Subnets
+{% for __aws_private_subnet_item in infra__vpc_private_subnets_info %}
+resource "aws_subnet" "{{ __aws_private_subnet_item.name }}" {
+    vpc_id = aws_vpc.{{ infra__vpc_name }}.id
+    cidr_block = "{{ __aws_private_subnet_item.cidr }}"
+    map_public_ip_on_launch = true
+    availability_zone = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}"
+    tags = merge(var.env_tags,{% for key, value in __aws_private_subnet_item.tags.items() %}{ "{{ key }}" = "{{ value }}" },{% endfor %})
+}
+{% endfor %}
+
+# Private Route Table for the AWS VPC
+#  - Not implemeted in Terraform because of "when: no" in Ansible
+
+# Elastic IP for each NAT gateway
+{% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}
+resource "aws_eip" "{{ infra__aws_nat_gateway_name }}-eip-{{ loop.index0 }}" {
+  vpc = true
+
+  tags = var.env_tags
+}
+{% endfor %}
+
+#  Network Gateways (NAT)
+{% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}
+resource "aws_nat_gateway" "{{ infra__aws_nat_gateway_name }}-{{ loop.index0 }}" {
+
+  subnet_id         = aws_subnet.{{ __aws_public_subnet_item.name }}.id
+  allocation_id     = aws_eip.{{ infra__aws_nat_gateway_name }}-eip-{{ loop.index0 }}.id
+  connectivity_type = "public"
+
+  tags = merge(var.env_tags,{Name = "{{ '-'.join([infra__aws_nat_gateway_name, loop.index0 | string ]) }}"})
+}
+{% endfor %}
+
+# Private Route Tables
+{% for __aws_private_subnet_item in infra__vpc_private_subnets_info %}
+resource "aws_route_table" "{{ infra__aws_private_route_table_name }}-{{ loop.index0 }}" {
+    vpc_id = aws_vpc.{{ infra__vpc_name }}.id
+    
+    tags = merge(var.env_tags,{Name = "{{ '-'.join([infra__aws_private_route_table_name, loop.index0 | string ]) }}"})
+    
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.{{ infra__aws_nat_gateway_name }}-{{ loop.index0 % infra__vpc_public_subnets_info | length }}.id
+  }
+
+}
+{% endfor %}
+
+# Associate the Private Route Tables with the Private Subnets
+{% for __aws_private_subnet_item in infra__vpc_private_subnets_info %}
+resource "aws_route_table_association" "{{ infra__aws_private_route_table_name }}-{{ loop.index0 }}-association" {
+   subnet_id      = aws_subnet.{{ __aws_private_subnet_item.name }}.id
+   route_table_id = aws_route_table.{{ infra__aws_private_route_table_name }}-{{ loop.index0 }}.id
+}
+{% endfor %}
+
+{% endif %}
+{# *** END Create AWS PRIVATE Network infrastructure  ****#}
 
 # ------- Security Groups -------
 {% set __security_group_names = [infra__security_group_knox_name, infra__security_group_default_name] %}
@@ -56,6 +128,9 @@ resource "aws_route_table_association" "{{ infra__namespace }}_subnet{{ loop.ind
 resource "aws_security_group" "{{ __security_group_name_item }}" {
   vpc_id       = aws_vpc.{{ infra__vpc_name }}.id
   name         = "{{ __security_group_name_item }}"
+  description  = "{{ __security_group_name_item }}"
+
+  tags = merge(var.env_tags,{Name = "{{ __security_group_name_item }}"})
 
   # Create self reference ingress rule to allow 
   # communication among resources in the security group.
@@ -158,6 +233,5 @@ resource "aws_security_group" "{{ __security_group_name_item }}" {
     protocol    = "all"
   }
 
-  tags = merge(var.env_tags,{Name = "{{ __security_group_name_item }}"})
 }
 {% endfor %}
