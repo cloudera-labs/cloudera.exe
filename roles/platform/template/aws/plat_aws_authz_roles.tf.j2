@@ -1,92 +1,4 @@
-# ------- IAM Managed Policies -------
-# **1. AWS Cross Account Policy**
-# The policy here is a dict variable so we'll use the variable
-# directly in the aws_iam_policy resource.
-resource "aws_iam_policy" "{{ plat__aws_xaccount_policy_name }}" {
-    name        = "{{ plat__aws_xaccount_policy_name }}"
-    description = "CDP Cross Account policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_xaccount_policy_name }}"})
-
-    policy      = <<EOF
-{{ plat__aws_xaccount_account_policy | tojson }}
-EOF
-}
-
-# **2. CDP IDBroker Assume Role policy**
-# First create the assume role policy document
-data "aws_iam_policy_document" "{{ plat__aws_idbroker_policy_name }}-policy-doc" {
-  version       = "2012-10-17"
-  
-  statement {
-    sid         = "VisualEditor0"
-    actions     = ["sts:AssumeRole"]
-    effect      = "Allow"
-    resources   = ["*"]
-  }
-}
-# Then create the policy using the document
-resource "aws_iam_policy" "{{ plat__aws_idbroker_policy_name }}" {
-    name        = "{{ plat__aws_idbroker_policy_name }}"
-    description = "CDP IDBroker Assume Role policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_idbroker_policy_name }}"})
-
-    policy      = data.aws_iam_policy_document.{{ plat__aws_idbroker_policy_name }}-policy-doc.json
-}
-
-# **3a. CDP Data Access Policies - Log **
-resource "aws_iam_policy" "{{ plat__aws_log_location_policy_name }}" {
-    name        = "{{ plat__aws_log_location_policy_name }}"
-    description = "CDP Log Location Access policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_log_location_policy_name }}"})
-
-    policy      = file("{{ __aws_policy_documents | json_query("results[?__policy_url_item.key==`log`].dest | [0]") }}")
-}
-
-# **3b. CDP Data Access Policies - ranger_audit_s3 **
-resource "aws_iam_policy" "{{ plat__aws_ranger_audit_s3_policy_name }}" {
-    name        = "{{ plat__aws_ranger_audit_s3_policy_name }}"
-    description = "CDP Ranger Audit S3 Access policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_ranger_audit_s3_policy_name }}"})
-
-    policy      = file("{{ __aws_policy_documents | json_query("results[?__policy_url_item.key==`ranger_audit_s3`].dest | [0]") }}")
-}
-
-# **3c. CDP Data Access Policies - datalake_admin_s3 **
-resource "aws_iam_policy" "{{ plat__aws_datalake_admin_s3_policy_name }}" {
-    name        = "{{ plat__aws_datalake_admin_s3_policy_name }}"
-    description = "CDP Datalake Admin S3 Access policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_datalake_admin_s3_policy_name }}"})
-
-    policy      = file("{{ __aws_policy_documents | json_query("results[?__policy_url_item.key==`datalake_admin_s3`].dest | [0]") }}")
-}
-
-# **3d. CDP Data Access Policies - bucket_access **
-resource "aws_iam_policy" "{{ plat__aws_bucket_access_policy_name }}" {
-    name        = "{{ plat__aws_bucket_access_policy_name }}"
-    description = "CDP Bucket S3 Access policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_bucket_access_policy_name }}"})
-
-    policy      = file("{{ __aws_policy_documents | json_query("results[?__policy_url_item.key==`bucket_access`].dest | [0]") }}")
-}
-
-# **3e. CDP Data Access Policies - dynamodb **
-resource "aws_iam_policy" "{{ plat__aws_dynamodb_policy_name }}" {
-    name        = "{{ plat__aws_dynamodb_policy_name }}"
-    description = "AWS DynamoDB Table Access policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_dynamodb_policy_name }}"})
-
-    policy      = file("{{ __aws_policy_documents | json_query("results[?__policy_url_item.key==`dynamodb`].dest | [0]") }}")
-}
-
-# ------- AWS IAM Roles -------
-# **1. Cross Account Role **
+# ------- Cross Account Role -------
 # First create the assume role policy document
 data "aws_iam_policy_document" "{{ plat__aws_xaccount_role_name }}-policy-doc" {
   version       = "2012-10-17"
@@ -125,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "{{ plat__aws_xaccount_role_name }}-at
   policy_arn = aws_iam_policy.{{ plat__aws_xaccount_policy_name }}.arn
 }
 
-# **2a. AWS Service Roles - CDP IDBroker**
+# ------- AWS Service Roles - CDP IDBroker -------
 # First create the Assume role policy document
 data "aws_iam_policy_document" "{{ plat__aws_idbroker_role_name }}-policy-doc" {
   version       = "2012-10-17"
@@ -163,7 +75,7 @@ resource "aws_iam_role_policy_attachment" "{{ plat__aws_idbroker_role_name }}-at
   policy_arn = aws_iam_policy.{{ plat__aws_idbroker_policy_name }}.arn
 }
 
-# **2b. AWS Service Roles - CDP Log**
+# ------- AWS Service Roles - CDP Log -------
 # First create the Assume role policy document
 data "aws_iam_policy_document" "{{ plat__aws_log_role_name }}-policy-doc" {
   version       = "2012-10-17"
@@ -217,7 +129,7 @@ resource "aws_iam_role_policy_attachment" "{{ plat__aws_log_role_name }}-attach2
   policy_arn = aws_iam_policy.{{ plat__aws_bucket_access_policy_name }}.arn
 }
 
-# **3a. AWS Data Access Roles - CDP Datalake Admin **
+# ------- AWS Data Access Roles - CDP Datalake Admin -------
 # First create the Assume role policy document
 data "aws_iam_policy_document" "{{ plat__aws_datalake_admin_role_name }}-policy-doc" {
   version       = "2012-10-17"
@@ -268,7 +180,7 @@ resource "aws_iam_role_policy_attachment" "{{ plat__aws_datalake_admin_role_name
   policy_arn = aws_iam_policy.{{ plat__aws_dynamodb_policy_name }}.arn
 }
 
-# **3b. AWS Data Access Roles - CDP Ranger Audit **
+# ------- AWS Data Access Roles - CDP Ranger Audit -------
 # First create the Assume role policy document
 data "aws_iam_policy_document" "{{ plat__aws_ranger_audit_role_name }}-policy-doc" {
   version       = "2012-10-17"

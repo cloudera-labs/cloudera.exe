@@ -50,11 +50,19 @@
 # ***************** TERRAFORM TEMPLATE PART 2 ***********************
 # Needed here because the policy documents are only available after above tasks
 # QUESTION: HOW CAN WE REARRANGE THIS?
-# Apply template for Terraform auth resources
-- name: Generate Terraform authz file
+# Apply template for Terraform auth resources....
+# ...policies
+- name: Generate Terraform authz file for policies 
   template:
-    src: 'template/{{ plat__infra_type }}/plat_{{ infra__type }}_authz.tf.j2'
-    dest: "{{ plat__terraform_tmp_dir }}/plat/plat_authz.tf"
+    src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf.j2'
+    dest: "{{ plat__terraform_tmp_dir }}/plat/plat_authz_policies.tf"
+  no_log: false
+
+# ...roles
+- name: Generate Terraform authz file for roles 
+  template:
+    src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
+    dest: "{{ plat__terraform_tmp_dir }}/plat/plat_authz_roles.tf"
   no_log: false
 
 - name: Prompt added by jenright 
