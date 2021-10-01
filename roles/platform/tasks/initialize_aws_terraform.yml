@@ -15,7 +15,6 @@
 # limitations under the License.
 
 - name: Create terraform template .tf files
-  when: plat__terraform_template_dir is defined # TODO: Move this to validation
   block:
     - name: Create Terraform template dir
       file:

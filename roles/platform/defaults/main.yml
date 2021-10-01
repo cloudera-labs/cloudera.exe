@@ -27,6 +27,7 @@ plat__terraform_template_dir:                 "{{ common__terraform_template_dir
 plat__terraform_artefact_dir:                 "{{ common__terraform_artefact_dir }}"
 plat__terraform_workspace_dir:                "{{ common__terraform_workspace_dir }}"
 
+plat__terraform_allowed_state_storage:       "{{ common__terraform_allowed_state_storage }}"
 plat__terraform_state_storage:               "{{ common__terraform_state_storage }}"
 plat__terraform_remote_state_bucket:         "{{ common__terraform_remote_state_bucket }}"      
 plat__terraform_remote_state_lock_table:     "{{ common__terraform_remote_state_lock_table }}"      

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 - name: Create terraform template .tf files
-  when: plat__terraform_template_dir is defined # TODO: Is this needed?
   block:
     - name: Create terraform template dir
       ansible.builtin.file:
@@ -72,7 +71,7 @@
     path: "{{ __aws_policy_tmpdir.path }}"
     state: absent
 
-# NOTE: These don't work because not all variables are defined during teardown
+# NOTE: jenright These don't work because not all variables are defined during teardown
 # ......ALSO they are not needed because we are working off the state file
 # # Apply template for Terraform auth resources....
 # # ...policies

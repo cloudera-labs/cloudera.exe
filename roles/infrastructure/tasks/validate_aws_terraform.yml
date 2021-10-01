@@ -30,6 +30,31 @@
 - name: Print AWS Profile to debug
   ansible.builtin.command: echo AWS_PROFILE is $AWS_PROFILE
 
+- name: Confirm that required Terraform variables are defined
+  block:
+  - name: Check infra__terraform_template_dir
+    ansible.builtin.assert:
+      that: 
+        - "infra__terraform_template_dir is defined"
+      fail_msg: "Required infra__terraform_template_dir variable for Terraform is not set."
+      quiet: yes
+
+  - name: Check infra__terraform_workspace_dir
+    ansible.builtin.assert:
+      that: 
+        - "infra__terraform_workspace_dir is defined"
+      fail_msg: "Required infra__terraform_workspace_dir variable for Terraform is not set."
+      quiet: yes
+
+  - name: Check infra__terraform_state_storage
+    ansible.builtin.assert:
+      that: 
+        - "infra__terraform_state_storage is defined"
+        - "infra__terraform_state_storage in infra__terraform_allowed_state_storage"
+      fail_msg: "Required infra__terraform_state_storage variable for Terraform needs to be \
+      one of {{ infra__terraform_allowed_state_storage | join(', ') }}"
+      quiet: yes
+
 - name: Print Executing Terraform message
   ansible.builtin.debug: 
     msg: "Executing Terraform. Value of infra__deployment_engine = {{ infra__deployment_engine }}"

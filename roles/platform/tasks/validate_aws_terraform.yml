@@ -27,8 +27,32 @@
   loop:
     - plat__public_key_id
 
+
+- name: Confirm that required Terraform variables are defined
+  block:
+  - name: Check plat__terraform_template_dir
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_template_dir is defined"
+      fail_msg: "Required plat__terraform_template_dir variable for Terraform is not set."
+      quiet: yes
+
+  - name: Check plat__terraform_workspace_dir
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_workspace_dir is defined"
+      fail_msg: "Required plat__terraform_workspace_dir variable for Terraform is not set."
+      quiet: yes
+
+  - name: Check infra__terraform_state_storage
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_state_storage is defined"
+        - "plat__terraform_state_storage in plat__terraform_allowed_state_storage"
+      fail_msg: "Required plat__terraform_state_storage variable for Terraform needs to be \
+      one of {{ plat__terraform_allowed_state_storage | join(', ') }}"
+      quiet: yes
+
 - name: Print Executing Terraform message
   ansible.builtin.debug: 
     msg: "Executing Terraform. Value of plat__infra_deployment_engine = {{ plat__infra_deployment_engine }}"
-
-# TODO: Put any Terraform specific stuff here

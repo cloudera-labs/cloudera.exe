@@ -67,13 +67,15 @@ common__public_key_text:                  "{{ globals.ssh.public_key_text | defa
 common__region:                           "{{ globals.region | default(common__region_default[common__infra_type]) }}"
 common__storage_name:                     "{{ infra.storage.name | default([common__namespace, common__unique_storage_name_suffix[::2] | replace('-','')] | join('-')) }}"
 
+# Terraform
 # The processed Jinja template files for Terraform are placed in common__terraform_template_dir
-common__terraform_template_dir:           "{{ globals.terraform_template_dir | default( playbook_dir , './terraform_processed_template_code') | path_join }}"
+common__terraform_template_dir:            "{{ globals.terraform_template_dir | default( playbook_dir , './terraform_processed_template_code') | path_join }}"
 # A timestamped artefact directory storing a copy of the Terraform code from each run 
-common__terraform_artefact_dir:           "{{ [ common__terraform_template_dir , ('snapshot_' + ansible_date_time.iso8601 ) ] | path_join | regex_replace(':','_')}}"
+common__terraform_artefact_dir:            "{{ [ common__terraform_template_dir , ('tf_artefacts_' + ansible_date_time.iso8601 ) ] | path_join | regex_replace(':','_')}}"
 
-common__terraform_workspace_dir:          "{{ globals.terraform_workspace_dir | default( playbook_dir + '/.namespaces') }}"
+common__terraform_workspace_dir:           "{{ globals.terraform_workspace_dir | default( playbook_dir + '/.namespaces') }}"
 
+common__terraform_allowed_state_storage:   "['local', 'remote_s3']"
 common__terraform_state_storage:           "{{ globals.terraform_state_storage  | default('local') }}"
 common__terraform_remote_state_bucket:     "{{ globals.terraform_remote_state_bucket | default('') }}"      
 common__terraform_remote_state_lock_table: "{{ globals.terraform_remote_state_lock_table | default('') }}"      

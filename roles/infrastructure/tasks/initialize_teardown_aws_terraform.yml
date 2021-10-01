@@ -13,7 +13,6 @@
 # limitations under the License.
 
 - name: Create terraform template .tf files
-  when: infra__terraform_template_dir is defined # TODO: Is this needed?
   block:
     - name: Create terraform template dir
       file:
