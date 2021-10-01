@@ -64,7 +64,7 @@ resource "aws_iam_policy" "{{ plat__aws_datalake_admin_s3_policy_name }}" {
     policy      = file("{{ "./policy_docs/" ~ (__aws_policy_documents | json_query("results[?__policy_url_item.key==`datalake_admin_s3`].dest | [0]") | basename) }}")
 }
 
-# ------- CDP Data Access Policies - datalake_admin_s3 -------
+# ------- CDP Data Access Policies - bucket_access -------
 resource "aws_iam_policy" "{{ plat__aws_bucket_access_policy_name }}" {
     name        = "{{ plat__aws_bucket_access_policy_name }}"
     description = "CDP Bucket S3 Access policy for {{ plat__namespace }}"
