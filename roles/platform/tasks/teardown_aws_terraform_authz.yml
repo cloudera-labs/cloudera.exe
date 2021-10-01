@@ -26,25 +26,52 @@
       - "I'm here doing to terraform destroy"
       - "Here's the workspace: {{ plat__terraform_workspace_dir }}"
 
-- name: Check if Terraform workspace directory exists
-  ansible.builtin.stat: 
-    path: "{{ plat__terraform_template_dir }}/workspace/plat"
-  register: workdir
+# When remote state use temp dir for terraform workspace
+- name: Create Terraform workspace for remote state
+  when: plat__terraform_state_storage in ['remote_s3']
+  block:
+  - name: Create a temporary directory for Terraform workspace
+    ansible.builtin.tempfile:
+      prefix: "tf_plat_workspace"
+      state: directory
+    register: __tf_plat_tmpdir
 
-- name: Ensure the Terraform workspace directory exists
-  ansible.builtin.copy:
-    src: "{{ plat__terraform_template_dir }}/plat/"
-    dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
-  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+  - name: Copy the Terraform code to __tf_plat_tmpdir
+    ansible.builtin.copy:
+      src: "{{ plat__terraform_template_dir }}/plat/"
+      dest: "{{ __tf_plat_tmpdir.path }}/"
 
-- name: Prompt added by jenright 
+- name: Create Terraform workspace for local state
+  when: plat__terraform_state_storage == 'local'
+  block:
+  - name: Check if Terraform workspace directory exists
+    ansible.builtin.stat: 
+      path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    register: workdir
+
+  - name: Ensure the Terraform workspace directory exists
+    ansible.builtin.copy:
+      src: "{{ plat__terraform_template_dir }}/plat/"
+      dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+
+- name: Prompt added by jenright for local state
   ansible.builtin.pause:
-    prompt: "Ready to do Terraform destroy on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
-  when: debug_terraform | default(false) | bool
+    prompt: "Ready to do Terraform apply on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+  when: 
+  - plat__terraform_state_storage == 'local'
+  - debug_terraform | default(false) | bool
+
+- name: Prompt added by jenright for remote state
+  ansible.builtin.pause:
+    prompt: "Ready to do Terraform apply on role files in {{ __tf_plat_tmpdir.path }}"
+  when: 
+  - plat__terraform_state_storage in ['remote_s3']
+  - debug_terraform | default(false) | bool
 
 - name: Destroy Terraform authz resources
   community.general.terraform:
-    project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    project_path: "{{ plat__terraform_workspace_dir +'/workspace/plat' if (plat__terraform_state_storage == 'local') else __tf_plat_tmpdir.path }}"
     state: "absent"
     force_init: yes
   register: tf_result
@@ -62,10 +89,17 @@
     path: "{{ plat__terraform_template_dir }}/plat/"
     state: absent
 
-- name: Remove the Terraform workspace directory
+- name: Remove the Terraform workspace directory for local state
   ansible.builtin.file:
     path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
     state: absent
+  when: plat__terraform_state_storage == 'local'
+
+- name: Remove the Terraform workspace directory for remote state
+  ansible.builtin.file:
+    path: "{{ __tf_plat_tmpdir.path }}"
+    state: absent
+  when: plat__terraform_state_storage in ['remote_s3']
     
 # TODO: Figure out how to handle below conditional with Terraform
 # - name: Tear down AWS Cross Acount

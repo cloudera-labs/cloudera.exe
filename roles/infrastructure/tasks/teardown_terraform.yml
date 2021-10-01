@@ -20,27 +20,56 @@
       - "I'm here doing to terraform destroy"
       - "Here's the workspace: {{ infra__terraform_workspace_dir }}"
 
-- name: Check if Terraform workspace directory exists
-  ansible.builtin.stat: 
-    path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
-  register: workdir
+# When remote state use temp dir for terraform workspace
+- name: Create Terraform workspace for remote state
+  when: infra__terraform_state_storage in ['remote_s3']
+  block:
+  - name: Create a temporary directory for Terraform workspace
+    ansible.builtin.tempfile:
+      prefix: "tf_infra_workspace"
+      state: directory
+    register: __tf_infra_tmpdir
 
-- name: Ensure the Terraform workspace directory exists
-  ansible.builtin.copy:
-    src: "{{ infra__terraform_template_dir }}/infra/"
-    dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
-  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+  - name: Copy the Terraform code to tf_infra_tmpdir
+    ansible.builtin.copy:
+      src: "{{ infra__terraform_template_dir }}/infra/"
+      dest: "{{ __tf_infra_tmpdir.path }}/"
 
-- name: Prompt added by jenright 
+- name: Create Terraform workspace for local state
+  when: infra__terraform_state_storage == 'local'
+  block:
+  - name: Check if Terraform workspace directory exists
+    ansible.builtin.stat: 
+      path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    register: workdir
+
+  - name: Ensure the Terraform workspace directory exists
+    ansible.builtin.copy:
+      src: "{{ infra__terraform_template_dir }}/infra/"
+      dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+
+- name: Print the values for remote or local state
+  debug:
+    msg: "{{ infra__terraform_state_storage == 'local' | ternary(infra__terraform_workspace_dir +'/workspace/infra', __tf_infra_tmpdir.path) }}"
+
+- name: Prompt added by jenright for local state
   ansible.builtin.pause:
     prompt: "Ready to do Terraform destroy on infra files in {{ infra__terraform_workspace_dir }}/workspace/infra"
-  when: debug_terraform | default(false) | bool
+  when: 
+  - infra__terraform_state_storage == 'local'
+  - debug_terraform | default(false) | bool
+
+- name: Prompt added by jenright for remote state
+  ansible.builtin.pause:
+    prompt: "Ready to do Terraform apply on infra files in {{ __tf_infra_tmpdir.path }}"
+  when: 
+  - infra__terraform_state_storage in ['remote_s3']
+  - debug_terraform | default(false) | bool
 
 - name: Destroy Terraform infra resources
   community.general.terraform:
-    # TODO: Fix workspace_dir_path
-    # project_path: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
-    project_path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    project_path: "{{ infra__terraform_state_storage == 'local' | ternary(infra__terraform_workspace_dir +'/workspace/infra', __tf_infra_tmpdir.path) }}"
     state: "absent"
     force_init: yes
   register: tf_result
@@ -58,7 +87,14 @@
     path: "{{ infra__terraform_template_dir }}/infra"
     state: absent
 
-- name: Remove the Terraform workspace directory
+- name: Remove the Terraform workspace directory for local state
   ansible.builtin.file:
     path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
     state: absent
+  when: infra__terraform_state_storage == 'local'
+
+- name: Remove the Terraform workspace directory for remote state
+  ansible.builtin.file:
+    path: "{{ __tf_infra_tmpdir.path }}"
+    state: absent
+  when: infra__terraform_state_storage in ['remote_s3']
