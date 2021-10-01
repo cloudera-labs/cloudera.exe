@@ -67,6 +67,9 @@ common__public_key_text:                  "{{ globals.ssh.public_key_text | defa
 common__region:                           "{{ globals.region | default(common__region_default[common__infra_type]) }}"
 common__storage_name:                     "{{ infra.storage.name | default([common__namespace, common__unique_storage_name_suffix[::2] | replace('-','')] | join('-')) }}"
 
+common__terraform_template_dir:           "{{ globals.terraform_template_dir | default( playbook_dir + './terraform_processed_template_code') }}"
+common__terraform_workspace_dir:          "{{ globals.terraform_workspace_dir | default( playbook_dir + '/.namespaces') }}"
+
 common__vpc_name:                         "{{ infra.vpc.name | default([common__namespace, common__vpc_name_suffix] | join('-')) }}"
 common__vpc_public_subnet_cidrs:          "{{ infra.vpc.public_subnets | default(['10.10.0.0/19', '10.10.32.0/19', '10.10.64.0/19']) }}"
 common__vpc_private_subnet_cidrs:         "{{ infra.vpc.private_subnets | default(['10.10.96.0/19', '10.10.128.0/19', '10.10.160.0/19']) }}"
