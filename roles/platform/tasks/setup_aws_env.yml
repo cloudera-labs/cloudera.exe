@@ -14,24 +14,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# - name: Debug variables with Terraform
-#   debug:
-#     msg:
-#     - "name: {{ plat__env_name }}"
-#     - "state: started"
-#     - "credential: {{ plat__xacccount_credential_name }}"
-#     - "cloud: {{ plat__infra_type }}"
-#     - "region: {{ plat__region }}"
-#     - "default_sg: {{ plat__aws_security_group_default_id }}"
-#     - "knox_sg: {{ plat__aws_security_group_knox_id }}"
-#     - "log_location: {{ plat__aws_storage_location }}"
-#     - "log_identity: {{ plat__aws_log_instance_profile_arn }}"
-#     - "public_key_id: {{ plat__public_key_id }}"
-#     - "workload_analytics: {{ plat__workload_analytics }}"
-#     - "vpc_id: {{ plat__aws_vpc_id }}"
-#     - "subnet_ids: {{ plat__aws_subnet_ids }}"
-#     - "s3_guard_name: {{ plat__aws_dynamodb_table_name }}"
-#     - "tags: {{ plat__tags }}"
+- name: Debug variables with Terraform
+  debug:
+    msg:
+    - "name: {{ plat__env_name }}"
+    - "state: started"
+    - "credential: {{ plat__xacccount_credential_name }}"
+    - "cloud: {{ plat__infra_type }}"
+    - "region: {{ plat__region }}"
+    - "default_sg: {{ plat__aws_security_group_default_id }}"
+    - "knox_sg: {{ plat__aws_security_group_knox_id }}"
+    - "log_location: {{ plat__aws_storage_location }}"
+    - "log_identity: {{ plat__aws_log_instance_profile_arn }}"
+    - "public_key_id: {{ plat__public_key_id }}"
+    - "workload_analytics: {{ plat__workload_analytics }}"
+    - "vpc_id: {{ plat__aws_vpc_id }}"
+    - "subnet_ids: {{ plat__aws_subnet_ids }}"
+    - "tags: {{ plat__tags }}"
+    - "tunnel: {{ plat__tunnel }}"
+    - "endpoint_access_scheme: {{ plat__endpoint_access_scheme | default(omit) }}"
+    - "endpoint_access_subnets: {{ plat__aws_public_subnet_ids | default(omit) }}"
+    - "freeipa instanceCountByGroup: {{ plat__env_freeipa }}"
+
+- name: Prompt added by jenright 
+  pause:
+    prompt: "Ready to create CDP environment"
+  when: debug_terraform | default(false) | bool
+
 
 - name: Set up CDP Environment Deployment on AWS
   cloudera.cloud.env:
