@@ -20,12 +20,6 @@
     name: "{{ plat__xacccount_credential_name }}"  # TODO: Make specific to AWS Teardown as credentials can be for multiple environments
     state: absent
 
-- name: Confirm I got to setup_aws_terraform
-  ansible.builtin.debug:
-    msg: 
-      - "I'm here doing to terraform destroy"
-      - "Here's the workspace: {{ plat__terraform_workspace_dir }}"
-
 - name: Check if Terraform workspace directory exists
   ansible.builtin.stat: 
     path: "{{ plat__terraform_template_dir }}/workspace/plat"

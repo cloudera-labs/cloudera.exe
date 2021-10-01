@@ -70,11 +70,6 @@
     region: "{{ plat__region }}"
   register: __aws_xaccount_role_info
 
-- name: Print details of AWS cross account role
-  debug:
-    msg: 
-    - Cross account role "{{ __aws_xaccount_role_info }}"
-
 - name: Create CDP Cross Account Credential for AWS
   when: plat__xacccount_credential_name not in plat__cdp_credentials_list
   cloudera.cloud.env_cred:

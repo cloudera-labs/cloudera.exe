@@ -14,12 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Confirm I got to setup_aws_terraform
-  ansible.builtin.debug:
-    msg: 
-      - "I'm here doing to terraform apply"
-      - "Here's the workspace: {{ infra__terraform_workspace_dir }}"
-
 - name: Check if Terraform workspace directory exists
   ansible.builtin.stat: 
     path: "{{ infra__terraform_workspace_dir }}/workspace/infra"

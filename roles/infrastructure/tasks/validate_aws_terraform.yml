@@ -54,7 +54,3 @@
       fail_msg: "Required infra__terraform_state_storage variable for Terraform needs to be \
       one of {{ infra__terraform_allowed_state_storage | join(', ') }}"
       quiet: yes
-
-- name: Print Executing Terraform message
-  ansible.builtin.debug: 
-    msg: "Executing Terraform. Value of infra__deployment_engine = {{ infra__deployment_engine }}"

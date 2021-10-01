@@ -14,12 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Confirm I got to teardown_terraform
-  ansible.builtin.debug:
-    msg: 
-      - "I'm here doing to terraform destroy"
-      - "Here's the workspace: {{ infra__terraform_workspace_dir }}"
-
 - name: Check if Terraform workspace directory exists
   ansible.builtin.stat: 
     path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
@@ -38,8 +32,6 @@
 
 - name: Destroy Terraform infra resources
   community.general.terraform:
-    # TODO: Fix workspace_dir_path
-    # project_path: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
     project_path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
     state: "absent"
     force_init: yes
