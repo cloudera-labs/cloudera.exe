@@ -73,13 +73,3 @@ resource "aws_iam_policy" "{{ plat__aws_bucket_access_policy_name }}" {
 
     policy      = file("{{ "./policy_docs/" ~ (__aws_policy_documents | json_query("results[?__policy_url_item.key==`bucket_access`].dest | [0]") | basename) }}")
 }
-
-# ------- CDP Data Access Policies - dynamodb -------
-resource "aws_iam_policy" "{{ plat__aws_dynamodb_policy_name }}" {
-    name        = "{{ plat__aws_dynamodb_policy_name }}"
-    description = "AWS DynamoDB Table Access policy for {{ plat__namespace }}"
-
-    tags        = merge(var.env_tags,{Name = "{{ plat__aws_dynamodb_policy_name }}"})
-
-    policy      = file("{{ "./policy_docs/" ~ (__aws_policy_documents | json_query("results[?__policy_url_item.key==`dynamodb`].dest | [0]") | basename) }}")
-}

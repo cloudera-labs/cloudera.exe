@@ -107,22 +107,14 @@ resource "aws_iam_instance_profile" "{{ plat__aws_log_role_name }}-instance-prof
   role = aws_iam_role.{{ plat__aws_log_role_name }}.name
 }
 
-# Attach CDP IDBroker Assume Policy to the Role
-# resource "aws_iam_role_policy_attachment" "{{ plat__aws_log_role_name }}-attach" {
-  
-#   # Use for_each to create multiple resources
-#   for_each = toset( [aws_iam_policy.{{ plat__aws_log_location_policy_name }}.arn, aws_iam_policy.{{ plat__aws_bucket_access_policy_name }}.arn] )
-
-#   role       = aws_iam_role.{{ plat__aws_log_role_name }}.name
-#   policy_arn = each.value
-# }
-
+# Attach AWS Log Location Policy to the Role
 resource "aws_iam_role_policy_attachment" "{{ plat__aws_log_role_name }}-attach1" {
   
   role       = aws_iam_role.{{ plat__aws_log_role_name }}.name
   policy_arn = aws_iam_policy.{{ plat__aws_log_location_policy_name }}.arn
 }
 
+# Attach AWS Buckey Access Policy to the Role
 resource "aws_iam_role_policy_attachment" "{{ plat__aws_log_role_name }}-attach2" {
   
   role       = aws_iam_role.{{ plat__aws_log_role_name }}.name
@@ -161,23 +153,18 @@ resource "aws_iam_instance_profile" "{{ plat__aws_datalake_admin_role_name }}-in
   role = aws_iam_role.{{ plat__aws_datalake_admin_role_name }}.name
 }
 
-# Attach CDP IDBroker Assume Policy to the Role
+# Attach AWS Datalake Admin S3 Policy to the Role
 resource "aws_iam_role_policy_attachment" "{{ plat__aws_datalake_admin_role_name }}-attach1" {
   
   role       = aws_iam_role.{{ plat__aws_datalake_admin_role_name }}.name
   policy_arn = aws_iam_policy.{{ plat__aws_datalake_admin_s3_policy_name }}.arn
 }
 
+# Attach AWS Bucket Access Policy to the Role
 resource "aws_iam_role_policy_attachment" "{{ plat__aws_datalake_admin_role_name }}-attach2" {
   
   role       = aws_iam_role.{{ plat__aws_datalake_admin_role_name }}.name
   policy_arn = aws_iam_policy.{{ plat__aws_bucket_access_policy_name }}.arn
-}
-
-resource "aws_iam_role_policy_attachment" "{{ plat__aws_datalake_admin_role_name }}-attach3" {
-  
-  role       = aws_iam_role.{{ plat__aws_datalake_admin_role_name }}.name
-  policy_arn = aws_iam_policy.{{ plat__aws_dynamodb_policy_name }}.arn
 }
 
 # ------- AWS Data Access Roles - CDP Ranger Audit -------
@@ -212,21 +199,16 @@ resource "aws_iam_instance_profile" "{{ plat__aws_ranger_audit_role_name }}-inst
   role = aws_iam_role.{{ plat__aws_ranger_audit_role_name }}.name
 }
 
-# Attach CDP IDBroker Assume Policy to the Role
+# Attach AWS Ranger Audit S3 Policy to the Role
 resource "aws_iam_role_policy_attachment" "{{ plat__aws_ranger_audit_role_name }}-attach1" {
   
   role       = aws_iam_role.{{ plat__aws_ranger_audit_role_name }}.name
   policy_arn = aws_iam_policy.{{ plat__aws_ranger_audit_s3_policy_name }}.arn
 }
 
+# Attach AWS Bucket Access Policy to the Role
 resource "aws_iam_role_policy_attachment" "{{ plat__aws_ranger_audit_role_name }}-attach2" {
   
   role       = aws_iam_role.{{ plat__aws_ranger_audit_role_name }}.name
   policy_arn = aws_iam_policy.{{ plat__aws_bucket_access_policy_name }}.arn
-}
-
-resource "aws_iam_role_policy_attachment" "{{ plat__aws_ranger_audit_role_name }}-attach3" {
-  
-  role       = aws_iam_role.{{ plat__aws_ranger_audit_role_name }}.name
-  policy_arn = aws_iam_policy.{{ plat__aws_dynamodb_policy_name }}.arn
 }
