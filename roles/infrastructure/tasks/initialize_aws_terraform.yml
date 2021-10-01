@@ -13,12 +13,22 @@
 # limitations under the License.
 
 - name: Create terraform template .tf files
-  when: infra__terraform_template_dir is defined # TODO: Is this needed?
+  when: infra__terraform_template_dir is defined # TODO: Move this to validation
   block:
-    - name: Create terraform template dir
+    - name: Create Terraform template dir
       file:
         path: "{{ infra__terraform_template_dir }}/infra"
         state: directory
+
+    - name: Create artefact directory for Terraform infra code
+      file:
+        path: "{{ infra__terraform_artefact_dir }}/infra"
+        state: directory
+
+    - name: Prompt added by jenright 
+      pause:
+        prompt: "Created an artefact directory at {{ infra__terraform_artefact_dir }}/infra"
+      when: debug_terraform | default(false) | bool
 
     # Apply template for Terraform provider
     - name: Generate Terraform Provider

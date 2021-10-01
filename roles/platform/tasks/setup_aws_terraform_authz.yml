@@ -90,6 +90,11 @@
     dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
   # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
+- name: Copy Terraform plat code to the artefact directory
+  ansible.builtin.copy:
+    src: "{{ plat__terraform_template_dir }}/plat/"
+    dest: "{{ plat__terraform_artefact_dir }}/plat"
+
 - name: Prompt added by jenright 
   ansible.builtin.pause:
     prompt: "Ready to do Terraform apply on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"

@@ -24,6 +24,7 @@
 plat__infra_deployment_engine:                "{{ common__infra_deployment_engine }}"
 # Location of output from template module which creates Terraform
 plat__terraform_template_dir:                 "{{ common__terraform_template_dir }}"
+plat__terraform_artefact_dir:                 "{{ common__terraform_artefact_dir }}"
 plat__terraform_workspace_dir:                "{{ common__terraform_workspace_dir }}"
 
 plat__terraform_state_storage:               "{{ common__terraform_state_storage }}"

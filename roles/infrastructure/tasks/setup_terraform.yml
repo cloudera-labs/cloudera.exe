@@ -31,6 +31,11 @@
     dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
   # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
+- name: Copy Terraform infra code to the artefact directory
+  ansible.builtin.copy:
+    src: "{{ infra__terraform_template_dir }}/infra/"
+    dest: "{{ infra__terraform_artefact_dir }}/infra"
+
 - name: Prompt added by jenright 
   ansible.builtin.pause:
     prompt: "Ready to do Terraform apply on infra files in {{ infra__terraform_workspace_dir }}/workspace/infra"

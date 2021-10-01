@@ -31,6 +31,7 @@ infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
 infra__deployment_engine:                 "{{ common__infra_deployment_engine }}"
 # Location of output from template module which creates Terraform
 infra__terraform_template_dir:            "{{ common__terraform_template_dir }}"
+infra__terraform_artefact_dir:            "{{ common__terraform_artefact_dir }}"
 infra__terraform_workspace_dir:           "{{ common__terraform_workspace_dir }}"      
 
 infra__terraform_state_storage:           "{{ common__terraform_state_storage }}"
