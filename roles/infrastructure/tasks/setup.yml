@@ -16,6 +16,9 @@
 
 # tasks file for setup
 
+- name: Set up provider-specific Infrastructure artifacts
+  ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}.yml"
+
 - name: Set up for Ansible deployment engine
   when: infra__deployment_engine == 'ansible'
   block:
