@@ -2,11 +2,11 @@
 # Get unique list of buckets from infra__aws_storage_locations
 {% for __aws_storage_location_item in ( infra__aws_storage_locations | map(attribute='bucket') | list | unique ) %}
 resource "aws_s3_bucket" "{{ __aws_storage_location_item }}" {
-  bucket = "{{ __aws_storage_location_item }}"
-  acl    = "private"
+  bucket        = "{{ __aws_storage_location_item }}"
+  acl           = "private"
   force_destroy = true
 
-  tags = merge(var.env_tags,{Name = "{{ __aws_storage_location_item }}"})
+  tags          = merge(var.env_tags,{Name = "{{ __aws_storage_location_item }}"})
 }
 {% endfor %}
 
@@ -15,8 +15,8 @@ resource "aws_s3_bucket" "{{ __aws_storage_location_item }}" {
 {# Terraform resources cannot have '/' so replace with '_' #}
 {% set __aws_storage_object_resource = __aws_storage_object_item.path |replace("/", "_") %}
 
-resource "aws_s3_bucket_object" "{{ __aws_storage_object_resource}}" {
-    bucket        = aws_s3_bucket.{{ __aws_storage_object_item.bucket}}.id
+resource "aws_s3_bucket_object" "{{ __aws_storage_object_resource }}" {
+    bucket        = aws_s3_bucket.{{ __aws_storage_object_item.bucket }}.id
     key           = "{{ __aws_storage_object_item.path }}/"
     # Below may not be required once we have the '/'
     content_type  = "application/x-directory"
