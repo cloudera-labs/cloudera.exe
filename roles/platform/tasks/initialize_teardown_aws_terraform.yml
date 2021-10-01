@@ -16,19 +16,25 @@
   when: plat__terraform_template_dir is defined # TODO: Is this needed?
   block:
     - name: Create terraform template dir
-      file:
+      ansible.builtin.file:
         path: "{{ plat__terraform_template_dir }}/plat"
         state: directory
 
     # Apply template for Terraform provider
     - name: Generate Terraform Provider
-      template:
+      ansible.builtin.template:
         src: 'template/{{ plat__infra_type }}/provider.tf.j2'
         dest: "{{ plat__terraform_template_dir }}/plat/provider.tf"
 
+    # Apply template for Terraform backend state
+    - name: Generate Terraform Backend State
+      ansible.builtin.template:
+        src: 'template/{{ plat__infra_type }}/backend_state.tf.j2'
+        dest: "{{ plat__terraform_template_dir }}/plat/backend_state.tf"
+
     # Apply template for Terraform variables
     - name: Generate Terraform Variables
-      template:
+      ansible.builtin.template:
         src: 'template/{{ plat__infra_type }}/terraform_variables.tf.j2'
         dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
       no_log: false
@@ -57,7 +63,7 @@
     label: "{{ __aws_policy_document_item.__policy_url_item.key }}"
 
 - name: Copy AWS policy documents to Terraform workspace_dir_path
-  copy:  
+  ansible.builtin.copy:  
     src: "{{ __aws_policy_tmpdir.path }}/"
     dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
 
@@ -67,6 +73,7 @@
     state: absent
 
 # NOTE: These don't work because not all variables are defined during teardown
+# ......ALSO they are not needed because we are working off the state file
 # # Apply template for Terraform auth resources....
 # # ...policies
 # - name: Generate Terraform authz file for policies 
@@ -83,6 +90,6 @@
 #   no_log: false
 
 - name: Prompt added by jenright 
-  pause:
+  ansible.builtin.pause:
     prompt: "Terraform role & policy files for Teardown created in {{ plat__terraform_template_dir }}/plat"
   when: debug_terraform | default(false) | bool

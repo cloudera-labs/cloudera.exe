@@ -26,6 +26,12 @@
         src: 'template/{{ infra__type }}/provider.tf.j2'
         dest: "{{ infra__terraform_template_dir }}/infra/provider.tf"
 
+    # Apply template for Terraform backend state
+    - name: Generate Terraform Backend State
+      template:
+        src: 'template/{{ infra__type }}/backend_state.tf.j2'
+        dest: "{{ infra__terraform_template_dir }}/infra/backend_state.tf"
+
     # Apply template for Terraform variables
     - name: Generate Terraform Variables
       template:

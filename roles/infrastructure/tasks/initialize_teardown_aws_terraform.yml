@@ -26,6 +26,12 @@
         src: 'template/{{ infra__type }}/provider.tf.j2'
         dest: "{{ infra__terraform_template_dir }}/infra/provider.tf"
 
+    # Apply template for Terraform backend state
+    - name: Generate Terraform Backend State
+      template:
+        src: 'template/{{ infra__type }}/backend_state.tf.j2'
+        dest: "{{ infra__terraform_template_dir }}/infra/backend_state.tf"
+
     # Apply template for Terraform variables
     - name: Generate Terraform Variables
       template:
@@ -34,6 +40,7 @@
       no_log: false
 
     # NOTE: These don't work because not all variables are defined during teardown
+    # ......ALSO they are not needed because we are working off the state file
     # # Apply template for Terraform infra....
     # # ...network resources
     # - name: Generate Terraform infra file for network resources

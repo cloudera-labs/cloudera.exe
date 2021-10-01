@@ -70,6 +70,10 @@ common__storage_name:                     "{{ infra.storage.name | default([comm
 common__terraform_template_dir:           "{{ globals.terraform_template_dir | default( playbook_dir + './terraform_processed_template_code') }}"
 common__terraform_workspace_dir:          "{{ globals.terraform_workspace_dir | default( playbook_dir + '/.namespaces') }}"
 
+common__terraform_state_storage:           "{{ globals.terraform_state_storage  | default('local') }}"
+common__terraform_remote_state_bucket:     "{{ globals.terraform_remote_state_bucket | default('') }}"      
+common__terraform_remote_state_lock_table: "{{ globals.terraform_remote_state_lock_table | default('') }}"      
+
 common__vpc_name:                         "{{ infra.vpc.name | default([common__namespace, common__vpc_name_suffix] | join('-')) }}"
 common__vpc_public_subnet_cidrs:          "{{ infra.vpc.public_subnets | default(['10.10.0.0/19', '10.10.32.0/19', '10.10.64.0/19']) }}"
 common__vpc_private_subnet_cidrs:         "{{ infra.vpc.private_subnets | default(['10.10.96.0/19', '10.10.128.0/19', '10.10.160.0/19']) }}"

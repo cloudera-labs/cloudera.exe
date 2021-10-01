@@ -14,55 +14,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Destroy terraform infrastructure
-  block:
+- name: Confirm I got to teardown_terraform
+  ansible.builtin.debug:
+    msg: 
+      - "I'm here doing to terraform destroy"
+      - "Here's the workspace: {{ infra__terraform_workspace_dir }}"
 
-    - name: Confirm I got to teardown_terraform
-      ansible.builtin.debug:
-        msg: 
-          - "I'm here doing to terraform destroy"
-          - "Here's the workspace: {{ infra__terraform_workspace_dir }}"
+- name: Check if Terraform workspace directory exists
+  ansible.builtin.stat: 
+    path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+  register: workdir
 
-    - name: Terraform local state
-      # when: terraform_state == "local" # TODO: Handle state
-      block:
-        - name: Check if workspace directory exists
-          # TODO: Fix workspace_dir_path
-          # stat: path={{ infra__terraform_workspace_dir }}/workspace_dir_path
-          stat: path={{ infra__terraform_workspace_dir }}/workspace/infra
-          register: workdir
+- name: Ensure the Terraform workspace directory exists
+  ansible.builtin.copy:
+    src: "{{ infra__terraform_template_dir }}/infra/"
+    dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
-        - name: Ensure the workspace directory exists
-          copy:
-            src: "{{ infra__terraform_template_dir }}/infra/"
-            # TODO: Fix workspace_dir_path
-            # dest: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
-            dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
-          # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+- name: Prompt added by jenright 
+  ansible.builtin.pause:
+    prompt: "Ready to do Terraform destroy on infra files in {{ infra__terraform_workspace_dir }}/workspace/infra"
+  when: debug_terraform | default(false) | bool
 
-        - name: Prompt added by jenright 
-          pause:
-            prompt: "Ready to do Terraform destroy on infra files in {{ infra__terraform_workspace_dir }}/workspace/infra"
-          when: debug_terraform | default(false) | bool
+- name: Destroy Terraform infra resources
+  community.general.terraform:
+    # TODO: Fix workspace_dir_path
+    # project_path: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
+    project_path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    state: "absent"
+    force_init: yes
+  register: tf_result
+  retries: 3
+  delay: 10
+  until: tf_result is succeeded
 
-        - name: Destroy terraform infra resources
-          community.general.terraform:
-            # TODO: Fix workspace_dir_path
-            # project_path: "{{ infra__terraform_workspace_dir }}/{{ workspace_dir_path }}"
-            project_path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
-            state: "absent"
-            force_init: yes
-          register: tf_result
-          retries: 3
-          delay: 10
-          until: tf_result is succeeded
+- name: Prompt added by jenright 
+  ansible.builtin.pause:
+    prompt: "Terraform destroy on infra files complete. Check AWS Console."
+  when: debug_terraform | default(false) | bool
 
-        - name: Prompt added by jenright 
-          pause:
-            prompt: "Terraform destroy on infra files complete. Check AWS Console."
-          when: debug_terraform | default(false) | bool
+- name: Remove the Terraform template directory
+  ansible.builtin.file:
+    path: "{{ infra__terraform_template_dir }}/infra"
+    state: absent
 
-        - name: Remove the terraform template directory
-          file:
-            path: "{{ infra__terraform_template_dir }}/infra"
-            state: absent
+- name: Remove the Terraform workspace directory
+  ansible.builtin.file:
+    path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    state: absent

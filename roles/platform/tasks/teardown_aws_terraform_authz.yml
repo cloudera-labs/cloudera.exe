@@ -20,59 +20,53 @@
     name: "{{ plat__xacccount_credential_name }}"  # TODO: Make specific to AWS Teardown as credentials can be for multiple environments
     state: absent
 
-- name: Destroy terraform infrastructure
-  block:
+- name: Confirm I got to setup_aws_terraform
+  ansible.builtin.debug:
+    msg: 
+      - "I'm here doing to terraform destroy"
+      - "Here's the workspace: {{ plat__terraform_workspace_dir }}"
 
-    - name: Confirm I got to setup_aws_terraform
-      ansible.builtin.debug:
-        msg: 
-          - "I'm here doing to terraform destroy"
-          - "Here's the workspace: {{ plat__terraform_workspace_dir }}"
+- name: Check if Terraform workspace directory exists
+  ansible.builtin.stat: 
+    path: "{{ plat__terraform_template_dir }}/workspace/plat"
+  register: workdir
 
-    - name: Terraform local state
-      # when: terraform_state == "local" # TODO: Handle state
-      block:
-        - name: Check if workspace directory exists
-          # TODO: Fix workspace_dir_path
-          # stat: path={{ infra__terraform_workspace_dir }}/workspace_dir_path/plat
-          stat: path={{ plat__terraform_template_dir }}/workspace/plat
-          register: workdir
+- name: Ensure the Terraform workspace directory exists
+  ansible.builtin.copy:
+    src: "{{ plat__terraform_template_dir }}/plat/"
+    dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
-        - name: Ensure the workspace directory exists
-          copy:
-            src: "{{ plat__terraform_template_dir }}/plat/"
-            # TODO: Fix workspace_dir_path
-            # dest: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
-            dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
-          # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+- name: Prompt added by jenright 
+  ansible.builtin.pause:
+    prompt: "Ready to do Terraform destroy on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+  when: debug_terraform | default(false) | bool
 
-        - name: Prompt added by jenright 
-          pause:
-            prompt: "Ready to do Terraform destroy on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
-          when: debug_terraform | default(false) | bool
+- name: Destroy Terraform authz resources
+  community.general.terraform:
+    project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    state: "absent"
+    force_init: yes
+  register: tf_result
+  retries: 3
+  delay: 10
+  until: tf_result is succeeded
 
-        - name: Destroy terraform authz resources
-          community.general.terraform:
-            # TODO: Fix workspace_dir_path
-            # project_path: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
-            project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
-            state: "absent"
-            force_init: yes
-          register: tf_result
-          retries: 3
-          delay: 10
-          until: tf_result is succeeded
+- name: Prompt added by jenright 
+  ansible.builtin.pause:
+    prompt: "Terraform destroy on role files complete. Check AWS Console."
+  when: debug_terraform | default(false) | bool
 
-        - name: Prompt added by jenright 
-          pause:
-            prompt: "Terraform destroy on role files complete. Check AWS Console."
-          when: debug_terraform | default(false) | bool
+- name: Remove the Terraform template directory
+  ansible.builtin.file:
+    path: "{{ plat__terraform_template_dir }}/plat/"
+    state: absent
 
-        - name: Remove the terraform template directory
-          file:
-            path: "{{ plat__terraform_template_dir }}/plat/"
-            state: absent
-
+- name: Remove the Terraform workspace directory
+  ansible.builtin.file:
+    path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    state: absent
+    
 # TODO: Figure out how to handle below conditional with Terraform
 # - name: Tear down AWS Cross Acount
 #   when: plat__teardown_deletes_xaccount

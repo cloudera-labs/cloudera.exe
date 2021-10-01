@@ -42,7 +42,7 @@
     label: "{{ __aws_policy_document_item.__policy_url_item.key }}"
 
 - name: Some variables for creation of IAM
-  debug:
+  ansible.builtin.debug:
     msg: 
       - plat__aws_xaccount_account_policy = {{ plat__aws_xaccount_account_policy }}
       - plat__aws_xaccount_policy_name = {{ plat__aws_xaccount_policy_name }}
@@ -52,76 +52,74 @@
 # QUESTION: HOW CAN WE REARRANGE THIS?
 
 # Copy the AWS policy documents
-- name: Copy AWS policy documents to Terraform workspace_dir_path
-  copy:  
+- name: Copy AWS policy documents to Terraform template directory
+  ansible.builtin.copy:  
     src: "{{ __aws_policy_tmpdir.path }}/"
     dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
 
 # Apply template for Terraform auth resources....
 # ...policies
 - name: Generate Terraform authz file for policies 
-  template:
+  ansible.builtin.template:
     src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf.j2'
     dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_policies.tf"
   no_log: false
 
 # ...roles
 - name: Generate Terraform authz file for roles 
-  template:
+  ansible.builtin.template:
     src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
     dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"
   no_log: false
 
 - name: Prompt added by jenright 
-  pause:
+  ansible.builtin.pause:
     prompt: "PART 2 - Terraform role & policy files created in {{ plat__terraform_template_dir }}/plat"
   when: debug_terraform | default(false) | bool
 # ***************** END TERRAFORM TEMPLATE PART 2 ***********************
 
 # ***************** TERRAFORM APPLY ***********************
-- name: Terraform local state
-  # when: terraform_state == "local" # TODO: Handle state
-  block:
-    - name: Check if workspace directory exists
-      # TODO: Fix workspace_dir_path
-      # stat: path={{ plat__terraform_workspace_dir }}/workspace_dir_path/plat
-      stat: path={{ plat__terraform_workspace_dir }}/workspace/plat
-      register: workdir
+- name: Check if Terraform workspace directory exists
+  ansible.builtin.stat: 
+    path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+  register: workdir
 
-    - name: Ensure the workspace directory exists
-      copy:
-        src: "{{ plat__terraform_template_dir }}/plat/"
-        # TODO: Fix workspace_dir_path
-        # dest: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
-        dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
-      # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+- name: Ensure the Terraform workspace directory exists
+  ansible.builtin.copy:
+    src: "{{ plat__terraform_template_dir }}/plat/"
+    dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
-    - name: Prompt added by jenright 
-      pause:
-        prompt: "Ready to do Terraform apply on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
-      when: debug_terraform | default(false) | bool
+- name: Prompt added by jenright 
+  ansible.builtin.pause:
+    prompt: "Ready to do Terraform apply on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+  when: debug_terraform | default(false) | bool
 
-    - name: Applying terraform
-      community.general.terraform:
-        # TODO: Fix workspace_dir_path
-        # project_path: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
-        project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
-        state: "present"
-        force_init: yes
-      register: tf_result
-      retries: 3
-      delay: 10
-      until: tf_result is succeeded
+- name: Applying Terraform
+  community.general.terraform:
+    project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    state: "present"
+    force_init: yes
+  register: tf_result
+  retries: 3
+  delay: 10
+  until: tf_result is succeeded
 
-    - name: Prompt added by jenright 
-      pause:
-        prompt: "Terraform apply on role files complete. Check AWS Console."
-      when: debug_terraform | default(false) | bool
+- name: Prompt added by jenright 
+  ansible.builtin.pause:
+    prompt: "Terraform apply on role files complete. Check AWS Console."
+  when: debug_terraform | default(false) | bool
 
-    - name: Remove the terraform template directory
-      file:
-        path: "{{ plat__terraform_template_dir }}/plat/"
-        state: absent
+- name: Remove the Terraform template directory
+  ansible.builtin.file:
+    path: "{{ plat__terraform_template_dir }}/plat/"
+    state: absent
+
+- name: Remove the Terraform workspace directory when using remote state
+  ansible.builtin.file:
+    path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    state: absent
+  when: plat__terraform_state_storage in ['remote_s3']
 
 # ***************** END TERRAFORM APPLY ***********************
 
