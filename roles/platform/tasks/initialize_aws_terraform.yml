@@ -27,10 +27,45 @@
         path: "{{ plat__terraform_artefact_dir }}/plat"
         state: directory
 
-    - name: Prompt added by jenright 
-      pause:
-        prompt: "Created an artefact directory at {{ plat__terraform_artefact_dir }}/plat"
-      when: debug_terraform | default(false) | bool
+    # Create and process the AWS Policy documents
+    - name: Create a temporary directory for policy documents
+      ansible.builtin.tempfile:
+        prefix: "aws-policy-"
+        state: directory
+      register: __aws_policy_tmpdir
+
+    - name: Download AWS default policy documents
+      ansible.builtin.get_url:
+        dest: "{{ __aws_policy_tmpdir.path }}"
+        url: "{{ __policy_url_item.value }}"
+      loop_control:
+        loop_var: __policy_url_item
+        label: "{{ __policy_url_item.key }}"
+      loop: "{{ plat__aws_policy_urls | dict2items }}"
+      register: __aws_policy_documents
+
+    - name: JE Debug Print __aws_policy_tmpdir
+      ansible.builtin.debug:
+        var: __aws_policy_tmpdir
+
+    - name: Process AWS default policy documents
+      ansible.builtin.include_tasks: aws_policy_regex.yml
+      loop: "{{ __aws_policy_documents.results }}"
+      loop_control:
+        loop_var: __aws_policy_document_item
+        label: "{{ __aws_policy_document_item.__policy_url_item.key }}"
+
+    - name: Some variables for creation of IAM
+      ansible.builtin.debug:
+        msg: 
+          - plat__aws_xaccount_account_policy = {{ plat__aws_xaccount_account_policy }}
+          - plat__aws_xaccount_policy_name = {{ plat__aws_xaccount_policy_name }}
+
+    # Copy the AWS policy documents to plat__terraform_template_dir
+    - name: Copy AWS policy documents to Terraform template directory
+      ansible.builtin.copy:  
+        src: "{{ __aws_policy_tmpdir.path }}/"
+        dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
 
     # Apply template for Terraform provider
     - name: Generate Terraform Provider
@@ -49,6 +84,21 @@
       template:
         src: 'template/{{ plat__infra_type }}/terraform_variables.tf.j2'
         dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
+      no_log: false
+
+    # Apply template for Terraform auth resources....
+    # ...policies
+    - name: Generate Terraform authz file for policies 
+      ansible.builtin.template:
+        src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf.j2'
+        dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_policies.tf"
+      no_log: false
+
+    # ...roles
+    - name: Generate Terraform authz file for roles 
+      ansible.builtin.template:
+        src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
+        dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"
       no_log: false
 
     - name: Prompt added by jenright 

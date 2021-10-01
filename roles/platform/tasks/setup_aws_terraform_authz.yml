@@ -14,71 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Create a temporary directory for policy documents
-  ansible.builtin.tempfile:
-    prefix: "aws-policy-"
-    state: directory
-  register: __aws_policy_tmpdir
-
-- name: Download AWS default policy documents
-  ansible.builtin.get_url:
-    dest: "{{ __aws_policy_tmpdir.path }}"
-    url: "{{ __policy_url_item.value }}"
-  loop_control:
-    loop_var: __policy_url_item
-    label: "{{ __policy_url_item.key }}"
-  loop: "{{ plat__aws_policy_urls | dict2items }}"
-  register: __aws_policy_documents
-
-- name: JE Debug Print __aws_policy_tmpdir
-  ansible.builtin.debug:
-    var: __aws_policy_tmpdir
-
-- name: Process AWS default policy documents
-  ansible.builtin.include_tasks: aws_policy_regex.yml
-  loop: "{{ __aws_policy_documents.results }}"
-  loop_control:
-    loop_var: __aws_policy_document_item
-    label: "{{ __aws_policy_document_item.__policy_url_item.key }}"
-
-- name: Some variables for creation of IAM
-  ansible.builtin.debug:
-    msg: 
-      - plat__aws_xaccount_account_policy = {{ plat__aws_xaccount_account_policy }}
-      - plat__aws_xaccount_policy_name = {{ plat__aws_xaccount_policy_name }}
-
-# ***************** TERRAFORM TEMPLATE PART 2 ***********************
-# Needed here because the policy documents are only available after above tasks
-# QUESTION: HOW CAN WE REARRANGE THIS?
-
-# Copy the AWS policy documents
-- name: Copy AWS policy documents to Terraform template directory
-  ansible.builtin.copy:  
-    src: "{{ __aws_policy_tmpdir.path }}/"
-    dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
-
-# Apply template for Terraform auth resources....
-# ...policies
-- name: Generate Terraform authz file for policies 
-  ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf.j2'
-    dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_policies.tf"
-  no_log: false
-
-# ...roles
-- name: Generate Terraform authz file for roles 
-  ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
-    dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"
-  no_log: false
-
-- name: Prompt added by jenright 
-  ansible.builtin.pause:
-    prompt: "PART 2 - Terraform role & policy files created in {{ plat__terraform_template_dir }}/plat"
-  when: debug_terraform | default(false) | bool
-# ***************** END TERRAFORM TEMPLATE PART 2 ***********************
-
-# ***************** TERRAFORM APPLY ***********************
 - name: Check if Terraform workspace directory exists
   ansible.builtin.stat: 
     path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
@@ -125,8 +60,6 @@
     path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
     state: absent
   when: plat__terraform_state_storage in ['remote_s3']
-
-# ***************** END TERRAFORM APPLY ***********************
 
 # Now need to get create CDP Cross Account Credential
 # TODO: Is there a better place to put this?
