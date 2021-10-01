@@ -76,15 +76,15 @@
   block:
     - name: Check if workspace directory exists
       # TODO: Fix workspace_dir_path
-      # stat: path={{ plat__terraform_tmp_dir }}/workspace_dir_path
-      stat: path={{ plat__terraform_tmp_dir }}/workspace/plat
+      # stat: path={{ plat__terraform_workspace_dir }}/workspace_dir_path/plat
+      stat: path={{ plat__terraform_workspace_dir }}/workspace/plat
       register: workdir
 
     - name: Ensure the workspace directory exists
       copy:
         src: "{{ plat__terraform_tmp_dir }}/plat/"
         # TODO: Fix workspace_dir_path
-        # dest: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}"
+        # dest: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
         dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
       # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
@@ -95,7 +95,7 @@
     - name: Applying terraform
       community.general.terraform:
         # TODO: Fix workspace_dir_path
-        # project_path: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}"
+        # project_path: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
         project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
         state: "present"
         force_init: yes
