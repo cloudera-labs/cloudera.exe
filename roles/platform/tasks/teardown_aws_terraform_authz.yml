@@ -1,0 +1,84 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Remove CDP Cross Account Credential for AWS
+  when: plat__teardown_deletes_credential
+  cloudera.cloud.env_cred:
+    name: "{{ plat__xacccount_credential_name }}"  # TODO: Make specific to AWS Teardown as credentials can be for multiple environments
+    state: absent
+
+- name: Destroy terraform infrastructure
+  block:
+
+    - name: Confirm I got to setup_aws_terraform
+      ansible.builtin.debug:
+        msg: 
+          - "I'm here doing to terraform destroy"
+          - "Here's the workspace: {{ plat__terraform_workspace_dir }}"
+
+    - name: Terraform local state
+      # when: terraform_state == "local" # TODO: Handle state
+      block:
+        - name: Check if workspace directory exists
+          # TODO: Fix workspace_dir_path
+          # stat: path={{ infra__terraform_workspace_dir }}/workspace_dir_path/plat
+          stat: path={{ plat__terraform_tmp_dir }}/workspace/plat
+          register: workdir
+
+        - name: Ensure the workspace directory exists
+          copy:
+            src: "{{ plat__terraform_tmp_dir }}/plat/"
+            # TODO: Fix workspace_dir_path
+            # dest: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
+            dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+          # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+
+        - name: Prompt added by jenright 
+          pause:
+            prompt: "Ready to do Terraform destroy on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+
+        - name: Destroy terraform authz resources
+          community.general.terraform:
+            # TODO: Fix workspace_dir_path
+            # project_path: "{{ plat__terraform_workspace_dir }}/{{ workspace_dir_path }}/plat"
+            project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+            state: "absent"
+            force_init: yes
+          register: tf_result
+          retries: 3
+          delay: 10
+          until: tf_result is succeeded
+
+        - name: Prompt added by jenright 
+          pause:
+            prompt: "Terraform destroy on role files complete. Check AWS Console."
+
+
+# TODO: Figure out how to handle below conditional with Terraform
+# - name: Tear down AWS Cross Acount
+#   when: plat__teardown_deletes_xaccount
+#   block:
+#     - name: Remove AWS Cross Account Role
+#       community.aws.iam_role:
+#         name: "{{ plat__aws_xaccount_role_name }}"
+#         region: "{{ plat__region }}"
+#         state: absent
+
+#     - name: Remove AWS Cross Account Policy
+#       community.aws.iam_managed_policy:
+#         region: "{{ plat__region }}"
+#         policy_name: "{{ plat__aws_xaccount_policy_name }}"
+#         state: absent
