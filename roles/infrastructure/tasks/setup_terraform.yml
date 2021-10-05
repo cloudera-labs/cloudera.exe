@@ -23,7 +23,7 @@
   ansible.builtin.copy:
     src: "{{ infra__terraform_template_dir }}/infra/"
     dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
-  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+  # when: not workdir.stat.exists # NOTE: When uncommented won't override workspace dir if any changes to .tf are made.
 
 - name: Copy Terraform infra code to the artefact directory
   ansible.builtin.copy:
@@ -60,3 +60,25 @@
     path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
     state: absent
   when: infra__terraform_state_storage in ['remote_s3']
+
+# If created Utility Instance via Terraform then
+# need to get it's info and add to an Ansible host group
+- name: Add Utility Instance to host group
+  when: infra__create_utility_service
+  block:
+    - name: Discover the Utility Instance details
+      community.aws.ec2_instance_info:
+        region: "{{ infra__region }}"
+        filters: "{{ __filters | items2dict }}"
+      vars:
+        __filters:
+          - key: "tag:Name"
+            value: "{{ infra__namespace }}*"
+      register: __infra_utility_compute_discovered
+
+    - name: Add discovered Utility Instance to host group
+      ansible.builtin.add_host:
+        hostname: "{{__infra_utility_compute_discovered.instances[0].public_ip_address}}"
+        ansible_user: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user }}"
+        ansible_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary(omit, infra__private_key_file) }}"
+        groupname: cldr_utility

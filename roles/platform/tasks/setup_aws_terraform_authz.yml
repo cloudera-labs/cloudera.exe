@@ -23,7 +23,7 @@
   ansible.builtin.copy:
     src: "{{ plat__terraform_template_dir }}/plat/"
     dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
-  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
+  # when: not workdir.stat.exists # NOTE: When uncommented won't override workspace dir if any changes to .tf are made.
 
 - name: Copy Terraform plat code to the artefact directory
   ansible.builtin.copy:
