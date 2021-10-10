@@ -34,7 +34,7 @@
         - name: Set fact for the artifacts directory path
           ansible.builtin.set_fact:
             __artifacts_directory_path: "{{ __artifacts_directory_create.path }}"
-      
+
     - name: Validate artifacts directory if it does exist
       when: __artifacts_directory.stat.exists
       block:
@@ -70,6 +70,11 @@
     env: "{{ info__env_name }}"
   register: __ml_info
 
+- name: Query CDP DE Services
+  cloudera.cloud.de_info:
+    env: "{{ info__env_name }}"
+  register: __de_info
+
 - name: Query CDP Operational DBs
   cloudera.cloud.opdb_info:
     env:  "{{ info__env_name }}"
@@ -82,6 +87,7 @@
       datalake: "{{ __datalake_info.datalakes | first | default({}) }}"
       datahubs: "{{ __datahubs_info.datahubs }}"
       workspaces: "{{ __ml_info.workspaces }}"
+      services: "{{ __de_info.services }}"
       operational_dbs: "{{ __opdb_info.databases }}"
 
 - name: Save the CDP deployment details locally

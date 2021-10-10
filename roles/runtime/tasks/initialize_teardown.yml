@@ -69,3 +69,15 @@
       loop_control:
         loop_var: __ml_config
         label: "{{ __ml_config.instanceName }}"
+
+    - name: Prepare teardown list of all DE Services in Environment
+      ansible.builtin.set_fact:
+        run__de_configs: "{{ run__de_configs | default([]) | union([config]) }}"
+      vars:
+        config:
+          name: "{{ __de_config.name }}"
+          env: "{{ __de_config.environmentName }}"
+      loop: "{{ run__env_info.environments[0].descendants.de }}"
+      loop_control:
+        loop_var: __de_config
+        label: "{{ __de_config.name }}"

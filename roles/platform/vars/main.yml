@@ -42,6 +42,8 @@ plat__cdp_iam_identities:
   df_admin: DFAdmin
   df_flow_admin: DFFlowAdmin
   df_flow_user: DFFlowUser
+  de_admin: DEAdmin
+  de_user: DEUser
 
 plat__cdp_iam_admin_group_resource_roles_default:
   - "{{ plat__cdp_iam_identities.env_admin }}"
@@ -53,6 +55,8 @@ plat__cdp_iam_admin_group_resource_roles_default:
   - "{{ plat__cdp_iam_identities.df_admin }}"
   - "{{ plat__cdp_iam_identities.df_flow_admin }}"
   - "{{ plat__cdp_iam_identities.df_flow_user }}"
+  - "{{ plat__cdp_iam_identities.de_admin }}"
+  - "{{ plat__cdp_iam_identities.de_user }}"
 
 plat__cdp_iam_user_group_resource_roles_default:
   - "{{ plat__cdp_iam_identities.env_user }}"
@@ -60,6 +64,7 @@ plat__cdp_iam_user_group_resource_roles_default:
   - "{{ plat__cdp_iam_identities.ml_user }}"
   - "{{ plat__cdp_iam_identities.df_flow_admin }}"
   - "{{ plat__cdp_iam_identities.df_flow_user }}"
+  - "{{ plat__cdp_iam_identities.de_user }}"
 
 plat__gcp_xaccount_policy_bindings_default:
   - "roles/compute.instanceAdmin.v1"

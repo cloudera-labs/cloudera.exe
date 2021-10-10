@@ -80,6 +80,27 @@
   poll: 0
   register: __ml_teardowns_info
 
+- name: Execute CDP DE Service teardown
+  when:
+    - run__include_de or run__force_teardown | bool
+    - run__de_configs is defined
+    - run__de_configs | length > 0
+  cloudera.cloud.de:
+    name: "{{ __de_config_item.name }}"
+    env: "{{ run__env_name }}"
+    instance_type: "{{ __de_config_item.raw.instance_type }}"
+    minimum_instances: "{{ __de_config_item.raw.minimum_instances }}"
+    maximum_instances: "{{ __de_config_item.raw.maximum_instances }}"
+    state: absent
+    force_delete: "{{ run__de_force_delete }}"
+  loop_control:
+    loop_var: __de_config_item
+    label: "{{ __de_config_item.name | default('de') }}"
+  loop: "{{ run__de_configs }}"
+  async: 7200 # 2 hour timeout
+  poll: 0
+  register: __de_teardowns_info
+
 - name: Execute CDP Datahub teardown
   when:
     - run__include_datahub or run__force_teardown | bool
@@ -113,6 +134,22 @@
   until: __ml_teardowns_async.finished
   retries: 120
   delay: 30
+
+- name: Wait for CDP DE Service deployments to decommission
+  when:
+    - __de_teardowns_info is defined
+    - __de_teardowns_info.results is defined
+    - __de_teardowns_info.results | length > 0
+  ansible.builtin.async_status:
+    jid: "{{ __de_teardown.ansible_job_id }}"
+  loop_control:
+    loop_var: __de_teardown
+    label: "{{ __de_teardown.__de_config_item.name | default('de') }}"
+  loop: "{{ __de_teardowns_info.results }}"
+  register: __de_teardowns_async
+  until: __de_teardowns_async.finished
+  retries: 120
+  delay: 60
 
 - name: Wait for CDP Datahub deployments to decommission
   when:
