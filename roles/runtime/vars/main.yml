@@ -59,3 +59,9 @@ run__datahub_storage_default:
     std: 'pd-standard'
     fast: 'pd-standard'
     eph: 'pd-standard'
+
+
+run__de_compute_default:
+  aws: 'm5.4xlarge'
+  azure: 'Standard_D8_v3'
+  gcp: 'e2-standard-8'
