@@ -62,6 +62,6 @@ run__datahub_storage_default:
 
 
 run__de_compute_default:
-  aws: 'm5.4xlarge'
+  aws: 'm5.2xlarge'
   azure: 'Standard_D8_v3'
   gcp: 'e2-standard-8'

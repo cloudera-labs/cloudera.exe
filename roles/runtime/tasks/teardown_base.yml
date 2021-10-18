@@ -88,9 +88,6 @@
   cloudera.cloud.de:
     name: "{{ __de_config_item.name }}"
     env: "{{ run__env_name }}"
-    instance_type: "{{ __de_config_item.raw.instance_type }}"
-    minimum_instances: "{{ __de_config_item.raw.minimum_instances }}"
-    maximum_instances: "{{ __de_config_item.raw.maximum_instances }}"
     state: absent
     force_delete: "{{ run__de_force_delete }}"
   loop_control:
