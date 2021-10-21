@@ -3,10 +3,10 @@
 resource "aws_vpc" "{{ infra__vpc_name }}" {
   cidr_block           = "{{ infra__vpc_cidr }}"
   tags = merge(var.env_tags,{Name = "{{ infra__vpc_name }}"})
-  # NOTE: Below variables not available in cloudera.exe
-  #instance_tenancy     = "aws.vpc.vpc_instanceTenancy"
-  #enable_dns_support   = "aws.vpc.vpc_enable_dns_support"
-  #enable_dns_hostnames = "aws.vpc.vpc_enable_dns_hostnames"
+
+  instance_tenancy     = "default"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 }
 
 {# *** START Create AWS Public Network infrastructure  ****#}
@@ -15,17 +15,17 @@ resource "aws_vpc" "{{ infra__vpc_name }}" {
 # Internet Gateway
 resource "aws_internet_gateway" "{{ infra__aws_igw_name }}" {
   vpc_id = aws_vpc.{{ infra__vpc_name }}.id
-  tags = merge(var.env_tags,{Name = "{{ infra__aws_igw_name }}"})
+  tags   = merge(var.env_tags,{Name = "{{ infra__aws_igw_name }}"})
 }
 
 # AWS VPC Public Subnets 
 {% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}
 resource "aws_subnet" "{{ __aws_public_subnet_item.name }}" {
-    vpc_id = aws_vpc.{{ infra__vpc_name }}.id
-    cidr_block = "{{ __aws_public_subnet_item.cidr }}"
+    vpc_id                  = aws_vpc.{{ infra__vpc_name }}.id
+    cidr_block              = "{{ __aws_public_subnet_item.cidr }}"
     map_public_ip_on_launch = true
-    availability_zone = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}"
-    tags = merge(var.env_tags,{% for key, value in __aws_public_subnet_item.tags.items() %}{ "{{ key }}" = "{{ value }}" },{% endfor %})
+    availability_zone       = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}"
+    tags                    = merge(var.env_tags,{% for key, value in __aws_public_subnet_item.tags.items() %}{ "{{ key }}" = "{{ value }}" },{% endfor %})
 }
 {% endfor %}
 
@@ -38,7 +38,7 @@ resource "aws_default_route_table" "{{ infra__aws_public_route_table_name }}" {
     gateway_id = aws_internet_gateway.{{ infra__aws_igw_name }}.id
   }
 
-  tags = merge(var.env_tags,{Name = "{{ infra__aws_public_route_table_name }}"})
+  tags                   = merge(var.env_tags,{Name = "{{ infra__aws_public_route_table_name }}"})
 
 }
 
@@ -58,16 +58,15 @@ resource "aws_route_table_association" "{{ __aws_public_subnet_item.name }}-asso
 {% if ( infra__tunnel ) and ( infra__aws_subnet_ids is not defined ) %}
 
 # ------- AWS Private Networking infrastructure -------
-# TODO: Conditional when: infra__tunnel and infra__aws_subnet_ids is undefined
 
 # AWS VPC Private Subnets
 {% for __aws_private_subnet_item in infra__vpc_private_subnets_info %}
 resource "aws_subnet" "{{ __aws_private_subnet_item.name }}" {
-    vpc_id = aws_vpc.{{ infra__vpc_name }}.id
-    cidr_block = "{{ __aws_private_subnet_item.cidr }}"
+    vpc_id                  = aws_vpc.{{ infra__vpc_name }}.id
+    cidr_block              = "{{ __aws_private_subnet_item.cidr }}"
     map_public_ip_on_launch = true
-    availability_zone = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}"
-    tags = merge(var.env_tags,{% for key, value in __aws_private_subnet_item.tags.items() %}{ "{{ key }}" = "{{ value }}" },{% endfor %})
+    availability_zone       = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}"
+    tags                    = merge(var.env_tags,{% for key, value in __aws_private_subnet_item.tags.items() %}{ "{{ key }}" = "{{ value }}" },{% endfor %})
 }
 {% endfor %}
 
@@ -77,7 +76,7 @@ resource "aws_subnet" "{{ __aws_private_subnet_item.name }}" {
 # Elastic IP for each NAT gateway
 {% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}
 resource "aws_eip" "{{ infra__aws_nat_gateway_name }}-eip-{{ loop.index0 }}" {
-  vpc = true
+  vpc  = true
 
   tags = var.env_tags
 }
@@ -91,7 +90,7 @@ resource "aws_nat_gateway" "{{ infra__aws_nat_gateway_name }}-{{ loop.index0 }}"
   allocation_id     = aws_eip.{{ infra__aws_nat_gateway_name }}-eip-{{ loop.index0 }}.id
   connectivity_type = "public"
 
-  tags = merge(var.env_tags,{Name = "{{ '-'.join([infra__aws_nat_gateway_name, loop.index0 | string ]) }}"})
+  tags              = merge(var.env_tags,{Name = "{{ '-'.join([infra__aws_nat_gateway_name, loop.index0 | string ]) }}"})
 }
 {% endfor %}
 
@@ -100,10 +99,10 @@ resource "aws_nat_gateway" "{{ infra__aws_nat_gateway_name }}-{{ loop.index0 }}"
 resource "aws_route_table" "{{ infra__aws_private_route_table_name }}-{{ loop.index0 }}" {
     vpc_id = aws_vpc.{{ infra__vpc_name }}.id
     
-    tags = merge(var.env_tags,{Name = "{{ '-'.join([infra__aws_private_route_table_name, loop.index0 | string ]) }}"})
+    tags   = merge(var.env_tags,{Name = "{{ '-'.join([infra__aws_private_route_table_name, loop.index0 | string ]) }}"})
     
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.{{ infra__aws_nat_gateway_name }}-{{ loop.index0 % infra__vpc_public_subnets_info | length }}.id
   }
 
@@ -130,15 +129,15 @@ resource "aws_security_group" "{{ __security_group_name_item }}" {
   name         = "{{ __security_group_name_item }}"
   description  = "{{ __security_group_name_item }}"
 
-  tags = merge(var.env_tags,{Name = "{{ __security_group_name_item }}"})
+  tags         = merge(var.env_tags,{Name = "{{ __security_group_name_item }}"})
 
   # Create self reference ingress rule to allow 
   # communication among resources in the security group.
   ingress {
       from_port = 0
-      to_port = 0
-      protocol = "all"
-      self = true
+      to_port   = 0
+      protocol  = "all"
+      self      = true
   }
 
 {# ******* NOTE: HERE COMES THE MESSY PART! *******#}
@@ -158,7 +157,7 @@ resource "aws_security_group" "{{ __security_group_name_item }}" {
 {# **Loop over security group rule**#}
 {% for ingress in infra__aws_security_group_rules %}
 # ----- Raw Inputs -----
-# ports = {{ ingress.ports|pprint }}
+# ports       = {{ ingress.ports|pprint }}
 # cidr_blocks = {{ ingress.cidr_ip }}
 # protocol    = {{ ingress.proto }}
 # ----------------------
