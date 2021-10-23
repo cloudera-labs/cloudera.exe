@@ -14,6 +14,7 @@ datahub:
     gcp:
   suffix:
   tags:
+  force_delete:
 de:
 df:
   suffix:
@@ -23,9 +24,38 @@ df:
   ip_ranges:
   teardown:
     persist:
+  force_delete:
 dw:
   definitions:
+    - name:
+      use_default_dbc:
+      load_demo_data:
+      virtual_warehouses:
+        - name:
+          type:
+          template:
+          autoscaling:
+            min_nodes:
+            max_nodes:
+          tags:
+          configs:
+            common_configs:
+            application_configs:
+            enable_sso:
+            ldap_groups:
   suffix:
+  vw:
+    suffix:
+    type:
+    template:
+  dbc:
+    suffix:
+    default_suffix: 
+  tags:
+  overlay_network:
+  private_load_balancer:
+  private_worker_nodes:
+  force_delete:
 env:
   aws:
     policy:
@@ -182,6 +212,7 @@ globals:
   dynamic_inventory:
     vm:
       count:
+  force_teardown:
   gcloud_credential_file:
   infra_type:
   labels:
@@ -328,6 +359,7 @@ ml:
   suffix:
   tags:
   public_loadbalancer:
+  force_delete:
 opdb:
   definitions:
   suffix:

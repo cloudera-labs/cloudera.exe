@@ -13,6 +13,8 @@
 # limitations under the License.
 
 galaxy_info:
+  role_name: platform
+  namespace: cloudera
   author: Webster Mudge (wmudge@cloudera.com)
   description: >
     Deployment and management of Cloudera Data Platform (CDP) Public Cloud core
