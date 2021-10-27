@@ -50,3 +50,20 @@
     - plat__azure_datalakeadmin_identity_name not in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
     - plat__azure_log_identity_name not in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
     - plat__azure_ranger_audit_identity_name not in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+
+- name: Remove CDP Cross Account Credential for Azure
+  when: plat__teardown_deletes_credential
+  cloudera.cloud.env_cred:
+    state: absent
+    #cloud: "{{ plat__infra_type }}"
+    name: "{{ plat__xacccount_credential_name }}"
+    #subscription: "{{ plat__azure_subscription_id }}"
+    #tenant: "{{ plat__azure_tenant_id }}"
+    #application: "{{ plat__azure_xaccount_app_uuid }}"
+    #secret: "{{ __azure_xaccount_app_pword }}"
+
+- name: Tear down Azure AD App Registration
+  when: plat__teardown_deletes_xaccount and ( plat__azure_xaccount_app_uuid is defined ) and ( plat__azure_xaccount_app_uuid | length > 0 )
+  command: >
+      az ad sp delete
+      --id {{ plat__azure_application_service_principal_objuuid }}
