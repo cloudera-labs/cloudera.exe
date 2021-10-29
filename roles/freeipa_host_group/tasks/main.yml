@@ -46,11 +46,22 @@
 #   when: freeipa_host_group__infra_type == "azure"
 #   block:
 
-# TODO: A block per cloud provider - GCP
 # Get instance details for specific infra_type - GCP
-# - name: Gather FreeIPA instance details on GCP
-#   when: freeipa_host_group__infra_type == "gcp"
-#   block:
+- name: Gather FreeIPA instance details on GCP
+  when: freeipa_host_group__infra_type == "gcp"
+  block:
+    - name: Gather Address information used by FreeIPA GCP instance
+      google.cloud.gcp_compute_address_info:
+        region: "{{ freeipa_host_group__region }}"
+        project: "{{ freeipa_host_group__gcp_project }}"
+        # Filter on the freeipa instance name with the timestamp stripped
+        filters:
+        - "name : {{ __freeipa_server_instance_id | regex_replace('[^-]+$', '') }}*"
+      register: __gcp_freeipa_address_info
+
+    - name: Set facts for the FreeIPA server IP
+      ansible.builtin.set_fact:
+        __freeipa_server_public_ip: "{{ __gcp_freeipa_address_info.resources | map(attribute='address') }}"
 
 # Add the FreeIPA server and username to the inventory
 - name: Add FreeIPA servers to inventory
