@@ -182,6 +182,7 @@ globals:
   dynamic_inventory:
     vm:
       count:
+      os:
   gcloud_credential_file:
   infra_type:
   labels:
@@ -277,7 +278,6 @@ infra:
     tag_key:
     tag_value:
     vm:
-      os:
       suffix:
       type:
   gcp:

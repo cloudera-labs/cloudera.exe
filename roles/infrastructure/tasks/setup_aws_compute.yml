@@ -34,10 +34,10 @@
         volume_size: "{{ infra__dynamic_inventory_storage_size }}"
         delete_on_termination: "{{ infra__dynamic_inventory_delete_storage }}"
     wait: yes
-    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, '%02d' | format(__infra_compute_instance_item)]) }) }}"
+    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }) }}"
     exact_count: 1
     count_tag:
-      Name: "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, '%02d' | format(__infra_compute_instance_item)]) }}"
+      Name: "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }}"
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
     assign_public_ip: yes
 

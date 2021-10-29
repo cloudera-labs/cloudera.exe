@@ -28,16 +28,21 @@ infra__cdp_control_plane_cidr_default:  ['52.36.110.208/32', '52.40.165.49/32', 
 
 infra__dynamic_inventory_images_default:
   aws:
-    centos7:
+    el7:
       search: 'CentOS Linux 7 x86_64 HVM EBS*'
       user: 'centos'
       owners:
         - 'aws-marketplace'
-    centos8:
+    el8:
       search: 'CentOS 8.2*x86*'
       user: 'centos'
       owners:
         - '125523088429'
+    bionic:
+      search: 'ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server*'
+      user: 'ubuntu'
+      owners:
+        - '099720109477'
 
 infra__all_ports_security_rule:
   aws: -1
