@@ -42,6 +42,19 @@
   poll: 0
   register: __eks_teardowns_info
 
+- name: Ensure RDS Instance deletion protection is disabled if discovered
+  when:
+    - infra__force_teardown | bool
+    - __infra_aws_rds_instances is defined
+    - __infra_aws_rds_instances | length > 0
+  command: >
+    aws rds modify-db-instance
+    --db-instance-identifier {{ __infra_rds_protect_item.db_instance_identifier }}
+    --no-deletion-protection
+  loop: "{{ __infra_aws_rds_instances }}"
+  loop_control:
+    loop_var: __infra_rds_protect_item
+
 - name: Handle RDS Instance removal if discovered
   when:
     - infra__force_teardown | bool
@@ -55,6 +68,7 @@
   loop: "{{ __infra_aws_rds_instances }}"
   loop_control:
     loop_var: __infra_rds_remove_item
+    label: "{{ __infra_rds_remove_item.db_instance_identifier }}"
   async: 3600 # 1 hour timeout
   poll: 0
   register: __rds_teardowns_info
@@ -71,7 +85,7 @@
   loop: "{{ __rds_teardowns_info.results }}"
   register: __rds_teardowns_async
   until: __rds_teardowns_async.finished
-  retries: 360
+  retries: 3600
   delay: 10
 
 - name: Wait for EKS teardowns to complete

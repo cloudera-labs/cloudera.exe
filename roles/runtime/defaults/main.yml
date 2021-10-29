@@ -71,9 +71,13 @@ run__dw_force_delete:               "{{ dw.force_delete | default (run__force_te
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
 run__df_nodes_max:                  "{{ df.max_k8s_nodes | default(5) }}"
 run__df_public_loadbalancer:        "{{ df.public_loadbalancer | default(run__public_endpoint_access) }}"
-run__df_ip_ranges:                  "{{ df.ip_ranges | default([]) }}"
+run__df_lb_ip_ranges:               "{{ df.loadbalancer_ip_ranges | default([]) }}"
+run__df_kube_ip_ranges:             "{{ df.kube_ip_ranges | default([]) }}"
+run__df_cluster_subnets:            "{{ df.cluster_subnets | default([]) }}"
+run__df_lb_subnets:                 "{{ df.loadbalancer_subnets | default([]) }}"
 run__df_persist:                    "{{ df.teardown.persist | default(False) }}"
-run__df_force_delete:               "{{ df.force_delete | default (run__force_teardown) }}"
+run__df_force_delete:               "{{ df.force_delete | default(run__force_teardown) }}"
+run__df_terminate_deployments:      "{{ df.terminate_deployments | default(run__force_teardown) }}"
 
 # Deploy
 run__include_ml:                     "{{ common__include_ml }}"
