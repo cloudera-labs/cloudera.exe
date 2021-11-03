@@ -19,6 +19,7 @@ de:
   suffix:
   tags:
   force_delete:
+  vc_suffix:
 df:
   suffix:
   min_k8s_nodes:
