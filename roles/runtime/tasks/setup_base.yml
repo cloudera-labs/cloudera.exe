@@ -59,6 +59,34 @@
   poll: 0
   register: __ml_builds
 
+- name: Execute CDP DE Service experiences setup
+  when: run__include_de
+  cloudera.cloud.de:
+    name: "{{ __de_config_item.name }}"
+    env: "{{ run__env_name }}"
+    instance_type: "{{ __de_config_item.raw.instance_type | default(run__de_compute_default[run__infra_type]) }}"
+    minimum_instances: "{{ __de_config_item.raw.minimum_instances | default(omit) }}"
+    maximum_instances: "{{ __de_config_item.raw.maximum_instances | default(omit) }}"
+    minimum_spot_instances: "{{ __de_config_item.raw.minimum_spot_instances | default(omit) }}"
+    maximum_spot_instances: "{{ __de_config_item.raw.maximum_spot_instances | default(omit) }}"
+    chart_value_overrides: "{{ __de_config_item.raw.chart_value_overrides | default(omit) }}"
+    enable_public_endpoint: "{{ __de_config_item.raw.enable_public_endpoint | default(omit) }}"
+    enable_workload_analytics: "{{ __de_config_item.raw.enable_workload_analytics | default(omit) }}"
+    initial_instances: "{{ __de_config_item.raw.initial_instances | default(omit) }}"
+    initial_spot_instances: "{{ __de_config_item.raw.initial_spot_instances | default(omit) }}"
+    root_volume_size: "{{ __de_config_item.raw.root_volume_size | default(omit) }}"
+    skip_validation: "{{ __de_config_item.raw.skip_validation | default(omit) }}"
+    tags: "{{ __de_config_item.raw.tags | default(omit) }}"
+    use_ssd: "{{ __de_config_item.raw.use_ssd | default(omit) }}"
+    whitelist_ips: "{{ __de_config_item.raw.whitelist_ips | default(omit) }}"
+  loop_control:
+    loop_var: __de_config_item
+    label: "{{ __de_config_item.name | default ('None') }}"
+  loop: "{{ run__de_configs }}"
+  async: 7200 # 2 hour timeout
+  poll: 0
+  register: __de_builds
+
 - name: Execute CDP OpDB setup
   when: run__include_opdb
   cloudera.cloud.opdb:
@@ -113,6 +141,19 @@
   until: __ml_builds_async.finished
   retries: 120
   delay: 30
+
+- name: Wait for CDP DE Service experiences to complete
+  when: run__include_de
+  ansible.builtin.async_status:
+    jid: "{{ __de_build.ansible_job_id }}"
+  loop_control:
+    loop_var: __de_build
+    label: "{{ __de_build.__de_config_item.name | default ('None') }}"
+  loop: "{{ __de_builds.results }}"
+  register: __de_builds_async
+  until: __de_builds_async.finished
+  retries: 120
+  delay: 60
 
 - name: Wait for CDP OpDB deployments to complete
   when: run__include_opdb
