@@ -25,9 +25,14 @@ df:
   min_k8s_nodes:
   max_k8s_nodes:
   public_loadbalancer:
-  ip_ranges:
+  loadbalancer_ip_ranges:
+  kube_ip_ranges:
+  cluster_subnets:
+  loadbalancer_subnets:
   teardown:
     persist:
+  force_delete:
+  terminate_deployments:
 dw:
   definitions:
   suffix:
