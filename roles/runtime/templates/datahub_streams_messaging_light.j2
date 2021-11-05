@@ -17,6 +17,13 @@ template: Streams Messaging Light Duty
 instance_groups:
   - instanceGroupName: master
   - instanceGroupName: broker
+    nodeCount: 0
+    instanceGroupType: CORE
+    attachedVolumeConfiguration:
+      - volumeSize: 500
+        volumeCount: 4
+        volumeType: "{{ run__datahub_storage[run__infra_type].fast }}"
+  - instanceGroupName: core_broker
     nodeCount: 3
     instanceGroupType: CORE
     attachedVolumeConfiguration:
