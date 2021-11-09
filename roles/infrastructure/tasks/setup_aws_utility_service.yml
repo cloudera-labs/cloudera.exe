@@ -14,6 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Construct tags for AWS Policy for Storage Utility Bucket
+  ansible.builtin.set_fact:
+    __infra_aws_policy_tags_list: "{{ __infra_aws_policy_tags_list | default([]) | union([policy_tag_pair]) }}"
+  vars:
+    policy_tag_pair: "Key={{ __policy_tag.key }},Value={{ __policy_tag.value | quote }}"
+  loop: "{{ __infra_aws_policy_tags | dict2items }}"
+  loop_control:
+    loop_var: __policy_tag
+
+- name: Construct tags for AWS Role for Storage Utility Bucket
+  ansible.builtin.set_fact:
+    __infra_aws_role_tags_list: "{{ __infra_aws_role_tags_list | default([]) | union([role_tag_pair]) }}"
+  vars:
+    role_tag_pair: "Key={{ __role_tag.key }},Value={{ __role_tag.value | quote }}"
+  loop: "{{ __infra_aws_role_tags | dict2items }}"
+  loop_control:
+    loop_var: __role_tag
+
 - name: Ensure IAM Policy for Storage Utility Bucket
   community.aws.iam_managed_policy:
     policy_name: "{{ infra__utlity_bucket_name }}"
@@ -33,6 +51,16 @@
             - "arn:aws:s3:::{{ infra__utlity_bucket_name }}"
             - "arn:aws:s3:::{{ infra__utlity_bucket_name }}/*"
     state: present
+  register: __infra_aws_utility_bucket_policy
+
+- name: Update AWS Storage Utility Bucket Policy tags
+  when: __infra_aws_policy_tags_list
+  ansible.builtin.command: >
+    aws iam tag-policy
+    --policy-arn {{ __infra_aws_utility_bucket_policy.policy.arn }} 
+    --tags {{ __infra_aws_policy_tags_list | join(' ') }}
+  register: __infra_aws_utility_bucket_policy_tags
+  failed_when: __infra_aws_utility_bucket_policy_tags.rc != 0
 
 - name: Create Role to access Storage Utility Service Bucket
   register: infra__download_mirror_role
@@ -49,6 +77,15 @@
           Principal:
             Service: "ec2.amazonaws.com"
           Action: "sts:AssumeRole"
+
+- name: Update AWS Storage Utility Service Bucket Role tags
+  when: __infra_aws_role_tags_list
+  ansible.builtin.command: >
+    aws iam tag-role
+    --role-name {{ infra__utlity_bucket_name }} 
+    --tags {{ __infra_aws_role_tags_list | join(' ') }}
+  register: __infra_aws_storage_utility_role_tags
+  failed_when: __infra_aws_storage_utility_role_tags.rc != 0
 
 - name: Wait for Instance Profile to be returned
   register: __infra_utility_iam_role_info

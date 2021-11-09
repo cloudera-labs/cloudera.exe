@@ -96,6 +96,7 @@ infra__ml_path:                     "{{ common__ml_path }}"
 infra__de_deploy:                   "{{ common__include_de }}"
 infra__de_path:                     "{{ common__de_path }}"
 
+# AWS
 infra__aws_profile:                 "{{ common__aws_profile }}"
 infra__aws_vpc_az_count:            "{{ infra.aws.vpc.az_count | default(3) }}"
 infra__aws_igw_name:                "{{ infra.aws.vpc.internet_gateway.name | default([infra__namespace, infra__aws_igw_suffix] | join('-')) }}"
@@ -108,6 +109,10 @@ infra__aws_private_route_table_name: "{{ infra.aws.vpc.labels.private_route_tabl
 
 infra__aws_nat_gateway_name:        "{{ infra.aws.vpc.nat_gateway.name | default([infra__namespace, infra__aws_nat_gateway_suffix] | join('-')) }}"
 infra__aws_nat_gateway_suffix:      "{{ infra.aws.vpc.nat_gateway.suffix | default(common__ngw_suffix) }}"
+
+infra__aws_role_tags:               "{{ infra.aws.role.tags | default({}) }}"
+infra__aws_policy_tags:             "{{ infra.aws.policy.tags | default({}) }}"
+infra__aws_storage_tags:            "{{ infra.aws.storage.tags | default({}) }}"
 
 # GCP
 infra__gcp_project:                 "{{ common__gcp_project }}"
