@@ -37,6 +37,24 @@
     loop_var: __aws_policy_document_item
     label: "{{ __aws_policy_document_item.__policy_url_item.key }}"
 
+- name: Construct tags for AWS Policies
+  ansible.builtin.set_fact:
+    __plat_aws_policy_tags_list: "{{ __plat_aws_policy_tags_list | default([]) | union([policy_tag_pair]) }}"
+  vars:
+    policy_tag_pair: "Key={{ __policy_tag.key }},Value={{ __policy_tag.value | quote }}"
+  loop: "{{ __plat_aws_policy_tags | dict2items }}"
+  loop_control:
+    loop_var: __policy_tag
+
+- name: Construct tags for AWS Roles
+  ansible.builtin.set_fact:
+    __plat_aws_role_tags_list: "{{ __plat_aws_role_tags_list | default([]) | union([role_tag_pair]) }}"
+  vars:
+    role_tag_pair: "Key={{ __role_tag.key }},Value={{ __role_tag.value | quote }}"
+  loop: "{{ __plat_aws_role_tags | dict2items }}"
+  loop_control:
+    loop_var: __role_tag
+
 # TODO - Handle if XAccount External and Account ID are provided - where is Account Policy defined?
 - name: Create AWS Cross Account Policy
   community.aws.iam_managed_policy:
@@ -45,6 +63,16 @@
     policy_description: "CDP Cross Account policy for {{ plat__namespace }}"
     policy: "{{ plat__aws_xaccount_account_policy }}"
     state: present
+  register: __aws_xaccount_policy
+
+- name: Update AWS Cross Account Policy tags
+  when: __plat_aws_policy_tags_list
+  ansible.builtin.command: >
+    aws iam tag-policy
+    --policy-arn {{ __aws_xaccount_policy.policy.arn }} 
+    --tags {{ __plat_aws_policy_tags_list | join(' ') }}
+  register: __aws_xaccount_policy_tags
+  failed_when: __aws_xaccount_policy_tags.rc != 0
 
 - name: Create AWS Cross Account Role
   community.aws.iam_role:
@@ -69,6 +97,15 @@
   retries: 5
   delay: "{{ 10 | random(start=3, step=1) }}"
 
+- name: Update AWS Cross Account Role tags
+  when: __plat_aws_role_tags_list
+  ansible.builtin.command: >
+    aws iam tag-role
+    --role-name {{ plat__aws_xaccount_role_name }} 
+    --tags {{ __plat_aws_role_tags_list | join(' ') }}
+  register: __aws_xaccount_role_tags
+  failed_when: __aws_xaccount_role_tags.rc != 0
+
 - name: Create CDP Cross Account Credential for AWS
   when: plat__xacccount_credential_name not in plat__cdp_credentials_list
   cloudera.cloud.env_cred:
@@ -92,6 +129,16 @@
           Resource:
             - "*"
     state: present
+  register: __aws_idbroker_assume_role_policy
+
+- name: Update AWS Cross Account Policy tags
+  when: __plat_aws_policy_tags_list
+  ansible.builtin.command: >
+    aws iam tag-policy
+    --policy-arn {{ __aws_idbroker_assume_role_policy.policy.arn }} 
+    --tags {{ __plat_aws_policy_tags_list | join(' ') }}
+  register: __aws_idbroker_assume_role_policy_tags
+  failed_when: __aws_idbroker_assume_role_policy_tags.rc != 0
 
 - name: Create CDP Data Access Policies
   community.aws.iam_managed_policy:
@@ -119,6 +166,20 @@
     - key: bucket_access
       name: "{{ plat__aws_bucket_access_policy_name }}"
       description: CDP Bucket S3 Access
+  register: __aws_cdp_data_access_policy_info
+
+- name: Update CDP Data Access Policies tags
+  when: __plat_aws_policy_tags_list
+  ansible.builtin.command: >
+    aws iam tag-policy
+    --policy-arn {{ __aws_cdp_data_policy_tags_item.policy.arn }} 
+    --tags {{ ___plat_aws_policy_tags_list | join(' ') }}
+  loop_control:
+    loop_var: __aws_cdp_data_policy_tags_item
+    label: "{{ __aws_cdp_data_policy_tags_item.policy.name }}"
+  loop: "{{ __aws_cdp_data_access_policy_info.results }}"
+  register: __aws_idbroker_assume_role_policy_tags
+  failed_when: __aws_cdp_data_policy_tags_item.failed
 
 - name: Create AWS Service Roles
   community.aws.iam_role:
@@ -157,6 +218,19 @@
         - "{{ plat__aws_log_location_policy_name }}"
         - "{{ plat__aws_bucket_access_policy_name }}"
 
+- name: Update AWS Service Role tags
+  when: __plat_aws_role_tags_list
+  ansible.builtin.command: >
+    aws iam tag-role
+    --role-name {{ __aws_service_role_tags_item.iam_role.role_name }} 
+    --tags {{ __plat_aws_role_tags_list | join(' ') }}
+  loop: "{{ __aws_service_role_info.results }}"
+  register: __aws_service_role_tags_info
+  loop_control:
+    loop_var: __aws_service_role_tags_item
+    label: "{{ __aws_service_role_tags_item.iam_role.role_name }}"
+  failed_when: __aws_service_role_tags_item.failed
+
 - name: Create AWS Data Access Roles
   community.aws.iam_role:
     region: "{{ plat__region }}"
@@ -191,6 +265,19 @@
       policies:
         - "{{ plat__aws_ranger_audit_s3_policy_name }}"
         - "{{ plat__aws_bucket_access_policy_name }}"
+
+- name: Update AWS Data Access Role tags
+  when: __plat_aws_role_tags_list
+  ansible.builtin.command: >
+    aws iam tag-role
+    --role-name {{ __aws_data_access_role_tags_item.iam_role.role_name }} 
+    --tags {{ __plat_aws_role_tags_list | join(' ') }}
+  loop: "{{ __aws_data_access_role_info.results }}"
+  register: __aws_data_access_role_tags_info
+  loop_control:
+    loop_var: __aws_data_access_role_tags_item
+    label: "{{ __aws_data_access_role_tags_item.iam_role.role_name }}"
+  failed_when: __aws_data_access_role_tags_item.failed
 
 - name: Ensure AWS Instance Profiles are attached to CDP Roles
   command: >
