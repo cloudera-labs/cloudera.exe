@@ -41,6 +41,7 @@
       - "name = {{ run__namespace }}*"
     project: "{{ run__gcp_project }}"
 
+# TODO Refactor to follow AWS discovery/assignment process
 - name: Set GCP Subnet Details
   when:
     - __gcp_subnets_discovered is defined

@@ -14,57 +14,101 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Discover AWS Public and Private VPC Subnets
-  when: not infra__aws_subnet_ids
+# Runlevel first, upstream second, and discover third
+- name: Discover AWS VPC if not defined
+  when: run__aws_vpc_id == "" and plat__aws_vpc_id is undefined and infra__aws_vpc_id is undefined
   block:
-    - name: Query AWS Public Subnets
+    - name: Query AWS VPC by name
+      amazon.aws.ec2_vpc_net_info:
+        region: "{{ run__region }}"
+        filters:
+          "tag:Name": "{{ run__vpc_name }}"
+      register: __aws_vpc_info
+
+    - name: Set fact for AWS VPC ID
+      when: __aws_vpc_info is defined
+      ansible.builtin.set_fact:
+        run__aws_vpc_id: "{{ __aws_vpc_info.vpcs[0].id }}"
+
+- name: Set fact for AWS VPC ID if established by Infrastructure
+  when: run__aws_vpc_id == "" and infra__aws_vpc_id is defined
+  ansible.builtin.set_fact:
+    run__aws_vpc_id: "{{ infra__aws_vpc_id }}"
+
+- name: Set fact for AWS VPC ID if established by Platform
+  when: run__aws_vpc_id == "" and plat__aws_vpc_id is defined
+  ansible.builtin.set_fact:
+    run__aws_vpc_id: "{{ plat__aws_vpc_id }}"
+
+# Runlevel first, upstream second, and discover third
+- name: Handle AWS Public and Private VPC Subnets if not defined
+  when: not run__aws_public_subnet_ids or not run__aws_private_subnet_ids # Defaults are empty lists
+  block:
+    - name: Query AWS Subnets
       amazon.aws.ec2_vpc_subnet_info:
         region: "{{ run__region }}"
         filters:
-          "tag:Name": "{{ run__vpc_public_subnets_name }}"
-      register: __aws_public_subnets_info
+          vpc-id: "{{ run__aws_vpc_id }}"
+      register: __aws_subnets_info
 
-    - name: Set fact for AWS Public Subnet IDs
-      when: __aws_public_subnets_info is defined
+    - name: Assert discovered AWS Subnets
+      ansible.builtin.assert:
+        that: __aws_subnets_info.subnets | length > 0
+        fail_msg: "No subnets discovered for AWS VPC"
+        quiet: yes
+
+    - name: Set fact for AWS Public Subnet IDs if established by Infrastructure
+      when: not run__aws_public_subnet_ids and infra__aws_public_subnet_ids is defined
       ansible.builtin.set_fact:
-        run__datahub_public_subnet_ids: "{{ run__datahub_public_subnet_ids | default([]) | union([__aws_public_subnet_item.subnet_id]) }}"
-      loop_control:
-        loop_var: __aws_public_subnet_item
-        label: "{{ __aws_public_subnet_item.subnet_id }}"
-      loop: "{{ __aws_public_subnets_info.subnets }}"
+        run__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
 
-    - name: Query AWS Private Subnets
-      amazon.aws.ec2_vpc_subnet_info:
-        region: "{{ run__region }}"
-        filters:
-          "tag:Name": "{{ run__vpc_private_subnets_name }}"
-      register: __aws_private_subnets_info
-
-    - name: Set fact for AWS Private Subnet IDs
-      when: __aws_private_subnets_info is defined
+    - name: Set fact for AWS Public Subnet IDs if established by Platform
+      when: not run__aws_public_subnet_ids and plat__aws_public_subnet_ids is defined
       ansible.builtin.set_fact:
-        run__datahub_private_subnet_ids: "{{ run__datahub_private_subnet_ids | default([]) | union([__aws_private_subnet_item.subnet_id]) }}"
-      loop_control:
-        loop_var: __aws_private_subnet_item
-        label: "{{ __aws_private_subnet_item.subnet_id }}"
-      loop: "{{ __aws_private_subnets_info.subnets }}"
+        run__aws_public_subnet_ids: "{{ plat__aws_public_subnet_ids }}"
 
-    - name: Set fact for AWS Subnet IDs
-      when: __aws_public_subnets_info is defined or __aws_private_subnets_info is defined
-      ansible.builtin.set_fact:
-        run__datahub_subnet_ids: "{{ run__datahub_public_subnet_ids | default([]) | union(run__datahub_private_subnet_ids) }}"
+    - name: Discover AWS VPC Public Subnets
+      when: not run__aws_public_subnet_ids
+      block:
+        - name: Collect AWS Public Subnets
+          ansible.builtin.set_fact:
+            __aws_public_subnet_ids: "{{ __aws_public_subnet_ids | default([]) | union([__aws_subnet_item.subnet_id | default('')]) }}"
+          loop_control:
+            loop_var: __aws_subnet_item
+            label: "{{ __aws_subnet_item.subnet_id }}"
+          loop: "{{ __aws_subnets_info.subnets | selectattr('map_public_ip_on_launch') }}"
+        
+        - name: Set fact for AWS Public Subnet IDs
+          ansible.builtin.set_fact:
+            run__aws_public_subnet_ids: "{{ __aws_public_subnet_ids | default([]) }}"
 
-- name: Set fact for AWS Subnet IDs by assignment
-  when: infra__aws_subnet_ids
-  block:
-    - name: Set fact for All AWS Subnet IDs by assignment
+    - name: Set fact for AWS Private Subnet IDs if established by Infrastructure
+      when: not run__aws_private_subnet_ids and infra__aws_private_subnet_ids is defined
       ansible.builtin.set_fact:
-        run__datahub_subnet_ids: "{{ infra__aws_subnet_ids }}"
+        run__aws_private_subnet_ids: "{{ infra__aws_private_subnet_ids }}"
 
-    - name: Set fact for AWS Public Subnet IDs by assignment
+    - name: Set fact for AWS Private Subnet IDs if established by Platform
+      when: not run__aws_private_subnet_ids and plat__aws_private_subnet_ids is defined
       ansible.builtin.set_fact:
-        run__datahub_public_subnet_ids: "{{ infra__aws_public_subnet_ids | default([]) }}"
+        run__aws_private_subnet_ids: "{{ plat__aws_private_subnet_ids }}"
 
-    - name: Set fact for AWS Private Subnet IDs by assignment
-      ansible.builtin.set_fact:
-        run__datahub_private_subnet_ids: "{{ infra__aws_private_subnet_ids | default([]) }}"
+    - name: Discover AWS VPC Private Subnets
+      when: not run__aws_private_subnet_ids
+      block:
+        - name: Collect AWS Private Subnets
+          ansible.builtin.set_fact:
+            __aws_private_subnet_ids: "{{ __aws_private_subnet_ids | default([]) | union([__aws_subnet_item.subnet_id | default('')]) }}"
+          loop_control:
+            loop_var: __aws_subnet_item
+            label: "{{ __aws_subnet_item.subnet_id }}"
+          loop: "{{ __aws_subnets_info.subnets | rejectattr('map_public_ip_on_launch') }}"
+        
+        - name: Set fact for AWS Private Subnet IDs
+          ansible.builtin.set_fact:
+            run__aws_private_subnet_ids: "{{ __aws_private_subnet_ids | default([]) }}"
+
+- name: Set fact for AWS Subnet IDs
+  ansible.builtin.set_fact:
+    run__aws_subnet_ids: "{{ run__aws_public_subnet_ids | union(run__aws_private_subnet_ids) }}"
+    run__public_subnet_ids: "{{ run__aws_public_subnet_ids }}"
+    run__private_subnet_ids: "{{ run__aws_private_subnet_ids }}"
