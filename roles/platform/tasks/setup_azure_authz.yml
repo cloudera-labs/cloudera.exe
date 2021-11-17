@@ -44,12 +44,7 @@
         - name: Wait for consistency
           ansible.builtin.pause:
             seconds: "{{ plat__azure_consistency_wait }}"
-
-    - name: Dump MetaGroup URI
-      ansible.builtin.debug:
-        msg: Dumping... {{ plat__azure_metagroup_uri }}
     
-    # Owner role is required for DWX if you are thinking of modifying this task
     - name: Request Azure Cross Account App Creation
       no_log: True
       register: __azure_xaccount_app_info
@@ -57,14 +52,7 @@
         az ad sp create-for-rbac
         --name {{ plat__azure_xaccount_app_name }}
         --role {{ plat__azure_xaccount_use_custom_role | ternary(__azure_xaccount_role_info.id, plat__azure_roles.contrib) }}
-        --scope {{ plat__azure_subscription_uri }}
-       # --role {{ __azure_xaccount_role_info.id }}
-       # --scopes {{ plat__azure_metagroup_uri }}
-       # Bake ternary into the above
-
-    #- name: SLEEEP
-    #  command: >
-    #    sleep 180
+        --scope {{ plat__azure_xaccount_rg_scope | ternary(plat__azure_metagroup_uri, plat__azure_subscription_uri) }} 
 
     - name: Register Azure Cross Account App info
       no_log: True
@@ -119,24 +107,6 @@
         application: "{{ plat__azure_xaccount_app_uuid }}"
         secret: "{{ __azure_xaccount_app_pword }}"
 
-#Move Up  
-#- name: Handle Azure Cross Account Role
-#  register: __azure_xaccount_role_info
-#  azure.azcollection.azure_rm_roledefinition:  # This version fails idempotence if a description is set
-#    state: present
-#    name: "{{ plat__azure_xaccount_role_name }}"
-#    assignable_scopes: "/subscriptions/{{ plat__azure_subscription_id }}"
-#    permissions:
-#      - actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('Actions') }}"
-#        data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('DataActions') }}"
-#        not_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotActions') }}"
-#        not_data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotDataActions') }}"
-
-#Not Needed?
-#- name: Set Azure Cross Account Role URI
-#  ansible.builtin.set_fact:
-#    plat__azure_xaccount_role_uri: "{{ __azure_xaccount_role_info.id }}"
-
 - name: Request creation of Azure Managed Identities
   when: ( __azure_identity_list_names is undefined ) or ( __azure_msi_item not in __azure_identity_list_names )
   loop_control:
@@ -148,7 +118,7 @@
     - "{{ plat__azure_datalakeadmin_identity_name }}"
     - "{{ plat__azure_log_identity_name }}"
     - "{{ plat__azure_ranger_audit_identity_name }}"
-#Dupe of Below?
+
 - name: Wait for identities to be listed
   command: "az identity list -g {{ plat__azure_metagroup_name }}"
   register: __azure_identity_list
@@ -260,20 +230,6 @@
       scope: "{{ plat__azure_datapath_uri }}"
       assignee: "{{ __azure_ranger_audit_identity_uuid }}"
       desc: Assign Storage Blob Data Contributor Role to Ranger Role at Data Container level
-    #- role: "{{ __azure_contributor_role_uri }}"
-    #  name: "{{ plat__azure_xaccount_contributor_assn_name }}"
-    #  scope: "{{ plat__azure_subscription_uri }}"
-    #  assignee: "{{ plat__azure_application_service_principal_objuuid }}"
-    #  desc: Assign top level Contributor Role to Cross Account App
-    #- role: "{{ __azure_xaccount_role_uri }}"
-    #  name: "{{ plat__azure_xaccount_role_assn_name }}"
-    #  scope: "{{ plat__azure_subscription_uri }}"
-    #  assignee: "{{ plat__azure_application_service_principal_objuuid }}"
-    #  desc: Assign Cross Account Role to Cross Account App
   loop_control:
     loop_var: __azure_rl_assgn_item
     label: "{{ __azure_rl_assgn_item.desc }}"
-
-#- name: SLEEEEEEEEEEP
-#  command: >
-#    sleep 1800
