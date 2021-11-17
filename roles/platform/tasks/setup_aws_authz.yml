@@ -173,7 +173,7 @@
   ansible.builtin.command: >
     aws iam tag-policy
     --policy-arn {{ __aws_cdp_data_policy_tags_item.policy.arn }} 
-    --tags {{ ___plat_aws_policy_tags_list | join(' ') }}
+    --tags {{ __plat_aws_policy_tags_list | join(' ') }}
   loop_control:
     loop_var: __aws_cdp_data_policy_tags_item
     label: "{{ __aws_cdp_data_policy_tags_item.policy.name }}"
