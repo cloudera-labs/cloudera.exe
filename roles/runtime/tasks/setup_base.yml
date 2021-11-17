@@ -175,6 +175,7 @@
     wait: yes
 
 - name: Create CDP DE Virtual clusters
+  when: run__include_de
   cloudera.cloud.de_virtual_cluster:
     cluster_name: "{{ __de_vc_config_item.0.name }}"
     env: "{{ run__env_name }}"
@@ -198,6 +199,7 @@
     label: "{{ __de_vc_config_item.0.name | default ('None') }}"
 
 - name: Wait for CDP DE Virtual cluster setup to complete
+  when: run__include_de
   ansible.builtin.async_status:
     jid: "{{ __de_vc_build.ansible_job_id }}"
   register: __de_vc_builds_async
