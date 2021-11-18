@@ -43,6 +43,11 @@ infra__dynamic_inventory_images_default:
       user: 'ubuntu'
       owners:
         - '099720109477'
+    focal:
+      search: 'ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server*'
+      user: 'ubuntu'
+      owners:
+        - '099720109477'
 
 infra__all_ports_security_rule:
   aws: -1
