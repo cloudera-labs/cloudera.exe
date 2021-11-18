@@ -59,6 +59,7 @@
 
 - name: Prepare for CDP Datahub clusters
   when: run__include_datahub
+  tags: dh
   block:
     - name: Retrieve Image Catalog File
       ansible.builtin.uri:
@@ -121,6 +122,7 @@
       loop: "{{ run__datahub_configs }}"
 
 - name: Prepare for CDP OpDB experiences
+  tags: opdb
   when: run__include_opdb
   block:
     - name: Construct OpDB Configurations
@@ -136,6 +138,7 @@
         label: "{{ config.name }}"
 
 - name: Prepare for CDP ML Workspace experiences
+  tags: ml
   when: run__include_ml
   block:
     - name: Construct CDP ML Workspace configurations

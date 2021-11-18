@@ -16,6 +16,16 @@
 
 - name: Include provider-specific tasks to initialize Runtime setup
   ansible.builtin.include_tasks: "initialize_setup_{{ run__infra_type }}.yml"
+  tags:
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Initialize CDP Runtime setup
   ansible.builtin.include_tasks: "initialize_base.yml"
+  tags:
+    - ml
+    - dw
+    - opdb
+    - dh

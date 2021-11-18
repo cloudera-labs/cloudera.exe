@@ -16,6 +16,7 @@
 
 - name: Set up AWS EC2 metadata for CDP Datahubs
   when: run__include_datahub
+  tags: dh
   block:
     - name: Retrieve AWS EC2 instance details
       community.aws.ec2_instance_info:
@@ -36,6 +37,7 @@
 
 - name: Setup CDP DW cluster on AWS
   when: run__include_dw
+  tags: dw
   block:
     - name: Execute CDP DW cluster setup
       cloudera.cloud.dw_cluster:
