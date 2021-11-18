@@ -170,3 +170,9 @@
   when: infra__aws_security_group_default_id is defined
   ansible.builtin.set_fact:
     plat__aws_security_group_default_id: "{{ infra__aws_security_group_default_id }}"
+
+- name: Collect tags for AWS IAM roles, policies, and storage
+  ansible.builtin.set_fact:
+    __plat_aws_role_tags: "{{ plat__tags | combine(plat__aws_role_tags) }}"
+    __plat_aws_policy_tags: "{{ plat__tags | combine(plat__aws_policy_tags) }}"
+    __plat_aws_storage_tags: "{{ plat__tags | combine(plat__aws_storage_tags) }}"

@@ -101,6 +101,7 @@
             state: absent
           loop_control:
             loop_var: __eni_adapter
+            label: "{{ __eni_adapter.id }}"
           loop: "{{ __infra_vpc_enis.network_interfaces }}"
 
         - name: Handle AWS Security Groups
@@ -216,11 +217,12 @@
             state: absent
             region: "{{ infra__region }}"
             wait: true
-            nat_gateway_id: "{{ item.nat_gateway_id }}"
+            nat_gateway_id: "{{ __aws_ngw_item.nat_gateway_id }}"
             release_eip: true
           register: __aws_ngw_teardown
           loop_control:
-            label: "{{ item.nat_gateway_id }}"
+            loop_var: __aws_ngw_item
+            label: "{{ __aws_ngw_item.nat_gateway_id }}"
           loop: "{{ __aws_all_ngws.result }}"
           ignore_errors: true
 
@@ -228,7 +230,9 @@
           when: __aws_ngw_teardown is defined and __aws_ngw_teardown.results is defined and __aws_ngw_teardown.results | count > 0
           ansible.builtin.fail:
             msg: "Failed to delete a NAT gateway"
-          failed_when: item.rc is defined and item.rc != 1 and ('InvalidAllocationID.NotFound' in item.module_stderr)
+          failed_when: __aws_ngw_teardown_item.rc is defined and __aws_ngw_teardown_item.rc != 1 and ('InvalidAllocationID.NotFound' in __aws_ngw_teardown_item.module_stderr)
+          loop_control:
+            loop_var: __aws_ngw_teardown_item
           loop: "{{ __aws_ngw_teardown.results }}"
 
     - name: Remove AWS Public Network

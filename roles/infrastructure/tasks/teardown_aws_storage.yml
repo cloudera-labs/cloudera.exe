@@ -43,16 +43,18 @@
   loop: "{{ __infra_efs_fs.results | community.general.json_query('[*].efs') | flatten }}"
   loop_control:
     loop_var: __infra_efs_item
+    label: "{{ __infra_efs_item.file_system_id }}"
 
 - name: Remove Orphaned EBS Volumes during Purge
   when:
     - infra__force_teardown | bool
     - __infra_aws_ebs_vols is defined
     - __infra_aws_ebs_vols.volumes | length > 0
-    - __infra_aws_ebs_item.attachment_set.status != ""
+    - __infra_aws_ebs_item.attachment_set | length < 1
   amazon.aws.ec2_vol:
     id: "{{ __infra_aws_ebs_item.id }}"
     state: absent
   loop: "{{ __infra_aws_ebs_vols.volumes }}"
   loop_control:
     loop_var: __infra_aws_ebs_item
+    label: "{{ __infra_aws_ebs_item.id }}"

@@ -47,6 +47,7 @@ env:
         log:
         ranger_audit_s3:
       suffix:
+      tags:
     role:
       label:
         cross_account:
@@ -61,8 +62,10 @@ env:
         log:
         ranger_audit:
       suffix:
+      tags:
     storage:
       suffix:
+      tags:
   azure:
     app:
       name:
@@ -255,6 +258,12 @@ infra:
         vpc_id:
         public_subnet_ids:
         private_subnet_ids:
+    role:
+      tags:
+    policy:
+      tags:
+    storage:
+      tags:
   azure:
     metagroup:
       name:

@@ -137,3 +137,9 @@
     infra__dynamic_inventory_connectors: "{{ 'ansible_user=' + infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user + provided_ssh_private_key_file }}"
   vars:
     provided_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary('', ' ansible_ssh_private_key_file=' + infra__private_key_file) }}"
+
+- name: Collect tags for AWS infrastructure IAM roles, policies, and storage
+  ansible.builtin.set_fact:
+    __infra_aws_role_tags: "{{ infra__tags | combine(infra__aws_role_tags) }}"
+    __infra_aws_policy_tags: "{{ infra__tags | combine(infra__aws_policy_tags) }}"
+    __infra_aws_storage_tags: "{{ infra__tags | combine(infra__aws_storage_tags) }}"

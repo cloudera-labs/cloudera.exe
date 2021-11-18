@@ -96,6 +96,10 @@ plat__aws_role_suffix:                        "{{ common__aws_role_suffix }}"
 plat__aws_policy_suffix:                      "{{ env.aws.policy.suffix | default(common__policy_suffix) }}"
 plat__aws_storage_suffix:                     "{{ env.aws.storage.suffix | default(common__storage_suffix) }}"
 
+plat__aws_role_tags:                          "{{ env.aws.role.tags | default({}) }}"
+plat__aws_policy_tags:                        "{{ env.aws.policy.tags | default({}) }}"
+plat__aws_storage_tags:                       "{{ env.aws.storage.tags | default({}) }}"
+
 plat__aws_xaccount_suffix:                    "{{ env.aws.role.label.cross_account | default(common__xaccount_suffix) }}"
 plat__aws_idbroker_suffix:                    "{{ common__aws_idbroker_suffix }}"
 plat__aws_log_suffix:                         "{{ env.aws.role.label.log | default(common__logs_suffix) }}"
