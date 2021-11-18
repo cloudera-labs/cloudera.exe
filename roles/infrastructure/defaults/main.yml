@@ -114,6 +114,7 @@ infra__aws_nat_gateway_suffix:      "{{ infra.aws.vpc.nat_gateway.suffix | defau
 infra__aws_role_tags:               "{{ infra.aws.role.tags | default({}) }}"
 infra__aws_policy_tags:             "{{ infra.aws.policy.tags | default({}) }}"
 infra__aws_storage_tags:            "{{ infra.aws.storage.tags | default({}) }}"
+infra__aws_private_endpoints:       "{{ infra.aws.vpc.private_endpoints | default(common__tunnel) }}"
 
 # GCP
 infra__gcp_project:                 "{{ common__gcp_project }}"

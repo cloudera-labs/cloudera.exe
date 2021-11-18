@@ -227,6 +227,7 @@ globals:
     table:
     user:
     vpc:
+    vpce:
   name_prefix:
   namespace_cdp:
   region:
@@ -264,6 +265,7 @@ infra:
       tags:
     storage:
       tags:
+    private_endpoints:
   azure:
     metagroup:
       name:
@@ -312,6 +314,9 @@ infra:
       name:
       suffix:
     knox:
+      name:
+      suffix:
+    vpce:
       name:
       suffix:
   storage:
