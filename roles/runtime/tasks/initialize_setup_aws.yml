@@ -25,6 +25,12 @@
           "tag:Name": "{{ run__vpc_name }}"
       register: __aws_vpc_info
 
+    - name: Assert discovered AWS VPC
+      ansible.builtin.assert:
+        that: __aws_vpc_info.vpc | length == 1
+        fail_msg: "No AWS VPC discovered"
+        quiet: yes
+
     - name: Set fact for AWS VPC ID
       when: __aws_vpc_info is defined
       ansible.builtin.set_fact:
@@ -107,7 +113,7 @@
           ansible.builtin.set_fact:
             run__aws_private_subnet_ids: "{{ __aws_private_subnet_ids | default([]) }}"
 
-- name: Set fact for AWS Subnet IDs
+- name: Set fact for AWS Subnet IDs and define generic subnet IDs
   ansible.builtin.set_fact:
     run__aws_subnet_ids: "{{ run__aws_public_subnet_ids | union(run__aws_private_subnet_ids) }}"
     run__public_subnet_ids: "{{ run__aws_public_subnet_ids }}"
