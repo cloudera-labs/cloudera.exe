@@ -47,7 +47,6 @@
     plat__aws_xaccount_external_id: "{{ plat__cdp_xaccount_external_id }}"
     plat__aws_xaccount_account_id: "{{ plat__cdp_xaccount_account_id }}"
 
-# TODO - Confirm the two following tasks are the design pattern we want: checking for a set_fact from another role before establishing its own role fact
 - name: Discover AWS VPC
   when: infra__aws_vpc_id is undefined
   block:
@@ -128,11 +127,9 @@
       ansible.builtin.set_fact:
         plat__aws_private_subnet_ids: "{{ __aws_private_subnet_ids | default([]) }}"
 
-# TODO: Discover AWS VPC Public Subnets if infra__ is not present
 - name: Set public subnets for public endpoint access
   when: plat__public_endpoint_access
   ansible.builtin.set_fact:
-    plat__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
     plat__endpoint_access_scheme: "PUBLIC"
 
 - name: Discover AWS Security Group for Knox
