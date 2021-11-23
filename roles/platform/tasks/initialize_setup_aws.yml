@@ -60,7 +60,7 @@
 
     - name: Assert discovered AWS VPC
       ansible.builtin.assert:
-        that: __aws_vpc_info.vpc | length == 1
+        that: __aws_vpc_info.vpcs | length == 1
         fail_msg: "No AWS VPC discovered"
         quiet: yes
 
