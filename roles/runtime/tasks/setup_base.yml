@@ -108,8 +108,8 @@
 - name: Execute CDP Dataflow setup
   when: run__include_df
   tags: df
-  cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+  cloudera.cloud.df_service:
+    env_crn: "{{ run__cdp_env_crn }}"
     nodes_min: "{{ run__df_nodes_min }}"
     nodes_max: "{{ run__df_nodes_max }}"
     public_loadbalancer: "{{ run__df_public_loadbalancer }}"
