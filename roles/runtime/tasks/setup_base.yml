@@ -178,8 +178,8 @@
 - name: Wait for CDP Dataflow deployment to complete
   when: run__include_df
   tags: df
-  cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+  cloudera.cloud.df_service:
+    env_crn: "{{ run__cdp_env_crn }}"
     wait: yes
 
 - name: Create CDP DE Virtual clusters
