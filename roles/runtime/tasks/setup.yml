@@ -16,6 +16,14 @@
 
 - name: Include Tasks to Setup CDP Public Runtimes
   ansible.builtin.include_tasks: "setup_base.yml"
+  tags:
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Include Tasks to Setup provider-specific CDP Public Runtimes
   ansible.builtin.include_tasks: "setup_{{ run__infra_type }}.yml"
+  tags:
+    - dw
+    - dh

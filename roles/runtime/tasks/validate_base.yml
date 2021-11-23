@@ -15,6 +15,7 @@
 # limitations under the License.
 
 - name: Check OpDB database names
+  tags: opdb
   when:
     - run__include_opdb
     - "'name' in __opdb_definition"
@@ -29,6 +30,7 @@
   loop: "{{ run__opdb_definitions }}"
 
 - name: Check Datahub names
+  tags: dh
   when:
     - run__include_datahub
     - "'name' in __datahub_definition"

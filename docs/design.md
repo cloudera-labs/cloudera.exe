@@ -109,12 +109,20 @@ For example, to add a pre-deploy role:
             - plat
             - run
             - animals
+            - ml
+            - dw
+            - opdb
+            - dh
       tags:
         - validate
         - infra
         - plat
         - run
         - animals
+        - ml
+        - dw
+        - opdb
+        - dh
     - name: Import the core Runlevels (and their tags)
       ansible.builtin.import_role:
         name: cloudera.exe.sequence 
@@ -158,12 +166,20 @@ For example, adding an explicit `install` tag to execute the [Installation](runl
             - plat
             - run
             - install
+            - ml
+            - dw
+            - opdb
+            - dh
       tags:
         - validate
         - infra
         - plat
         - run
         - install
+        - ml
+        - dw
+        - opdb
+        - dh
     
     - name: Validate Platform Configuration
       ansible.builtin.include_role:
@@ -175,11 +191,19 @@ For example, adding an explicit `install` tag to execute the [Installation](runl
             - plat
             - run
             - install
+            - ml
+            - dw
+            - opdb
+            - dh
       tags:
         - validate
         - plat
         - run
         - install
+        - ml
+        - dw
+        - opdb
+        - dh
 
     - name: Validate Runtime Configuration
       ansible.builtin.include_role:
@@ -190,10 +214,18 @@ For example, adding an explicit `install` tag to execute the [Installation](runl
             - validate
             - run
             - install
+            - ml
+            - dw
+            - opdb
+            - dh
       tags:
         - validate
         - run
         - install
+        - ml
+        - dw
+        - opdb
+        - dh
 
     - name: Validate Installation Configuration
       ansible.builtin.include_role:

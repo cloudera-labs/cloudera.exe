@@ -16,6 +16,7 @@
 
 - name: Request CDP Datahub deployments
   when: run__include_datahub
+  tags: dh
   cloudera.cloud.datahub_cluster:
     name: "{{ __datahub_config_item.name }}"
     env: "{{ run__env_name }}"
@@ -37,6 +38,7 @@
 
 - name: Execute CDP ML Workspace experiences setup
   when: run__include_ml
+  tags: ml
   cloudera.cloud.ml:
     name: "{{ __ml_config_item.name }}"
     env: "{{ run__env_name }}"
@@ -89,6 +91,7 @@
 
 - name: Execute CDP OpDB setup
   when: run__include_opdb
+  tags: opdb
   cloudera.cloud.opdb:
     name: "{{ __opdb_config_item.name }}"
     env: "{{ run__env_name }}"
@@ -104,6 +107,7 @@
 
 - name: Execute CDP Dataflow setup
   when: run__include_df
+  tags: df
   cloudera.cloud.df_service:
     env_crn: "{{ run__cdp_env_crn }}"
     nodes_min: "{{ run__df_nodes_min }}"
@@ -118,6 +122,7 @@
 
 - name: Wait for CDP Datahub deployments to complete
   when: run__include_datahub
+  tags: dh
   ansible.builtin.async_status:
     jid: "{{ __datahub_build_item.ansible_job_id }}"
   loop_control:
@@ -131,6 +136,7 @@
 
 - name: Wait for CDP ML Workspace experiences to complete
   when: run__include_ml
+  tags: ml
   ansible.builtin.async_status:
     jid: "{{ __ml_build.ansible_job_id }}"
   loop_control:
@@ -157,6 +163,7 @@
 
 - name: Wait for CDP OpDB deployments to complete
   when: run__include_opdb
+  tags: opdb
   ansible.builtin.async_status:
     jid: "{{ __opdb_build.ansible_job_id }}"
   loop_control:
@@ -170,6 +177,7 @@
 
 - name: Wait for CDP Dataflow deployment to complete
   when: run__include_df
+  tags: df
   cloudera.cloud.df_service:
     env_crn: "{{ run__cdp_env_crn }}"
     wait: yes
