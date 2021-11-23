@@ -14,6 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: List VPC Endpoints
+  when: infra__aws_private_endpoints | bool
+  community.aws.ec2_vpc_endpoint_info:
+    region: "{{ infra__region }}"
+    filters:
+      vpc-id: "{{ infra__aws_vpc_id }}"
+  register: __infra_vpc_existing_endpoints
+
 - name: Discover AWS VPC dependencies for forced teardown
   when:
     - infra__force_teardown | bool
