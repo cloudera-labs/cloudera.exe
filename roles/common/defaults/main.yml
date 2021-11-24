@@ -93,10 +93,16 @@ common__aws_private_subnet_ids:           "{{ infra.aws.vpc.existing.private_sub
 common__aws_region:                       "{{ infra.aws.region | default('eu-west-1') }}"
 common__aws_profile:                      "{{ infra.aws.profile | default('') }}"
 common__aws_role_suffix:                  "{{ infra.aws.role.suffix | default(common__role_suffix) }}"
+
 common__aws_datalake_admin_role_name:     "{{ env.aws.role.name.datalake_admin | default([common__namespace, common__aws_datalake_admin_suffix, common__aws_role_suffix] | join('-')) }}"
 common__aws_datalake_admin_suffix:        "{{ env.aws.role.label.datalake_admin | default(common__datalake_admin_suffix) }}"
 common__aws_idbroker_role_name:           "{{ env.aws.role.name.idbroker | default([common__namespace, common__aws_idbroker_suffix, common__aws_role_suffix] | join('-')) }}"
 common__aws_idbroker_suffix:              "{{ env.aws.role.label.idbroker | default(common__idbroker_suffix) }}"
+
+
+common__aws_vpc_id:                       "{{ infra.aws.vpc.existing.vpc_id | default('') }}"
+common__aws_public_subnet_ids:            "{{ infra.aws.vpc.existing.public_subnet_ids | default([]) }}"
+common__aws_private_subnet_ids:           "{{ infra.aws.vpc.existing.private_subnet_ids | default([]) }}"
 
 # Azure Infra
 common__azure_storage_name:               "{{ infra.azure.storage.name | default(common__storage_name | replace('-','')) }}"
