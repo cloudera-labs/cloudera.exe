@@ -71,7 +71,7 @@
 
     - name: Create CDP DW Database catalogs
       when: not __dw_dbc_config.use_default_dbc
-      cloudera.cloud.dw_dbc:
+      cloudera.cloud.dw_database_catalog:
         cluster_id : "{{ run__dw_list.clusters[0].id }}"
         name: "{{ __dw_dbc_config.name }}"
         load_demo_data: "{{ __dw_dbc_config.load_demo_data }}"
@@ -99,22 +99,22 @@
         label: "{{ __dw_dbc_build.__dw_dbc_config.name }}"
 
     - name: Set CDP DW Database catalog name to id map
-      when: __dw_dbc_build_async.dbcs is defined
+      when: __dw_dbc_build_async.database_catalogs is defined
       ansible.builtin.set_fact:
-        run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({ __dw_dbc_build_async.dbcs[0].name : __dw_dbc_build_async.dbcs[0].id}) }}"
+        run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({ __dw_dbc_build_async.database_catalogs[0].name : __dw_dbc_build_async.database_catalogs[0].id}) }}"
       loop: "{{ __dw_dbc_builds_async.results }}"
       loop_control:
         loop_var: __dw_dbc_build_async
 
     - name: Create CDP DW Virtual warehouse
-      cloudera.cloud.dw_vw:
+      cloudera.cloud.dw_virtual_warehouse:
         cluster_id: "{{ run__dw_list.clusters[0].id }}"
         dbc_id: "{{ run__dw_dbc_ids[__dw_vw_config.dbc_name] if not __dw_vw_config.use_default_dbc else run__dw_list.clusters[0].dbcs[0].id}}"
-        vw_type: "{{ __dw_vw_config.vw_type }}"
+        type: "{{ __dw_vw_config.type }}"
         name: "{{ __dw_vw_config.name }}"
         template: "{{ __dw_vw_config.template }}"
-        autoscaling_min_cluster: "{{ __dw_vw_config.autoscaling_min_cluster | int }}"
-        autoscaling_max_cluster: "{{ __dw_vw_config.autoscaling_max_cluster | int }}"
+        autoscaling_min_nodes: "{{ __dw_vw_config.autoscaling_min_nodes | int }}"
+        autoscaling_max_nodes: "{{ __dw_vw_config.autoscaling_max_nodes | int }}"
         common_configs: "{{ __dw_vw_config.common_configs }}"
         application_configs: "{{ __dw_vw_config.application_configs }}"
         ldap_groups: "{{ __dw_vw_config.ldap_groups }}"
