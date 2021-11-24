@@ -188,12 +188,10 @@
       ansible.builtin.set_fact:
         run__dw_vw_configs: "{{ run__dw_vw_configs | default([]) | union([config]) }}"
       vars:
-        dbc_name: "{{ item.0.name }}"
-        use_default_dbc: "{{ item.0.use_default_dbc }}"
         config:
           name: "{{ item.1.name | default([run__namespace, run__dw_vw_suffix ,__dw_dbc_index] | join('-')) }}"
-          dbc_name: "{{ dbc_name }}"
-          use_default_dbc: "{{ use_default_dbc }}"
+          dbc_name: "{{ item.0.name }}"
+          use_default_dbc: "{{ item.0.use_default_dbc }}"
           type: "{{ item.1.type | default('hive') }}"
           template: "{{ item.1.template | default('xsmall') }}"
           autoscaling_min_nodes: "{{ item.1.autoscaling.min_nodes | default(None) }}"
