@@ -23,8 +23,6 @@ provisioner:
       pipelining: false
   vvv: true
   playbooks:
-    delegated:
-      create: baz.yml
     prepare: ../shared/prepare.yml
     converge: ../shared/converge.yml
     cleanup: ../shared/cleanup.yml
@@ -33,21 +31,20 @@ provisioner:
       localhost:
         globals:
           admin_password: "@NotSecure456!"
-          name_prefix: mol01
-          ssh:
-            public_key_id: molecule-level1-testing
+          name_prefix: ${FOUNDRY_NAME_PREFIX:-f01}
+          infra_type: ${FOUNDRY_INFRA_TYPE:-aws}
         infra:
           vpc:
-            name: molecule-level1-testing
+            name: ${FOUNDRY_NAME_PREFIX:-f01}-test
           storage:
-            name: molecule-level1-testing
+            name: ${FOUNDRY_NAME_PREFIX:-f01}-test
           security_group:
             knox:
-              name: molecule-level1-testing-knox
+              name: ${FOUNDRY_NAME_PREFIX:-f01}-test-knox
             default:
-              name: molecule-level1-testing-default
+              name: ${FOUNDRY_NAME_PREFIX:-f01}-test-default
           aws:
-            region: us-east-2
+            region: ${FOUNDRY_AWS_REGION:-us-east-2}
         env:
           tunnel: yes                   # L1 Networking
           public_endpoint_access: yes

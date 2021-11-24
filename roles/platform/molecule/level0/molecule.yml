@@ -31,21 +31,20 @@ provisioner:
       localhost:
         globals:
           admin_password: "@NotSecure456!"
-          name_prefix: mol00
-          ssh:
-            public_key_id: molecule-level0-testing
+          name_prefix: ${FOUNDRY_NAME_PREFIX:-f00}
+          infra_type: ${FOUNDRY_INFRA_TYPE:-aws}
         infra:
           vpc:
-            name: molecule-level0-testing
+            name: ${FOUNDRY_NAME_PREFIX:-f00}-test
           storage:
-            name: molecule-level0-testing
+            name: ${FOUNDRY_NAME_PREFIX:-f00}-test
           security_group:
             knox:
-              name: molecule-level0-testing-knox
+              name: ${FOUNDRY_NAME_PREFIX:-f00}-test-knox
             default:
-              name: molecule-level0-testing-default
+              name: ${FOUNDRY_NAME_PREFIX:-f00}-test-default
           aws:
-            region: us-east-2
+            region: ${FOUNDRY_AWS_REGION:-us-east-2}
         env:
           tunnel: no                   # L0 Networking
 verifier:
