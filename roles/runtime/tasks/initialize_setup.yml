@@ -29,3 +29,19 @@
     - dw
     - opdb
     - dh
+
+- name: Prepare for CDP DW experiences
+  when: run__include_dw
+  block:
+    - name: Confirm public subnet count CDP DW public load balancer
+      when: not run__dw_private_load_balancer
+      ansible.builtin.assert:
+        that:
+          - run__public_subnet_ids | length == 3
+        fail_msg: "Must have exactly 3 public subnets when deploying CDP Data Warehouse with a public load balancer"
+        quiet: yes
+      tags:
+        - ml
+        - dw
+        - opdb
+        - dh
