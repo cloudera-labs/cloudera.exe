@@ -39,27 +39,104 @@
   when: run__include_dw
   tags: dw
   block:
-    - name: Execute CDP DW cluster setup
-      cloudera.cloud.dw_cluster:
+#    - name: Execute CDP DW cluster setup
+#      cloudera.cloud.dw_cluster:
+#        env: "{{ run__env_name }}"
+#        overlay: "{{ run__dw_overlay_network }}"
+#        aws_public_subnets: "{{ run__datahub_public_subnet_ids }}"
+#        aws_private_subnets: "{{ run__datahub_private_subnet_ids }}"
+#        state: present
+#        wait: yes
+#      async: 3600 # 1 hour timeout
+#      poll: 0
+#      register: __dw_builds
+#
+#    - name: Wait for CDP DW cluster setup to complete
+#      ansible.builtin.async_status:
+#        jid: "{{ __dw_builds.ansible_job_id }}"
+#      #loop_control:
+#      #  loop_var: __opdb_build
+#      #  label: "{{ __opdb_build.__opdb_config.name }}"
+#      #loop: "{{ __opdb_builds.results }}"
+#      register: __dw_builds_async
+#      until: __dw_builds_async.finished
+#      retries: 120
+#      delay: 30
+
+    - name: Retrieve CDP DW experiences
+      cloudera.cloud.dw_cluster_info:
         env: "{{ run__env_name }}"
-        overlay: no
-        # TODO - Allow direct assignment (will need to coordinate with infra role)
-        aws_public_subnets: "{{ run__datahub_public_subnet_ids }}"
-        aws_private_subnets: "{{ run__datahub_private_subnet_ids }}"
+      register: run__dw_list
+
+    - name: Create CDP DW Database catalogs
+      when: not __dw_dbc_config.use_default_dbc
+      cloudera.cloud.dw_dbc:
+        cluster_id : "{{ run__dw_list.clusters[0].id }}"
+        name: "{{ __dw_dbc_config.name }}"
+        load_demo_data: "{{ __dw_dbc_config.load_demo_data }}"
         state: present
         wait: yes
       async: 3600 # 1 hour timeout
       poll: 0
-      register: __dw_builds
+      loop: "{{ run__dw_dbc_configs }}"
+      loop_control:
+        loop_var: __dw_dbc_config
+      register: __dw_dbc_builds
 
-    - name: Wait for CDP DW cluster setup to complete
+    - name: Wait for CDP DW Database catalogs setup to complete
+      when: __dw_dbc_build.ansible_job_id is defined
       ansible.builtin.async_status:
-        jid: "{{ __dw_builds.ansible_job_id }}"
-      #loop_control:
-      #  loop_var: __opdb_build
-      #  label: "{{ __opdb_build.__opdb_config.name }}"
-      #loop: "{{ __opdb_builds.results }}"
-      register: __dw_builds_async
-      until: __dw_builds_async.finished
+        jid: "{{ __dw_dbc_build.ansible_job_id }}"
+      register: __dw_dbc_builds_async
+      until: __dw_dbc_builds_async.finished
       retries: 120
       delay: 30
+      loop: "{{ __dw_dbc_builds.results }}"
+      loop_control:
+        loop_var: __dw_dbc_build
+
+    - name: Set CDP DW Database catalog name to id map
+      when: __dw_dbc_build_async.dbcs is defined
+      ansible.builtin.set_fact:
+        run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({ __dw_dbc_build_async.dbcs[0].name : __dw_dbc_build_async.dbcs[0].id}) }}"
+      loop: "{{ __dw_dbc_builds_async.results }}"
+      loop_control:
+        loop_var: __dw_dbc_build_async
+
+    - name: Create CDP DW Virtual warehouse
+      cloudera.cloud.dw_vw:
+        cluster_id: "{{ run__dw_list.clusters[0].id }}"
+        dbc_id: "{{ run__dw_dbc_ids[__dw_vw_config.dbc_name] if not __dw_vw_config.use_default_dbc else run__dw_list.clusters[0].dbcs[0].id}}"
+        vw_type: "{{ __dw_vw_config.vw_type }}"
+        name: "{{ __dw_vw_config.name }}"
+        template: "{{ __dw_vw_config.template }}"
+        autoscaling_min_cluster: "{{ __dw_vw_config.autoscaling_min_cluster | int }}"
+        autoscaling_max_cluster: "{{ __dw_vw_config.autoscaling_max_cluster | int }}"
+        common_configs: "{{ __dw_vw_config.common_configs }}"
+        application_configs: "{{ __dw_vw_config.application_configs }}"
+        ldap_groups: "{{ __dw_vw_config.ldap_groups }}"
+        enable_sso: "{{ __dw_vw_config.enable_sso | bool }}"
+        tags: "{{ __dw_vw_config.tags }}"
+        wait: yes
+      async: 3600 # 1 hour timeout
+      poll: 0
+      register: __dw_vw_builds
+      loop: "{{ run__dw_vw_configs }}"
+      loop_control:
+        loop_var: __dw_vw_config
+
+    - name: Wait for CDP DW Virtual warehouse setup to complete
+      when: __dw_vw_build.ansible_job_id is defined
+      ansible.builtin.async_status:
+        jid: "{{ __dw_vw_build.ansible_job_id }}"
+      register: __dw_vw_builds_async
+      until: __dw_vw_builds_async.finished
+      retries: 120
+      delay: 30
+      loop: "{{ __dw_vw_builds.results }}"
+      loop_control:
+        loop_var: __dw_vw_build
+
+    - name: Print Virtual Warehouses
+      ansible.builtin.debug:
+        msg: "Database Cluster : {{ __dw_vw_builds_async }}"

@@ -71,7 +71,12 @@ run__de_force_delete:               "{{ de.force_delete | default (run__force_te
 run__de_vc_suffix:                  "{{ de.vc.suffix | default('vc') }}"
 
 run__dw_definitions:                "{{ dw.definitions | default([{}]) }}"
-run__dw_suffix:                     "{{ dw.suffix | default('dw') }}"
+run__dw_dbc_suffix:                 "{{ dw.dbc.suffix | default('dbc') }}"
+run__dw_vw_suffix:                  "{{ dw.vw.suffix | default('vw') }}"
+run__dw_tags:                       "{{ dw.tags | default(common__tags) }}"
+run__dw_overlay_network:            "{{ dw.overlay_network | bool }}"
+run__dw_private_load_balancer:      "{{ dw.private_load_balancer | default(not run__public_endpoint_access) }}"
+run__dw_private_worker_nodes:       "{{ dw.private_worker_nodes | bool }}"
 run__dw_force_delete:               "{{ dw.force_delete | default (run__force_teardown) }}"
 
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
