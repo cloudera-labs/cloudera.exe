@@ -54,14 +54,16 @@ dw:
   suffix:
   vw:
     suffix:
+    type:
+    template:
+  dbc:
+    suffix:
+    default_suffix: 
   tags:
   overlay_network:
   private_load_balancer:
   private_worker_nodes:
   force_delete:
-  default_vw_type:
-  default_template_type:
-  default_dbc_suffix:
 env:
   aws:
     policy:
