@@ -35,7 +35,7 @@
         label: "{{ __aws_instance_item.instance_id }}"
       loop: "{{ __aws_instance_info.instances }}"
 
-- name: Setup CDP DW cluster on AWS
+- name: Setup CDP DW Cluster on AWS
   when: run__include_dw
   tags: dw
   block:
@@ -48,41 +48,12 @@
         aws_private_subnets: "{{ run__datahub_private_subnet_ids if run__dw_private_worker_nodes else [] }}"
         state: present
         wait: yes
-      async: 3600 # 1 hour timeout
-      poll: 0
       register: __dw_builds
 
-    - name: Wait for CDP DW cluster setup to complete
-      when: false
-      ansible.builtin.async_status:
-        jid: "{{ __dw_builds.ansible_job_id }}"
-      register: __dw_builds_async
-      until: __dw_builds_async.finished
-      retries: 120
-      delay: 30
-
-    - name: Retrieve CDP DW experiences
-      cloudera.cloud.dw_cluster_info:
-        env: "{{ run__env_name }}"
-      register: run__dw_list
-
-    - name: Fetch all the Database Catalogs under the cluster
-      cloudera.cloud.dw_database_catalog_info:
-        cluster_id: "{{ run__dw_list.clusters[0].id }}"
-      register: __dbc_list
-
-    - name: Set default Database catalog id for the cluster
-      when: __dw_dbc.name | regex_search('.*'+run__dw_default_dbc_suffix+'$')
-      ansible.builtin.set_fact:
-        __default_dbc_id: "{{ __dw_dbc.id }}"
-      loop: "{{ __dbc_list.database_catalogs }}"
-      loop_control:
-        loop_var: __dw_dbc
-
-    - name: Create CDP DW Database catalogs
-      when: not __dw_dbc_config.use_default_dbc
+    # TODO Refactor for non-AWS?
+    - name: Create CDP DW Database Catalogs
       cloudera.cloud.dw_database_catalog:
-        cluster_id : "{{ run__dw_list.clusters[0].id }}"
+        cluster_id: "{{ __dw_builds.cluster.id }}"
         name: "{{ __dw_dbc_config.name }}"
         load_demo_data: "{{ __dw_dbc_config.load_demo_data }}"
         state: present
@@ -95,8 +66,7 @@
         label: "{{ __dw_dbc_config.name }}"
       register: __dw_dbc_builds
 
-    - name: Wait for CDP DW Database catalogs setup to complete
-      when: __dw_dbc_build.ansible_job_id is defined
+    - name: Wait for CDP DW Database Catalogs setup to complete
       ansible.builtin.async_status:
         jid: "{{ __dw_dbc_build.ansible_job_id }}"
       register: __dw_dbc_builds_async
@@ -108,18 +78,19 @@
         loop_var: __dw_dbc_build
         label: "{{ __dw_dbc_build.__dw_dbc_config.name }}"
 
-    - name: Set CDP DW Database catalog name to id map
-      when: __dw_dbc_build_async.database_catalog is defined
+    - name: Set CDP DW Database Catalog ID map
       ansible.builtin.set_fact:
         run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({ __dw_dbc_build_async.database_catalog.name : __dw_dbc_build_async.database_catalog.id}) }}"
       loop: "{{ __dw_dbc_builds_async.results }}"
       loop_control:
         loop_var: __dw_dbc_build_async
+        label: "{{ __dw_dbc_build_async.database_catalog.name }}"
+      failed_when: __dw_dbc_build_async.database_catalog is undefined
 
     - name: Create CDP DW Virtual warehouse
       cloudera.cloud.dw_virtual_warehouse:
-        cluster_id: "{{ run__dw_list.clusters[0].id }}"
-        dbc_id: "{{ __dw_vw_config.use_default_dbc | ternary(__default_dbc_id, run__dw_dbc_ids[__dw_vw_config.dbc_name]) }}"
+        cluster_id: "{{ __dw_builds.cluster.id }}"
+        dbc_id: "{{ run__dw_dbc_ids[__dw_vw_config.dbc_name] }}"
         type: "{{ __dw_vw_config.type }}"
         name: "{{ __dw_vw_config.name }}"
         template: "{{ __dw_vw_config.template }}"
@@ -140,7 +111,6 @@
         label: "{{ __dw_vw_config.name }}"
 
     - name: Wait for CDP DW Virtual warehouse setup to complete
-      when: __dw_vw_build.ansible_job_id is defined
       ansible.builtin.async_status:
         jid: "{{ __dw_vw_build.ansible_job_id }}"
       register: __dw_vw_builds_async
