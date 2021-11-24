@@ -92,6 +92,10 @@ plat__cdp_xaccount_external_id:               "{{ env.cdp.cross_account.external
 plat__cdp_xaccount_account_id:                "{{ env.cdp.cross_account.account_id | default(False) }}"
 
 # AWS
+plat__aws_vpc_id:                             "{{ common__aws_vpc_id }}"
+plat__aws_public_subnet_ids:                  "{{ common__aws_public_subnet_ids }}"
+plat__aws_private_subnet_ids:                 "{{ common__aws_private_subnet_ids }}"
+
 plat__aws_role_suffix:                        "{{ common__aws_role_suffix }}"
 plat__aws_policy_suffix:                      "{{ env.aws.policy.suffix | default(common__policy_suffix) }}"
 plat__aws_storage_suffix:                     "{{ env.aws.storage.suffix | default(common__storage_suffix) }}"

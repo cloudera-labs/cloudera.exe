@@ -47,35 +47,42 @@
     plat__aws_xaccount_external_id: "{{ plat__cdp_xaccount_external_id }}"
     plat__aws_xaccount_account_id: "{{ plat__cdp_xaccount_account_id }}"
 
-# TODO - Confirm the two following tasks are the design pattern we want: checking for a set_fact from another role before establishing its own role fact
-- name: Discover AWS VPC
-  when: infra__aws_vpc_id is undefined
+# Runlevel first, upstream second, and discover third
+- name: Discover AWS VPC if not defined
+  when: plat__aws_vpc_id == "" and infra__aws_vpc_id is undefined
   block:
-    - name: Query AWS VPC
+    - name: Query AWS VPC by name
       amazon.aws.ec2_vpc_net_info:
         region: "{{ plat__region }}"
         filters:
           "tag:Name": "{{ plat__vpc_name }}"
       register: __aws_vpc_info
 
+    - name: Assert discovered AWS VPC
+      ansible.builtin.assert:
+        that: __aws_vpc_info.vpcs | length == 1
+        fail_msg: "No AWS VPC discovered"
+        quiet: yes
+
     - name: Set fact for AWS VPC ID
       when: __aws_vpc_info is defined
       ansible.builtin.set_fact:
         plat__aws_vpc_id: "{{ __aws_vpc_info.vpcs[0].id }}"
 
-- name: Set fact for AWS VPC ID by assignment
+- name: Set fact for AWS VPC ID if established by Infrastructure
   when: infra__aws_vpc_id is defined
   ansible.builtin.set_fact:
     plat__aws_vpc_id: "{{ infra__aws_vpc_id }}"
 
-- name: Discover AWS VPC Subnets
-  when: infra__aws_subnet_ids is undefined
+# Runlevel first, upstream second, and discover third
+- name: Handle AWS Public and Private VPC Subnets if not defined
+  when: not plat__aws_public_subnet_ids or not plat__aws_private_subnet_ids
   block:
     - name: Query AWS Subnets
       amazon.aws.ec2_vpc_subnet_info:
         region: "{{ plat__region }}"
         filters:
-          "tag:Name": "{{ plat__namespace }}"
+          vpc-id: "{{ plat__aws_vpc_id }}"
       register: __aws_subnets_info
 
     - name: Assert discovered AWS Subnets
@@ -120,15 +127,20 @@
             label: "{{ __aws_subnet_item.subnet_id }}"
           loop: "{{ __aws_subnets_info.subnets | rejectattr('map_public_ip_on_launch') }}"
 
-        - name: Set fact for AWS Private Subnet IDs 
+        - name: Set fact for AWS Private Subnet IDs
           ansible.builtin.set_fact:
             plat__aws_private_subnet_ids: "{{ __aws_private_subnet_ids | default([]) }}"
 
-# TODO: Discover AWS VPC Public Subnets if infra__ is not present
+- name: Set fact for AWS Subnet IDs and define generic subnet IDs
+  ansible.builtin.set_fact:
+    plat__aws_subnet_ids: "{{ plat__aws_public_subnet_ids | union(plat__aws_private_subnet_ids) }}"
+    plat__public_subnet_ids: "{{ plat__aws_public_subnet_ids }}"
+    plat__private_subnet_ids: "{{ plat__aws_private_subnet_ids }}"
+
+# TODO: Move endpoint access scheme to instantiation section
 - name: Set public subnets for public endpoint access
   when: plat__public_endpoint_access
   ansible.builtin.set_fact:
-    plat__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
     plat__endpoint_access_scheme: "PUBLIC"
 
 - name: Discover AWS Security Group for Knox
