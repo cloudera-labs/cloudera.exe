@@ -31,7 +31,7 @@
     subnet_ids: "{{ plat__aws_public_subnet_ids | union(plat__aws_private_subnet_ids) }}"
     tags: "{{ plat__tags }}"
     tunnel: "{{ plat__tunnel }}"
-    endpoint_access_scheme: "{{ plat__endpoint_access_scheme | default(omit) }}"
+    endpoint_access_scheme: "{{ plat__public_endpoint_access | ternary('PUBLIC', omit) }}"
     endpoint_access_subnets: "{{ plat__aws_public_subnet_ids | default(omit) }}"
     freeipa:
       instanceCountByGroup: "{{ plat__env_freeipa }}"
