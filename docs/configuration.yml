@@ -40,11 +40,11 @@ dw:
       load_demo_data:
       virtual_warehouses:
         - name:
-          vw_type:
+          type:
           template:
           autoscaling:
-            min_cluster:
-            max_cluster:
+            min_nodes:
+            max_nodes:
           tags:
           configs:
             common_configs:
