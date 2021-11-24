@@ -123,13 +123,13 @@
         type: "{{ __dw_vw_config.type }}"
         name: "{{ __dw_vw_config.name }}"
         template: "{{ __dw_vw_config.template }}"
-        autoscaling_min_nodes: "{{ __dw_vw_config.autoscaling_min_nodes }}"
-        autoscaling_max_nodes: "{{ __dw_vw_config.autoscaling_max_nodes }}"
-        common_configs: "{{ __dw_vw_config.common_configs }}"
-        application_configs: "{{ __dw_vw_config.application_configs }}"
-        ldap_groups: "{{ __dw_vw_config.ldap_groups }}"
-        enable_sso: "{{ __dw_vw_config.enable_sso | bool }}"
         tags: "{{ __dw_vw_config.tags }}"
+        autoscaling_min_nodes: "{{ __dw_vw_config.autoscaling.min_nodes | default(omit) }}"
+        autoscaling_max_nodes: "{{ __dw_vw_config.autoscaling.max_nodes | default(omit) }}"
+        common_configs: "{{ __dw_vw_config.configs.common_configs | default(omit) }}"
+        application_configs: "{{ __dw_vw_config.configs.application_configs | default(omit) }}"
+        ldap_groups: "{{ __dw_vw_config.configs.ldap_groups | default(omit) }}"
+        enable_sso: "{{ __dw_vw_config.configs.enable_sso | default(omit) }}"
         wait: yes
       async: 3600 # 1 hour timeout
       poll: 0
