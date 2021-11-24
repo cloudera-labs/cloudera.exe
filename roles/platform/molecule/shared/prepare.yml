@@ -51,7 +51,7 @@
       delegate_to: localhost
 
     - name: Retrieve the testing SSH keypair ID
-      ansible.builtin.command: aws ec2 describe-key-pairs --key-names {{ __aws_ssh_key.key.name }}
+      ansible.builtin.command: aws ec2 describe-key-pairs --region {{ infra.aws.region }} --key-names {{ __aws_ssh_key.key.name }}
       register: __aws_ssh_key_id
 
     - name: Tag the testing SSH key
