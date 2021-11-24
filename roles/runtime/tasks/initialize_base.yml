@@ -196,7 +196,7 @@
           tags: "{{ __dw_config.1.tags | default({}) | combine(run__dw_tags) }}"
           autoscaling: "{{ __dw_config.1.autoscaling | default({}) }}"
           configs: "{{ __dw_config.1.configs | default({}) }}"
-      loop: "{{ run__dw_dbc_configs | subelements('virtual_warehouses')}}"
+      loop: "{{ run__dw_dbc_configs | default([{}]) | subelements('virtual_warehouses')}}"
       loop_control:
         loop_var: __dw_config
         index_var: __dw_dbc_index
