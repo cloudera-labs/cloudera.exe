@@ -20,6 +20,7 @@ galaxy_info:
     addition to the CDP services, the role handles the deployment and management
     of the cloud provider artifacts required for CDP operations, e.g. roles, policies.
   company: Cloudera
+  namespace: cloudera
   license: Apache-2.0
 
   min_ansible_version: 2.10

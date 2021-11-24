@@ -1,0 +1,81 @@
+---
+dependency:
+  name: galaxy
+  enabled: true
+  options:
+    force: false
+driver:
+  name: delegated
+  options:
+    managed: false
+    ansible_connection_options:
+      ansible_connection: local
+platforms:
+  - name: placeholder
+provisioner:
+  name: ansible
+  log: true
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks, timer, yaml
+      enable_task_debugger: true
+    ssh_connection:
+      pipelining: false
+  vvv: true
+  playbooks:
+    prepare: ../shared/prepare.yml
+    converge: ../shared/converge.yml
+    cleanup: ../shared/cleanup.yml
+  inventory:
+    host_vars:
+      localhost:
+        globals:
+          admin_password: "@NotSecure456!"
+          name_prefix: ${FOUNDRY_NAME_PREFIX:-r01}
+          infra_type: ${FOUNDRY_INFRA_TYPE:-aws}
+        infra:
+          vpc:
+            name: ${FOUNDRY_NAME_PREFIX:-r01}-test
+          storage:
+            name: ${FOUNDRY_NAME_PREFIX:-r01}-test
+          security_group:
+            knox:
+              name: ${FOUNDRY_NAME_PREFIX:-r01}-test-knox
+            default:
+              name: ${FOUNDRY_NAME_PREFIX:-r01}-test-default
+          aws:
+            region: ${FOUNDRY_AWS_REGION:-us-east-2}
+        env:
+          tunnel: yes                   # L1 Networking
+          public_endpoint_access: yes
+        dw:
+          force_delete: yes  # Non-force delete is inconsistent until we can filter 'compactor' VWs
+          tags:
+            project: "${FOUNDRY_NAME_PREFIX:-r01}-CDW-testing"
+          definitions:
+            - name: ${FOUNDRY_NAME_PREFIX:-r01}-empty
+            - virtual_warehouses:
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-dbc-default
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-dbc-hive
+                  type: hive
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-dbc-impala
+                  type: impala
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-dbc-autoscale
+                  autoscaling:
+                    min_nodes: 0  
+            - name: ${FOUNDRY_NAME_PREFIX:-r01}-named
+              virtual_warehouses:
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-named-default
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-named-hive
+                  type: hive
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-named-impala
+                  type: impala
+                - name: ${FOUNDRY_NAME_PREFIX:-r01}-named-autoscale
+                  autoscaling:
+                    min_nodes: 0
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
