@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: localhost
+  tasks:
+    - name: Default platform role
+      ansible.builtin.include_role:
+        name: platform

@@ -1,0 +1,52 @@
+---
+
+- name: Prepare
+  hosts: localhost
+  tasks:
+    - name: Set up the deployment state directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ molecule_scenario_directory }}/deployment"
+
+    - name: Copy the Terraform provider files
+      ansible.builtin.copy:
+        dest: "{{ molecule_scenario_directory }}/deployment"
+        src: "{{ molecule_scenario_directory }}/terraform/"
+
+    - name: Create the Terraform variables file
+      ansible.builtin.copy:
+        dest: "{{ molecule_scenario_directory }}/deployment/terraform.tfvars.json"
+        content: "{{ input_vars | to_nice_json }}"
+      vars:
+        input_vars:
+          name_prefix: "{{ globals.name_prefix }}"
+          region: "{{ infra.aws.region }}"
+          vpc_name: "{{ infra.vpc.name }}"
+          sg_names: 
+            knox: "{{ infra.security_group.knox.name }}"
+            default: "{{ infra.security_group.default.name }}"
+          tags:
+            deploy_tool: "Foundry"
+            project: "Molecule testing"
+            name_prefix: "{{ globals.name_prefix }}"
+          s3_bucket_name: "{{ infra.storage.name }}"
+
+    - name: Deploy the Terraform provider assets
+      community.general.terraform:
+        project_path: "{{ molecule_scenario_directory }}/deployment/"
+        state: present
+        force_init: yes
+
+    - name: Create the testing SSH key
+      amazon.aws.ec2_key:
+        name: "{{ globals.ssh.public_key_id }}"
+        region: "{{ infra.aws.region }}"
+        force: yes
+      register: __aws_ssh_key
+
+    - name: Save the private key locally
+      when: __aws_ssh_key.key.private_key is defined
+      ansible.builtin.copy:
+        content: "{{ __aws_ssh_key.key.private_key }}"
+        dest: "{{ molecule_scenario_directory }}/deployment/{{ __aws_ssh_key.key.name }}.private_key"
+      delegate_to: localhost

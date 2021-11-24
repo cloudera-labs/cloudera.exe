@@ -1,0 +1,33 @@
+---
+
+- name: Cleanup CDP deployment and SSH key
+  hosts: localhost
+  tasks:
+    - name: Teardown platform role
+      ansible.builtin.include_role:
+        name: platform
+        tasks_from: teardown.yml
+
+    - name: Delete the SSH key asset
+      amazon.aws.ec2_key:
+        name: "{{ globals.ssh.public_key_id }}"
+        region: "{{ infra.aws.region }}"
+        state: absent
+
+    - name: Stat the deployment state directory
+      ansible.builtin.stat:
+        path: "{{ molecule_scenario_directory }}/deployment"
+      register: __deployment
+
+    - name: Teardown the Terraform provider assets
+      when: __deployment.stat.exists
+      community.general.terraform:
+        project_path: "{{ molecule_scenario_directory }}/deployment/"
+        state: absent
+        force_init: yes
+
+    - name: Delete the deployment state directory
+      when: __deployment.stat.exists
+      ansible.builtin.file:
+        state: absent
+        path: "{{ molecule_scenario_directory }}/deployment"

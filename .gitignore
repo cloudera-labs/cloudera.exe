@@ -1,6 +1,12 @@
 # Keep the Galaxy builds
 !cloudera-exe-*.tar.gz
 
+# Remove ansible-test output
+tests/output
+
+# Remove molecule testing deployments
+**/molecule/*/deployment
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/

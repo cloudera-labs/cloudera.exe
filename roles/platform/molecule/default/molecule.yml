@@ -1,0 +1,59 @@
+---
+dependency:
+  name: galaxy
+  enabled: true
+  options:
+    force: false
+driver:
+  name: delegated
+  options:
+    managed: false
+    ansible_connection_options:
+      ansible_connection: local
+platforms:
+  - name: placeholder
+provisioner:
+  name: ansible
+  log: true
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks, timer, yaml
+      enable_task_debugger: true
+    ssh_connection:
+      pipelining: false
+  vvv: true
+  playbooks:
+    delegated:
+      create: baz.yml
+    prepare: ../shared/prepare.yml
+    converge: ../shared/converge.yml
+    cleanup: ../shared/cleanup.yml
+  inventory:
+    host_vars:
+      localhost:
+        globals:
+          admin_password: "@NotSecure456!"
+          name_prefix: mol01
+          ssh:
+            public_key_id: molecule-level1-testing
+        infra:
+          vpc:
+            name: molecule-level1-testing
+          storage:
+            name: molecule-level1-testing
+          security_group:
+            knox:
+              name: molecule-level1-testing-knox
+            default:
+              name: molecule-level1-testing-default
+          aws:
+            region: us-east-2
+        env:
+          tunnel: yes                   # L1 Networking
+          public_endpoint_access: yes
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
