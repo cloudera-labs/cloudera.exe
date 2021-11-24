@@ -33,7 +33,6 @@
   register: __opdb_teardowns_info
 
 - name: Execute CDP DW cluster teardown
-  register: __dw_teardown_info
   when:
     - run__include_dw or run__force_teardown | bool
     - run__env_info.environments | length > 0
@@ -41,8 +40,11 @@
   cloudera.cloud.dw_cluster:
     env: "{{ run__env_name }}"
     state: absent
-    wait: no
+    wait: yes
     force: "{{ run__dw_force_delete }}"
+  async: 3600 # 1 hour timeout
+  poll: 0
+  register: __dw_cluster_teardown_info
 
 - name: Execute CDP Dataflow teardown
   register: __df_teardown_info
@@ -164,16 +166,16 @@
   retries: 120
   delay: 30
 
-- name: Wait for CDP DW deployments to decommission
+- name: Wait for CDP Data Warehouse deployments to decommission
   when:
-    - __dw_teardown_info is defined
-    - __dw_teardown_info.started | default(False)
-  cloudera.cloud.dw_cluster:
-    env: "{{ run__env_name }}"
-    state: absent
-    wait: yes
-    force: "{{ run__dw_force_delete }}"
-
+    - __dw_cluster_teardown_info is defined
+  ansible.builtin.async_status:
+    jid: "{{ __dw_cluster_teardown_info.ansible_job_id }}"
+  register: __dw_cluster_teardown_async
+  until: __dw_cluster_teardown_async.finished
+  retries: 120
+  delay: 30
+  
 - name: Wait for CDP OpDB deployments to decommission
   when:
     - __opdb_teardowns_info is defined
