@@ -78,9 +78,10 @@ run__dw_overlay_network:            "{{ dw.overlay_network | default(False) | bo
 run__dw_private_load_balancer:      "{{ dw.private_load_balancer | default(not run__public_endpoint_access) }}"
 run__dw_private_worker_nodes:       "{{ dw.private_worker_nodes | default(False) | bool }}"
 run__dw_force_delete:               "{{ dw.force_delete | default (run__force_teardown) }}"
-run__dw_default_vw_type:            "{{ dw.vw.type | default('hive') }}"
-run__dw_default_template_type:      "{{ dw.vw.template | default('xsmall') }}"
-run__dw_default_dbc_suffix:         "{{ dw.dbc.default_suffix | default('dl-default') }}"
+run__dw_default_vw_type:            "{{ dw.default_vw.type | default('hive') }}"
+run__dw_default_template_type:      "{{ dw.default_template.type | default('xsmall') }}"
+run__dw_default_dbc_suffix:         "{{ dw.default_dbc.suffix | default('dl-default') }}"
+run__dw_default_dbc:                "{{ dw.default_dbc.name | default([run__env_name, run__dw_default_dbc_suffix] | join('-')) }}"
 
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
 run__df_nodes_max:                  "{{ df.max_k8s_nodes | default(5) }}"
