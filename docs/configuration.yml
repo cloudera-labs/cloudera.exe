@@ -14,6 +14,7 @@ datahub:
     gcp:
   suffix:
   tags:
+  force_delete:
 de:
   definitions:
   suffix:
@@ -32,7 +33,6 @@ df:
   teardown:
     persist:
   force_delete:
-  terminate_deployments:
 dw:
   definitions:
     - name:
@@ -221,7 +221,7 @@ globals:
   dynamic_inventory:
     vm:
       count:
-      os:
+  force_teardown:
   gcloud_credential_file:
   infra_type:
   labels:
@@ -379,6 +379,7 @@ ml:
   suffix:
   tags:
   public_loadbalancer:
+  force_delete:
 opdb:
   definitions:
   suffix:
