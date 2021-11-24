@@ -8,11 +8,23 @@
         name: platform
         tasks_from: teardown.yml
 
+    - name: Find all the deployment SSH keys
+      ansible.builtin.find:
+        paths: "{{ molecule_scenario_directory }}/deployment"
+        patterns: "*.private_key"
+      register: __ssh_keys
+
     - name: Delete the SSH key asset
       amazon.aws.ec2_key:
-        name: "{{ globals.ssh.public_key_id }}"
+        name: "{{ ssh_key_label }}"
         region: "{{ infra.aws.region }}"
         state: absent
+      loop: "{{ __ssh_keys.files }}"
+      loop_control:
+        loop_var: __ssh_key
+        label: "{{ ssh_key_label }}"
+      vars:
+        ssh_key_label: "{{ __ssh_key.path | basename | splitext | first }}"
 
     - name: Stat the deployment state directory
       ansible.builtin.stat:
