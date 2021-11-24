@@ -192,7 +192,7 @@
         dbc_name: "{{ item.0.name }}"
         use_default_dbc: "{{ item.0.use_default_dbc }}"
         config:
-          name: "{{ item.1.name | default([dbc_name, run__dw_vw_suffix ,__dw_dbc_index] | join('-')) }}"
+          name: "{{ item.1.name | default([run__namespace, run__dw_vw_suffix ,__dw_dbc_index] | join('-')) }}"
           dbc_name: "{{ dbc_name }}"
           use_default_dbc: "{{ use_default_dbc }}"
           vw_type: "{{ item.1.vw_type | default('hive') }}"
@@ -207,3 +207,4 @@
       loop: "{{ run__dw_dbc_configs | subelements('virtual_warehouses')}}"
       loop_control:
         index_var: __dw_dbc_index
+        label: "{{ item.0.name }}"
