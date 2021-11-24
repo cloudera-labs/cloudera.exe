@@ -95,9 +95,9 @@ infra__vpc_user_ports:              "{{ infra.vpc.user_ports | default([infra__a
 infra__vpc_user_cidr:               "{{ infra.vpc.user_cidr | default([]) }}"
 infra__vpc_tunneled_cidr:           "{{ infra.vpc.tunneled_cidr | default([]) }}"
 
-infra__aws_vpc_id:                  "{{ infra.aws.vpc.existing.vpc_id | default('') }}"
-infra__aws_public_subnet_ids:       "{{ infra.aws.vpc.existing.public_subnet_ids | default([]) }}"
-infra__aws_private_subnet_ids:      "{{ infra.aws.vpc.existing.private_subnet_ids | default([]) }}"
+infra__aws_vpc_id:                  "{{ common__aws_vpc_id }}"
+infra__aws_public_subnet_ids:       "{{ common__aws_public_subnet_ids }}"
+infra__aws_private_subnet_ids:      "{{ common__aws_private_subnet_ids }}"
 
 infra__security_group_knox_name:    "{{ common__security_group_knox_name }}"
 infra__security_group_default_name: "{{ common__security_group_default_name }}"

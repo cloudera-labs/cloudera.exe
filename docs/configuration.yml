@@ -30,6 +30,7 @@ datahub:
     gcp:
   suffix:
   tags:
+  force_delete:
 de:
   definitions:
   suffix:
@@ -82,7 +83,35 @@ df:
                   id: SECONDS|MINUTES|HOURS|DAYS
 dw:
   definitions:
+    - name:
+      use_default_dbc:
+      load_demo_data:
+      virtual_warehouses:
+        - name:
+          type:
+          template:
+          autoscaling:
+            min_nodes:
+            max_nodes:
+          tags:
+          configs:
+            common_configs:
+            application_configs:
+            enable_sso:
+            ldap_groups:
   suffix:
+  vw:
+    suffix:
+    type:
+    template:
+  dbc:
+    suffix:
+    default_suffix: 
+  tags:
+  overlay_network:
+  private_load_balancer:
+  private_worker_nodes:
+  force_delete:
 env:
   aws:
     arn_partition: aws | aws-cn | aws-us-gov (See https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
@@ -247,7 +276,7 @@ globals:
   dynamic_inventory:
     vm:
       count:
-      os:
+  force_teardown:
   gcloud_credential_file:
   infra_deployment_engine:
   infra_type:
@@ -411,6 +440,7 @@ ml:
   suffix:
   tags:
   public_loadbalancer:
+  force_delete:
 opdb:
   definitions:
   suffix:
