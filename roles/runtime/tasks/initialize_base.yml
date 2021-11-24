@@ -173,10 +173,9 @@
         run__dw_dbc_configs: "{{ run__dw_dbc_configs | default([]) | union([config]) }}"
       vars:
         include: "{{ lookup('template', __dw_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
-        use_default_dbc: "{{ __dw_config.use_default_dbc | default(False) | bool }}"
-        default_dbc_name: "{{ None if use_default_dbc else [run__namespace, run__dw_dbc_suffix, __dw_config_index] | join('-') }}"
+        use_default_dbc: "{{ True if __dw_config.name is not defined else False | bool }}"
         config:
-          name: "{{ __dw_config.name | default(default_dbc_name) }}"
+          name: "{{ __dw_config.name | default('') }}"
           load_demo_data: "{{ __dw_config.load_demo_data | default(False) | bool }}"
           use_default_dbc: "{{ use_default_dbc }}"
           virtual_warehouses: "{{ __dw_config.virtual_warehouses | default([]) }}"
