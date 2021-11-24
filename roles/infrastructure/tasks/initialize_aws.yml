@@ -115,7 +115,6 @@
 
         - name: Set facts for existing AWS Public Subnet IDs
           ansible.builtin.set_fact:
-            infra__aws_public_subnet_ids: "{{ infra__aws_public_subnet_ids }}"
             infra__aws_subnet_ids: "{{ infra__aws_subnet_ids | default([]) | union(infra__aws_public_subnet_ids) }}"
             infra__aws_vpc_id: "{{ __aws_public_subnets_info.subnets | map(attribute='vpc_id') | list | first }}"
 
