@@ -47,31 +47,6 @@ provisioner:
             region: ${FOUNDRY_AWS_REGION:-us-east-2}
         env:
           tunnel: no                   # L0 Networking
-        dw:
-          #force_delete: yes  # Non-force delete is inconsistent until we can filter 'compactor' VWs
-          tags:
-            project: "${FOUNDRY_NAME_PREFIX:-r00}-CDW-testing"
-          definitions:
-            - name: ${FOUNDRY_NAME_PREFIX:-r00}-empty
-            - virtual_warehouses:
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-dbc-default
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-dbc-hive
-                  type: hive
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-dbc-impala
-                  type: impala
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-dbc-autoscale
-                  autoscaling:
-                    min_nodes: 0  
-            - name: ${FOUNDRY_NAME_PREFIX:-r00}-named
-              virtual_warehouses:
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-named-default
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-named-hive
-                  type: hive
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-named-impala
-                  type: impala
-                - name: ${FOUNDRY_NAME_PREFIX:-r00}-named-autoscale
-                  autoscaling:
-                    min_nodes: 0
 verifier:
   name: ansible
 lint: |
