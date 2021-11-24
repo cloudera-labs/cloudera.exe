@@ -64,7 +64,7 @@
     - name: Retrieve Image Catalog File
       ansible.builtin.uri:
         url: "{{ run__datahub_image_catalog_url }}"
-      #no_log: yes
+      no_log: yes
       register: __datahub_image_catalog
 
     - name: Set fact for latest CDP Image in Catalog
@@ -174,9 +174,8 @@
       vars:
         include: "{{ lookup('template', __dw_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
         config:
-          name: "{{ __dw_config.name | default('') }}"
+          name: "{{ __dw_config.name | default(run__dw_default_dbc) }}"
           load_demo_data: "{{ __dw_config.load_demo_data | default(False) | bool }}"
-          use_default_dbc: "{{ __dw_config.name is undefined | bool }}"
           virtual_warehouses: "{{ __dw_config.virtual_warehouses | default([]) }}"
       loop: "{{ run__dw_definitions }}"
       loop_control:
@@ -188,16 +187,15 @@
         run__dw_vw_configs: "{{ run__dw_vw_configs | default([]) | union([config]) }}"
       vars:
         config:
-          name: "{{ __dw_config.1.name | default([run__namespace, run__dw_vw_suffix ,__dw_dbc_index] | join('-')) }}"
           dbc_name: "{{ __dw_config.0.name }}"
-          use_default_dbc: "{{ __dw_config.0.use_default_dbc }}"
+          name: "{{ __dw_config.1.name | default([run__namespace, run__dw_vw_suffix ,__dw_dbc_index] | join('-')) }}"
           type: "{{ __dw_config.1.type | default(run__dw_default_vw_type) }}"
           template: "{{ __dw_config.1.template | default(run__dw_default_template_type) }}"
           tags: "{{ __dw_config.1.tags | default({}) | combine(run__dw_tags) }}"
           autoscaling: "{{ __dw_config.1.autoscaling | default({}) }}"
           configs: "{{ __dw_config.1.configs | default({}) }}"
-      loop: "{{ run__dw_dbc_configs | default([{}]) | subelements('virtual_warehouses')}}"
+      loop: "{{ run__dw_dbc_configs | default({}) | subelements('virtual_warehouses')}}"
       loop_control:
         loop_var: __dw_config
         index_var: __dw_dbc_index
-        label: "{{ __dw_config.0.name }}"
+        label: "{{ config.name }}"
