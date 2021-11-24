@@ -52,6 +52,7 @@
       ansible.builtin.set_fact:
         run__cdp_datalake_version: "{{ __cdp_datalake_version_info.versions[0].runtimeVersion | trim }}"
 
+# TODO Discover version if upstream is not present
 - name: Set fact for CDP Datalake version by assignment
   when: plat__cdp_datalake_version is defined
   ansible.builtin.set_fact:
@@ -168,7 +169,7 @@
 - name: Prepare for CDP DW experiences
   when: run__include_dw
   block:
-    - name: Construct CDP DW Data catalog configurations
+    - name: Construct CDP DW Data Catalog configurations
       ansible.builtin.set_fact:
         run__dw_dbc_configs: "{{ run__dw_dbc_configs | default([]) | union([config]) }}"
       vars:
@@ -182,7 +183,7 @@
         loop_var: __dw_config
         index_var: __dw_config_index
 
-    - name: Construct CDP DW Virtual warehouse configurations
+    - name: Construct CDP DW Virtual Warehouse configurations
       ansible.builtin.set_fact:
         run__dw_vw_configs: "{{ run__dw_vw_configs | default([]) | union([config]) }}"
       vars:
@@ -199,3 +200,17 @@
         loop_var: __dw_config
         index_var: __dw_dbc_index
         label: "{{ config.name }}"
+
+    - name: Check CDP DW Virtual Warehouse tags
+      ansible.builtin.assert:
+        that:
+          - __dw_vw_config.tags | dict2items | rejectattr('value', 'regex', '[^-_a-zA-Z0-9.=:+@]+') | list
+        fail_msg: 
+          - "A tag in Data Warehouse, '{{ __dw_vw_config.name }}', does not meet requirements;"
+          - "current tags: {{ __dw_vw_config.tags}}."
+          - "Allowed characters in tags are letters, numbers and the following characters: _.:/=+-@"
+        quiet: yes
+      loop_control:
+        loop_var: __dw_vw_config
+        label: "{{ __dw_vw_config.name }}"
+      loop: "{{ run__dw_vw_configs }}"
