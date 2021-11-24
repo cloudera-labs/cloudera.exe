@@ -167,7 +167,7 @@
 - name: Wait for CDP DW deployments to decommission
   when:
     - __dw_teardown_info is defined
-    - __dw_teardown_info.started | default(False)
+    # - __dw_teardown_info.started | default(False)
   cloudera.cloud.dw_cluster:
     env: "{{ run__env_name }}"
     state: absent
