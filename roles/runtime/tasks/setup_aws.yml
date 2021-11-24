@@ -44,18 +44,8 @@
         env: "{{ run__env_name }}"
         overlay: "{{ run__dw_overlay_network }}"
         private_load_balancer: "{{ run__dw_private_load_balancer }}"
-        aws_public_subnets: "{{ run__datahub_public_subnet_ids }}"
-        aws_private_subnets: "{{ run__datahub_private_subnet_ids if run__dw_private_worker_nodes else [] }}"
-        state: present
-        wait: yes
-      register: __dw_builds
-
-    # TODO Refactor for non-AWS?
-    - name: Create CDP DW Database Catalogs
-      cloudera.cloud.dw_database_catalog:
-        cluster_id: "{{ __dw_builds.cluster.id }}"
-        name: "{{ __dw_dbc_config.name }}"
-        load_demo_data: "{{ __dw_dbc_config.load_demo_data }}"
+        aws_public_subnets: "{{ run__aws_public_subnet_ids }}"
+        aws_private_subnets: "{{ run__aws_private_subnet_ids if run__dw_private_worker_nodes else [] }}"
         state: present
         wait: yes
       async: 3600 # 1 hour timeout
