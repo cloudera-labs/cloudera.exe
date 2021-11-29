@@ -243,3 +243,90 @@
   vars:
     knox: "results[?group_name=='{{ infra__security_group_knox_name }}'].group_id"
     default: "results[?group_name=='{{ infra__security_group_default_name }}'].group_id"
+
+
+- name: Setup AWS Private Endpoints
+  when: infra__aws_private_endpoints | bool
+  block:
+    - name: Create VPC Endpoint Security Group (Skip if infra__aws_private_endpoints is false)
+      amazon.aws.ec2_group:
+        state: present
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        tags: "{{ infra__tags | combine({ 'Name': 'infra__security_group_vpce_name' }, recursive=True) }}"
+        name: "{{ infra__security_group_vpce_name }}"
+        description: "{{ infra__security_group_vpce_name }}"
+        rules:
+          - proto: all
+            cidr_ip: "{{ infra__vpc_cidr }}"
+      register: __aws_vpce_security_group_info
+
+    - name: List the Route Tables for the AWS VPC (Skip if infra__aws_private_endpoints is false)
+      community.aws.ec2_vpc_route_table_info:
+        region: "{{ infra__region }}"
+        filters:
+          vpc-id: "{{ infra__aws_vpc_id }}"
+      register: __aws_route_table_list_again
+    
+    - name: Set fact for All Route Table IDs (Skip if infra__aws_private_endpoints is false)
+      ansible.builtin.set_fact:
+        infra__route_table_ids: "{{ infra__route_table_ids | default([]) | union([route_table_id]) }}"
+      vars:
+        route_table_id: "{{ __aws_route_tables.associations[0].route_table_id }}"
+      loop: "{{ __aws_route_table_list_again.route_tables }}"
+      loop_control:
+        label: "{{ __aws_route_tables.associations[0].route_table_id }}"
+        loop_var: __aws_route_tables
+
+    - name: Create Gateway VPC Endpoints (Skip if infra__aws_private_endpoints is false)
+      community.aws.ec2_vpc_endpoint:
+        state: present
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        service: "{{ __infra_gateway_vpc_endpoint }}"
+        route_table_ids: "{{ infra__route_table_ids }}"
+        tags: "{{ infra__tags | combine({ 'Name': infra__namespace + __infra_gateway_vpc_endpoint.split(infra__region)[1] }, recursive=True) }}"
+      vars:
+        route_table_id: "{{ route_tables.associations[0].route_table_id }}"
+      loop: "{{ infra__aws_gateway_vpc_private_endpoints }}"
+      loop_control:
+        loop_var: __infra_gateway_vpc_endpoint
+      register: __aws_gateway_vpc_endpoints
+
+    - name: Create Interface VPC Endpoints (Skip if infra__aws_private_endpoints is false)
+      community.aws.ec2_vpc_endpoint:
+        state: present
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        service: "{{ __infra_interface_vpc_endpoint }}"
+        vpc_endpoint_type: Interface
+        wait: true
+        tags: "{{ infra__tags | combine({ 'Name': infra__namespace + __infra_interface_vpc_endpoint.split(infra__region)[1] }, recursive=True) }}"
+      loop: "{{ infra__aws_interface_vpc_private_endpoints }}"
+      loop_control:
+        loop_var: __infra_interface_vpc_endpoint
+      register: __aws_interface_vpc_endpoints
+
+    - name: List Default Security Group for VPC (Skip if infra__aws_private_endpoints is false)
+      amazon.aws.ec2_group_info:
+        filters:
+          vpc-id: "{{ infra__aws_vpc_id }}"
+          group-name:
+            - default
+      register: __aws_vpc_default_sg
+    
+    - name: Add Subnets and Security Groups to Interface VPC Endpoints (Skip if infra__aws_private_endpoints is false)
+      when:
+        - __aws_interface_vpc_endpoints is defined
+        - __aws_interface_vpc_endpoints.results is defined
+      command: >
+        aws ec2 modify-vpc-endpoint
+        --vpc-endpoint-id {{ __infra_vpce_loop_var.result.vpc_endpoint_id }}
+        --add-subnet-ids {{ infra__aws_public_subnet_ids | join(' ') }} 
+        --add-security-group-ids {{ __aws_vpce_security_group_info.group_id }}
+        --remove-security-group-ids {{ __aws_vpc_default_sg.security_groups[0].group_id }}
+        --private-dns-enabled
+      loop_control:
+        label: "{{ __infra_vpce_loop_var.result.vpc_endpoint_id | default('') }}"  # Default empty string to avoid ansible label undef error
+        loop_var: __infra_vpce_loop_var
+      loop: "{{ __aws_interface_vpc_endpoints.results }}"

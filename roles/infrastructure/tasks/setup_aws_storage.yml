@@ -21,6 +21,15 @@
       - "If you see HeadBucket Forbidden errors. "
       - "Your bucket name is probably use in another AWS account and you should use a different name_prefix"
 
+- name: Construct tags for AWS Buckets
+  ansible.builtin.set_fact:
+    __infra_aws_storage_tags_list: "{{ __infra_aws_storage_tags_list | default([]) | union([storage_tag_pair]) }}"
+  vars:
+    storage_tag_pair: '{Key={{ __storage_tag.key }},Value="{{ __storage_tag.value | quote }}"}'
+  loop: "{{ __infra_aws_storage_tags | dict2items }}"
+  loop_control:
+    loop_var: __storage_tag
+
 - name: Create AWS Buckets
   amazon.aws.aws_s3:
     region: "{{ infra__region }}"
@@ -30,6 +39,7 @@
   loop_control:
     loop_var: __aws_storage_location_item
   loop: "{{ infra__aws_storage_locations }}"
+  register: __infra_aws_storage_locations_info
 
 - name: Create AWS Buckets directory structures
   amazon.aws.aws_s3:
@@ -41,6 +51,18 @@
     loop_var: __aws_storage_object_item
   loop: "{{ infra__aws_storage_locations }}"
 
+- name: Update AWS Buckets tags (overwrite)
+  when: __infra_aws_storage_tags_list
+  ansible.builtin.command: >
+    aws s3api put-bucket-tagging
+    --bucket {{ __infra_aws_storage_location_item.bucket }} 
+    --tagging TagSet=[{{ __infra_aws_storage_tags_list | join(',') }}]
+  loop_control:
+    loop_var: __infra_aws_storage_location_item
+    label: "{{ __infra_aws_storage_location_item.bucket }}"
+  loop: "{{ infra__aws_storage_locations }}"
+  register: __infra_aws_storage_tags_info
+
 - name: Ensure Download Mirror Bucket exists in target region
   when: infra__create_utility_service
   amazon.aws.aws_s3:
@@ -48,3 +70,15 @@
     bucket: "{{ infra__utlity_bucket_name }}"
     mode: create
     permission: private
+
+- name: Update Download Mirror Buckets tags (overwrite)
+  when: infra__create_utility_service and __infra_aws_storage_tags_list
+  ansible.builtin.command: >
+    aws s3api put-bucket-tagging
+    --bucket {{ infra__utlity_bucket_name }} 
+    --tagging TagSet=[{{ __infra_aws_storage_tags_list | join(',') }}]
+  loop_control:
+    loop_var: __infra_aws_storage_location_item
+    label: "{{ __infra_aws_storage_location_item }}"
+  loop: "{{ infra__aws_storage_locations }}"
+  register: __infra_aws_storage_tags_info

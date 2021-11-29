@@ -14,6 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: List VPC Endpoints
+  when: infra__aws_private_endpoints | bool
+  community.aws.ec2_vpc_endpoint_info:
+    region: "{{ infra__region }}"
+    filters:
+      vpc-id: "{{ infra__aws_vpc_id }}"
+  register: __infra_vpc_existing_endpoints
+
 - name: Discover AWS VPC dependencies for forced teardown
   when:
     - infra__force_teardown | bool
@@ -64,6 +72,7 @@
       loop: "{{ __infra_eks_cluster_details.results }}"
       loop_control:
         loop_var: __infra_eks_cluster_detail_item
+        label: "{{ __infra_eks_cluster_detail_item.stdout | from_json | community.general.json_query('cluster.name') }}"
 
     - name: List all AWS Autoscaling Groups
       register: __infra_ec2_asg_list
@@ -83,6 +92,7 @@
       loop: "{{ __infra_disc_subnets.subnets }}"
       loop_control:
         loop_var: __subnet
+        label: "{{ __subnet.cidr_block }}"
 
     - name: Filter Autoscaling Groups by discovered AWS VPC Subnets
       when:
@@ -96,6 +106,7 @@
       loop: "{{ __infra_ec2_asg_list.results }}"
       loop_control:
         loop_var: __infra_asg_filter_item
+        label: "{{ __infra_asg_filter_item.auto_scaling_group_name }}"
 
     - name: List all AWS Elastic Loadbalancers
       community.aws.ec2_elb_info:
@@ -103,14 +114,15 @@
       register: __infra_ec2_elbs
 
     - name: Filter list of AWS Elastic Loadbalancers by AWS VPC
-      when:
-        - __infra_ec2_elbs.elbs | length > 0
-        - __infra_ec2_elb_item.vpc_id == infra__aws_vpc_id
+      #when:
+      #  - __infra_ec2_elbs.elbs | length > 0
+      #  - __infra_ec2_elb_item.vpc_id == infra__aws_vpc_id
       ansible.builtin.set_fact:
         __infra_ec2_elb_names: "{{ __infra_ec2_elb_names | default([]) + [__infra_ec2_elb_item.name] }}"
-      loop: "{{ __infra_ec2_elbs.elbs }}"
+      loop: "{{ __infra_ec2_elbs.elbs | selectattr('vpc_id', 'equalto', infra__aws_vpc_id) | map('name') | list }}"
       loop_control:
         loop_var: __infra_ec2_elb_item
+        #label: "{{ __infra_ec2_elb_item.name }}"
 
     - name: List all AWS VPC NAT gatways
       community.aws.ec2_vpc_nat_gateway_info:
@@ -148,8 +160,7 @@
         __aws_rds_jq: "instances[?db_subnet_group.vpc_id == '{{ infra__aws_vpc_id }}']"
 
 - name: Discover AWS Elastic Block Storage for forced teardown
-  when:
-    - infra__force_teardown | bool
+  when: infra__force_teardown | bool
   block:
     - name: List AWS EBS Volumes
       register: __infra_aws_ebs_vols

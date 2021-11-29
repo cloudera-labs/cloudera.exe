@@ -1,0 +1,24 @@
+---
+
+collections:
+  - name: https://github.com/cloudera-labs/cloudera.cloud
+    type: git
+    version: devel
+  - name: https://github.com/cloudera-labs/cloudera.cluster
+    type: git
+    version: main
+  - amazon.aws
+  - ansible.netcommon
+  - ansible.posix
+  - azure.azcollection
+  - community.aws
+  - community.crypto
+  - community.general
+  - community.kubernetes
+  - community.mysql
+  - community.postgresql
+  - community.docker
+  - freeipa.ansible_freeipa
+  - google.cloud
+  - kubernetes.core
+  - netapp.azure

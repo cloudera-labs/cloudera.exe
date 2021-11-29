@@ -15,14 +15,24 @@ datahub:
   suffix:
   tags:
 de:
+  definitions:
+  suffix:
+  tags:
+  force_delete:
+  vc_suffix:
 df:
   suffix:
   min_k8s_nodes:
   max_k8s_nodes:
   public_loadbalancer:
-  ip_ranges:
+  loadbalancer_ip_ranges:
+  kube_ip_ranges:
+  cluster_subnets:
+  loadbalancer_subnets:
   teardown:
     persist:
+  force_delete:
+  terminate_deployments:
 dw:
   definitions:
   suffix:
@@ -37,6 +47,7 @@ env:
         log:
         ranger_audit_s3:
       suffix:
+      tags:
     role:
       label:
         cross_account:
@@ -51,8 +62,10 @@ env:
         log:
         ranger_audit:
       suffix:
+      tags:
     storage:
       suffix:
+      tags:
   azure:
     app:
       name:
@@ -182,12 +195,14 @@ globals:
   dynamic_inventory:
     vm:
       count:
+      os:
   gcloud_credential_file:
   infra_type:
   labels:
     admin:
     app:
     cml:
+    cde:
     credential:
     cross_account:
     data:
@@ -212,6 +227,7 @@ globals:
     table:
     user:
     vpc:
+    vpce:
   name_prefix:
   namespace_cdp:
   region:
@@ -243,6 +259,13 @@ infra:
         vpc_id:
         public_subnet_ids:
         private_subnet_ids:
+    role:
+      tags:
+    policy:
+      tags:
+    storage:
+      tags:
+    private_endpoints:
   azure:
     metagroup:
       name:
@@ -277,7 +300,6 @@ infra:
     tag_key:
     tag_value:
     vm:
-      os:
       suffix:
       type:
   gcp:
@@ -292,6 +314,9 @@ infra:
       name:
       suffix:
     knox:
+      name:
+      suffix:
+    vpce:
       name:
       suffix:
   storage:

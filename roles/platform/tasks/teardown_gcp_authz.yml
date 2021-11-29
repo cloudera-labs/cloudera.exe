@@ -39,19 +39,15 @@
     project: "{{ plat__gcp_project }}"
     state: absent
 
-- name: Tear down GCP Roles
-  when: plat__teardown_deletes_roles
+- name: Tear down GCP Custom Log Role
+  when: plat__teardown_deletes_gcp_custom_roles
   register: __gcp_role_teardown
   failed_when:
-    - plat__teardown_deletes_roles.msg is defined
-    - "'GCP returned error' in plat__teardown_deletes_roles.msg"
-    - "'it is already deleted' not in plat__teardown_deletes_roles.msg"
-  loop_control:
-    loop_var: __gcp_role_item
-  loop:
-    - "{{ plat__gcp_log_role_name }}"
+    - __gcp_role_teardown.msg is defined
+    - "'GCP returned error' in __gcp_role_teardown.msg"
+    - "'it is already deleted' not in __gcp_role_teardown.msg"
   google.cloud.gcp_iam_role:
-    name: "{{ __gcp_role_item }}"
+    name: "{{ plat__gcp_log_role_name }}"
     project: "{{ plat__gcp_project }}"
     state: absent
 

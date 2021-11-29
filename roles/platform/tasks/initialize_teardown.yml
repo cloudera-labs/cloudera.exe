@@ -28,6 +28,7 @@
       - plat__env_info.environments[0].descendants.df | length == 0
       - plat__env_info.environments[0].descendants.dw | length == 0
       - plat__env_info.environments[0].descendants.opdb | length == 0
+      - plat__env_info.environments[0].descendants.de | length == 0
     fail_msg: "Environment {{ plat__env_name }} has one or more child services registered, please check and try again"
     quiet: yes
 

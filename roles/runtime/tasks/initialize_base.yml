@@ -59,6 +59,7 @@
 
 - name: Prepare for CDP Datahub clusters
   when: run__include_datahub
+  tags: dh
   block:
     - name: Retrieve Image Catalog File
       ansible.builtin.uri:
@@ -121,6 +122,7 @@
       loop: "{{ run__datahub_configs }}"
 
 - name: Prepare for CDP OpDB experiences
+  tags: opdb
   when: run__include_opdb
   block:
     - name: Construct OpDB Configurations
@@ -136,6 +138,7 @@
         label: "{{ config.name }}"
 
 - name: Prepare for CDP ML Workspace experiences
+  tags: ml
   when: run__include_ml
   block:
     - name: Construct CDP ML Workspace configurations
@@ -160,4 +163,21 @@
       loop: "{{ run__ml_definitions }}"
       loop_control:
         loop_var: __ml_config
+        label: "{{ config.name }}"
+
+- name: Prepare for CDP DE Service experiences
+  when: run__include_de
+  block:
+    - name: Construct CDP DE Service configurations
+      ansible.builtin.set_fact:
+        run__de_configs: "{{ run__de_configs | default([]) | union([config]) }}"
+      vars:
+        include: "{{ lookup('template', __de_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
+        overlay_tags: "{{ __de_config.tags | default(include.tags) | default(run__de_tags) }}"
+        config:
+          name: "{{ __de_config.name | default([run__namespace_cdp, __de_config.suffix | default(include.suffix) | default(run__de_suffix)] | join('-')) }}"
+          raw: "{{ __de_config }}"
+      loop: "{{ run__de_definitions }}"
+      loop_control:
+        loop_var: __de_config
         label: "{{ config.name }}"

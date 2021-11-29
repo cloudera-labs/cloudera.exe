@@ -48,17 +48,18 @@
   register: __df_teardown_info
   when:
     - run__include_df or run__force_teardown | bool
-    - run__df_env_info is defined and run__df_env_info.services is defined
-    - run__df_env_info.services | length > 0
-  cloudera.cloud.df:
-    name: "{{ __df_teardown_req_item.crn }}"
+    - run__df_service_info is defined and run__df_service_info.services is defined
+    - run__df_service_info.services | length > 0
+  cloudera.cloud.df_service:
+    df_crn: "{{ __df_teardown_req_item.crn }}"
     persist: "{{ run__df_persist }}"
     force: "{{ run__df_force_delete }}"
+    terminate: "{{ run__df_terminate_deployments }}"
     state: absent
     wait: no
   loop_control:
     loop_var: __df_teardown_req_item
-  loop: "{{ run__df_env_info.services }}"
+  loop: "{{ run__df_service_info.services }}"
 
 - name: Execute CDP ML Workspace teardown
   when:
@@ -78,6 +79,24 @@
   async: 3600 # 1 hour timeout
   poll: 0
   register: __ml_teardowns_info
+
+- name: Execute CDP DE Service teardown
+  when:
+    - run__include_de or run__force_teardown | bool
+    - run__de_configs is defined
+    - run__de_configs | length > 0
+  cloudera.cloud.de:
+    name: "{{ __de_config_item.name }}"
+    env: "{{ run__env_name }}"
+    state: absent
+    force_delete: "{{ run__de_force_delete }}"
+  loop_control:
+    loop_var: __de_config_item
+    label: "{{ __de_config_item.name | default('de') }}"
+  loop: "{{ run__de_configs }}"
+  async: 7200 # 2 hour timeout
+  poll: 0
+  register: __de_teardowns_info
 
 - name: Execute CDP Datahub teardown
   when:
@@ -112,6 +131,22 @@
   until: __ml_teardowns_async.finished
   retries: 120
   delay: 30
+
+- name: Wait for CDP DE Service deployments to decommission
+  when:
+    - __de_teardowns_info is defined
+    - __de_teardowns_info.results is defined
+    - __de_teardowns_info.results | length > 0
+  ansible.builtin.async_status:
+    jid: "{{ __de_teardown.ansible_job_id }}"
+  loop_control:
+    loop_var: __de_teardown
+    label: "{{ __de_teardown.__de_config_item.name | default('de') }}"
+  loop: "{{ __de_teardowns_info.results }}"
+  register: __de_teardowns_async
+  until: __de_teardowns_async.finished
+  retries: 120
+  delay: 60
 
 - name: Wait for CDP Datahub deployments to decommission
   when:
@@ -158,13 +193,13 @@
 - name: Wait for CDP Dataflow deployment to decommission
   when:
     - run__include_df
-    - run__df_env_info.services | length > 0
-  cloudera.cloud.df:
-    name: "{{ __df_teardown_wait_item.crn }}"
+    - run__df_service_info.services | length > 0
+  cloudera.cloud.df_service:
+    df_crn: "{{ __df_teardown_wait_item.crn }}"
     persist: "{{ run__df_persist }}"
     force: "{{ run__df_force_delete }}"
     state: absent
     wait: yes
   loop_control:
     loop_var: __df_teardown_wait_item
-  loop: "{{ run__df_env_info.services }}"
+  loop: "{{ run__df_service_info.services }}"

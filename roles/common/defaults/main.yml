@@ -34,6 +34,7 @@ common__public_suffix:                    "{{ globals.labels.public | default('p
 common__private_suffix:                   "{{ globals.labels.private | default('pvt') }}"
 common__security_group_knox_suffix:       "{{ globals.labels.knox | default('knox') }}"
 common__security_group_default_suffix:    "{{ globals.labels.default | default('default') }}"
+common__security_group_vpce_suffix:       "{{ globals.labels.vpce | default('vpce') }}"
 common__role_suffix:                      "{{ globals.labels.role | default('role') }}"
 common__policy_suffix:                    "{{ globals.labels.policy | default('policy') }}"
 common__storage_suffix:                   "{{ globals.labels.storage | default('storage') }}"
@@ -45,6 +46,7 @@ common__external_data_suffix:             "{{ globals.labels.external_data | def
 common__datalake_admin_suffix:            "{{ globals.labels.datalake_admin | default('dladmin') }}"
 common__ranger_audit_suffix:              "{{ globals.labels.ranger_audit | default('audit') }}"
 common__cml_suffix:                       "{{ globals.labels.cml | default('cml') }}"
+common__cde_suffix:                       "{{ globals.labels.cde | default('cde') }}"
 common__igw_suffix:                       "{{ globals.labels.internet_gateway | default('igw') }}"
 common__app_suffix:                       "{{ globals.labels.app | default('app') }}"
 common__group_suffix:                     "{{ globals.labels.group | default('group') }}"
@@ -72,9 +74,11 @@ common__vpc_public_subnets_suffix:        "{{ infra.vpc.private_subnets_suffix |
 
 common__security_group_knox_name:         "{{ infra.security_group.knox.name | default([common__namespace, common__security_group_knox_name_suffix] | join('-')) }}"
 common__security_group_default_name:      "{{ infra.security_group.default.name | default([common__namespace, common__security_group_default_name_suffix] | join('-')) }}"
+common__security_group_vpce_name:         "{{ infra.security_group.vpce.name | default([common__namespace, common__security_group_vpce_name_suffix] | join('-')) }}"
 
 common__security_group_knox_name_suffix:    "{{ infra.security_group.knox.suffix | default(common__security_group_knox_suffix) }}"
 common__security_group_default_name_suffix: "{{ infra.security_group.default.suffix | default(common__security_group_default_suffix) }}"
+common__security_group_vpce_name_suffix:    "{{ infra.security_group.vpce.suffix | default(common__security_group_vpce_suffix) }}"
 
 common__ml_path:                          "{{ infra.storage.path.ml | default('datasci') }}"
 common__de_path:                          "{{ infra.storage.path.de | default('dataeng') }}"
@@ -83,6 +87,9 @@ common__data_path:                        "{{ infra.storage.path.data | default(
 common__ranger_audit_path:                "{{ infra.storage.path.ranger_audit | default('ranger/audit') }}"
 
 # AWS Infra
+common__aws_vpc_id:                       "{{ infra.aws.vpc.existing.vpc_id | default('') }}"
+common__aws_public_subnet_ids:            "{{ infra.aws.vpc.existing.public_subnet_ids | default([]) }}"
+common__aws_private_subnet_ids:           "{{ infra.aws.vpc.existing.private_subnet_ids | default([]) }}"
 common__aws_region:                       "{{ infra.aws.region | default('eu-west-1') }}"
 common__aws_profile:                      "{{ infra.aws.profile | default('') }}"
 common__aws_role_suffix:                  "{{ infra.aws.role.suffix | default(common__role_suffix) }}"

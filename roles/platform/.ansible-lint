@@ -1,0 +1,9 @@
+---
+
+warn_list:
+  - empty-string-compare
+  - experimental
+  - ignore-errors
+  - no-changed-when
+  - var-spacing
+  

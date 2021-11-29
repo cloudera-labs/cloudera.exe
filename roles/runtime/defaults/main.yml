@@ -64,6 +64,12 @@ run__ml_force_delete:               "{{ ml.force_delete | default (run__force_te
 run__ml_remove_storage:             "{{ ml.remove_storage | default (run__force_teardown) }}"
 run__ml_public_loadbalancer:        "{{ ml.public_loadbalancer | default(run__public_endpoint_access) }}"
 
+run__de_definitions:                "{{ de.definitions | default([{}]) }}"
+run__de_suffix:                     "{{ de.suffix | default('de') }}"
+run__de_tags:                       "{{ de.tags | default(common__tags) }}"
+run__de_force_delete:               "{{ de.force_delete | default (run__force_teardown) }}"
+run__de_vc_suffix:                  "{{ de.vc.suffix | default('vc') }}"
+
 run__dw_definitions:                "{{ dw.definitions | default([{}]) }}"
 run__dw_suffix:                     "{{ dw.suffix | default('dw') }}"
 run__dw_force_delete:               "{{ dw.force_delete | default (run__force_teardown) }}"
@@ -71,9 +77,13 @@ run__dw_force_delete:               "{{ dw.force_delete | default (run__force_te
 run__df_nodes_min:                  "{{ df.min_k8s_nodes | default(3) }}"
 run__df_nodes_max:                  "{{ df.max_k8s_nodes | default(5) }}"
 run__df_public_loadbalancer:        "{{ df.public_loadbalancer | default(run__public_endpoint_access) }}"
-run__df_ip_ranges:                  "{{ df.ip_ranges | default([]) }}"
+run__df_lb_ip_ranges:               "{{ df.loadbalancer_ip_ranges | default([]) }}"
+run__df_kube_ip_ranges:             "{{ df.kube_ip_ranges | default([]) }}"
+run__df_cluster_subnets:            "{{ df.cluster_subnets | default([]) }}"
+run__df_lb_subnets:                 "{{ df.loadbalancer_subnets | default([]) }}"
 run__df_persist:                    "{{ df.teardown.persist | default(False) }}"
-run__df_force_delete:               "{{ df.force_delete | default (run__force_teardown) }}"
+run__df_force_delete:               "{{ df.force_delete | default(run__force_teardown) }}"
+run__df_terminate_deployments:      "{{ df.terminate_deployments | default(run__force_teardown) }}"
 
 # Deploy
 run__include_ml:                     "{{ common__include_ml }}"
@@ -82,3 +92,8 @@ run__include_de:                     "{{ common__include_de }}"
 run__include_df:                     "{{ common__include_df }}"
 run__include_datahub:                "{{ common__include_datahub }}"
 run__include_opdb:                   "{{ common__include_opdb }}"
+
+# AWS
+run__aws_vpc_id:                     "{{ common__aws_vpc_id }}"
+run__aws_public_subnet_ids:          "{{ common__aws_public_subnet_ids }}"
+run__aws_private_subnet_ids:         "{{ common__aws_private_subnet_ids }}"

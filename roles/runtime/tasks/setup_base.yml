@@ -16,6 +16,7 @@
 
 - name: Request CDP Datahub deployments
   when: run__include_datahub
+  tags: dh
   cloudera.cloud.datahub_cluster:
     name: "{{ __datahub_config_item.name }}"
     env: "{{ run__env_name }}"
@@ -37,6 +38,7 @@
 
 - name: Execute CDP ML Workspace experiences setup
   when: run__include_ml
+  tags: ml
   cloudera.cloud.ml:
     name: "{{ __ml_config_item.name }}"
     env: "{{ run__env_name }}"
@@ -59,8 +61,37 @@
   poll: 0
   register: __ml_builds
 
+- name: Execute CDP DE Service experiences setup
+  when: run__include_de
+  cloudera.cloud.de:
+    name: "{{ __de_config_item.name }}"
+    env: "{{ run__env_name }}"
+    instance_type: "{{ __de_config_item.raw.instance_type | default(run__de_compute_default[run__infra_type]) }}"
+    minimum_instances: "{{ __de_config_item.raw.minimum_instances | default(omit) }}"
+    maximum_instances: "{{ __de_config_item.raw.maximum_instances | default(omit) }}"
+    minimum_spot_instances: "{{ __de_config_item.raw.minimum_spot_instances | default(omit) }}"
+    maximum_spot_instances: "{{ __de_config_item.raw.maximum_spot_instances | default(omit) }}"
+    chart_value_overrides: "{{ __de_config_item.raw.chart_value_overrides | default(omit) }}"
+    enable_public_endpoint: "{{ __de_config_item.raw.enable_public_endpoint | default(omit) }}"
+    enable_workload_analytics: "{{ __de_config_item.raw.enable_workload_analytics | default(omit) }}"
+    initial_instances: "{{ __de_config_item.raw.initial_instances | default(omit) }}"
+    initial_spot_instances: "{{ __de_config_item.raw.initial_spot_instances | default(omit) }}"
+    root_volume_size: "{{ __de_config_item.raw.root_volume_size | default(omit) }}"
+    skip_validation: "{{ __de_config_item.raw.skip_validation | default(omit) }}"
+    tags: "{{ __de_config_item.raw.tags | default(omit) }}"
+    use_ssd: "{{ __de_config_item.raw.use_ssd | default(omit) }}"
+    whitelist_ips: "{{ __de_config_item.raw.whitelist_ips | default(omit) }}"
+  loop_control:
+    loop_var: __de_config_item
+    label: "{{ __de_config_item.name | default ('None') }}"
+  loop: "{{ run__de_configs }}"
+  async: 7200 # 2 hour timeout
+  poll: 0
+  register: __de_builds
+
 - name: Execute CDP OpDB setup
   when: run__include_opdb
+  tags: opdb
   cloudera.cloud.opdb:
     name: "{{ __opdb_config_item.name }}"
     env: "{{ run__env_name }}"
@@ -76,17 +107,22 @@
 
 - name: Execute CDP Dataflow setup
   when: run__include_df
-  cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+  tags: df
+  cloudera.cloud.df_service:
+    env_crn: "{{ run__cdp_env_crn }}"
     nodes_min: "{{ run__df_nodes_min }}"
     nodes_max: "{{ run__df_nodes_max }}"
     public_loadbalancer: "{{ run__df_public_loadbalancer }}"
-    ip_ranges: "{{ run__df_ip_ranges }}"
+    loadbalancer_ip_ranges: "{{ run__df_lb_ip_ranges }}"
+    kube_ip_ranges: "{{ run__df_kube_ip_ranges }}"
+    cluster_subnets: "{{ run__df_cluster_subnets }}"
+    loadbalancer_subnets: "{{ run__df_lb_subnets }}"
     state: present
     wait: no
 
 - name: Wait for CDP Datahub deployments to complete
   when: run__include_datahub
+  tags: dh
   ansible.builtin.async_status:
     jid: "{{ __datahub_build_item.ansible_job_id }}"
   loop_control:
@@ -100,6 +136,7 @@
 
 - name: Wait for CDP ML Workspace experiences to complete
   when: run__include_ml
+  tags: ml
   ansible.builtin.async_status:
     jid: "{{ __ml_build.ansible_job_id }}"
   loop_control:
@@ -111,8 +148,22 @@
   retries: 120
   delay: 30
 
+- name: Wait for CDP DE Service experiences to complete
+  when: run__include_de
+  ansible.builtin.async_status:
+    jid: "{{ __de_build.ansible_job_id }}"
+  loop_control:
+    loop_var: __de_build
+    label: "{{ __de_build.__de_config_item.name | default ('None') }}"
+  loop: "{{ __de_builds.results }}"
+  register: __de_builds_async
+  until: __de_builds_async.finished
+  retries: 120
+  delay: 60
+
 - name: Wait for CDP OpDB deployments to complete
   when: run__include_opdb
+  tags: opdb
   ansible.builtin.async_status:
     jid: "{{ __opdb_build.ansible_job_id }}"
   loop_control:
@@ -126,6 +177,44 @@
 
 - name: Wait for CDP Dataflow deployment to complete
   when: run__include_df
-  cloudera.cloud.df:
-    name: "{{ run__cdp_env_crn }}"
+  tags: df
+  cloudera.cloud.df_service:
+    env_crn: "{{ run__cdp_env_crn }}"
     wait: yes
+
+- name: Create CDP DE Virtual clusters
+  when: run__include_de
+  cloudera.cloud.de_virtual_cluster:
+    cluster_name: "{{ __de_vc_config_item.0.name }}"
+    env: "{{ run__env_name }}"
+    name: "{{ __de_vc_config_item.1.name | default([run__namespace, run__de_vc_suffix ,__de_vc_index] | join('-')) }}"
+    cpu_requests: "{{ __de_vc_config_item.1.cpu_requests | default(omit) }}"
+    memory_requests: "{{ __de_vc_config_item.1.memory_requests | default(omit) }}"
+    chart_value_overrides: "{{ __de_vc_config_item.1.chart_value_overrides | default(omit) }}"
+    runtime_spot_component: "{{ __de_vc_config_item.1.runtime_spot_component | default(omit) }}"
+    spark_version: "{{ __de_vc_config_item.1.spark_version | default(omit) }}"
+    acl_users: "{{ __de_vc_config_item.1.acl_users | default(omit) }}"
+    wait: yes
+  async: 1800 # 30 minute timeout
+  poll: 0
+  register: __de_vc_builds
+  with_subelements:
+    - "{{ run__de_configs | selectattr('raw.virtual_clusters', 'defined') | list }}"
+    - raw.virtual_clusters
+  loop_control:
+    loop_var: __de_vc_config_item
+    index_var: __de_vc_index
+    label: "{{ __de_vc_config_item.0.name | default ('None') }}"
+
+- name: Wait for CDP DE Virtual cluster setup to complete
+  when: run__include_de
+  ansible.builtin.async_status:
+    jid: "{{ __de_vc_build.ansible_job_id }}"
+  register: __de_vc_builds_async
+  until: __de_vc_builds_async.finished
+  retries: 30
+  delay: 30
+  loop: "{{ __de_vc_builds.results }}"
+  loop_control:
+    loop_var: __de_vc_build
+    label: "{{ __de_vc_build.__de_vc_config_item.0.name | default ('None') }}"

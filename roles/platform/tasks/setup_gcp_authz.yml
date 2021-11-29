@@ -56,32 +56,51 @@
     name: "{{ plat__xacccount_credential_name }}"
     secret: "{{ __gcp_creds_tmpdir.path }}/{{ plat__gcp_xaccount_identity_name }}-gcp-cred.json"
 
-- name: Create other GCP Roles
+- name: Create Custom GCP Log Role
   register: __gcp_role_creation_info
-  loop_control:
-    loop_var: __gcp_role_item
-  loop:
-    - name: "{{ plat__gcp_log_role_name }}"
-      perms: "{{ plat__gcp_log_role_perms }}"
   google.cloud.gcp_iam_role:
-    name: "{{ __gcp_role_item.name }}"
-    title: "{{ __gcp_role_item.name }}"
-    description: "{{ __gcp_role_item.name }}"
-    included_permissions: "{{ __gcp_role_item.perms }}"
+    name: "{{ plat__gcp_log_role_name }}"
+    title: "{{ plat__gcp_log_role_name }}"
+    description: "{{ plat__gcp_log_role_name }}"
+    included_permissions: "{{ plat__gcp_log_role_perms }}"
     project: "{{ plat__gcp_project }}"
     state: present
+  failed_when:
+    - __gcp_role_creation_info.msg is defined
+    - "'GCP returned error' in __gcp_role_creation_info.msg"
+    - "'marked for deletion' not in __gcp_role_creation_info.msg"
 
-- name: Undelete custom role if name is being reused before removal from GCP
-  loop: "{{ __gcp_role_creation_info.results }}"
-  loop_control:
-    loop_var: __gcp_role_undelete_item
+- name: Undelete Custom Log role if recently marked for deletion
   when:
-    - __gcp_role_undelete_item.deleted is defined
-    - __gcp_role_undelete_item.deleted | bool
+    - __gcp_role_creation_info.deleted is defined
+    - __gcp_role_creation_info.deleted | bool
   ansible.builtin.command: >
     gcloud iam roles
     undelete {{ plat__gcp_log_role_name }}
     --project={{ plat__gcp_project }}
+  register: __gcp_role_undelete
+
+- name: Fetch resulting Custom GCP Log Role status
+  ansible.builtin.command: >
+    gcloud iam roles
+    describe {{ plat__gcp_log_role_name }}
+    --project={{ plat__gcp_project }}
+  register: __gcp_custom_log_role_info
+  failed_when:
+    - __gcp_custom_log_role_info.rc == 1
+    - "'NOT_FOUND:' not in __gcp_custom_log_role_info.stderr"
+
+- name: Fail when custom GCP Log Role is not available
+  ansible.builtin.assert:
+    that:
+      - "'includedPermissions:' in __gcp_custom_log_role_info.stdout"
+      - "'NOT_FOUND' not in __gcp_custom_log_role_info.stderr"
+    quiet: yes
+    fail_msg: |
+      Custom Log Role {{ plat__gcp_log_role_name }} could not be created or undeleted.
+      It is likely that the unique role_id was marked for deletion recently and you are in the GCloud no-reuse window.
+      This no-reuse of a role_id window is typically somewhere from 7-14 days after initial deletion, and lasts 30 days.
+      Please use a different name for your custom Role.
 
 - name: Create Operational GCP Service Accounts
   register: __gcp_identity_info

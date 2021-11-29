@@ -39,6 +39,33 @@
     - name: Remove all AWS VPC networking resources
       when: infra__force_teardown | bool
       block:
+        - name: List VPC Endpoints
+          community.aws.ec2_vpc_endpoint_info:
+            region: "{{ infra__region }}"
+            filters:
+              vpc-id: "{{ infra__aws_vpc_id }}"
+          register: existing_endpoints
+        
+        - name: Delete VPC Endpoints
+          community.aws.ec2_vpc_endpoint:
+            state: absent
+            vpc_endpoint_id: "{{ endpoint.vpc_endpoint_id }}"
+            region: "{{ infra__region }}"
+          loop: "{{ existing_endpoints.vpc_endpoints }}"
+          loop_control:
+            loop_var: endpoint
+            label: "{{ endpoint.vpc_endpoint_id }}"
+
+        - name: Wait for VPC Endpoint Deletion
+          community.aws.ec2_vpc_endpoint_info:
+            region: "{{ infra__region }}"
+            filters:
+              vpc-id: "{{ infra__aws_vpc_id }}"
+          register: existing_endpoints_wait
+          until: existing_endpoints_wait.vpc_endpoints | length == 0
+          retries: 15
+          delay: 10
+
         - name: Handle AWS Elastic Loadbalancers
           when:
             - __infra_ec2_elb_names is defined
@@ -101,6 +128,7 @@
             state: absent
           loop_control:
             loop_var: __eni_adapter
+            label: "{{ __eni_adapter.id }}"
           loop: "{{ __infra_vpc_enis.network_interfaces }}"
 
         - name: Handle AWS Security Groups
@@ -175,6 +203,36 @@
             lookup: id
             state: absent
 
+    - name: Teardown VPC Endpoints
+      when: infra__aws_private_endpoints | bool
+      block:
+        - name: Delete VPC Endpoints
+          community.aws.ec2_vpc_endpoint:
+            state: absent
+            vpc_endpoint_id: "{{ __infra_vpc_endpoint.vpc_endpoint_id }}"
+            region: "{{ infra__region }}"
+          loop: "{{ __infra_vpc_existing_endpoints.vpc_endpoints }}"
+          loop_control:
+            loop_var: __infra_vpc_endpoint
+            label: "{{ __infra_vpc_endpoint.vpc_endpoint_id }}"
+
+        - name: Wait for VPC Endpoint Deletion
+          community.aws.ec2_vpc_endpoint_info:
+            region: "{{ infra__region }}"
+            filters:
+              vpc-id: "{{ infra__aws_vpc_id }}"
+          register: __infra_existing_endpoints_wait
+          until: __infra_existing_endpoints_wait.vpc_endpoints | length == 0
+          retries: 15
+          delay: 10
+
+        - name: Delete VPC Endpoint Security Group
+          amazon.aws.ec2_group:
+            region: "{{ infra__region }}"
+            vpc_id: "{{ infra__aws_vpc_id }}"
+            name: "{{ infra__security_group_vpce_name }}"
+            state: absent
+
     - name: Remove AWS Private Network
       when:
         - infra__tunnel
@@ -216,11 +274,12 @@
             state: absent
             region: "{{ infra__region }}"
             wait: true
-            nat_gateway_id: "{{ item.nat_gateway_id }}"
+            nat_gateway_id: "{{ __aws_ngw_item.nat_gateway_id }}"
             release_eip: true
           register: __aws_ngw_teardown
           loop_control:
-            label: "{{ item.nat_gateway_id }}"
+            loop_var: __aws_ngw_item
+            label: "{{ __aws_ngw_item.nat_gateway_id }}"
           loop: "{{ __aws_all_ngws.result }}"
           ignore_errors: true
 
@@ -228,7 +287,9 @@
           when: __aws_ngw_teardown is defined and __aws_ngw_teardown.results is defined and __aws_ngw_teardown.results | count > 0
           ansible.builtin.fail:
             msg: "Failed to delete a NAT gateway"
-          failed_when: item.rc is defined and item.rc != 1 and ('InvalidAllocationID.NotFound' in item.module_stderr)
+          failed_when: __aws_ngw_teardown_item.rc is defined and __aws_ngw_teardown_item.rc != 1 and ('InvalidAllocationID.NotFound' in __aws_ngw_teardown_item.module_stderr)
+          loop_control:
+            loop_var: __aws_ngw_teardown_item
           loop: "{{ __aws_ngw_teardown.results }}"
 
     - name: Remove AWS Public Network

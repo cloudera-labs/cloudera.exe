@@ -28,7 +28,7 @@
     public_key_id: "{{ plat__public_key_id }}"
     workload_analytics: "{{ plat__workload_analytics }}"
     vpc_id: "{{ plat__aws_vpc_id }}"
-    subnet_ids: "{{ plat__aws_subnet_ids }}"
+    subnet_ids: "{{ plat__aws_public_subnet_ids | union(plat__aws_private_subnet_ids) }}"
     tags: "{{ plat__tags }}"
     tunnel: "{{ plat__tunnel }}"
     endpoint_access_scheme: "{{ plat__endpoint_access_scheme | default(omit) }}"

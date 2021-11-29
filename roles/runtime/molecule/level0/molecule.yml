@@ -1,0 +1,55 @@
+---
+dependency:
+  name: galaxy
+  enabled: true
+  options:
+    force: false
+driver:
+  name: delegated
+  options:
+    managed: false
+    ansible_connection_options:
+      ansible_connection: local
+platforms:
+  - name: placeholder
+provisioner:
+  name: ansible
+  log: true
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks, timer, yaml
+      enable_task_debugger: true
+    ssh_connection:
+      pipelining: false
+  vvv: true
+  playbooks:
+    prepare: ../shared/prepare.yml
+    converge: ../shared/converge.yml
+    cleanup: ../shared/cleanup.yml
+  inventory:
+    host_vars:
+      localhost:
+        globals:
+          admin_password: "@NotSecure456!"
+          name_prefix: ${FOUNDRY_NAME_PREFIX:-r00}
+          infra_type: ${FOUNDRY_INFRA_TYPE:-aws}
+        infra:
+          vpc:
+            name: ${FOUNDRY_NAME_PREFIX:-r00}-test
+          storage:
+            name: ${FOUNDRY_NAME_PREFIX:-r00}-test
+          security_group:
+            knox:
+              name: ${FOUNDRY_NAME_PREFIX:-r00}-test-knox
+            default:
+              name: ${FOUNDRY_NAME_PREFIX:-r00}-test-default
+          aws:
+            region: ${FOUNDRY_AWS_REGION:-us-east-2}
+        env:
+          tunnel: no                   # L0 Networking
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .

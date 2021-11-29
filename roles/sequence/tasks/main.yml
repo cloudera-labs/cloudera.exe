@@ -26,12 +26,20 @@
         - infra
         - plat
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - validate
     - infra
     - plat
     - run
-
+    - ml
+    - dw
+    - opdb
+    - dh
+  
 - name: Validate Platform Configuration
   ansible.builtin.include_role:
     name: cloudera.exe.platform
@@ -41,10 +49,18 @@
         - validate
         - plat
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - validate
     - plat
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Validate Runtime Configuration
   ansible.builtin.include_role:
@@ -54,9 +70,17 @@
       tags:
         - validate
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - validate
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Initialize Runtime Teardown
   ansible.builtin.include_role:
@@ -147,11 +171,19 @@
         - infra
         - plat
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - init
     - infra
     - plat
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Setup Infrastructure
   when: sequence__setup_infra | bool
@@ -163,10 +195,18 @@
         - infra
         - plat
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - infra
     - plat
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Initialize Platform Setup
   when: sequence__setup_plat | bool
@@ -178,10 +218,18 @@
         - init
         - plat
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - init
     - plat
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Setup Platform
   when: sequence__setup_plat | bool
@@ -192,9 +240,17 @@
       tags:
         - plat
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - plat
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Initialize Runtime Setup
   when: sequence__setup_runtime | bool
@@ -205,9 +261,17 @@
       tags:
         - init
         - run
+        - ml
+        - dw
+        - opdb
+        - dh
   tags:
     - init
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
 
 - name: Setup Runtime
   when: sequence__setup_runtime | bool
@@ -219,3 +283,7 @@
         - run
   tags:
     - run
+    - ml
+    - dw
+    - opdb
+    - dh
