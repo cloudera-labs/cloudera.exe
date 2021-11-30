@@ -52,7 +52,7 @@
   loop: "{{ infra__aws_storage_locations }}"
 
 - name: Update AWS Buckets tags (overwrite)
-  when: __infra_aws_storage_tags_list
+  when: __infra_aws_storage_tags_list is defined
   ansible.builtin.command: >
     aws s3api put-bucket-tagging
     --bucket {{ __infra_aws_storage_location_item.bucket }} 
@@ -72,7 +72,7 @@
     permission: private
 
 - name: Update Download Mirror Buckets tags (overwrite)
-  when: infra__create_utility_service and __infra_aws_storage_tags_list
+  when: infra__create_utility_service and __infra_aws_storage_tags_list is defined
   ansible.builtin.command: >
     aws s3api put-bucket-tagging
     --bucket {{ infra__utlity_bucket_name }} 
