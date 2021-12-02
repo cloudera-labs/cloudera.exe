@@ -36,31 +36,7 @@
     dest: "{{ infra__terraform_template_dir }}/infra/variables.tf"
   no_log: false
 
-# NOTE: These don't work because not all variables are defined during teardown
-# ......ALSO they are not needed because we are working off the state file
-# # Apply template for Terraform infra....
-# # ...network resources
-# - name: Generate Terraform infra file for network resources
-#   template:
-#     src: 'template/{{ infra__type }}/infra_{{ infra__type }}_network.tf.j2'
-#     dest: "{{ infra__terraform_template_dir }}/infra/infra_network.tf"
-#   no_log: false
-
-# # ...storage resources
-# - name: Generating Terraform infra file for storage resources
-#   template:
-#     src: 'template/{{ infra__type }}/infra_{{ infra__type }}_storage.tf.j2'
-#     dest: "{{ infra__terraform_template_dir }}/infra/infra_storage.tf"
-#   no_log: false
-
-# # ...compute resources
-# - name: Generating Terraform infra file for compute resources
-#   template:
-#     src: 'template/{{ infra__type }}/infra_{{ infra__type }}_compute.tf.j2'
-#     dest: "{{ infra__terraform_template_dir }}/infra/infra_compute.tf"
-#   no_log: false
-
-- name: Prompt added by jenright 
+- name: Prompt to debug Terraform deployment 
   ansible.builtin.pause:
     prompt: "Terraform infra files for Teardown created in {{ infra__terraform_template_dir }}/infra"
   when: debug_terraform | default(false) | bool

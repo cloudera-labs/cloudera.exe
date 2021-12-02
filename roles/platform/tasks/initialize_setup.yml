@@ -23,8 +23,6 @@
 - name: Include provider-specific initialization setup
   ansible.builtin.include_tasks: "initialize_setup_{{ plat__infra_type | lower }}.yml"
 
-# NOTE: Added by jenright, Terraform 
-# QUESTION: Do we make this generic (i.e. no infra__type)
 - name: Include tasks for provider-specific Terraform initialization
   ansible.builtin.include_tasks: "initialize_{{ plat__infra_type | lower }}_{{ plat__infra_deployment_engine }}.yml"
   when: plat__infra_deployment_engine == 'terraform'

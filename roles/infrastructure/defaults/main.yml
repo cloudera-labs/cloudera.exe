@@ -26,7 +26,6 @@ infra__vpc_svcnet_suffix:           "{{ common__vpc_svcnet_suffix }}"
 infra__vpc_private_subnets_suffix:  "{{ common__vpc_private_subnets_suffix }}"
 infra__vpc_public_subnets_suffix:   "{{ common__vpc_public_subnets_suffix }}"
 
-# NOTE: Added by jenright for Terraform
 # Deployment type
 infra__deployment_engine:                 "{{ common__infra_deployment_engine }}"
 # Location of output from template module which creates Terraform

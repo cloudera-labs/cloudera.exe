@@ -33,7 +33,7 @@ resource "aws_s3_bucket_object" "{{ __aws_storage_object_resource }}" {
 {% endfor %}
 
 # ------- Download Mirror Bucket -------
-# QUESTION: How to not fail if already exists from non-Terraform code.
+# TODO: Don't fail if Mirror Bucket already exists from non-Terraform code.
 # resource "aws_s3_bucket" "{{ infra__utlity_bucket_name }}" {
 #   bucket = "{{ infra__utlity_bucket_name }}"
 #   acl    = "private"
