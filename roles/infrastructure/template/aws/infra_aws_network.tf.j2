@@ -64,7 +64,7 @@ resource "aws_route_table_association" "{{ __aws_public_subnet_item.name }}-asso
 resource "aws_subnet" "{{ __aws_private_subnet_item.name }}" {
     vpc_id                  = aws_vpc.{{ infra__vpc_name }}.id
     cidr_block              = "{{ __aws_private_subnet_item.cidr }}"
-    map_public_ip_on_launch = true
+    map_public_ip_on_launch = false
     availability_zone       = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}"
     tags                    = merge(var.env_tags,{% for key, value in __aws_private_subnet_item.tags.items() %}{ "{{ key }}" = "{{ value }}" },{% endfor %})
 }

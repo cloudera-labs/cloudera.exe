@@ -1,16 +1,6 @@
-# NOTE: We no longer have access & secret key readily available
-# variable "access_key" {
-#   default = " access_key "
-# }
-# variable "secret_key" {
-#   default = " secret_key "
-# }
-
-# NOTE: Added by jenright because we have profile and not access & secret key
 variable "aws_profile" {
-  # TODO: How to make this default if blank
-  # default = "{{ infra__aws_profile | default('default') }}"
-  default = "default"
+  # Profile is default is plat__aws_profile is blank
+  default = "{{ (infra__aws_profile | length > 0) | ternary(infra__aws_profile, 'default') }}"
 }
 
 # Region
