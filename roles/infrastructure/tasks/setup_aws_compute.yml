@@ -67,10 +67,10 @@
         volume_size: 100
         delete_on_termination: yes
     wait: yes
-    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }) }}"
+    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__region, infra__dynamic_inventory_utility_suffix ]) }) }}"
     exact_count: 1
     count_tag:
-      Name: "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}"
+      Name: "{{ '-'.join([infra__namespace, infra__region, infra__dynamic_inventory_utility_suffix ]) }}"
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
     assign_public_ip: yes
 

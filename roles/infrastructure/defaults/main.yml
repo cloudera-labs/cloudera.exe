@@ -36,6 +36,7 @@ infra__private_key_file:                 "{{ globals.ssh.private_key_file | defa
 infra__dynamic_inventory_count:          "{{ globals.dynamic_inventory.vm.count | default(0) }}"
 infra__dynamic_inventory_os:             "{{ globals.dynamic_inventory.vm.os | default('el7') }}"
 infra__dynamic_inventory_vm_suffix:      "{{ infra.dynamic_inventory.vm.suffix | default('vm') }}"
+infra__dynamic_inventory_utility_suffix: "{{ infra.dynamic_inventory.utility_vm.suffix | default('utility_vm') }}"
 infra__dynamic_inventory_vm_type:        "{{ infra.dynamic_inventory.vm.type | default('std') }}"
 infra__dynamic_inventory_storage_type:   "{{ infra.dynamic_inventory.storage.type | default('std') }}"
 infra__dynamic_inventory_storage_size:   "{{ infra.dynamic_inventory.storage.size | default('200') }}"
@@ -49,6 +50,7 @@ infra__teardown_deletes_data:       "{{ infra.teardown.delete_data | default(Fal
 infra__teardown_deletes_ssh_key:    "{{ infra.teardown.delete_ssh_key | default(False) }}"
 infra__teardown_deletes_network:    "{{ infra.teardown.delete_network | default(True) }}"
 infra__teardown_download_mirror:    "{{ infra.teardown.delete_mirror | default(False) }}"
+infra__teardown_utility_vm:         "{{ infra.teardown.delete_utility_vm | default(True) }}"
 
 infra__region:                      "{{ common__region }}"
 

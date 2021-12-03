@@ -47,10 +47,6 @@
           - key: "vpc-id"
             value: "{{ infra__aws_vpc_id }}"
 
-    - name: Update fact for discovered EC2 Compute inventory
-      ansible.builtin.set_fact:
-        infra__discovered_compute_inventory: "{{ infra__discovered_compute_inventory + __infra_vpc_ec2_instances.instances }}"
-
     - name: List AWS EKS clusters
       register: __infra_eks_cluster_list
       command: "aws eks list-clusters --region {{ infra__region }}"
