@@ -104,10 +104,36 @@
   retries: 360
   delay: 10
 
-- name: Handle Compute Removal if Discovered
-  when: infra__discovered_compute_inventory | count > 0
+- name: Handle Dynamic Inventory Compute Removal if Discovered
+  when:
+    - __infra_dynamic_inventory_discovered is defined
+    - __infra_dynamic_inventory_discovered.instances is defined
+    - __infra_dynamic_inventory_discovered.instances | count > 0
   amazon.aws.ec2:
     region: "{{ infra__region }}"
     wait: yes
     state: absent
-    instance_ids: "{{ infra__discovered_compute_inventory | community.general.json_query('[*].instance_id') | list | unique }}"
+    instance_ids: "{{ __infra_dynamic_inventory_discovered.instances | community.general.json_query('[*].instance_id') | list | unique }}"
+
+- name: Handle Utility VM Compute Removal if Discovered
+  when:
+    - __infra_utility_compute_discovered is defined
+    - __infra_utility_compute_discovered.instances is defined
+    - __infra_utility_compute_discovered.instances | count > 0
+    - infra__teardown_utility_vm | bool
+  amazon.aws.ec2:
+    region: "{{ infra__region }}"
+    wait: yes
+    state: absent
+    instance_ids: "{{ __infra_utility_compute_discovered.instances | community.general.json_query('[*].instance_id') | list | unique }}"
+
+- name: Handle VPC Compute Removal if Discovered
+  when:
+    - __infra_vpc_ec2_instances is defined
+    - __infra_vpc_ec2_instances.instances is defined
+    - __infra_vpc_ec2_instances.instances | count > 0
+  amazon.aws.ec2:
+    region: "{{ infra__region }}"
+    wait: yes
+    state: absent
+    instance_ids: "{{ __infra_vpc_ec2_instances.instances | community.general.json_query('[*].instance_id') | list | unique }}"
