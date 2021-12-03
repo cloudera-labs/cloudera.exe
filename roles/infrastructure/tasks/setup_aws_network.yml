@@ -321,6 +321,7 @@
         - __aws_interface_vpc_endpoints.results is defined
       command: >
         aws ec2 modify-vpc-endpoint
+        --region {{ infra__region }}
         --vpc-endpoint-id {{ __infra_vpce_loop_var.result.vpc_endpoint_id }}
         --add-subnet-ids {{ infra__aws_public_subnet_ids | join(' ') }} 
         --add-security-group-ids {{ __aws_vpce_security_group_info.group_id }}
