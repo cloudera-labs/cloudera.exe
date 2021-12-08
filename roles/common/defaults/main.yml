@@ -58,8 +58,7 @@ common__unique_storage_name_suffix:       "{{ globals.storage.name | default((co
 
 # Infra
 common__infra_type:                       "{{ globals.infra_type | default('aws') }}"
-common__aws_region:                       "{{ globals.region | default('eu-west-1') }}"
-common__aws_profile:                      "{{ globals.profile | default('') }}"
+common__aws_profile:                      "{{ globals.aws_profile | default('') }}"
 common__public_key_file:                  "{{ globals.ssh.public_key_file | default('') }}"
 common__namespace_cdp:                    "{{ globals.namespace_cdp | default([common__namespace, common__namespace_unique_suffix] | join('-')) }}"
 common__tags:                             "{{ globals.tags | default({}) }}"
@@ -89,6 +88,7 @@ common__data_path:                        "{{ infra.storage.path.data | default(
 common__ranger_audit_path:                "{{ infra.storage.path.ranger_audit | default('ranger/audit') }}"
 
 # AWS Infra
+common__aws_region:                       "{{ infra.aws.region | default('eu-west-1') }}"
 common__aws_vpc_id:                       "{{ infra.aws.vpc.existing.vpc_id | default('') }}"
 common__aws_public_subnet_ids:            "{{ infra.aws.vpc.existing.public_subnet_ids | default([]) }}"
 common__aws_private_subnet_ids:           "{{ infra.aws.vpc.existing.private_subnet_ids | default([]) }}"
