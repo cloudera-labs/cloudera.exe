@@ -21,7 +21,7 @@
   loop_control:
     loop_var: __infra_compute_instance_item
   loop: "{{ range(0, infra__dynamic_inventory_count | int ) | list }}"
-  amazon.aws.ec2:
+  amazon.aws.ec2_instance:
     region: "{{ infra__region }}"
     group_id: "{{ infra__aws_security_group_default_id }}"
     key_name: "{{ infra__public_key_id }}"
@@ -53,7 +53,7 @@
 - name: Create localised Utility Instance to process Downloads
   when: infra__create_utility_service
   register: __infra_utility_vm_instance
-  amazon.aws.ec2:
+  amazon.aws.ec2_instance:
     region: "{{ infra__region }}"
     group_id: "{{ infra__aws_security_group_default_id }}"
     key_name: "{{ infra__public_key_id }}"
