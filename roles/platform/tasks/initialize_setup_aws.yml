@@ -78,7 +78,6 @@
 - name: Handle AWS Public and Private VPC Subnets if not defined
   when: not plat__aws_public_subnet_ids or not plat__aws_private_subnet_ids
   block:
-    # Search using a wildcard on the subnet Name tag {{ plat__namespace }}*
     - name: Query AWS Subnets
       amazon.aws.ec2_vpc_subnet_info:
         region: "{{ plat__region }}"

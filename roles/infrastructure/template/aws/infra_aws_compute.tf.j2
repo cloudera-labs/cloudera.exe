@@ -59,5 +59,4 @@ resource "aws_instance" "{{ '-'.join([infra__namespace, infra__region, 'utility_
   tags                        = merge({{ infra__dynamic_inventory_tags  | to_json }},{Name = "{{ '-'.join([infra__namespace, infra_region, 'utility_vm' ]) }}"}) 
 }
 
-TODO: Need to add Utility Instance to host group
 {% endif %}

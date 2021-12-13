@@ -22,23 +22,23 @@
 
 - name: Check if Terraform workspace directory exists
   ansible.builtin.stat: 
-    path: "{{ plat__terraform_template_dir }}/workspace/plat"
+    path: "{{ plat__terraform_template_dir }}/plat"
   register: workdir
 
 - name: Ensure the Terraform workspace directory exists
   ansible.builtin.copy:
     src: "{{ plat__terraform_template_dir }}/plat/"
-    dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    dest: "{{ plat__terraform_workspace_dir }}/plat"
   # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
 - name: Prompt to debug Terraform deployment 
   ansible.builtin.pause:
-    prompt: "Ready to do Terraform destroy on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+    prompt: "Ready to do Terraform destroy on role files in {{ plat__terraform_workspace_dir }}/plat"
   when: debug_terraform | default(false) | bool
 
 - name: Destroy Terraform authz resources
   community.general.terraform:
-    project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    project_path: "{{ plat__terraform_workspace_dir }}/plat"
     state: "absent"
     force_init: yes
   register: tf_result
@@ -58,21 +58,5 @@
 
 - name: Remove the Terraform workspace directory
   ansible.builtin.file:
-    path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    path: "{{ plat__terraform_workspace_dir }}/plat"
     state: absent
-    
-# TODO: Figure out how to handle below conditional with Terraform
-# - name: Tear down AWS Cross Acount
-#   when: plat__teardown_deletes_xaccount
-#   block:
-#     - name: Remove AWS Cross Account Role
-#       community.aws.iam_role:
-#         name: "{{ plat__aws_xaccount_role_name }}"
-#         region: "{{ plat__region }}"
-#         state: absent
-
-#     - name: Remove AWS Cross Account Policy
-#       community.aws.iam_managed_policy:
-#         region: "{{ plat__region }}"
-#         policy_name: "{{ plat__aws_xaccount_policy_name }}"
-#         state: absent

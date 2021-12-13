@@ -16,13 +16,13 @@
 
 - name: Check if Terraform workspace directory exists
   ansible.builtin.stat: 
-    path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    path: "{{ plat__terraform_workspace_dir }}/plat"
   register: workdir
 
 - name: Ensure the Terraform workspace directory exists
   ansible.builtin.copy:
     src: "{{ plat__terraform_template_dir }}/plat/"
-    dest: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    dest: "{{ plat__terraform_workspace_dir }}/plat"
   # when: not workdir.stat.exists # NOTE: When uncommented won't override workspace dir if any changes to .tf are made.
 
 - name: Copy Terraform plat code to the artefact directory
@@ -32,12 +32,12 @@
 
 - name: Prompt to debug Terraform deployment 
   ansible.builtin.pause:
-    prompt: "Ready to do Terraform apply on role files in {{ plat__terraform_workspace_dir }}/workspace/plat"
+    prompt: "Ready to do Terraform apply on role files in {{ plat__terraform_workspace_dir }}/plat"
   when: debug_terraform | default(false) | bool
 
 - name: Applying Terraform
   community.general.terraform:
-    project_path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    project_path: "{{ plat__terraform_workspace_dir }}/plat"
     state: "present"
     force_init: yes
   register: tf_result
@@ -57,12 +57,11 @@
 
 - name: Remove the Terraform workspace directory when using remote state
   ansible.builtin.file:
-    path: "{{ plat__terraform_workspace_dir }}/workspace/plat"
+    path: "{{ plat__terraform_workspace_dir }}/plat"
     state: absent
   when: plat__terraform_state_storage in ['remote_s3']
 
 # Now need to get create CDP Cross Account Credential
-# TODO: Is there a better place to put this?
 # First get the AWS Cross Account Role
 - name: Query the AWS Cross Account Role
   community.aws.iam_role_info:

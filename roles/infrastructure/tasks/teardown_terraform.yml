@@ -16,23 +16,23 @@
 
 - name: Check if Terraform workspace directory exists
   ansible.builtin.stat: 
-    path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    path: "{{ infra__terraform_workspace_dir }}/infra"
   register: workdir
 
 - name: Ensure the Terraform workspace directory exists
   ansible.builtin.copy:
     src: "{{ infra__terraform_template_dir }}/infra/"
-    dest: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    dest: "{{ infra__terraform_workspace_dir }}/infra"
   # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
 
 - name: Prompt to debug Terraform deployment 
   ansible.builtin.pause:
-    prompt: "Ready to do Terraform destroy on infra files in {{ infra__terraform_workspace_dir }}/workspace/infra"
+    prompt: "Ready to do Terraform destroy on infra files in {{ infra__terraform_workspace_dir }}/infra"
   when: debug_terraform | default(false) | bool
 
 - name: Destroy Terraform infra resources
   community.general.terraform:
-    project_path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    project_path: "{{ infra__terraform_workspace_dir }}/infra"
     state: "absent"
     force_init: yes
   register: tf_result
@@ -52,5 +52,5 @@
 
 - name: Remove the Terraform workspace directory
   ansible.builtin.file:
-    path: "{{ infra__terraform_workspace_dir }}/workspace/infra"
+    path: "{{ infra__terraform_workspace_dir }}/infra"
     state: absent

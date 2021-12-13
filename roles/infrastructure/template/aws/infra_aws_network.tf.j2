@@ -140,7 +140,7 @@ resource "aws_security_group" "{{ __security_group_name_item }}" {
       self      = true
   }
 
-{# ******* NOTE: HERE COMES THE MESSY PART! *******#}
+{# ******* NOTE: HANDLING OF SECURITY GROUP RULES *******#}
 {# Need to loop over each security group rule:#}
 {# Need to Process & Translate *CIDR Block* according to following rules:#}
 {#         * Can be empty in which case remove entry - DONE#}
