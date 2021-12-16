@@ -166,6 +166,7 @@
         label: "{{ config.name }}"
 
 - name: Prepare for CDP DE Service experiences
+  tags: de
   when: run__include_de
   block:
     - name: Construct CDP DE Service configurations
@@ -180,4 +181,23 @@
       loop: "{{ run__de_definitions }}"
       loop_control:
         loop_var: __de_config
+        label: "{{ config.name }}"
+
+- name: Prepare for CDP DF Service experiences
+  tags: df
+  when:
+    - run__include_df
+    - run__df_deployments | length > 0
+  block:
+    - name: Construct CDP DF Deployment configurations
+      ansible.builtin.set_fact:
+        run__df_configs: "{{ run__df_configs | default([]) | union([config]) }}"
+      vars:
+        include: "{{ lookup('template', __df_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
+        config:
+          name: "{{ __df_config.name | default([run__namespace_cdp, __df_config.flow_name[::2] | replace(' ','') ] | join('-')) }}"
+          raw: "{{ __df_config }}"
+      loop: "{{ run__df_deployments }}"
+      loop_control:
+        loop_var: __df_config
         label: "{{ config.name }}"

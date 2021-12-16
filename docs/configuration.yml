@@ -33,6 +33,37 @@ df:
     persist:
   force_delete:
   terminate_deployments:
+  tags:
+  deployments:
+    - name:
+      flow_ver_crn:
+      size:
+      static_node_count:
+      autoscale:
+      autoscale_nodes_min:
+      autoscale_nodes_max:
+      nifi_ver:
+      autostart_flow:
+      parameter_groups:
+        - name:
+          parameters:
+            - name:
+              value:
+              assetReferences: [str, ...]
+      kpis:
+        - metricId:
+          componentId:
+          alert:
+            thresholdMoreThan:
+              unitId:
+              value:
+            thresholdLessThan:
+              unitId:
+              value:
+            frequencyTolerance:
+              value:
+                unit:
+                  id: SECONDS|MINUTES|HOURS|DAYS
 dw:
   definitions:
   suffix:

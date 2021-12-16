@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Request Service Deployments
 - name: Request CDP Datahub deployments
   when: run__include_datahub
   tags: dh
@@ -63,6 +64,7 @@
 
 - name: Execute CDP DE Service experiences setup
   when: run__include_de
+  tags: de
   cloudera.cloud.de:
     name: "{{ __de_config_item.name }}"
     env: "{{ run__env_name }}"
@@ -117,9 +119,11 @@
     kube_ip_ranges: "{{ run__df_kube_ip_ranges }}"
     cluster_subnets: "{{ run__df_cluster_subnets }}"
     loadbalancer_subnets: "{{ run__df_lb_subnets }}"
+    tags: "{{ run__df_tags }}"
     state: present
     wait: no
 
+# Wait for Service Deployments
 - name: Wait for CDP Datahub deployments to complete
   when: run__include_datahub
   tags: dh
@@ -150,6 +154,7 @@
 
 - name: Wait for CDP DE Service experiences to complete
   when: run__include_de
+  tags: de
   ansible.builtin.async_status:
     jid: "{{ __de_build.ansible_job_id }}"
   loop_control:
@@ -182,8 +187,10 @@
     env_crn: "{{ run__cdp_env_crn }}"
     wait: yes
 
+# Request Service child deployments
 - name: Create CDP DE Virtual clusters
   when: run__include_de
+  tags: de
   cloudera.cloud.de_virtual_cluster:
     cluster_name: "{{ __de_vc_config_item.0.name }}"
     env: "{{ run__env_name }}"
@@ -206,8 +213,36 @@
     index_var: __de_vc_index
     label: "{{ __de_vc_config_item.0.name | default ('None') }}"
 
+- name: Create CDP DF Deployments
+  when: run__include_df
+  tags: df
+  cloudera.cloud.df_deployment:
+    name: "{{ __df_deploy_item.name }}"
+    df_name: "{{ run__env_name }}"
+    flow_ver_crn: "{{ __df_deploy_item.raw.flow_ver_crn | default(omit) }}"
+    flow_name: "{{ __df_deploy_item.raw.flow_name | default(omit) }}"
+    flow_ver: "{{ __df_deploy_item.raw.flow_ver | default(omit) }}"
+    size: "{{ __df_deploy_item.raw.size | default(omit) }}"
+    static_node_count: "{{ __df_deploy_item.raw.static_node_count | default(omit) }}"
+    autoscale: "{{ __df_deploy_item.raw.autoscale | default(omit) }}"
+    autoscale_nodes_min: "{{ __df_deploy_item.raw.autoscale_nodes_min | default(omit) }}"
+    autoscale_nodes_max: "{{ __df_deploy_item.raw.autoscale_nodes_max | default(omit) }}"
+    nifi_ver: "{{ __df_deploy_item.raw.nifi_ver | default(omit) }}"
+    autostart_flow: "{{ __df_deploy_item.raw.autostart_flow | default(omit) }}"
+    parameter_groups: "{{ __df_deploy_item.raw.parameter_groups | default(omit) }}"
+    kpis: "{{ __df_deploy_item.raw.kpis | default(omit) }}"
+  async: 720
+  poll: 0
+  register: __df_deployments
+  loop: "{{ run__df_configs }}"
+  loop_control:
+    loop_var: __df_deploy_item
+    label: "{{ __df_deploy_item.name }}"
+
+# Wait for Service child deployments
 - name: Wait for CDP DE Virtual cluster setup to complete
   when: run__include_de
+  tags: de
   ansible.builtin.async_status:
     jid: "{{ __de_vc_build.ansible_job_id }}"
   register: __de_vc_builds_async
@@ -218,3 +253,17 @@
   loop_control:
     loop_var: __de_vc_build
     label: "{{ __de_vc_build.__de_vc_config_item.0.name | default ('None') }}"
+
+- name: Wait for CDP DF Deployments to complete
+  when: run__include_df
+  tags: df
+  ansible.builtin.async_status:
+    jid: "{{ __df_deployment.ansible_job_id }}"
+  register: __df_deployments_async
+  until: __df_deployments_async.finished
+  retries: 60
+  delay: 15
+  loop: "{{ __df_deployments.results }}"
+  loop_control:
+    loop_var: __df_deployment
+    label: "{{ __df_deployment.__df_deploy_item.0.name | default ('None') }}"

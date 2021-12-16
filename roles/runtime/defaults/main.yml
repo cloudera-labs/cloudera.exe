@@ -83,7 +83,9 @@ run__df_cluster_subnets:            "{{ df.cluster_subnets | default([]) }}"
 run__df_lb_subnets:                 "{{ df.loadbalancer_subnets | default([]) }}"
 run__df_persist:                    "{{ df.teardown.persist | default(False) }}"
 run__df_force_delete:               "{{ df.force_delete | default(run__force_teardown) }}"
-run__df_terminate_deployments:      "{{ df.terminate_deployments | default(run__force_teardown) }}"
+run__df_terminate_deployments:      "{{ df.terminate_deployments | default(True) }}"
+run__df_tags:                       "{{ df.tags | default(common__tags) }}"
+run__df_deployments:                "{{ df.deployments | default([]) }}"
 
 # Deploy
 run__include_ml:                     "{{ common__include_ml }}"
