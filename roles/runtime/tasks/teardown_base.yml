@@ -190,7 +190,7 @@
   retries: 120
   delay: 30
 
-- name: Wait for CDP Dataflow deployment to decommission
+- name: Wait for CDP Dataflow Service to decommission
   when:
     - run__include_df
     - run__df_service_info.services | length > 0
@@ -198,8 +198,22 @@
     df_crn: "{{ __df_teardown_wait_item.crn }}"
     persist: "{{ run__df_persist }}"
     force: "{{ run__df_force_delete }}"
+    terminate: "{{ run__df_terminate_deployments }}"
     state: absent
     wait: yes
   loop_control:
     loop_var: __df_teardown_wait_item
   loop: "{{ run__df_service_info.services }}"
+
+- name: Ensure requested CDP DF ReadyFlow imports are deleted from Tenant
+  when:
+    - run__include_df
+    - run__df_delete_readyflows | bool
+  tags: df
+  cloudera.cloud.df_readyflow:
+    name: "{{ __df_readyflow_item.flow_name }}"
+    state: absent
+  loop: "{{ run__df_readyflows }}"
+  loop_control:
+    loop_var: __df_readyflow_item
+    label: "{{ __df_readyflow_item.flow_name }}"

@@ -213,6 +213,16 @@
     index_var: __de_vc_index
     label: "{{ __de_vc_config_item.0.name | default ('None') }}"
 
+- name: Ensure requested CDP DF ReadyFlows are imported
+  when: run__include_df
+  tags: df
+  cloudera.cloud.df_readyflow:
+    name: "{{ __df_readyflow_item.flow_name }}"
+  loop: "{{ run__df_readyflows }}"
+  loop_control:
+    loop_var: __df_readyflow_item
+    label: "{{ __df_readyflow_item.flow_name }}"
+
 - name: Create CDP DF Deployments
   when: run__include_df
   tags: df
