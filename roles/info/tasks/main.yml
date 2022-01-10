@@ -80,6 +80,11 @@
     env:  "{{ info__env_name }}"
   register: __opdb_info
 
+- name: Query CDP DFX
+  cloudera.cloud.df_service_info:
+    name:  "{{ info__env_name }}"
+  register: __df_info
+
 - name: Set facts for the CDP deployment details
   ansible.builtin.set_fact:
     deployment:
@@ -87,6 +92,7 @@
       datalake: "{{ __datalake_info.datalakes | first | default({}) }}"
       datahubs: "{{ __datahubs_info.datahubs }}"
       workspaces: "{{ __ml_info.workspaces }}"
+      dataflow: "{{ __df_info.services }}"
       services: "{{ __de_info.services }}"
       operational_dbs: "{{ __opdb_info.databases }}"
 

@@ -224,7 +224,9 @@
     label: "{{ __df_readyflow_item.flow_name }}"
 
 - name: Create CDP DF Deployments
-  when: run__include_df
+  when:
+    - run__include_df
+    - run__df_configs is defined
   tags: df
   cloudera.cloud.df_deployment:
     name: "{{ __df_deploy_item.name }}"
@@ -265,7 +267,9 @@
     label: "{{ __de_vc_build.__de_vc_config_item.0.name | default ('None') }}"
 
 - name: Wait for CDP DF Deployments to complete
-  when: run__include_df
+  when:
+    - run__include_df
+    - run__df_configs is defined
   tags: df
   ansible.builtin.async_status:
     jid: "{{ __df_deployment.ansible_job_id }}"
