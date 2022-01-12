@@ -133,7 +133,7 @@ infra__azure_netapp_account_name:   "{{ common__azure_netapp_account_name }}"
 infra__azure_netapp_pool_name:      "{{ common__azure_netapp_pool_name }}"
 infra__azure_netapp_vol_name:       "{{ common__azure_netapp_vol_name }}"
 
-infra__azure_netapp_pool_size:      "{{ infra.azure.netapp.pool.size | default(4) }}"
+infra__azure_netapp_pool_size:      "{{ infra.azure.netapp.pool.size | default(1) }}" # 4TB 'chunks'
 infra__azure_netapp_pool_type:      "{{ infra.azure.netapp.pool.type | default('Standard') }}"
 infra__azure_netapp_vol_size:       "{{ infra.azure.netapp.volume.size | default(500) }}"
 infra__azure_netapp_vol_type:       "{{ infra.azure.netapp.volume.type | default('Standard') }}"

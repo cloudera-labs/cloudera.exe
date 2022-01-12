@@ -91,7 +91,7 @@
         name: "{{ infra__azure_netapp_pool_name }}"
         state: present
         location: "{{ infra__region }}"
-        size: "{{ infra__azure_netapp_pool_size }}"
+        size: "{{ infra__azure_netapp_pool_size | int }}"
         service_level: "{{ infra__azure_netapp_pool_type }}"
 
     - name: Handle Azure NetApp Volume
