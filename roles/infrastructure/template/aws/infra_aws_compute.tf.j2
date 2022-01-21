@@ -29,7 +29,7 @@ resource "aws_instance" "{{ '-'.join([infra__namespace, infra__dynamic_inventory
   associate_public_ip_address = true
 
   {# to_json is used to convert single quotes around IP to double #}
-  tags                        = merge({{ infra__dynamic_inventory_tags  | to_json }},{Name = "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, '%02d' | format(__infra_compute_instance_item)]) }}"}) 
+  tags                        = merge({{ infra__dynamic_inventory_tags  | to_json }},{Name = "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }}"}) 
 
 }
 {% endfor %}

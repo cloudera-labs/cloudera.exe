@@ -61,6 +61,26 @@
     state: absent
   when: infra__terraform_state_storage in ['remote_s3']
 
+# Get information about Dynamic Inventory VMs if created via Terraform
+- name: Fetch EC2 Instance info for Dynamic Inventory Nodes
+  register: __infra_dynamic_inventory_discovered
+  community.aws.ec2_instance_info:
+    region: "{{ infra__region }}"
+    filters: "{{ __filters | items2dict }}"
+  vars:
+    __filters:
+      - key: "tag:{{ infra__dynamic_inventory_tag_key }}"
+        value: "{{ infra__dynamic_inventory_tag_value }}*"
+
+- name: Create output Dictionary for producing Static Inventory artefact
+  ansible.builtin.set_fact:
+    infra__dynamic_inventory_host_entries: "{{ infra__dynamic_inventory_host_entries | default([]) | union([host_entry]) }}"
+  vars:
+    host_entry: "{{ [__infra_di_item.private_dns_name, 'ansible_host=' + __infra_di_item.public_ip_address, infra__dynamic_inventory_connectors] | join(' ') }}"
+  loop: "{{ __infra_dynamic_inventory_discovered.instances }}"
+  loop_control:
+    loop_var: __infra_di_item
+
 # If created Utility Instance via Terraform then
 # need to get it's info and add to an Ansible host group
 - name: Add Utility Instance to host group
