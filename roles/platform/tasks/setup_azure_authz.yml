@@ -193,7 +193,7 @@
   until: __infra_az_sp_assign_result is not failed
   retries: 3
   delay: 3
-  azure.azcollection.azure_rm_roleassignment: # This Azure module is not idempotent at all it seems?
+  azure.azcollection.azure_rm_roleassignment: # This Azure module is not idempotent at all it seems? We have made it so... see error catching below
     state: present
     scope: "{{ __azure_rl_assgn_item.scope }}"
     name: "{{ __azure_rl_assgn_item.name }}"
@@ -233,3 +233,7 @@
   loop_control:
     loop_var: __azure_rl_assgn_item
     label: "{{ __azure_rl_assgn_item.desc }}"
+  failed_when:
+    - "'rc' in __infra_az_sp_assign_result" 
+    - __infra_az_sp_assign_result.rc != 0
+    - "'The role assignment already exists' not in __infra_az_sp_assign_result.module_stderr"
