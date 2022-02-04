@@ -35,8 +35,3 @@
     src: 'template/{{ infra__type }}/terraform_variables.tf.j2'
     dest: "{{ infra__terraform_template_dir }}/infra/variables.tf"
   no_log: false
-
-- name: Prompt to debug Terraform deployment 
-  ansible.builtin.pause:
-    prompt: "Terraform infra files for Teardown created in {{ infra__terraform_template_dir }}/infra"
-  when: debug_terraform | default(false) | bool

@@ -56,8 +56,3 @@
   ansible.builtin.file:
     path: "{{ __aws_policy_tmpdir.path }}"
     state: absent
-
-- name: Prompt to debug Terraform deployment 
-  ansible.builtin.pause:
-    prompt: "Terraform role & policy files for Teardown created in {{ plat__terraform_template_dir }}/plat"
-  when: debug_terraform | default(false) | bool

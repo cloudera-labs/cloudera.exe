@@ -23,12 +23,6 @@
   ansible.builtin.copy:
     src: "{{ infra__terraform_template_dir }}/infra/"
     dest: "{{ infra__terraform_workspace_dir }}/infra"
-  # when: not workdir.stat.exists # TODO: This won't override if any changes to .tf are made. Good or Bad?
-
-- name: Prompt to debug Terraform deployment 
-  ansible.builtin.pause:
-    prompt: "Ready to do Terraform destroy on infra files in {{ infra__terraform_workspace_dir }}/infra"
-  when: debug_terraform | default(false) | bool
 
 - name: Destroy Terraform infra resources
   community.general.terraform:
@@ -39,11 +33,6 @@
   retries: 3
   delay: 10
   until: tf_result is succeeded
-
-- name: Prompt to debug Terraform deployment 
-  ansible.builtin.pause:
-    prompt: "Terraform destroy on infra files complete. Check AWS Console."
-  when: debug_terraform | default(false) | bool
 
 - name: Remove the Terraform template directory
   ansible.builtin.file:

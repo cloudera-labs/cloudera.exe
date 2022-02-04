@@ -75,8 +75,3 @@
     src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
     dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"
   no_log: false
-
-- name: Prompt to debug Terraform deployment 
-  ansible.builtin.pause:
-    prompt: "Terraform role & policy files created in {{ plat__terraform_template_dir }}/plat"
-  when: debug_terraform | default(false) | bool

@@ -62,8 +62,3 @@
     src: 'template/{{ infra__type }}/infra_{{ infra__type }}_compute.tf.j2'
     dest: "{{ infra__terraform_template_dir }}/infra/infra_compute.tf"
   no_log: false
-
-- name: Prompt to debug Terraform deployment 
-  ansible.builtin.pause:
-    prompt: "Terraform infra files created in {{ infra__terraform_template_dir }}/infra"
-  when: debug_terraform | default(false) | bool
