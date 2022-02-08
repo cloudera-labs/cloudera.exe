@@ -109,7 +109,7 @@
         label: "{{ __infra_asg_filter_item.auto_scaling_group_name }}"
 
     - name: List all AWS Elastic Loadbalancers
-      community.aws.ec2_elb_info:
+      community.aws.elb_classic_lb_info:
         region: "{{ infra__region }}"
       register: __infra_ec2_elbs
 

@@ -60,7 +60,7 @@
     - infra__force_teardown | bool
     - __infra_aws_rds_instances is defined
     - __infra_aws_rds_instances | length > 0
-  community.aws.rds:
+  community.aws.rds_instance:
     command: delete
     region: "{{ infra__region }}"
     instance_name: "{{ __infra_rds_remove_item.db_instance_identifier }}"
