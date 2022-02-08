@@ -117,6 +117,9 @@ env:
         data:
         logs:
       suffix:
+    use_custom_role:
+    rg_scope:
+    single_resource_group:
   cdp:
     admin_group:
       name:

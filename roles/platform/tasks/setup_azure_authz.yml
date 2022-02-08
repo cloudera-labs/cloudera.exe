@@ -14,6 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Handle Azure Cross Account Role
+  register: __azure_xaccount_role_info
+  azure.azcollection.azure_rm_roledefinition:  # This version fails idempotence if a description is set
+    state: present
+    name: "{{ plat__azure_xaccount_role_name }}"
+    assignable_scopes: "/subscriptions/{{ plat__azure_subscription_id }}"
+    permissions:
+      - actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('Actions') }}"
+        data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('DataActions') }}"
+        not_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotActions') }}"
+        not_data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotDataActions') }}"
+
 - name: Ensure Azure Cross Account App and Credential are Deployed
   when: plat__azure_xaccount_app_uuid is undefined or plat__xacccount_credential_name not in plat__cdp_credentials_list
   block:
@@ -32,16 +44,15 @@
         - name: Wait for consistency
           ansible.builtin.pause:
             seconds: "{{ plat__azure_consistency_wait }}"
-
-    # Owner role is required for DWX if you are thinking of modifying this task
+    
     - name: Request Azure Cross Account App Creation
       no_log: True
       register: __azure_xaccount_app_info
       command: >
         az ad sp create-for-rbac
         --name {{ plat__azure_xaccount_app_name }}
-        --role {{ plat__azure_roles.owner }}
-        --scopes {{ plat__azure_metagroup_uri }}
+        --role {{ plat__azure_xaccount_use_custom_role | ternary(__azure_xaccount_role_info.id, plat__azure_roles.contrib) }}
+        --scope {{ plat__azure_xaccount_rg_scope | ternary(plat__azure_metagroup_uri, plat__azure_subscription_uri) }} 
 
     - name: Register Azure Cross Account App info
       no_log: True
@@ -95,22 +106,6 @@
         tenant: "{{ plat__azure_tenant_id }}"
         application: "{{ plat__azure_xaccount_app_uuid }}"
         secret: "{{ __azure_xaccount_app_pword }}"
-  
-- name: Handle Azure Cross Account Role
-  register: __azure_xaccount_role_info
-  azure.azcollection.azure_rm_roledefinition:  # This version fails idempotence if a description is set
-    state: present
-    name: "{{ plat__azure_xaccount_role_name }}"
-    assignable_scopes: "/subscriptions/{{ plat__azure_subscription_id }}"
-    permissions:
-      - actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('Actions') }}"
-        data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('DataActions') }}"
-        not_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotActions') }}"
-        not_data_actions: "{{ lookup('file', __azure_policy_document.dest ) | from_json | community.general.json_query('NotDataActions') }}"
-
-- name: Set Azure Cross Account Role URI
-  ansible.builtin.set_fact:
-    plat__azure_xaccount_role_uri: "{{ __azure_xaccount_role_info.id }}"
 
 - name: Request creation of Azure Managed Identities
   when: ( __azure_identity_list_names is undefined ) or ( __azure_msi_item not in __azure_identity_list_names )
@@ -198,7 +193,7 @@
   until: __infra_az_sp_assign_result is not failed
   retries: 3
   delay: 3
-  azure.azcollection.azure_rm_roleassignment: # This Azure module is not idempotent at all it seems?
+  azure.azcollection.azure_rm_roleassignment: # This Azure module is not idempotent at all it seems? We have made it so... see error catching below
     state: present
     scope: "{{ __azure_rl_assgn_item.scope }}"
     name: "{{ __azure_rl_assgn_item.name }}"
@@ -235,16 +230,10 @@
       scope: "{{ plat__azure_datapath_uri }}"
       assignee: "{{ __azure_ranger_audit_identity_uuid }}"
       desc: Assign Storage Blob Data Contributor Role to Ranger Role at Data Container level
-    - role: "{{ __azure_contributor_role_uri }}"
-      name: "{{ plat__azure_xaccount_contributor_assn_name }}"
-      scope: "{{ plat__azure_subscription_uri }}"
-      assignee: "{{ plat__azure_application_service_principal_objuuid }}"
-      desc: Assign top level Contributor Role to Cross Account App
-    - role: "{{ __azure_xaccount_role_uri }}"
-      name: "{{ plat__azure_xaccount_role_assn_name }}"
-      scope: "{{ plat__azure_subscription_uri }}"
-      assignee: "{{ plat__azure_application_service_principal_objuuid }}"
-      desc: Assign Cross Account Role to Cross Account App
   loop_control:
     loop_var: __azure_rl_assgn_item
     label: "{{ __azure_rl_assgn_item.desc }}"
+  failed_when:
+    - "'rc' in __infra_az_sp_assign_result" 
+    - __infra_az_sp_assign_result.rc != 0
+    - "'The role assignment already exists' not in __infra_az_sp_assign_result.module_stderr"
