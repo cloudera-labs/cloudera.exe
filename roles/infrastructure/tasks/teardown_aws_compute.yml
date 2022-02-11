@@ -106,7 +106,7 @@
 
 - name: Handle Compute Removal if Discovered
   when: infra__discovered_compute_inventory | count > 0
-  amazon.aws.ec2:
+  amazon.aws.ec2_instance:
     region: "{{ infra__region }}"
     wait: yes
     state: absent
