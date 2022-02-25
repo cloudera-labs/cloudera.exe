@@ -1,0 +1,73 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Mandatory auth parameters for AWS
+  ansible.builtin.assert:
+    that:
+      - "{{ __auth_fact_item }} is defined"
+      - "{{ __auth_fact_item }} is string"
+      - "{{ __auth_fact_item }} | trim | length > 0"
+    fail_msg: "Authentication parameter, '{{ __auth_fact_item }}', is invalid."
+    quiet: yes
+  loop_control:
+    loop_var: __auth_fact_item
+  loop:
+    - plat__public_key_id
+
+- name: Confirm that required Terraform variables are defined
+  block:
+  - name: Check plat__terraform_template_dir
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_template_dir is defined"
+        - "plat__terraform_template_dir | length > 0"
+      fail_msg: "Required plat__terraform_template_dir variable for Terraform is not valid."
+      quiet: yes
+
+  - name: Check plat__terraform_workspace_dir
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_workspace_dir is defined"
+        - "plat__terraform_workspace_dir | length > 0"
+      fail_msg: "Required plat__terraform_workspace_dir variable for Terraform is not valid."
+      quiet: yes
+
+  - name: Check plat__terraform_artefact_dir
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_artefact_dir is defined"
+        - "plat__terraform_artefact_dir | length > 0"
+      fail_msg: "Required plat__terraform_artefact_dir variable for Terraform is not valid."
+      quiet: yes
+
+  - name: Check plat__terraform_state_storage
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_state_storage is defined"
+        - "plat__terraform_state_storage in plat__terraform_allowed_state_storage"
+      fail_msg: "Required plat__terraform_state_storage variable for Terraform needs to be \
+      one of {{ plat__terraform_allowed_state_storage | join(', ') }}"
+      quiet: yes
+
+  - name: Check remote state variables are defined for remote_s3
+    ansible.builtin.assert:
+      that: 
+        - "plat__terraform_remote_state_bucket | length > 0"
+        - "plat__terraform_remote_state_lock_table | length > 0"
+      fail_msg: "Required plat__terraform_remote_state_bucket and plat__terraform_remote_state_lock_table variables \
+      need to be defined for '{{ plat__terraform_state_storage }}' Terraform remote state"
+      quiet: yes
+    when: plat__terraform_state_storage == "remote_s3"

@@ -1,0 +1,15 @@
+{% if plat__terraform_state_storage == "local" %}
+# Terraform state is stored locally at {{ plat__terraform_workspace_dir }}/workspace/plat
+{% endif %}
+
+
+{% if plat__terraform_state_storage == "remote_s3" %}
+terraform {
+  backend "s3" {
+    region                  = "{{ plat__region }}"
+    bucket                  = "{{ plat__terraform_remote_state_bucket }}"
+    key                     = "{{ plat__namespace }}/plat/terraform.tfstate"
+    dynamodb_table          = "{{ plat__terraform_remote_state_lock_table }}"
+  }
+}
+{% endif %}

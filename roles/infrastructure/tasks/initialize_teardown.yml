@@ -22,3 +22,7 @@
 
 - name: Include tasks for provider-specific Infrastructure teardown initialization
   ansible.builtin.include_tasks: "initialize_teardown_{{ infra__type | lower }}.yml"
+
+- name: Include Terraform tasks for provider-specific Infrastructure teardown initialization
+  ansible.builtin.include_tasks: "initialize_teardown_{{ infra__type | lower }}_{{ infra__deployment_engine }}.yml"
+  when: infra__deployment_engine == 'terraform'

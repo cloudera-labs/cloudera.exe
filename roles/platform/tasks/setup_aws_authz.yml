@@ -20,22 +20,10 @@
     state: directory
   register: __aws_policy_tmpdir
 
-- name: Download AWS default policy documents
-  ansible.builtin.get_url:
-    dest: "{{ __aws_policy_tmpdir.path }}"
-    url: "{{ __policy_url_item.value }}"
-  loop_control:
-    loop_var: __policy_url_item
-    label: "{{ __policy_url_item.key }}"
-  loop: "{{ plat__aws_policy_urls | dict2items }}"
-  register: __aws_policy_documents
-
-- name: Process AWS default policy documents
-  ansible.builtin.include_tasks: aws_policy_regex.yml
-  loop: "{{ __aws_policy_documents.results }}"
-  loop_control:
-    loop_var: __aws_policy_document_item
-    label: "{{ __aws_policy_document_item.__policy_url_item.key }}"
+- name: Download and Process AWS default policy documents
+  ansible.builtin.include_tasks: aws_policy_download.yml
+  vars:
+    __aws_policy_download_dir: "{{ __aws_policy_tmpdir.path }}"
 
 - name: Construct tags for AWS Policies
   ansible.builtin.set_fact:

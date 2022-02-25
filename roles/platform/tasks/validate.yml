@@ -72,5 +72,12 @@
 - name: Print CDP Profile to debug
   ansible.builtin.command: echo CDP_PROFILE is $CDP_PROFILE
 
-- name: Include provider-specific Platform validation Tasks
+- name: Include provider-specific Platform validation Tasks - Ansible
   ansible.builtin.include_tasks: "validate_{{ plat__infra_type | lower }}.yml"
+  when: plat__infra_deployment_engine == 'ansible'
+
+- name: Include Terraform provider-specific Platform validation Tasks
+  ansible.builtin.include_tasks: "validate_{{ plat__infra_type | lower }}_{{ plat__infra_deployment_engine }}.yml"
+  when: plat__infra_deployment_engine == 'terraform'
+
+  

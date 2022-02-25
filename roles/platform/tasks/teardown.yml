@@ -36,5 +36,10 @@
     name: "{{ plat__env_name }}"
     state: absent
 
-- name: Tear down provider-specific roles and policies
+- name: Tear down provider-specific roles and policies - Ansible
   ansible.builtin.include_tasks: "teardown_{{ plat__infra_type | lower }}_authz.yml"
+  when: plat__infra_deployment_engine == 'ansible'
+
+- name: Tear down provider-specific roles and policies - Terraform
+  ansible.builtin.include_tasks: "teardown_{{ plat__infra_type | lower }}_{{ plat__infra_deployment_engine }}_authz.yml"
+  when: plat__infra_deployment_engine == 'terraform'

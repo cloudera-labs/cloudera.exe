@@ -1,0 +1,19 @@
+variable "aws_profile" {
+  # Profile is default is plat__aws_profile is blank
+  default = "{{ (infra__aws_profile | length > 0) | ternary(infra__aws_profile, 'default') }}"
+}
+
+# Region
+variable "region" {
+  default = "{{ infra__region }}"
+}
+
+
+variable "env_tags" {
+  default = {
+    {% for key, value in infra__tags.items() %}
+    {{ key }} = "{{ value }}"
+    {% endfor %}
+    comment = "Created with Terraform by cloudera-deploy"
+  }
+}

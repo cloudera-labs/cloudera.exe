@@ -22,5 +22,10 @@
       - infra__private_key_file is string
     fail_msg: "Invalid SSH private key file for Dynamic Inventory. Key file must be a string."
 
-- name: Validate provider-specific Infrastructure parameters
+- name: Validate provider-specific Infrastructure parameters - Ansible
   ansible.builtin.include_tasks: "validate_{{ infra__type | lower }}.yml"
+  when: infra__deployment_engine == 'ansible'
+
+- name: Validate Terraform provider-specific Infrastructure parameters
+  ansible.builtin.include_tasks: "validate_{{ infra__type | lower }}_{{ infra__deployment_engine }}.yml"
+  when: infra__deployment_engine == 'terraform'

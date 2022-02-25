@@ -1,0 +1,67 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Ensure the Terraform workspace directory exists
+  ansible.builtin.copy:
+    src: "{{ plat__terraform_template_dir }}/plat/"
+    dest: "{{ plat__terraform_workspace_dir }}/plat"
+
+- name: Copy Terraform plat code to the artefact directory
+  ansible.builtin.copy:
+    src: "{{ plat__terraform_template_dir }}/plat/"
+    dest: "{{ plat__terraform_artefact_dir }}/plat"
+
+- name: Applying Terraform
+  community.general.terraform:
+    project_path: "{{ plat__terraform_workspace_dir }}/plat"
+    state: "present"
+    force_init: yes
+  register: tf_result
+  retries: 3
+  delay: 10
+  until: tf_result is succeeded
+
+- name: Remove the Terraform template directory
+  ansible.builtin.file:
+    path: "{{ plat__terraform_template_dir }}/plat/"
+    state: absent
+
+- name: Remove the Terraform workspace directory when using remote state
+  ansible.builtin.file:
+    path: "{{ plat__terraform_workspace_dir }}/plat"
+    state: absent
+  when: plat__terraform_state_storage in ['remote_s3']
+
+# Now need to get create CDP Cross Account Credential
+# First get the AWS Cross Account Role
+- name: Query the AWS Cross Account Role
+  community.aws.iam_role_info:
+    name: "{{ plat__aws_xaccount_role_name }}"
+    region: "{{ plat__region }}"
+  register: __aws_xaccount_role_info
+
+- name: Create CDP Cross Account Credential for AWS
+  when: plat__xacccount_credential_name not in plat__cdp_credentials_list
+  cloudera.cloud.env_cred:
+    cloud: "{{ plat__infra_type }}"
+    name: "{{ plat__xacccount_credential_name }}"
+    role: "{{ __aws_xaccount_role_info.iam_roles[0].arn }}"
+    state: present
+
+- name: Remove temporary directory for policy documents
+  ansible.builtin.file:
+    path: "{{ __aws_policy_tmpdir.path }}"
+    state: absent

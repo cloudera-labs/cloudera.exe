@@ -1,0 +1,33 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Download AWS policy documents to __aws_policy_download_dir
+- name: Download AWS default policy documents
+  ansible.builtin.get_url:
+    dest: "{{ __aws_policy_download_dir }}"
+    url: "{{ __policy_url_item.value }}"
+  loop_control:
+    loop_var: __policy_url_item
+    label: "{{ __policy_url_item.key }}"
+  loop: "{{ plat__aws_policy_urls | dict2items }}"
+  register: __aws_policy_documents
+
+- name: Process AWS default policy documents
+  ansible.builtin.include_tasks: aws_policy_regex.yml
+  loop: "{{ __aws_policy_documents.results }}"
+  loop_control:
+    loop_var: __aws_policy_document_item
+    label: "{{ __aws_policy_document_item.__policy_url_item.key }}"

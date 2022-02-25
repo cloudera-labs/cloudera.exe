@@ -1,0 +1,64 @@
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create directory for processed Terraform template files
+  ansible.builtin.file:
+    path: "{{ infra__terraform_template_dir }}/infra"
+    state: directory
+
+- name: Create artefact directory for Terraform infra code
+  ansible.builtin.file:
+    path: "{{ infra__terraform_artefact_dir }}/infra"
+    state: directory
+
+# Apply template for Terraform provider
+- name: Generate Terraform Provider
+  ansible.builtin.template:
+    src: 'template/{{ infra__type }}/provider.tf.j2'
+    dest: "{{ infra__terraform_template_dir }}/infra/provider.tf"
+
+# Apply template for Terraform backend state
+- name: Generate Terraform Backend State
+  ansible.builtin.template:
+    src: 'template/{{ infra__type }}/backend_state.tf.j2'
+    dest: "{{ infra__terraform_template_dir }}/infra/backend_state.tf"
+
+# Apply template for Terraform variables
+- name: Generate Terraform Variables
+  ansible.builtin.template:
+    src: 'template/{{ infra__type }}/terraform_variables.tf.j2'
+    dest: "{{ infra__terraform_template_dir }}/infra/variables.tf"
+  no_log: false
+
+# Apply template for Terraform infra....
+# ...network resources
+- name: Generate Terraform infra file for network resources
+  ansible.builtin.template:
+    src: 'template/{{ infra__type }}/infra_{{ infra__type }}_network.tf.j2'
+    dest: "{{ infra__terraform_template_dir }}/infra/infra_network.tf"
+  no_log: false
+
+# ...storage resources
+- name: Generating Terraform infra file for storage resources
+  ansible.builtin.template:
+    src: 'template/{{ infra__type }}/infra_{{ infra__type }}_storage.tf.j2'
+    dest: "{{ infra__terraform_template_dir }}/infra/infra_storage.tf"
+  no_log: false
+
+# ...compute resources
+- name: Generating Terraform infra file for compute resources
+  ansible.builtin.template:
+    src: 'template/{{ infra__type }}/infra_{{ infra__type }}_compute.tf.j2'
+    dest: "{{ infra__terraform_template_dir }}/infra/infra_compute.tf"
+  no_log: false

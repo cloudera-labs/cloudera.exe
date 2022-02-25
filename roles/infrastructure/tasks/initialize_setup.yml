@@ -23,3 +23,7 @@
 
 - name: Include tasks fpr provider-specific Infrastructure setup initialization
   ansible.builtin.include_tasks: "initialize_setup_{{ infra__type | lower }}.yml"
+
+- name: Include Terraform tasks for provider-specific Infrastructure initialization
+  ansible.builtin.include_tasks: "initialize_{{ infra__type | lower }}_{{ infra__deployment_engine }}.yml"
+  when: infra__deployment_engine == 'terraform'

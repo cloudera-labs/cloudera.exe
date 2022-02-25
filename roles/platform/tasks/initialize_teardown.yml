@@ -37,3 +37,7 @@
 
 - name: Include provider-specific resources for CDP Public Environment teardown
   ansible.builtin.include_tasks: "initialize_teardown_{{ plat__infra_type | lower }}.yml"
+
+- name: Include tasks for provider-specific Terraform teardown
+  ansible.builtin.include_tasks: "initialize_teardown_{{ plat__infra_type | lower }}_{{ plat__infra_deployment_engine }}.yml"
+  when: plat__infra_deployment_engine == 'terraform'

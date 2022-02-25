@@ -1,0 +1,88 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Ensure the Terraform workspace directory exists
+  ansible.builtin.copy:
+    src: "{{ infra__terraform_template_dir }}/infra/"
+    dest: "{{ infra__terraform_workspace_dir }}/infra"
+
+- name: Copy Terraform infra code to the artefact directory
+  ansible.builtin.copy:
+    src: "{{ infra__terraform_template_dir }}/infra/"
+    dest: "{{ infra__terraform_artefact_dir }}/infra"
+
+- name: Applying Terraform
+  community.general.terraform:
+    project_path: "{{ infra__terraform_workspace_dir }}/infra"
+    state: "present"
+    force_init: yes
+  register: tf_result
+  retries: 3
+  delay: 10
+  until: tf_result is succeeded
+
+- name: Remove the Terraform template directory
+  ansible.builtin.file:
+    path: "{{ infra__terraform_template_dir }}/infra"
+    state: absent
+
+- name: Remove the Terraform workspace directory when using remote state
+  ansible.builtin.file:
+    path: "{{ infra__terraform_workspace_dir }}/infra"
+    state: absent
+  when: infra__terraform_state_storage in ['remote_s3']
+
+# Get information about Dynamic Inventory VMs if created via Terraform
+- name: Fetch EC2 Instance info for Dynamic Inventory Nodes
+  register: __infra_dynamic_inventory_discovered
+  community.aws.ec2_instance_info:
+    region: "{{ infra__region }}"
+    filters: "{{ __filters | items2dict }}"
+  vars:
+    __filters:
+      - key: "tag:{{ infra__dynamic_inventory_tag_key }}"
+        value: "{{ infra__dynamic_inventory_tag_value }}*"
+
+- name: Create output Dictionary for producing Static Inventory artefact
+  ansible.builtin.set_fact:
+    infra__dynamic_inventory_host_entries: "{{ infra__dynamic_inventory_host_entries | default([]) | union([host_entry]) }}"
+  vars:
+    host_entry: "{{ [__infra_di_item.private_dns_name, 'ansible_host=' + __infra_di_item.public_ip_address, infra__dynamic_inventory_connectors] | join(' ') }}"
+  loop: "{{ __infra_dynamic_inventory_discovered.instances }}"
+  loop_control:
+    loop_var: __infra_di_item
+
+# If created Utility Instance via Terraform then
+# need to get it's info and add to an Ansible host group
+- name: Add Utility Instance to host group
+  when: infra__create_utility_service
+  block:
+    - name: Discover the Utility Instance details
+      community.aws.ec2_instance_info:
+        region: "{{ infra__region }}"
+        filters: "{{ __filters | items2dict }}"
+      vars:
+        __filters:
+          - key: "tag:Name"
+            value: "{{ infra__namespace }}*"
+      register: __infra_utility_compute_discovered
+
+    - name: Add discovered Utility Instance to host group
+      ansible.builtin.add_host:
+        hostname: "{{__infra_utility_compute_discovered.instances[0].public_ip_address}}"
+        ansible_user: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user }}"
+        ansible_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary(omit, infra__private_key_file) }}"
+        groupname: cldr_utility

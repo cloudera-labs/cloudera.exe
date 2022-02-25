@@ -19,6 +19,18 @@
 # Role prefix is 'plat__'
 
 # Labels
+# Deployment type (Ansible or Terraform)
+plat__infra_deployment_engine:                "{{ common__infra_deployment_engine }}"
+# Location of output from template module which creates Terraform
+plat__terraform_template_dir:                 "{{ common__terraform_template_dir }}"
+plat__terraform_artefact_dir:                 "{{ common__terraform_artefact_dir }}"
+plat__terraform_workspace_dir:                "{{ common__terraform_workspace_dir }}"
+
+plat__terraform_allowed_state_storage:       "{{ common__terraform_allowed_state_storage }}"
+plat__terraform_state_storage:               "{{ common__terraform_state_storage }}"
+plat__terraform_remote_state_bucket:         "{{ common__terraform_remote_state_bucket }}"      
+plat__terraform_remote_state_lock_table:     "{{ common__terraform_remote_state_lock_table }}"      
+
 plat__infra_type:                             "{{ common__infra_type }}"
 plat__region:                                 "{{ common__region }}"
 plat__namespace:                              "{{ common__namespace }}"
@@ -92,6 +104,7 @@ plat__cdp_xaccount_external_id:               "{{ env.cdp.cross_account.external
 plat__cdp_xaccount_account_id:                "{{ env.cdp.cross_account.account_id | default(False) }}"
 
 # AWS
+plat__aws_profile:                            "{{ common__aws_profile }}"
 plat__aws_vpc_id:                             "{{ common__aws_vpc_id }}"
 plat__aws_public_subnet_ids:                  "{{ common__aws_public_subnet_ids }}"
 plat__aws_private_subnet_ids:                 "{{ common__aws_private_subnet_ids }}"
