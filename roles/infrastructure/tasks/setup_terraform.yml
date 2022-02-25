@@ -14,11 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Check if Terraform workspace directory exists
-  ansible.builtin.stat: 
-    path: "{{ infra__terraform_workspace_dir }}/infra"
-  register: workdir
-
 - name: Ensure the Terraform workspace directory exists
   ansible.builtin.copy:
     src: "{{ infra__terraform_template_dir }}/infra/"
