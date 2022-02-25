@@ -15,5 +15,5 @@
 # limitations under the License.
 
 - include_tasks: validate.yml
-# - include_tasks: initialize_setup.yml
-# - include_tasks: setup.yml
+- include_tasks: initialize_setup.yml
+- include_tasks: setup.yml
