@@ -34,10 +34,10 @@ infra__dynamic_inventory_images_default:
       owners:
         - 'aws-marketplace'
     el8:
-      search: 'CentOS 8.2*x86*'
-      user: 'centos'
+      search: 'RHEL-8.4*HVM*x86_64*'
+      user: 'ec2-user'
       owners:
-        - '125523088429'
+        - '309956199498'
     bionic:
       search: 'ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server*'
       user: 'ubuntu'
