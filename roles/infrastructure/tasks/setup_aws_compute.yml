@@ -23,29 +23,30 @@
   loop: "{{ range(0, infra__dynamic_inventory_count | int ) | list }}"
   amazon.aws.ec2_instance:
     region: "{{ infra__region }}"
-    group_id: "{{ infra__aws_security_group_default_id }}"
+    security_group: "{{ infra__aws_security_group_default_id }}"
     key_name: "{{ infra__public_key_id }}"
     instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type][infra__dynamic_inventory_vm_type] }}"
-    image: "{{ __infra_aws_ami_info.image_id }}"
+    image_id: "{{ __infra_aws_ami_info.image_id }}"
     ebs_optimized: yes
     volumes:
       - device_name: /dev/sda1
-        volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type][infra__dynamic_inventory_storage_type] }}"
-        volume_size: "{{ infra__dynamic_inventory_storage_size }}"
-        delete_on_termination: "{{ infra__dynamic_inventory_delete_storage }}"
+        ebs:
+          volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type][infra__dynamic_inventory_storage_type] }}"
+          volume_size: "{{ infra__dynamic_inventory_storage_size }}"
+          delete_on_termination: "{{ infra__dynamic_inventory_delete_storage | bool }}"
     wait: yes
-    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }) }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }}"
+    state: running
+    tags: "{{ infra__dynamic_inventory_tags }}"
+    name: "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }}"
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
-    assign_public_ip: yes
+    network:
+      assign_public_ip: yes
 
 - name: Create output Dictionary for producing Static Inventory artefact
   ansible.builtin.set_fact:
     infra__dynamic_inventory_host_entries: "{{ infra__dynamic_inventory_host_entries | default([]) | union([host_entry]) }}"
   vars:
-    host_entry: "{{ [__infra_di_item.tagged_instances[0].private_dns_name, 'ansible_host=' + __infra_di_item.tagged_instances[0].public_ip, infra__dynamic_inventory_connectors] | join(' ') }}"
+    host_entry: "{{ [__infra_di_item.instances[0].private_dns_name, 'ansible_host=' + __infra_di_item.instances[0].public_ip_address, infra__dynamic_inventory_connectors] | join(' ') }}"
   loop: "{{ __infra_dynamic_inventory_instances.results }}"
   loop_control:
     loop_var: __infra_di_item
@@ -58,26 +59,27 @@
     group_id: "{{ infra__aws_security_group_default_id }}"
     key_name: "{{ infra__public_key_id }}"
     instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type]['sml'] }}"
-    image: "{{ __infra_aws_ami_info.image_id }}"
+    image_id: "{{ __infra_aws_ami_info.image_id }}"
     ebs_optimized: yes
     instance_profile_name: "{{ infra__download_mirror_role.iam_role.role_name }}"
     volumes:
       - device_name: /dev/sda1
-        volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type]['std'] }}"
-        volume_size: 100
-        delete_on_termination: yes
+        ebs:
+          volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type]['std'] }}"
+          volume_size: 100
+          delete_on_termination: true
     wait: yes
-    instance_tags: "{{ infra__dynamic_inventory_tags | combine( {'Name': '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }) }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}"
+    state: running
+    instance_tags: "{{ infra__dynamic_inventory_tags }}"
+    name: "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}"
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
-    assign_public_ip: yes
+    network:
+      assign_public_ip: yes
 
 - name: Add Utility Instance to host group
   when: infra__create_utility_service
   ansible.builtin.add_host:
-    hostname: "{{__infra_utility_vm_instance.tagged_instances[0].public_ip}}"
+    hostname: "{{ __infra_utility_vm_instance.instances[0].public_ip_address }}"
     ansible_user: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user }}"
     ansible_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary(omit, infra__private_key_file) }}"
     groupname: cldr_utility
