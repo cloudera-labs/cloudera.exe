@@ -30,7 +30,6 @@ plat__gcp_roles:
   iam_service_account_token_creator: roles/iam.serviceAccountTokenCreator
 
 plat__cdp_iam_identities:
-  namespace: "crn:altus:iam:us-west-1:altus"
   role_suffix: role
   resource_role_suffix: resourceRole
   env_admin: EnvironmentAdmin
