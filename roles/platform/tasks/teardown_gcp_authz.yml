@@ -51,20 +51,6 @@
     project: "{{ plat__gcp_project }}"
     state: absent
 
-- name: Tear down Operational GCP Service Accounts
-  when: plat__teardown_deletes_roles
-  loop_control:
-    loop_var: __gcp_identity_item
-  loop:
-    - "{{ plat__gcp_log_identity_name }}"
-    - "{{ plat__gcp_datalakeadmin_identity_name }}"
-    - "{{ plat__gcp_ranger_audit_identity_name }}"
-    - "{{ plat__gcp_idbroker_identity_name }}"
-  google.cloud.gcp_iam_service_account:
-    name: "{{ __gcp_identity_item }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-    project: "{{ plat__gcp_project }}"
-    state: absent
-
 - name: Tear down Operational GCP Service Accounts Policies
   when: plat__teardown_deletes_policies
   register: __gcp_service_account_teardown
@@ -119,3 +105,17 @@
     gsutil iam
     ch -d {{ __gcp_pol_item.account |quote }}
     gs://{{ __gcp_pol_item.bucket |quote }}
+
+- name: Tear down Operational GCP Service Accounts
+  when: plat__teardown_deletes_roles
+  loop_control:
+    loop_var: __gcp_identity_item
+  loop:
+    - "{{ plat__gcp_log_identity_name }}"
+    - "{{ plat__gcp_datalakeadmin_identity_name }}"
+    - "{{ plat__gcp_ranger_audit_identity_name }}"
+    - "{{ plat__gcp_idbroker_identity_name }}"
+  google.cloud.gcp_iam_service_account:
+    name: "{{ __gcp_identity_item }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+    project: "{{ plat__gcp_project }}"
+    state: absent
