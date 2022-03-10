@@ -26,7 +26,7 @@ plat__gcp_roles:
   storage_admin: roles/storage.admin
   storage_object_admin: roles/storage.objectAdmin
   iam_workload_identity_user: roles/iam.workloadIdentityUser
-  iam_service_account_user: roles/iam.workloadIdentityUser
+  iam_service_account_user: roles/iam.serviceAccountUser
   iam_service_account_token_creator: roles/iam.serviceAccountTokenCreator
 
 plat__cdp_iam_identities:
