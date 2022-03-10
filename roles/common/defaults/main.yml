@@ -56,6 +56,9 @@ common__ngw_suffix:                       "{{ globals.labels.nat_gateway | defau
 
 common__unique_storage_name_suffix:       "{{ globals.storage.name | default((common__region + common__aws_profile) if 'aws' in common__infra_type else common__region) }}"
 
+# CDP Control Plane Region
+common__cdp_control_plane_region:         "{{ globals.cdp_region | default('us-west-1') }}"
+common__cdp_control_plane_crn:            "{{ common__cdp_control_planes[common__cdp_control_plane_region] }}"
 # Infra
 common__infra_deployment_engine:          "{{ globals.infra_deployment_engine | default('ansible') }}"
 common__infra_type:                       "{{ globals.infra_type | default('aws') }}"

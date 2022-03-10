@@ -55,7 +55,7 @@
   ansible.builtin.set_fact:
     plat__cdp_pub_admin_group_role_crns: "{{ plat__cdp_pub_admin_group_role_crns | default([]) | union([role]) }}"
   vars:
-    role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_role_suffix, __cdp_pub_admin_group_role_item] | join(':') }}"
+    role: "{{ [plat__cdp_control_plane_crn, plat__cdp_iam_role_suffix, __cdp_pub_admin_group_role_item] | join(':') }}"
   loop_control:
     loop_var: __cdp_pub_admin_group_role_item
   loop: "{{ plat__cdp_iam_admin_group_roles }}"
@@ -64,7 +64,7 @@
   ansible.builtin.set_fact:
     plat__cdp_pub_admin_group_resource_role_crns: "{{ plat__cdp_pub_admin_group_resource_role_crns | default([]) | union([resource_role]) }}"
   vars:
-    resource_role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_resource_suffix, __cdp_env_admin_group_resource_role_item] | join(':') }}"
+    resource_role: "{{ [plat__cdp_control_plane_crn, plat__cdp_iam_resource_suffix, __cdp_env_admin_group_resource_role_item] | join(':') }}"
   loop_control:
     loop_var: __cdp_env_admin_group_resource_role_item
   loop: "{{ plat__cdp_iam_admin_group_resource_roles }}"
@@ -73,7 +73,7 @@
   ansible.builtin.set_fact:
     plat__cdp_pub_user_group_role_crns: "{{ plat__cdp_pub_user_group_role_crns | default([]) | union([role]) }}"
   vars:
-    role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_role_suffix, __cdp_pub_user_group_role_item] | join(':') }}"
+    role: "{{ [plat__cdp_control_plane_crn, plat__cdp_iam_role_suffix, __cdp_pub_user_group_role_item] | join(':') }}"
   loop_control:
     loop_var: __cdp_pub_user_group_role_item
   loop: "{{ plat__cdp_iam_user_group_roles }}"
@@ -82,7 +82,7 @@
   ansible.builtin.set_fact:
     plat__cdp_pub_user_group_resource_role_crns: "{{ plat__cdp_pub_user_group_resource_role_crns | default([]) | union([resource_role]) }}"
   vars:
-    resource_role: "{{ [plat__cdp_iam_identities.namespace, plat__cdp_iam_resource_suffix, __cdp_pub_user_group_resource_role_item] | join(':') }}"
+    resource_role: "{{ [plat__cdp_control_plane_crn, plat__cdp_iam_resource_suffix, __cdp_pub_user_group_resource_role_item] | join(':') }}"
   loop_control:
     loop_var: __cdp_pub_user_group_resource_role_item
   loop: "{{ plat__cdp_iam_user_group_resource_roles }}"

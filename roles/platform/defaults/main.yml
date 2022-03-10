@@ -40,6 +40,7 @@ plat__env_suffix:                             "{{ common__env_suffix }}"
 plat__vpc_private_subnets_suffix:             "{{ common__vpc_private_subnets_suffix }}"
 plat__vpc_public_subnets_suffix:              "{{ common__vpc_public_subnets_suffix }}"
 
+plat__cdp_control_plane_crn:                  "{{ common__cdp_control_plane_crn }}"
 plat__cdp_iam_role_suffix:                    "{{ plat__cdp_iam_identities.role_suffix }}"
 plat__cdp_iam_resource_suffix:                "{{ plat__cdp_iam_identities.resource_role_suffix }}"
 
