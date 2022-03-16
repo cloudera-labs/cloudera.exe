@@ -114,15 +114,12 @@
       register: __infra_ec2_elbs
 
     - name: Filter list of AWS Elastic Loadbalancers by AWS VPC
-      #when:
-      #  - __infra_ec2_elbs.elbs | length > 0
-      #  - __infra_ec2_elb_item.vpc_id == infra__aws_vpc_id
       ansible.builtin.set_fact:
-        __infra_ec2_elb_names: "{{ __infra_ec2_elb_names | default([]) + [__infra_ec2_elb_item.name] }}"
-      loop: "{{ __infra_ec2_elbs.elbs | selectattr('vpc_id', 'equalto', infra__aws_vpc_id) | map('name') | list }}"
+        __infra_ec2_elb_names: "{{ __infra_ec2_elb_names | default([]) | union([__infra_ec2_elb_item]) }}"
+      loop: "{{ __infra_ec2_elbs.elbs | selectattr('vpc_id', 'equalto', infra__aws_vpc_id) | map(attribute='load_balancer_name') | list }}"
       loop_control:
         loop_var: __infra_ec2_elb_item
-        #label: "{{ __infra_ec2_elb_item.name }}"
+        #label: "{{ __infra_ec2_elb_item.load_balancer_name }}"
 
     - name: List all AWS VPC NAT gatways
       community.aws.ec2_vpc_nat_gateway_info:
