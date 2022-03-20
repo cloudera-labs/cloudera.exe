@@ -46,7 +46,7 @@
   amazon.aws.ec2_instance_info:
     region: "{{ infra__region }}"
     filters:
-      "tag:Name": "{{ infra__namespace }}-*"
+      "tag:Name": "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2]]) }}-*"
       instance-state-name: [ "running" ]
   until: __infra_dynamic_inventory_instances.instances | selectattr('public_ip_address', 'defined') | list | count | int == infra__dynamic_inventory_count | int
   retries: 5
