@@ -245,10 +245,11 @@ globals:
   storage:
     name:
   tags:
-  terraform_base_dir:
-  terraform_remote_state_bucket:
-  terraform_remote_state_lock_table:
-  terraform_state_storage:
+  terraform:
+    base_dir:
+    remote_state_bucket:
+    remote_state_lock_table:
+    state_storage:
   utility_bucket_name:
 infra:
   aws:
