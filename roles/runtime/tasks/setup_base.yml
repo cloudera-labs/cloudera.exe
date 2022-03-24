@@ -180,7 +180,7 @@
   retries: 120
   delay: 30
 
-- name: Wait for CDP Dataflow deployment to complete
+- name: Wait for CDP Dataflow Service Enablement to complete
   when: run__include_df
   tags: df
   cloudera.cloud.df_service:
