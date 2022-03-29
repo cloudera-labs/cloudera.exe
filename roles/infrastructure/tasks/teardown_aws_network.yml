@@ -75,7 +75,7 @@
               loop: "{{ __infra_ec2_elb_names }}"
               loop_control:
                 loop_var: __infra_elb_remove_item
-              amazon.aws.ec2_elb_lb:
+              amazon.aws.elb_classic_lb:
                 name: "{{ __infra_elb_remove_item }}"
                 state: absent
                 wait: yes
