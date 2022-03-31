@@ -62,6 +62,7 @@ common__cdp_control_plane_crn:            "{{ common__cdp_control_planes[common_
 # Infra
 common__infra_deployment_engine:          "{{ globals.infra_deployment_engine | default('ansible') }}"
 common__infra_type:                       "{{ globals.infra_type | default('aws') }}"
+common__aws_profile:                      "{{ globals.aws_profile | default('') }}"
 common__public_key_file:                  "{{ globals.ssh.public_key_file | default('') }}"
 common__namespace_cdp:                    "{{ globals.namespace_cdp | default([common__namespace, common__namespace_unique_suffix] | join('-')) }}"
 common__tags:                             "{{ globals.tags | default({}) }}"
@@ -105,11 +106,10 @@ common__data_path:                        "{{ infra.storage.path.data | default(
 common__ranger_audit_path:                "{{ infra.storage.path.ranger_audit | default('ranger/audit') }}"
 
 # AWS Infra
+common__aws_region:                       "{{ infra.aws.region | default('eu-west-1') }}"
 common__aws_vpc_id:                       "{{ infra.aws.vpc.existing.vpc_id | default('') }}"
 common__aws_public_subnet_ids:            "{{ infra.aws.vpc.existing.public_subnet_ids | default([]) }}"
 common__aws_private_subnet_ids:           "{{ infra.aws.vpc.existing.private_subnet_ids | default([]) }}"
-common__aws_region:                       "{{ infra.aws.region | default('eu-west-1') }}"
-common__aws_profile:                      "{{ infra.aws.profile | default('') }}"
 common__aws_role_suffix:                  "{{ infra.aws.role.suffix | default(common__role_suffix) }}"
 common__aws_datalake_admin_role_name:     "{{ env.aws.role.name.datalake_admin | default([common__namespace, common__aws_datalake_admin_suffix, common__aws_role_suffix] | join('-')) }}"
 common__aws_datalake_admin_suffix:        "{{ env.aws.role.label.datalake_admin | default(common__datalake_admin_suffix) }}"
