@@ -152,7 +152,8 @@
         base_instance_group: "{{ run__ml_k8s_request_base }}"
         config:
           name: "{{ __ml_config.name | default([run__namespace_cdp, __ml_config.suffix | default(include.suffix) | default(run__ml_suffix)] | join('-')) }}"
-          nfs: "{{ __ml_config.nfs | default(run__azure_nfs_mount | default(omit)) }}"
+          nfs: "{{ __ml_config.nfs | default(run__azure_netapp_nfs_mount | default(omit)) }}"
+          nfs_version: "{{ __ml_config.nfs_version | default(run__azure_netapp_nfs_version if __ml_config.nfs is defined or run__azure_netapp_nfs_mount is defined | default(omit)) }}"
           k8s_request:
             environmentName: "{{ run__env_name }}"
             instanceGroups: "{{ overlay_instance_groups | map('cloudera.exe.combine_onto', base_instance_group, recursive=True) | list }}"

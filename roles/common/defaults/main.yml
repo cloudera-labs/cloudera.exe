@@ -131,6 +131,7 @@ common__azure_sp_login_from_env:          "{{ infra.azure.sp_login_from_env | de
 common__azure_netapp_account_name:        "{{ infra.azure.netapp.account.name | default([common__namespace, common__azure_netapp_suffix, common__azure_account_suffix] | join('-'))}}"
 common__azure_netapp_pool_name:           "{{ infra.azure.netapp.pool.name | default([common__namespace, common__azure_netapp_suffix, common__azure_pool_suffix] | join('-')) }}"
 common__azure_netapp_vol_name:            "{{ infra.azure.netapp.volume.name | default([common__namespace, common__azure_netapp_suffix, common__azure_volume_suffix] | join('-')) }}"
+common__azure_netapp_nfs_version:         "{{ infra.azure.netapp.nfs.version | default('3') }}"
 
 # GCP Infra
 common__gcp_project:                      "{{ infra.gcp.project | default('gcp-se') }}"

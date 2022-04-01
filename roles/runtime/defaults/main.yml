@@ -101,3 +101,10 @@ run__include_opdb:                   "{{ common__include_opdb }}"
 run__aws_vpc_id:                     "{{ common__aws_vpc_id }}"
 run__aws_public_subnet_ids:          "{{ common__aws_public_subnet_ids }}"
 run__aws_private_subnet_ids:         "{{ common__aws_private_subnet_ids }}"
+
+# Azure
+run__azure_metagroup_name:           "{{ common__azure_metagroup_name }}"
+run__azure_netapp_account_name:      "{{ common__azure_netapp_account_name }}"
+run__azure_netapp_pool_name:         "{{ common__azure_netapp_pool_name }}"
+run__azure_netapp_vol_name:          "{{ common__azure_netapp_vol_name }}"
+run__azure_netapp_nfs_version:       "{{ common__azure_netapp_nfs_version }}"

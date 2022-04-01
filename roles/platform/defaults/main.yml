@@ -211,9 +211,5 @@ plat__azure_storageowner_datalakeadmin_data_assn_name:  "{{ env.azure.role.assig
 plat__azure_storagecontr_log_assn_name:                 "{{ env.azure.role.assignment.log.storagecontr | default('-'.join([plat__namespace, plat__azure_contributor_name_suffix, plat__azure_log_suffix, plat__azure_assignment_name_suffix,ansible_date_time.iso8601]) | to_uuid )}}"
 plat__azure_storagecontr_ranger_audit_assn_name:        "{{ env.azure.role.assignment.ranger_audit.storagecontr | default('-'.join([plat__namespace, plat__azure_contributor_name_suffix, plat__azure_ranger_audit_suffix, plat__azure_assignment_name_suffix,ansible_date_time.iso8601]) | to_uuid )}}"
 
-plat__azure_netapp_account_name:              "{{ common__azure_netapp_account_name }}"
-plat__azure_netapp_pool_name:                 "{{ common__azure_netapp_pool_name }}"
-plat__azure_netapp_vol_name:                  "{{ common__azure_netapp_vol_name }}"
-
 plat__azure_stor_logs_uri:                    "{{ env.azure.storage.path.logs | default('abfs://' + plat__logs_path + '@' + plat__azure_storage_name + '.dfs.core.windows.net') }}"
 plat__azure_stor_data_uri:                    "{{ env.azure.storage.path.data | default('abfs://' + plat__data_path + '@' + plat__azure_storage_name + '.dfs.core.windows.net') }}"

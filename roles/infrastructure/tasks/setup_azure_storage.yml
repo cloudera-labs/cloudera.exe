@@ -75,7 +75,7 @@
 - name: Handle Azure NetApp Storage if deploying CML
   when:
     - infra__ml_deploy
-    - infra__azure_nfs_mount is undefined or infra__azure_nfs_mount == ''
+    - infra__azure_netapp_nfs_mount is undefined or infra__azure_netapp_nfs_mount == ''
   block:
     - name: Handle Netapp Storage Account
       netapp.azure.azure_rm_netapp_account:
@@ -108,14 +108,15 @@
         subnet_id: "{{ infra__vpc_svcnet_name }}"
         service_level: "{{ infra__azure_netapp_vol_type }}"
         size: "{{ infra__azure_netapp_vol_size }}"
+        protocol_types: "{{ ['NFSv' + infra__azure_netapp_nfs_version] }}"
 
     - name: Prepare netapp vol info for submission during initial creation
       when: __azure_netapp_vol_details.msg is defined
-      set_fact:
-        infra__azure_nfs_mount: "{{ __azure_netapp_vol_details.msg }}"
+      ansible.builtin.set_fact:
+        infra__azure_netapp_nfs_mount: "{{ __azure_netapp_vol_details.msg }}"
 
     # Yay for Azure consistency
     - name: Prepare netapp vol info for submission during recreation
       when: __azure_netapp_vol_details.mount_path is defined
-      set_fact:
-        infra__azure_nfs_mount: "{{ __azure_netapp_vol_details.mount_path }}"
+      ansible.builtin.set_fact:
+        infra__azure_netapp_nfs_mount: "{{ __azure_netapp_vol_details.mount_path }}"
