@@ -150,6 +150,8 @@ infra__azure_netapp_pool_type:      "{{ infra.azure.netapp.pool.type | default('
 infra__azure_netapp_vol_size:       "{{ infra.azure.netapp.volume.size | default(500) }}"
 infra__azure_netapp_vol_type:       "{{ infra.azure.netapp.volume.type | default('Standard') }}"
 
+infra__azure_sp_login_from_env:     "{{ common__azure_sp_login_from_env }}"
+
 # CDP Control Plane
 infra__cdp_control_plane_ports:     "{{ env.cdp.control_plane.ports | default([443, 9443]) }}"
 infra__cdp_control_plane_cidr:      "{{ env.cdp.control_plane.cidr | default(infra__cdp_control_plane_cidr_default) }}"
