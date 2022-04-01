@@ -225,12 +225,14 @@ globals:
     create_deployment_details:
     directory:
   cloudera_license_file:
+  cdp_region:
   create_utility_service:
   dynamic_inventory:
     vm:
       count:
       os:
   gcloud_credential_file:
+  infra_deployment_engine:
   infra_type:
   labels:
     admin:
@@ -274,6 +276,11 @@ globals:
   storage:
     name:
   tags:
+  terraform:
+    base_dir:
+    remote_state_bucket:
+    remote_state_lock_table:
+    state_storage:
   utility_bucket_name:
 infra:
   aws:
