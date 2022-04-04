@@ -72,7 +72,7 @@ common__region:                           "{{ globals.region | default(common__r
 common__storage_name:                     "{{ infra.storage.name | default([common__namespace, common__unique_storage_name_suffix[::2] | replace('-','')] | join('-')) }}"
 
 # Terraform
-common__terraform_base_dir:               "{{ globals.terraform_base_dir | default( [playbook_dir , 'terraform'] | path_join ) }}"
+common__terraform_base_dir:               "{{ globals.terraform.base_dir | default( [playbook_dir , 'terraform'] | path_join ) }}"
 # The processed Jinja template files for Terraform are placed in common__terraform_template_dir
 common__terraform_template_dir:            "{{ [common__terraform_base_dir , 'processed_template_code'] | path_join }}"
 # A timestamped artefact directory storing a copy of the Terraform code from each run
@@ -81,9 +81,9 @@ common__terraform_artefact_dir:            "{{ [common__terraform_base_dir , ('t
 common__terraform_workspace_dir:           "{{ [common__terraform_base_dir, 'workspace'] | path_join }}"
 
 common__terraform_allowed_state_storage:   "['local', 'remote_s3']"
-common__terraform_state_storage:           "{{ globals.terraform_state_storage  | default('local') }}"
-common__terraform_remote_state_bucket:     "{{ globals.terraform_remote_state_bucket | default('') }}"
-common__terraform_remote_state_lock_table: "{{ globals.terraform_remote_state_lock_table | default('') }}"
+common__terraform_state_storage:           "{{ globals.terraform.state_storage  | default('local') }}"
+common__terraform_remote_state_bucket:     "{{ globals.terraform.remote_state_bucket | default('') }}"      
+common__terraform_remote_state_lock_table: "{{ globals.terraform.remote_state_lock_table | default('') }}"      
 
 common__vpc_name:                         "{{ infra.vpc.name | default([common__namespace, common__vpc_name_suffix] | join('-')) }}"
 common__vpc_public_subnet_cidrs:          "{{ infra.vpc.public_subnets | default(['10.10.0.0/19', '10.10.32.0/19', '10.10.64.0/19']) }}"
