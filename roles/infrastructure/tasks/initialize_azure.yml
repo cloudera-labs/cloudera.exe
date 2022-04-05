@@ -15,7 +15,7 @@
 # limitations under the License.
 
 - name: Azure Service Principal login
-  when: common__azure_sp_login_from_env |bool
+  when: infra__azure_sp_login_from_env | bool
   ansible.builtin.command: >
     az login
     --service-principal
