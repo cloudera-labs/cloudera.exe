@@ -144,6 +144,7 @@ infra__azure_storage_kind:          "{{ infra.azure.storage.type | default('Stor
 infra__azure_netapp_account_name:   "{{ common__azure_netapp_account_name }}"
 infra__azure_netapp_pool_name:      "{{ common__azure_netapp_pool_name }}"
 infra__azure_netapp_vol_name:       "{{ common__azure_netapp_vol_name }}"
+infra__azure_netapp_nfs_version:    "{{ common__azure_netapp_nfs_version }}"
 
 infra__azure_netapp_pool_size:      "{{ infra.azure.netapp.pool.size | default(1) }}" # 4TB 'chunks'
 infra__azure_netapp_pool_type:      "{{ infra.azure.netapp.pool.type | default('Standard') }}"

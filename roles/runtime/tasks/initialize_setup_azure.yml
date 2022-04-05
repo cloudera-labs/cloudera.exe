@@ -18,7 +18,47 @@
   ansible.builtin.set_fact:
     run__datahub_subnet_ids: "{{ infra__azure_subnets }}"
 
-- name: Set fact for Azure NFS Mount
-  when: infra__azure_nfs_mount is defined
+# TODO Discover an existing NFS mount (shared) if not created upstream
+# This might not exist. If so, then the ML configs MUST declare their own location
+# If it does exist, then the ML configs can use it as a default if not set explicitly
+
+- name: Set fact for Azure NFS mount path if established by Infrastructure
+  when: infra__azure_netapp_nfs_mount is defined
   ansible.builtin.set_fact:
-    run__azure_nfs_mount: "{{ infra__azure_nfs_mount }}"
+    run__azure_netapp_nfs_mount: "{{ infra__azure_netapp_nfs_mount }}"
+
+- name: Discover Azure NetApp NFS mount path
+  when: run__azure_netapp_nfs_mount is undefined
+  block:
+    - name: Get Azure NetApp NFS volume details
+      register: __azure_netapp_nfs_info
+      azure.azcollection.azure_rm_resource_info:
+        resource_group: "{{ run__azure_metagroup_name }}"
+        provider: NetApp
+        resource_type: netAppAccounts
+        resource_name: "{{ run__azure_netapp_account_name }}"
+        subresource:
+          - type: capacityPools
+            name: "{{ run__azure_netapp_pool_name }}"
+          - type: volumes
+            name: "{{ run__azure_netapp_vol_name }}"
+
+    - name: Set Azure NetApp Volume Start IP if exists
+      when: __azure_netapp_nfs_info.response | length > 0
+      ansible.builtin.set_fact:
+        __azure_netapp_startip: "{{ __azure_netapp_nfs_info.response | first | community.general.json_query('properties.mountTargets[0].ipAddress') }}"
+
+    - name: Set Azure NetApp Volume Info and Protocol if exists
+      when: __azure_netapp_startip is defined
+      block:
+        - name: Set Azure NetApp Volume NFS mount path
+          ansible.builtin.set_fact:
+            run__azure_netapp_nfs_mount: "{{ __azure_netapp_startip }}:/{{ run__namespace }}"
+
+        - name: Validate Azure NetApp Volume NFS protocol version
+          ansible.builtin.assert:
+            that: ("NFSv" + run__azure_netapp_nfs_version) in __azure_netapp_nfs_info.response | first | community.general.json_query('properties.protocolTypes')
+            fail_msg: "Invalid NFS protocol version. 'NFSv{{ run__azure_netapp_nfs_version }}' not supported by Azure NetApp volume, '{{ __azure_netapp_nfs_info.response | map('attribute', 'id') | list | first }}'."
+            quiet: yes
+
+# ansible -m azure.azcollection.azure_rm_resource_info localhost -a "resource_group=go03-rmgp provider=NetApp resource_type='netAppAccounts' resource_name='go03-netapp-account' subresource={{ subs }}" -e '{ "subs": [{ "type": "capacityPools" }] }'

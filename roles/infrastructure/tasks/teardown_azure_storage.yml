@@ -38,6 +38,24 @@
         name: "{{ infra__azure_netapp_vol_name }}"
         state: absent
 
+    - name: Confirm removal of Azure NetApp Volume
+      azure.azcollection.azure_rm_resource_info:
+        resource_group: "{{ infra__azure_metagroup_name }}"
+        provider: NetApp
+        resource_type: netAppAccounts
+        resource_name: "{{ infra__azure_netapp_account_name }}"
+        subresource:
+          - type: capacityPools
+            name: "{{ infra__azure_netapp_pool_name }}"
+          - type: volumes
+            name: "{{ infra__azure_netapp_vol_name }}"
+      register: __azure_netapp_volume_removal
+      until: __azure_netapp_volume_removal.failed or __azure_netapp_volume_removal.response | first | community.general.json_query(query)
+      delay: 15
+      retries: 40 # 10 mins
+      vars:
+        query: "error.code == 'ResourceNotFound'"
+
     - name: Remove NetApp Capacity Pool
       netapp.azure.azure_rm_netapp_capacity_pool:
         resource_group: "{{ infra__azure_metagroup_name }}"
