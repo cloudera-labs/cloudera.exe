@@ -77,6 +77,7 @@ plat__xacccount_credential_name:              "{{ common__xaccount_credential_na
 plat__workload_analytics:                     "{{ env.workload_analytics | default(True) }}"
 plat__tunnel:                                 "{{ common__tunnel }}"
 plat__public_endpoint_access:                 "{{ common__public_endpoint_access }}"
+plat__enable_raz:                             "{{ env.datalake.enable_raz | default(False) }}"
 
 plat__env_admin_password:                     "{{ common__env_admin_password }}"
 
@@ -129,6 +130,7 @@ plat__aws_idbroker_role_name:                 "{{ common__aws_idbroker_role_name
 plat__aws_log_role_name:                      "{{ env.aws.role.name.log | default([plat__namespace, plat__aws_log_suffix, plat__aws_role_suffix] | join('-')) }}"
 plat__aws_datalake_admin_role_name:           "{{ common__aws_datalake_admin_role_name }}"
 plat__aws_ranger_audit_role_name:             "{{ env.aws.role.name.ranger_audit | default([plat__namespace, plat__aws_ranger_audit_suffix, plat__aws_role_suffix] | join('-')) }}"
+plat__aws_ranger_cloud_access_role_name:      "{{ env.aws.role.name.ranger_cloud_access | default(common__aws_datalake_admin_role_name) }}"
 
 plat__aws_xaccount_policy_name:               "{{ env.aws.policy.name.cross_account | default([plat__namespace, plat__aws_xaccount_suffix, plat__aws_policy_suffix] | join('-')) }}"
 plat__aws_idbroker_policy_name:               "{{ env.aws.policy.name.idbroker | default([plat__namespace, plat__aws_idbroker_suffix, plat__aws_policy_suffix] | join('-')) }}"
