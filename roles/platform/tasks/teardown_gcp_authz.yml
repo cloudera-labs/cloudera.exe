@@ -59,7 +59,7 @@
     label: __gcp_binding_item.member
   failed_when:
     - __gcp_service_account_teardown.rc == 1
-    - "'Policy bindings with the specified member and role not found!' not in __gcp_service_account_teardown.stderr"
+    - "'Policy bindings with the specified principal and role not found!' not in __gcp_service_account_teardown.stderr"
   loop:
     # Logs
     - member: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
