@@ -32,13 +32,13 @@
       
 - name: Set list of role assignments to delete
   ansible.builtin.set_fact:
-    __plat_azure_role_assignment_list: "{{ __plat_azure_role_assignments_discovered.roleassignments | selectattr('assignee_object_id', 'in', role_assignment_assignee_list) | list }}"
+    __plat_azure_role_assignment_list: "{{ __plat_azure_role_assignments_discovered.roleassignments | selectattr('assignee_object_id', 'in', role_assignment_assignee_list) | list if __plat_azure_role_assignments_discovered.roleassignments is defined else [] }}"
   vars:
-    msi_principal_id_list: "{{ __azure_identity_list.response | selectattr('name', 'in', identity_names) | map(attribute='properties') | map(attribute='principalId') | list }}"
+    msi_principal_id_list: "{{ __azure_identity_list.response | rejectattr('name', 'undefined') | selectattr('name', 'in', identity_names) | map(attribute='properties') | map(attribute='principalId') | list }}"
     identity_names:
       - "{{ plat__azure_idbroker_identity_name }}"
       - "{{ plat__azure_datalakeadmin_identity_name }}"
       - "{{ plat__azure_log_identity_name }}"
       - "{{ plat__azure_ranger_audit_identity_name }}"
-    role_assignment_assignee_list: "{{ msi_principal_id_list | union([plat__azure_application_service_principal_objuuid]) }}"
+    role_assignment_assignee_list: "{{ msi_principal_id_list | union([plat__azure_application_service_principal_objuuid]) | list }}"
     

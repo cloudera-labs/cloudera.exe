@@ -25,6 +25,9 @@
     "{{ __plat_azure_role_assignment_list }}"
 
 - name: Request deletion of Azure Managed Identities
+  when:
+    - plat__azure_metagroup_uri is defined
+    - plat__azure_metagroup_uri | length > 0
   loop_control:
     loop_var: __azure_msi_item
   register: __azure_az_msi_info
@@ -45,6 +48,9 @@
     - "{{ plat__azure_ranger_audit_identity_name }}"
 
 - name: Wait for MSIs to be delisted
+  when:
+    - plat__azure_metagroup_uri is defined
+    - plat__azure_metagroup_uri | length > 0
   azure.azcollection.azure_rm_resource_info:
     resource_group: "{{ plat__azure_metagroup_name }}"
     provider: ManagedIdentity
