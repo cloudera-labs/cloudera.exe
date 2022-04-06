@@ -91,19 +91,6 @@
   ansible.builtin.set_fact:
     plat__azure_xaccount_role_uri: "{{ __azure_xaccount_role_info.roledefinitions[0].id | default('') }}"
 
-- name: Refresh List of Identities in Azure Resource Group
-  when: plat__azure_metagroup_uri | length > 0
-  register: __azure_identity_list
-  command: "az identity list -g {{ plat__azure_metagroup_name }}"
-
-- name: Preparse Azure Resource Group list of Identity Names
-  when:
-    - __azure_identity_list is defined
-    - __azure_identity_list.stdout is defined
-    - __azure_identity_list.stdout | count > 0
-  ansible.builtin.set_fact:
-    __azure_identity_list_names: "{{ __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') }}"
-
 - name: Fetch Azure Security Group Info
   register: __azure_sg_info
   command: "az network nsg list"
@@ -119,6 +106,7 @@
     __azure_jq_default: "[?name=='{{ plat__security_group_default_name }}'].id"
 
 - name: Extract Azure Identity Principals
+  when: no # TODO: Review for existing MSI usage
   ignore_errors: True
   ansible.builtin.set_fact:
     __azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_idbroker_uri) | first }}"

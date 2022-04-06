@@ -18,7 +18,7 @@
   cloudera.cloud.datalake:
     name: "{{ plat__datalake_name }}"
     env: "{{ plat__env_name }}"
-    managed_identity: "{{ __azure_idbroker_identity_uri }}"
+    managed_identity: "{{ __azure_idbroker_identity.id }}"
     storage: "{{ plat__azure_stor_data_uri }}"
     runtime: "{{ plat__datalake_version | default(omit) }}"
     scale: "{{ plat__datalake_scale | default(omit) }}"

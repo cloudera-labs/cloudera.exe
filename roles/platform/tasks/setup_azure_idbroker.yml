@@ -18,10 +18,10 @@
   cloudera.cloud.env_idbroker:
     name: "{{ plat__env_name }}"
     sync: no
-    data_access: "{{ __azure_datalakeadmin_identity_uri }}"
-    ranger_audit: "{{ __azure_ranger_audit_identity_uri }}"
+    data_access: "{{ __azure_datalakeadmin_identity.id }}"
+    ranger_audit: "{{ __azure_ranger_audit_identity.id }}"
     mappings:
       - accessor: "{{ plat__cdp_pub_admin_group_crn }}"
-        role: "{{ __azure_datalakeadmin_identity_uri }}"
+        role: "{{ __azure_datalakeadmin_identity.id }}"
       - accessor: "{{ plat__cdp_pub_user_group_crn }}"
-        role: "{{ __azure_datalakeadmin_identity_uri }}"
+        role: "{{ __azure_datalakeadmin_identity.id }}"
