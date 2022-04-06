@@ -115,7 +115,7 @@
       ansible.builtin.set_fact:
         infra__azure_netapp_nfs_mount: "{{ __azure_netapp_vol_details.msg }}"
 
-    # Yay for Azure consistency
+    # Handle Azure (in-)consistency
     - name: Prepare netapp vol info for submission during recreation
       when: __azure_netapp_vol_details.mount_path is defined
       ansible.builtin.set_fact:
