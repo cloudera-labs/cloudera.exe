@@ -135,7 +135,7 @@
     api_version: '2018-11-30'
   register: __azure_identity_list
   delay: 5
-  retries: 10
+  retries: 120 # 10 mins
   until:
     - plat__azure_idbroker_identity_name in discovered_msi_list
     - plat__azure_datalakeadmin_identity_name in discovered_msi_list
@@ -205,10 +205,6 @@
       scope: "{{ plat__azure_subscription_uri }}"
       assignee: "{{ plat__azure_application_service_principal_objuuid }}"
       desc: Assign top level Contributor Role to Cross Account App
-    - role: "{{ __azure_xaccount_role_id }}"
-      scope: "{{ plat__azure_subscription_uri }}"
-      assignee: "{{ plat__azure_application_service_principal_objuuid }}"
-      desc: Assign Cross Account Role to Cross Account App
   loop_control:
     loop_var: __azure_rl_assgn_item
     label: "{{ __azure_rl_assgn_item.desc }}"
