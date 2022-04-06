@@ -105,26 +105,6 @@
     __azure_jq_knox: "[?name=='{{ plat__security_group_knox_name }}'].id"
     __azure_jq_default: "[?name=='{{ plat__security_group_default_name }}'].id"
 
-- name: Get Azure Netapp NFS Info
-  register: __azure_netapp_nfs_info
-  command: >
-    az netappfiles volume show \
-    --resource-group "{{ plat__azure_metagroup_name |quote }}" \
-    --account-name "{{ plat__azure_netapp_account_name |quote }}" \
-    --pool-name "{{ plat__azure_netapp_pool_name |quote }}" \
-    --volume-name "{{ plat__azure_netapp_vol_name |quote }}"
-  ignore_errors: true
-
-- name: Set Azure NetApp Volume Start IP if exists
-  when: __azure_netapp_nfs_info.stdout != ''
-  ansible.builtin.set_fact:
-    __azure_netapp_startip: "{{ __azure_netapp_nfs_info.stdout | from_json | community.general.json_query('mountTargets[0].ipAddress') }}"
-
-- name: Set Azure NetApp Volume Info if exists
-  when: __azure_netapp_startip is defined
-  ansible.builtin.set_fact:
-    infra__azure_nfs_mount: "{{ __azure_netapp_startip }}:/{{ plat__namespace }}"
-
 - name: Generate Public Subnet details
   ansible.builtin.set_fact:
     plat__vpc_public_subnets_info: "{{ plat__vpc_public_subnets_info | default([]) | union([entry]) }}"
