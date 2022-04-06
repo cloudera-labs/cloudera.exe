@@ -43,9 +43,7 @@ dependencies:
   'amazon.aws': '3.0.0'
   'azure.azcollection': '1.11.0'
   'google.cloud': '1.0.2'
-  # netapp.azure
-  # Bug fix for Netapp collection
-  'git+https://github.com/ansible-collections/netapp.git#ansible_collections/netapp/azure': 'main'
+  'netapp.azure': '21.10.0'
 
 repository: https://github.com/cloudera-labs/cloudera.exe
 # TODO: Set documentation URL
