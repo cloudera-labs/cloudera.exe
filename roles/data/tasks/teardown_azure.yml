@@ -32,7 +32,7 @@
         state: absent
         scope: "{{ __azure_data_location_assignment.scope }}"
         assignee_object_id: "{{ __azure_data_location_assignment.assignee }}"
-        role_definition_id: "{{ __data_store.read_only | default(False) | ternary(__azure_storage_blob_data_reader_uri, __azure_storage_blob_data_contributor_uri) }}"
+        role_definition_id: "{{ __data_store.read_only | default(False) | ternary(__azure_storage_blob_data_reader_uri, __azure_storage_blob_data_owner_uri) }}"
       loop: "{{ __azure_data_location_storage_assignments }}"
       loop_control:
         loop_var: __azure_data_location_assignment
