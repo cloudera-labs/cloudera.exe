@@ -253,7 +253,7 @@
         state: present
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
-        tags: "{{ infra__tags | combine({ 'Name': 'infra__security_group_vpce_name' }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({ 'Name': infra__security_group_vpce_name }, recursive=True) }}"
         name: "{{ infra__security_group_vpce_name }}"
         description: "{{ infra__security_group_vpce_name }}"
         rules:
