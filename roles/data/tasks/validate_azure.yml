@@ -23,6 +23,6 @@
       - __data_location.container is string
     fail_msg: "Each Azure external data location must provide both 'storage_account' and 'container' names."
     quiet: yes
-  loop: "{{ __data_storage.locations.azure }}"
+  loop: "{{ data__storage | map(attribute='locations') | map(attribute='azure') | default([]) | flatten | list }}"
   loop_control:
     loop_var: __data_location
