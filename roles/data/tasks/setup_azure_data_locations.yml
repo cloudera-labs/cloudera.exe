@@ -40,5 +40,5 @@
     entry:
       name: "{{ __azure_data_location_assignment_name | to_uuid }}"
       scope: "{{ __azure_data_location_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ __data_store_azure_location.storage_account }}/blobServices/default/containers/{{ __data_store_azure_location.container }}"
-      assignee: "{{ __azure_datalakeadmin_identity_uuid }}"
+      assignee: "{{ __azure_datalakeadmin_identity.properties.principalId }}"
       desc: external data location assignment

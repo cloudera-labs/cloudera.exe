@@ -23,20 +23,18 @@
   ansible.builtin.set_fact:
     data__azure_metagroup_uri: "{{ __azure_resource_metagroup_info.resourcegroups[0].id | default('') }}"
 
-- name: Query for the Azure Datalake Admin Identity 
-  command: "az identity list -g {{ data__azure_metagroup_name }}"
-  register: __azure_identity_list
-  failed_when: __azure_identity_list.rc != 0
-  delay: 5
-  retries: 10
-  until:
-    - data__azure_datalakeadmin_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+- name: Retrieve Azure Datalake Admin Identity
+  azure.azcollection.azure_rm_resource_info:
+    resource_group: "{{ data__azure_metagroup_name }}"
+    provider: ManagedIdentity
+    resource_type: userAssignedIdentities
+    resource_name: "{{ data__azure_datalakeadmin_identity_name }}"
+    #api_version: '2018-11-30'
+  register: __azure_dl_admin_identity
 
-- name: Extract Azure Identity Principals
+- name: Set fact Azure Datalake Admin Principal details
   ansible.builtin.set_fact:
-    __azure_datalakeadmin_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_dtadmin_uuid) | first }}"
-  vars:
-    jq_dtadmin_uuid: "[?name=='{{ data__azure_datalakeadmin_identity_name }}'].principalId"
+    __azure_datalakeadmin_identity: "{{ __azure_dl_admin_identity.response | selectattr('name', 'eq', data__azure_datalakeadmin_identity_name) | first }}"
 
 - name: Retrieve Storage Blob Data Owner Role definition
   azure_rm_roledefinition_info:
