@@ -69,3 +69,19 @@
         region: "{{ data__region }}"
         policy_name: "{{ __data_aws_external_policy_name }}"
         state: absent
+
+- name: Tear down AWS external role
+  when: __data_storage.role.delete | default(data__teardown_deletes_roles)
+  block:
+    - name: Set fact for external data AWS role name
+      ansible.builtin.set_fact:
+        __data_aws_access_role_name: "{{ __data_storage.role.name | default(__data_role_name) }}"
+      vars:
+        __data_role_name: "{{ __data_storage.role.datalake_admin | default(True) | ternary(data__aws_datalake_admin_role_name, __data_role_name_default) }}"
+        __data_role_name_default: "{{ [data__namespace, data__external_data_suffix, __data_storage.role.suffix | default(data__aws_role_suffix)] | join('-') }}"
+
+    - name: Delete external data AWS role
+      community.aws.iam_role:
+        region: "{{ data__region }}"
+        name: "{{ __data_aws_access_role_name }}"
+        state: absent
