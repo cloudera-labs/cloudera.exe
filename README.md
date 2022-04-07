@@ -1,6 +1,6 @@
 # cloudera.exe - Runlevel Management and Utilities for Cloudera Data Platform (CDP)
 
-Readme last updated: 2021-05-26
+Readme last updated: 2022-04-07
 
 `cloudera.exe` is an Ansible collection enabling runlevel management of CDP Public Cloud deployments. The collection also contains a number of utilities for common scenarios encountered when managing a CDP deployment.
 
@@ -30,7 +30,7 @@ The collection has several dependencies that should resolve automatically via th
 - [amazon.aws](https://github.com/ansible-collections/amazon.aws)
 - [azure.azcollection](https://github.com/ansible-collections/azure)
 - [google.cloud](https://github.com/ansible-collections/google.cloud)
-- [netapp.azure](https://github.com/ansible-collections/netapp.git#ansible_collections/netapp/azure) (currently a bug fix branch)
+- [netapp.azure](https://github.com/ansible-collections/netapp.azure)
 
 ## Option #1: Install from GitHub
 
@@ -159,7 +159,7 @@ Contribution instructions are coming soon!
 
 # License and Copyright
 
-Copyright 2021, Cloudera, Inc.
+Copyright 2022, Cloudera, Inc.
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
