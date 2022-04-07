@@ -21,7 +21,6 @@
 # TODO Discover an existing NFS mount (shared) if not created upstream
 # This might not exist. If so, then the ML configs MUST declare their own location
 # If it does exist, then the ML configs can use it as a default if not set explicitly
-
 - name: Set fact for Azure NFS mount path if established by Infrastructure
   when: infra__azure_netapp_nfs_mount is defined
   ansible.builtin.set_fact:

@@ -24,7 +24,7 @@
     default_sg: "{{ __azure_sec_group_default_uri }}"
     knox_sg: "{{ __azure_sec_group_knox_uri }}"
     log_location: "{{ plat__azure_stor_logs_uri }}"
-    log_identity: "{{ __azure_log_identity_uri }}"
+    log_identity: "{{ __azure_log_identity.id }}"
     public_key_text: "{{ plat__public_key_text }}"
     workload_analytics: "{{ plat__workload_analytics }}"
     vpc_id: "{{ plat__vpc_name }}"
