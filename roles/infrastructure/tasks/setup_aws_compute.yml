@@ -66,12 +66,12 @@
   register: __infra_utility_vm_instance
   amazon.aws.ec2_instance:
     region: "{{ infra__region }}"
-    group_id: "{{ infra__aws_security_group_default_id }}"
+    security_group: "{{ infra__aws_security_group_default_id }}"
     key_name: "{{ infra__public_key_id }}"
     instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type]['sml'] }}"
     image_id: "{{ __infra_aws_ami_info.image_id }}"
     ebs_optimized: yes
-    instance_profile_name: "{{ infra__download_mirror_role.iam_role.role_name }}"
+    instance_role: "{{ infra__download_mirror_role.iam_role.role_name }}"
     volumes:
       - device_name: /dev/sda1
         ebs:
@@ -80,7 +80,7 @@
           delete_on_termination: true
     wait: yes
     state: running
-    instance_tags: "{{ infra__dynamic_inventory_tags }}"
+    tags: "{{ infra__dynamic_inventory_tags }}"
     name: "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}"
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
     network:
