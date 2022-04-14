@@ -39,8 +39,6 @@
     api_version: '2018-11-30'
     idempotency: yes
     state: absent
-    body:
-      location: "{{ plat__region }}"
   loop:
     - "{{ plat__azure_idbroker_identity_name }}"
     - "{{ plat__azure_datalakeadmin_identity_name }}"
@@ -60,10 +58,10 @@
   delay: 5
   retries: 10
   until:
-    - plat__azure_idbroker_identity_name in discovered_msi_list
-    - plat__azure_datalakeadmin_identity_name in discovered_msi_list
-    - plat__azure_log_identity_name in discovered_msi_list
-    - plat__azure_ranger_audit_identity_name in discovered_msi_list
+    - plat__azure_idbroker_identity_name not in discovered_msi_list
+    - plat__azure_datalakeadmin_identity_name not in discovered_msi_list
+    - plat__azure_log_identity_name not in discovered_msi_list
+    - plat__azure_ranger_audit_identity_name not in discovered_msi_list
   vars:
     discovered_msi_list: "{{ __azure_identity_list.response | map(attribute='name') | list }}"
 
