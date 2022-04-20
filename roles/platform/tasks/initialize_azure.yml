@@ -145,3 +145,19 @@
     plat__azure_storage_account_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}"
     plat__azure_logpath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{ plat__azure_log_suffix }}"
     plat__azure_datapath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{ plat__azure_data_suffix }}"
+
+- name: Set fact for default Azure MSIs
+  ansible.builtin.set_fact:
+    plat__azure_msis: "{{ plat__azure_msis | default([]) | union([__azure_msi_item]) }}"
+  loop_control:
+    loop_var: __azure_msi_item
+  loop: 
+    - "{{ plat__azure_idbroker_identity_name }}"
+    - "{{ plat__azure_datalakeadmin_identity_name }}"
+    - "{{ plat__azure_log_identity_name }}"
+    - "{{ plat__azure_ranger_audit_identity_name }}"
+
+- name: Update fact for RAZ Azure MSI
+  when: plat__enable_raz | bool
+  ansible.builtin.set_fact:
+    plat__azure_msis: "{{ plat__azure_msis | union([plat__azure_raz_identity_name]) }}"

@@ -16,6 +16,7 @@
 
 - name: Handle Azure Cross Account Role
   register: __azure_xaccount_role_info
+  when: plat__azure_xaccount_use_custom_role | bool
   azure.azcollection.azure_rm_roledefinition:  # This version fails idempotence if a description is set
     state: present
     name: "{{ plat__azure_xaccount_role_name }}"
@@ -121,11 +122,7 @@
     state: present
     body:
       location: "{{ plat__region }}"
-  loop:
-    - "{{ plat__azure_idbroker_identity_name }}"
-    - "{{ plat__azure_datalakeadmin_identity_name }}"
-    - "{{ plat__azure_log_identity_name }}"
-    - "{{ plat__azure_ranger_audit_identity_name }}"
+  loop: "{{ plat__azure_msis }}"
 
 - name: Wait for MSIs to be listed
   azure.azcollection.azure_rm_resource_info:
@@ -136,11 +133,7 @@
   register: __azure_identity_list
   delay: 5
   retries: 120 # 10 mins
-  until:
-    - plat__azure_idbroker_identity_name in discovered_msi_list
-    - plat__azure_datalakeadmin_identity_name in discovered_msi_list
-    - plat__azure_log_identity_name in discovered_msi_list
-    - plat__azure_ranger_audit_identity_name in discovered_msi_list
+  until: discovered_msi_list is subset(plat__azure_msis)
   vars:
     discovered_msi_list: "{{ __azure_identity_list.response | map(attribute='name') | list }}"
 
@@ -150,6 +143,7 @@
     __azure_datalakeadmin_identity: "{{ __azure_identity_list.response | selectattr('name', 'eq', plat__azure_datalakeadmin_identity_name) | first }}"
     __azure_log_identity: "{{ __azure_identity_list.response | selectattr('name', 'eq', plat__azure_log_identity_name) | first }}"
     __azure_ranger_audit_identity: "{{ __azure_identity_list.response | selectattr('name', 'eq', plat__azure_ranger_audit_identity_name) | first }}"
+    __azure_raz_identity: "{{ __azure_identity_list.response | selectattr('name', 'eq', plat__azure_raz_identity_name) | first | default(omit) }}"
   
 - name: Refresh listing of Azure Role Definitions
   register: __azure_role_definition_info
@@ -159,12 +153,12 @@
 
 - name: Extract Azure Role Definition IDs
   ansible.builtin.set_fact:
-    __azure_xaccount_role_id: "{{ __azure_role_definition_info.roledefinitions | selectattr('role_name', 'eq', plat__azure_xaccount_role_name) | map(attribute='id') | list | first }}"
     __azure_virtualmachine_ctrb_role_id: "{{ __azure_role_definition_info.roledefinitions | selectattr('role_name', 'eq', plat__azure_roles.vmcnt) | map(attribute='id') | list | first }}"
     __azure_managedidentity_optr_role_id: "{{ __azure_role_definition_info.roledefinitions | selectattr('role_name', 'eq', plat__azure_roles.miop) | map(attribute='id') | list | first }}"
     __azure_storageblobdata_ownr_role_id: "{{ __azure_role_definition_info.roledefinitions | selectattr('role_name', 'eq', plat__azure_roles.storown) | map(attribute='id') | list | first }}"
     __azure_storageblobdata_ctrb_role_id: "{{ __azure_role_definition_info.roledefinitions | selectattr('role_name', 'eq', plat__azure_roles.storcnt) | map(attribute='id') | list | first }}"
     __azure_contributor_role_id: "{{ __azure_role_definition_info.roledefinitions | selectattr('role_name', 'eq', plat__azure_roles.contrib) | map(attribute='id') | list | first }}"
+    __azure_storageblob_delegator_role_id: "{{ __azure_role_definition_info.roledefinitions | selectattr('role_name', 'eq', plat__azure_roles.stordel) | map(attribute='id') | list | first }}"
 
 - name: Process Azure Role Assignments
   register: __infra_az_sp_assign_result
@@ -213,3 +207,31 @@
     - "'rc' in __infra_az_sp_assign_result" 
     - __infra_az_sp_assign_result.rc != 0
     - "'The role assignment already exists' not in __infra_az_sp_assign_result.module_stderr"
+
+- name: Process RAZ Azure Role Assignments
+  register: __infra_az_sp_assign_raz_result
+  until: __infra_az_sp_assign_raz_result is not failed
+  when: plat__enable_raz | bool
+  retries: 3
+  delay: 3
+  azure.azcollection.azure_rm_roleassignment:
+    state: present
+    scope: "{{ __azure_rl_assgn_raz_item.scope }}"
+    assignee_object_id: "{{ __azure_rl_assgn_raz_item.assignee }}"
+    role_definition_id: "{{ __azure_rl_assgn_raz_item.role }}"
+  loop:
+    - role: "{{ __azure_storageblob_delegator_role_id }}"
+      scope: "{{ plat__azure_storage_account_uri }}"
+      assignee: "{{ __azure_raz_identity.properties.principalId }}"
+      desc: Assign Storage Blob Delegator Role to RAZ Identity at Storage Account level
+    - role: "{{ __azure_storageblobdata_ownr_role_id }}"
+      scope: "{{ plat__azure_storage_account_uri }}"
+      assignee: "{{ __azure_raz_identity.properties.principalId }}"
+      desc: Assign Storage Blob Data Owner Role to RAZ Identity at Storage Account level
+  loop_control:
+    loop_var: __azure_rl_assgn_raz_item
+    label: "{{ __azure_rl_assgn_raz_item.desc }}"
+  failed_when:
+    - "'rc' in __infra_az_sp_assign_raz_result" 
+    - __infra_az_sp_assign_raz_result.rc != 0
+    - "'The role assignment already exists' not in __infra_az_sp_assign_raz_result.module_stderr"

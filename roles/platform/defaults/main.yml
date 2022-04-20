@@ -188,6 +188,7 @@ plat__azure_data_suffix:                      "{{ env.azure.role.label.data | de
 plat__azure_identity_suffix:                  "{{ env.azure.role.label.identity | default(common__identity_suffix) }}"
 plat__azure_datalake_admin_suffix:            "{{ env.azure.role.label.datalake_admin | default(common__datalake_admin_suffix) }}"
 plat__azure_ranger_audit_suffix:              "{{ env.azure.role.label.ranger_audit | default(common__ranger_audit_suffix) }}"
+plat__azure_raz_suffix:                       "{{ env.azure.role.label.raz | default(common__raz_suffix) }}"
 plat__azure_idbroker_suffix:                  "{{ env.azure.role.label.idbroker | default(common__idbroker_suffix) }}"
 
 plat__azure_owner_name_suffix:                "{{ env.azure.role.name_suffix.owner | default('owner') }}"
@@ -211,6 +212,7 @@ plat__azure_policy_url:                       "{{ env.azure.policy.url | default
 plat__azure_log_identity_name:                "{{ env.azure.role.name.log | default([plat__namespace, plat__azure_log_suffix, plat__azure_identity_suffix] | join('-')) }}"
 plat__azure_datalakeadmin_identity_name:      "{{ env.azure.role.name.datalake_admin | default([plat__namespace, plat__azure_datalake_admin_suffix, plat__azure_identity_suffix] | join('-')) }}"
 plat__azure_ranger_audit_identity_name:       "{{ env.azure.role.name.ranger_audit | default([plat__namespace, plat__azure_ranger_audit_suffix, plat__azure_identity_suffix] | join('-')) }}"
+plat__azure_raz_identity_name:                "{{ env.azure.role.name.raz | default([plat__namespace, plat__azure_raz_suffix, plat__azure_identity_suffix] | join('-')) }}"
 plat__azure_idbroker_identity_name:           "{{ env.azure.role.name.idbroker | default([plat__namespace, plat__azure_idbroker_suffix, plat__azure_identity_suffix] | join('-')) }}"
 
 plat__azure_xaccount_contributor_assn_name:             "{{ env.azure.role.assignment.cross_account.contributor | default('-'.join([plat__namespace, plat__azure_xaccount_suffix, plat__azure_contributor_name_suffix, plat__azure_assignment_name_suffix,ansible_date_time.iso8601]) | to_uuid )}}"

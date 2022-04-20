@@ -20,6 +20,7 @@
     sync: no
     data_access: "{{ __azure_datalakeadmin_identity.id }}"
     ranger_audit: "{{ __azure_ranger_audit_identity.id }}"
+    ranger_cloud_access: "{{ (plat__enable_raz | bool) | ternary(__azure_raz_identity.id, omit) }}"
     mappings:
       - accessor: "{{ plat__cdp_pub_admin_group_crn }}"
         role: "{{ __azure_datalakeadmin_identity.id }}"
