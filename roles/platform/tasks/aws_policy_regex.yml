@@ -1,6 +1,6 @@
 ---
 
-# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+# Copyright 2022 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,3 +36,5 @@
       replace: "{{ plat__storage_name }}"
     - regexp: '\${DATALAKE_BUCKET}'
       replace: "{{ plat__storage_name }}"
+    - regexp: '\${ARN_PARTITION}'
+      replace: "{{ plat__aws_arn_partition }}"
