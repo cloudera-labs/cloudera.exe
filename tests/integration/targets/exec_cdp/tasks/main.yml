@@ -5,9 +5,9 @@
     name: cloudera.exe.platform
     tasks_from: validate.yml
   environment: "{{ env_vars }}"
-  tags: always
 
 - name: Install the CDP Public Cloud environment
+  when: install | bool
   block:
     - name: Initialize the CDP Public Cloud environment for setup
       ansible.builtin.import_role:
@@ -20,9 +20,9 @@
         name: cloudera.exe.platform
         tasks_from: setup.yml
       environment: "{{ env_vars }}"
-  tags: setup
 
 - name: Teardown the CDP Public Cloud environment
+  when: not install | bool
   block:
     - name: Initialize the CDP Public Cloud environment for teardown
       ansible.builtin.import_role:
@@ -35,4 +35,3 @@
         name: cloudera.exe.platform
         tasks_from: teardown.yml
       environment: "{{ env_vars }}"
-  tags: teardown
