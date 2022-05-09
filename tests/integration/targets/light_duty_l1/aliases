@@ -1,0 +1,4 @@
+# cloud/aws
+skip/python2
+setup/once/setup_infra
+needs/target/exec_cdp

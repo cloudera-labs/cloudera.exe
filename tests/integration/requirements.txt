@@ -1,0 +1,15 @@
+# CDPCLI / cdpy
+git+https://github.com/cloudera-labs/cdpy@main#egg=cdpy
+
+# AWS SDKs
+awscli>=1.18.222
+boto>=2.49.0
+botocore>=1.12.249
+boto3>=1.9.249
+
+# Ansible 
+jmespath                # community.general.json_query
+netaddr                 # ansible.netcommon.ipaddr
+
+# Upstream dependencies
+docutils==0.14          # Required by cdpcli-beta 0.9.59

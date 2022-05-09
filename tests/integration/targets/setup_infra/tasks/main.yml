@@ -1,0 +1,30 @@
+---
+
+- name: Read CDP Public Cloud environment infrastructure variables
+  ansible.builtin.include_vars:
+    file: infra.yml
+    name: __infra
+
+- name: Combine with CDP Public Cloud environment runtime variables
+  ansible.builtin.set_fact:
+    globals: "{{ __infra.globals | default({}) | combine(globals | default({}), recursive=True) }}"
+    infra: "{{ __infra.infra | default({}) | combine(infra | default({}), recursive=True) }}"
+    env: "{{ __infra.env | default({}) | combine(env | default({}), recursive=True) }}"
+
+- name: Validate CDP Public Cloud environment variables
+  ansible.builtin.import_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: validate.yml
+  environment: "{{ env_vars }}"
+
+- name: Initialize CDP Public Cloud environment setup variables
+  ansible.builtin.import_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: initialize_setup.yml
+  environment: "{{ env_vars }}"
+
+- name: Setup CDP Public Cloud environment infrastructure
+  ansible.builtin.import_role:
+    name: cloudera.exe.infrastructure
+    tasks_from: setup.yml
+  environment: "{{ env_vars }}"

@@ -1,0 +1,12 @@
+---
+
+# Default flags for teardown
+
+env:
+  tunnel: yes  # Delete any private networking elements
+
+infra:
+  teardown:
+    delete_network: yes
+    delete_data: yes
+    delete_ssh_key: yes

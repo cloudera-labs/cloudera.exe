@@ -1,0 +1,19 @@
+---
+
+# Light-duty Datalake
+# Level 1 networking (public/private)
+
+env:
+  name: "{{ globals.name_prefix }}-{{ globals.infra_type}}-lgt-l1-test"
+  cdp:
+    credential:
+      name: "{{ globals.name_prefix }}-{{ globals.infra_type }}-lgt-l1-test"
+  datalake:
+    scale: LIGHT_DUTY  # same as env.enable_ha=False
+  tunnel: yes
+  public_endpoint_access: yes
+  workload_analytics: no
+  teardown:
+    delete_credential: yes
+  azure:
+    single_resource_group: yes

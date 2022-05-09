@@ -1,0 +1,18 @@
+---
+
+- name: Read CDP Public Cloud environment variables
+  ansible.builtin.include_vars:
+    file: cdp.yml
+    name: __cdp
+  tags: always
+
+- name: Combine CDP Public Cloud environment variables with runtime variables
+  ansible.builtin.set_fact:
+    globals: "{{ __cdp.globals | default({}) | combine(globals | default({}), recursive=True) }}"
+    env: "{{ __cdp.env | default({}) | combine(env | default({}), recursive=True) }}"
+  tags: always
+
+- name: Manage the CDP Public Cloud environment
+  ansible.builtin.import_role:
+    name: exec_cdp
+  tags: always
