@@ -69,4 +69,3 @@
     name: "{{ item }}" 
     groups: "{{ freeipa_host_group__host_group_name }}" 
   loop: "{{ __freeipa_server_public_ip }}"
-

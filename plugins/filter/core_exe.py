@@ -53,6 +53,7 @@ def combine_onto(*terms, **kwargs):
 
     return result
 
+
 class FilterModule(object):
     ''' Derivatives of Ansible jinja2 filters '''
 
