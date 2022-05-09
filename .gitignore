@@ -4,6 +4,9 @@
 # Remove ansible-test output
 tests/output
 
+# Remove any integration configuration
+tests/integration/integration_config.yml
+
 # Remove molecule testing deployments
 **/molecule/*/deployment
 
