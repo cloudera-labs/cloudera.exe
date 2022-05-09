@@ -12,4 +12,4 @@ netaddr                 # ansible.netcommon.ipaddr
 molecule[lint]==3.4     # Pinned due to https://github.com/ansible-community/molecule/issues/3243
 
 # CDPCLI / cdpy
-git+git://github.com/cloudera-labs/cdpy@main#egg=cdpy
+git+https://github.com/cloudera-labs/cdpy@main#egg=cdpy
