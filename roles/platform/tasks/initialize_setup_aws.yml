@@ -48,7 +48,7 @@
     plat__aws_xaccount_account_id: "{{ plat__cdp_xaccount_account_id }}"
 
 # Runlevel first, upstream second, and discover third
-- name: Discover AWS VPC if not defined
+- name: Discover AWS VPC if not defined or established by Infrastructure
   when: plat__aws_vpc_id == "" and infra__aws_vpc_id is undefined
   block:
     - name: Query AWS VPC by name
@@ -70,13 +70,12 @@
         plat__aws_vpc_id: "{{ __aws_vpc_info.vpcs[0].id }}"
 
 - name: Set fact for AWS VPC ID if established by Infrastructure
-  when: infra__aws_vpc_id is defined
+  when: plat__aws_vpc_id == "" and infra__aws_vpc_id is defined
   ansible.builtin.set_fact:
     plat__aws_vpc_id: "{{ infra__aws_vpc_id }}"
 
-# Runlevel first, upstream second, and discover third
-- name: Handle AWS Public and Private VPC Subnets if not defined
-  when: not plat__aws_public_subnet_ids or not plat__aws_private_subnet_ids
+- name: Handle AWS Subnet IDs if not defined
+  when: not plat__aws_public_subnet_ids or not plat__aws_private_subnet_ids # Defaults are empty lists
   block:
     - name: Query AWS Subnets
       amazon.aws.ec2_vpc_subnet_info:
@@ -143,6 +142,7 @@
   ansible.builtin.set_fact:
     plat__endpoint_access_scheme: "PUBLIC"
 
+# TODO Collapse the two SG queries together
 - name: Discover AWS Security Group for Knox
   when: infra__aws_security_group_knox_id is undefined
   block:
@@ -150,6 +150,7 @@
       amazon.aws.ec2_group_info:
         region: "{{ plat__region }}"
         filters:
+          vpc-id: "{{ plat__aws_vpc_id }}"
           group-name: "{{ plat__security_group_knox_name }}"
       register: __aws_security_group_knox_info
 
@@ -170,6 +171,7 @@
       amazon.aws.ec2_group_info:
         region: "{{ plat__region }}"
         filters:
+          vpc-id: "{{ plat__aws_vpc_id }}"
           group-name: "{{ plat__security_group_default_name }}"
       register: __aws_security_group_default_info
 
