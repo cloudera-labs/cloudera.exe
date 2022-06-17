@@ -37,7 +37,7 @@ env_vars:
 # Parameters used by all functions of cloudera.exe
 globals:
   name_prefix:        t01
-  admin_password:     MyVerySecretPassword
+  admin_password:     My$Very%Secret5Password9
   infra_type:         aws
   region:             us-east-2
   ssh:
