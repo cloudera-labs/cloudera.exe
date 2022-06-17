@@ -33,12 +33,26 @@
     install: yes
   tags: setup
 
+- name: Set up the CDP Public Cloud environment again (idempotent)
+  ansible.builtin.import_role:
+    name: exec_cdp
+  vars:
+    install: yes
+  tags: setup
+
 - name: Run test tasks
   ansible.builtin.debug:
     msg: "No tests defined"
   tags: test
 
 - name: Tear down the CDP Public Cloud environment
+  ansible.builtin.import_role:
+    name: exec_cdp
+  vars:
+    install: no
+  tags: teardown
+
+- name: Tear down the CDP Public Cloud environment (idempotent)
   ansible.builtin.import_role:
     name: exec_cdp
   vars:
