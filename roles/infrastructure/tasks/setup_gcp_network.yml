@@ -74,3 +74,42 @@
     --network={{ infra__vpc_name }}
     --service=servicenetworking.googleapis.com
     --ranges={{ infra__vpc_svcnet_name }}
+
+# Cloud Router and Cloud NAT for L2 networking
+- name: Create a Cloud Router
+  when: 
+    - infra__tunnel
+    - not infra__public_endpoint_access 
+  google.cloud.gcp_compute_router:
+    name: "{{ infra__gcp_cloud_router_name }}"
+    network: "{{ __gcp_vpc_info }}"
+    bgp:
+      asn: "{{ infra__gcp_cloud_router_asn }}"
+      advertise_mode: DEFAULT
+    region: "{{ infra__region }}"
+    project: "{{ infra__gcp_project }}"
+    state: present
+
+- name: Discover Cloud NAT and Create if required
+  when:
+    - infra__tunnel
+    - not infra__public_endpoint_access 
+  block:
+    - name: Discover Cloud NAT
+      ansible.builtin.command: >
+        gcloud compute routers nats describe {{ infra__gcp_cloud_nat_name }}        
+        --router={{ infra__gcp_cloud_router_name }}
+        --router-region={{ infra__region }}
+      ignore_errors: true
+      register: __gcp_nat_discovered
+
+    - name: Create Cloud NAT if not discovered
+      when:
+        - __gcp_nat_discovered is failed 
+      ansible.builtin.command: >
+        gcloud compute routers nats create {{ infra__gcp_cloud_nat_name }}
+        --router={{ infra__gcp_cloud_router_name }}
+        --router-region={{ infra__region }}
+        --auto-allocate-nat-external-ips
+        --nat-all-subnet-ip-ranges
+        --enable-logging

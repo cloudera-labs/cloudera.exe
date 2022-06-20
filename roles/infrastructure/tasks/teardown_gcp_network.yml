@@ -32,6 +32,34 @@
         name: "{{ infra__security_group_default_name }}"
         state: absent
 
+
+# CREATE NAT
+- name: Discover Cloud NAT and Delete if required
+  block:
+    - name: Delete Cloud NAT
+      ansible.builtin.command: >
+        gcloud compute routers nats describe {{ infra__gcp_cloud_nat_name }}        
+        --router={{ infra__gcp_cloud_router_name }}
+        --router-region={{ infra__region }}
+      ignore_errors: true
+      register: __gcp_nat_discovered
+
+    - name: Delete Cloud NAT if discovered
+      when:
+        - __gcp_nat_discovered is succeeded 
+      ansible.builtin.command: >
+        gcloud compute routers nats delete {{ infra__gcp_cloud_nat_name }}        
+        --router={{ infra__gcp_cloud_router_name }}
+        --router-region={{ infra__region }}
+
+    - name: Delete a Cloud Router
+      google.cloud.gcp_compute_router:
+        name: "{{ infra__gcp_cloud_router_name }}"
+        network: "{{ __gcp_vpc_info }}"
+        region: "{{ infra__region }}"
+        project: "{{ infra__gcp_project }}"
+        state: absent
+
     - name: Remove GCP VPC Subnets
       google.cloud.gcp_compute_subnetwork:
         region: "{{ infra__region }}"
