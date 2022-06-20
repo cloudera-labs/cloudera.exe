@@ -78,6 +78,7 @@ plat__workload_analytics:                     "{{ env.workload_analytics | defau
 plat__tunnel:                                 "{{ common__tunnel }}"
 plat__public_endpoint_access:                 "{{ common__public_endpoint_access }}"
 plat__enable_raz:                             "{{ env.datalake.enable_raz | default(False) }}"
+plat__use_public_ip:                          "{{ common__use_public_ip }}"
 
 plat__env_admin_password:                     "{{ common__env_admin_password }}"
 
