@@ -32,8 +32,6 @@
         name: "{{ infra__security_group_default_name }}"
         state: absent
 
-
-# CREATE NAT
 - name: Discover Cloud NAT and Delete if required
   block:
     - name: Delete Cloud NAT
