@@ -37,6 +37,13 @@ de:
   force_delete:
   vc_suffix:
 df:
+  readyflows:
+    - flow_name:
+  customflows:
+    - flow_name:
+      file:
+      description:
+      comments:
   suffix:
   min_k8s_nodes:
   max_k8s_nodes:
