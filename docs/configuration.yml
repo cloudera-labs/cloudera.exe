@@ -50,7 +50,7 @@ df:
   max_k8s_nodes:
   public_loadbalancer:
   loadbalancer_ip_ranges:
-  kube_ip_ranges:
+  k8s_ip_ranges:
   cluster_subnets:
   loadbalancer_subnets:
   teardown:
