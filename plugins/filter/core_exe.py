@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+# Copyright 2022 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ def combine_onto(*terms, **kwargs):
         result = merge_hash(dictionary, result, recursive, list_merge)
 
     return result
+
 
 class FilterModule(object):
     ''' Derivatives of Ansible jinja2 filters '''

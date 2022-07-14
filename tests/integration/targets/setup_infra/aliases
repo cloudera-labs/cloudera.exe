@@ -12,7 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Google Cloud
-    
-# NOTE: google-cloud-sdk, including the CLI, is installed as OS package.
-google-auth
+skip/python2

@@ -1,3 +1,5 @@
+---
+
 # Copyright 2022 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Google Cloud
-    
-# NOTE: google-cloud-sdk, including the CLI, is installed as OS package.
-google-auth
+# Light-duty Datalake
+# Level 1 networking (public/private)
+
+env:
+  name: "{{ globals.name_prefix }}-{{ globals.infra_type}}-lgt-l1-test"
+  cdp:
+    credential:
+      name: "{{ globals.name_prefix }}-{{ globals.infra_type }}-lgt-l1-test"
+  datalake:
+    scale: LIGHT_DUTY  # same as env.enable_ha=False
+  tunnel: yes
+  public_endpoint_access: yes
+  workload_analytics: no
+  teardown:
+    delete_credential: yes
+  azure:
+    single_resource_group: yes
