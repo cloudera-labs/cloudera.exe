@@ -145,6 +145,7 @@ env:
         identity:
         log:
         ranger_audit:
+        raz: 
         xaccount:
       name:
         cross_account:
@@ -152,6 +153,7 @@ env:
         idbroker:
         log:
         ranger_audit:
+        raz: 
       name_suffix:
         admin:
         assignment:
@@ -196,6 +198,7 @@ env:
     user_sync:
     version:
     scale:
+    enable_raz: 
   gcp:
     bindings:
       cross_account:
@@ -273,6 +276,7 @@ globals:
     private:
     public:
     ranger_audit:
+    raz:
     role:
     service_network:
     storage:
