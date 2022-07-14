@@ -24,12 +24,6 @@
   ansible.builtin.set_fact:
     plat__cdp_env_crn: "{{ plat__cdp_env_info.environments[0].crn }}"
 
-- name: Set CDP Workload password
-  cloudera.cloud.env_auth:
-    password: "{{ plat__env_admin_password }}"
-    name: "{{ plat__env_name }}"
-    strict: false
-
 - name: Set fact for CDP Admin Group Resource Role assignments
   ansible.builtin.set_fact:
     plat__cdp_env_admin_group_resource_role_assignments: "{{ plat__cdp_env_admin_group_resource_role_assignments | default([]) | union([resource_role_assignment]) }}"
