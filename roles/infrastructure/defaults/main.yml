@@ -134,6 +134,13 @@ infra__gcp_project:                 "{{ common__gcp_project }}"
 infra__gcp_storage_location_data:   "{{ infra.gcp.storage.path.data | default([infra__storage_name, infra__data_path] | join('-')) }}"
 infra__gcp_storage_location_logs:   "{{ infra.gcp.storage.path.logs | default([infra__storage_name, infra__logs_path] | join('-')) }}"
 
+infra__gcp_cloud_router_name_suffix:  "{{ infra.gcp.network.router.name_suffix | default('router') }}"
+infra__gcp_cloud_router_name:         "{{ infra.gcp.network.router.name | default([infra__namespace, infra__gcp_cloud_router_name_suffix] | join('-')) }}"
+infra__gcp_cloud_router_asn:          "{{ infra.gcp.network.router.asn | default(64514) }}"
+
+infra__gcp_cloud_nat_name_suffix:   "{{ infra.gcp.network.nat.name_suffix | default('nat') }}"
+infra__gcp_cloud_nat_name:          "{{ infra.gcp.network.nat.name | default([infra__namespace, infra__gcp_cloud_nat_name_suffix] | join('-')) }}"
+
 # Azure
 infra__azure_metagroup_name:        "{{ common__azure_metagroup_name }}"
 

@@ -22,7 +22,7 @@
     cloud: "{{ plat__infra_type }}"
     region: "{{ plat__region }}"
     public_key_text: "{{ plat__public_key_text }}"
-    public_ip: yes
+    public_ip: "{{ plat__use_public_ip }}"
     log_location: "gs://{{ plat__gcp_storage_location_logs }}"
     log_identity: "{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
     vpc_id: "{{ plat__vpc_name }}"
