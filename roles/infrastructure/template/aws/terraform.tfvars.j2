@@ -1,0 +1,199 @@
+# ------- Global settings -------
+region   = "{{ infra__region }}"
+
+aws_profile = "{{ (infra__aws_profile | length > 0) | ternary(infra__aws_profile, 'default') }}"
+
+env_tags = {
+{% for key, value in infra__tags.items() %}
+    {{ key }} = "{{ value }}"
+{% endfor %}
+    comment = "Created with Terraform by cloudera-deploy"
+}
+
+# ------- Network Resources -------
+vpc_name = "{{ infra__vpc_name }}"
+vpc_cidr = "{{ infra__vpc_cidr }}"
+igw_name = "{{ infra__aws_igw_name }}"
+
+# Public Network infrastructure
+{% if infra__aws_subnet_ids is not defined %}
+public_subnets = [
+{% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}  
+{
+  name = "{{ __aws_public_subnet_item.name }}",
+  cidr = "{{ __aws_public_subnet_item.cidr }}",
+  az   = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}",
+  tags = {
+      {% for key, value in __aws_public_subnet_item.tags.items() %}
+      "{{ key }}" = "{{ value }}",
+      {% endfor %}
+  },
+},
+{% endfor %}
+]
+
+public_route_table_name = "{{ infra__aws_public_route_table_name }}"
+{% endif %}
+
+
+# Private Network infrastructure
+{% if ( infra__tunnel ) and ( infra__aws_subnet_ids is not defined ) %}
+private_subnets = [
+{% for __aws_private_subnet_item in infra__vpc_private_subnets_info %}
+{
+  name = "{{ __aws_private_subnet_item.name }}",
+  cidr = "{{ __aws_private_subnet_item.cidr }}",
+  az   = "{{ __aws_az_info.availability_zones[loop.index0 % infra__aws_vpc_az_count | int].zone_name }}",
+  tags = {
+      {% for key, value in __aws_private_subnet_item.tags.items() %}
+      "{{ key }}" = "{{ value }}",
+      {% endfor %}
+  },
+},
+{% endfor %}
+]
+
+nat_gateway_name = "{{ infra__aws_nat_gateway_name }}"
+
+private_route_table_name = "{{ infra__aws_private_route_table_name }}"
+
+{% endif %}
+
+# Security Groups
+security_group_default_name = "{{ infra__security_group_default_name }}"
+security_group_knox_name = "{{ infra__security_group_knox_name }}"
+
+security_group_rules_ingress = [
+{# ******* NOTE: HANDLING OF SECURITY GROUP RULES *******#}
+{# Need to loop over each security group rule and...#}
+{# 1/ Process & Translate *CIDR Block* according to following rules:#}
+{#         * Can be empty in which case remove entry#}
+{#         * Can be a string. Check if this works; if not cast to list element#}
+{#         * Can be a list. Use directly #}
+
+{# 2/ Process & Translate *Ports* according to following rules: #}
+{#         * If proto is `all` (or -1) then ports are 0#}
+{#         * If toPort and fromPort specified use those#}
+{#         * ports: can be a range. Split and select#}
+{#         * ports: could be a list. Loop over each #}
+{#         * If no ports, toPort and fromPort then use default of full range (0)#}
+{# ******* END NOTE *******#}
+{% for ingress in infra__aws_security_group_rules %}
+{# ** 1/ Process CIDR Block**#}
+{# 1. CIDR block can be empty, in which case remove entry#}
+{% if ingress.cidr_ip | length > 0 %}
+{# 1a. If CIDR is a single string value then we need to convert single item list #}
+{#     to_json is used to convert single quotes around IP to double #}
+{% if ingress.cidr_ip is string %}
+{% set cidr_ingress = [ingress.cidr_ip]| to_json | string %}
+{% else %}
+{# 1b. If CIDR is a list to convert single quotes to double quotes (to_json) and stringify #}
+{% set cidr_ingress = ingress.cidr_ip| to_json | string %}
+{% endif %}
+{% else %}
+{# 1c. If CIDR is empty we remove the entry #}
+{% set cidr_ingress = null %}
+{% endif %}
+
+{# **Process Ports**#}
+{# 1. If proto is 'all' or -1 #}
+{% if ingress.proto in ['all', -1]  or ingress.ports is not defined %}
+{# 1a. to and from ports are 0 #}
+{% set toPort = 0 %}
+{% set fromPort = 0 %}
+{# 1b. Print out ingress #}
+{
+    cidr        = {{ cidr_ingress }}
+    from_port   = "{{ toPort }}"
+    to_port     = "{{ fromPort }}"
+    protocol    = "{{ ingress.proto }}"
+},
+{# 2. Ports can be a String (either a single value or a range)#}
+{% elif ingress.ports is string %}
+{# 2a. Attempt to split the string at '-' to create a list#}
+{% set portList = ingress.ports.split('-') %}
+{# 2b. In the list toPort is the first element#}
+{% set toPort = portList[0] %}
+{# 2c. Value of fromPort depends on length of the split string.#}
+{% if portList|length > 1 %}
+{# ...it's the second element if a range is given (i.e. length > 1)#}
+{% set fromPort = portList[1] %}
+{% else %}
+{# ...it's also the first element if a single value is given#}
+{% set fromPort = portList[0] %}
+{% endif %}
+{# 2d. Print the ingress block#}
+{
+    cidr        = {{ cidr_ingress }}
+    from_port   = "{{ toPort }}"
+    to_port     = "{{ fromPort }}"
+    protocol    = "{{ ingress.proto }}"
+},
+{# 3. Ports can be a List of individual ports which we need to loop over#}
+{% elif ingress.ports is iterable and (ingress.ports is not string and ingress.ports is not mapping) %}
+{# 3a. Loop over each port separately and print ingress #}
+{% for port in ingress.ports %}
+{
+    cidr        = {{ cidr_ingress }}
+    from_port   = "{{ port }}"
+    to_port     = "{{ port }}"
+    protocol    = "{{ ingress.proto }}"
+},
+{% endfor %}
+{% endif %}
+{% endfor %}
+]
+
+# ------- Storage Resources -------
+storage_locations = [
+{% for __aws_storage_object_item in infra__aws_storage_locations %}
+{
+  bucket = "{{ __aws_storage_object_item.bucket }}",
+  object = "{{ __aws_storage_object_item.path }}/", {# Append a / to ensure a directory is created #}
+},
+{% endfor %}
+]
+teardown_deletes_data = "{{ infra__teardown_deletes_data | lower }}"
+
+utility_bucket = "{{ infra__utlity_bucket_name }}"
+
+# ------- Compute Resources -------
+# Dynamic Inventory VMs
+dynamic_inventory_vms = [
+{% for __infra_compute_instance_item in range(0, infra__dynamic_inventory_count | int ) | list %}
+{
+    name          = "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }}",
+    instance_type = "{{ infra__dynamic_inventory_vm_type_default[infra__type][infra__dynamic_inventory_vm_type] }}",
+    ami           = "{{ __infra_aws_ami_info.image_id }}",
+    volume        =  {
+        delete_on_termination  = {{ infra__dynamic_inventory_delete_storage | bool | lower }},
+        volume_size            = {{ infra__dynamic_inventory_storage_size }},
+        volume_type            = "{{ infra__dynamic_inventory_storage_type_default[infra__type][infra__dynamic_inventory_storage_type] }}",
+    }
+},
+{% endfor %}
+]
+
+{# to_json is used to convert single quotes around tags to double #}
+dynamic_inventory_tags = {{ infra__dynamic_inventory_tags  | to_json }}
+
+dynamic_inventory_public_key_id = "{{ infra__public_key_id }}"
+
+# Localised Utility VM - if requested
+{% if infra__create_utility_service %}
+utility_vms = [
+{
+    name          = "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}",
+    instance_type = "{{ infra__dynamic_inventory_vm_type_default[infra__type]['sml'] }}",
+    ami           = "{{ __infra_aws_ami_info.image_id }}",
+    volume        =
+        delete_on_termination  = {{ infra__dynamic_inventory_delete_storage | bool | lower }},
+        volume_size            = 100,
+        volume_type            = "{{ infra__dynamic_inventory_storage_type_default[infra__type][infra__dynamic_inventory_storage_type] }}",
+    }
+}
+]
+{% endif %}
+
+utility_vm_tags = {{ infra__dynamic_inventory_tags  | to_json }}
+utility_vm_public_key_id = "{{ infra__public_key_id }}"
