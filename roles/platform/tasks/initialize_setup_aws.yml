@@ -24,6 +24,7 @@
     plat__aws_idbroker_role_arn: "arn:aws:iam::{{ __aws_caller_info.account }}:role/{{ plat__aws_idbroker_role_name }}"
     plat__aws_datalake_admin_role_arn: "arn:aws:iam::{{ __aws_caller_info.account }}:role/{{ plat__aws_datalake_admin_role_name }}"
     plat__aws_ranger_audit_role_arn: "arn:aws:iam::{{ __aws_caller_info.account }}:role/{{ plat__aws_ranger_audit_role_name }}"
+    plat__aws_ranger_cloud_access_role_arn: "arn:aws:iam::{{ __aws_caller_info.account }}:role/{{ plat__aws_ranger_cloud_access_role_name }}"
 
 - name: Discover CDP Cross Account information
   when: not plat__cdp_xaccount_external_id and not plat__cdp_xaccount_account_id

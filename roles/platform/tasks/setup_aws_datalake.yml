@@ -23,6 +23,7 @@
     runtime: "{{ plat__datalake_version | default(omit) }}"
     scale: "{{ plat__datalake_scale | default(omit) }}"
     tags: "{{ plat__tags }}"
+    raz: "{{ plat__enable_raz }}"
     state: present
 
 - name: Retrieve AWS EC2 Instance details for CDP Datalake
