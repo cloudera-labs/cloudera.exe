@@ -71,7 +71,7 @@
     instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type]['sml'] }}"
     image_id: "{{ __infra_aws_ami_info.image_id }}"
     ebs_optimized: yes
-    instance_role: "{{ infra__download_mirror_role.iam_role.role_name }}"
+    instance_role: "{{ infra__auto_repo_mirror_role.iam_role.role_name }}"
     volumes:
       - device_name: /dev/sda1
         ebs:

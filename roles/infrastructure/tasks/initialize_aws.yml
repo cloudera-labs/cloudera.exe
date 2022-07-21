@@ -180,16 +180,4 @@
   ansible.builtin.set_fact:
     infra__discovered_compute_inventory: "{{ __infra_dynamic_inventory_discovered.instances + __infra_utility_compute_discovered.instances }}"
 
-# Note that the download mirror is localised to the Account and Region deliberately
-- name: Determine Download Mirror Bucket Name
-  when:
-    - not infra__utlity_bucket_name
-    - infra__create_utility_service | bool
-  ansible.builtin.set_fact:
-    infra__utlity_bucket_name: "{{ [ infra__download_mirror_bucket_prefix, infra__aws_caller_info.account, infra__region ] | join('-') }}"
 
-# These need to be set as facts on the Ansible Controller to be picked up later
-- name: Set Download Mirror output artefacts
-  ansible.builtin.set_fact:
-    infra__type: "{{ infra__type }}"
-    infra__region: "{{ infra__region }}"

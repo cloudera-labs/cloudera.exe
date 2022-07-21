@@ -1,4 +1,6 @@
-# Copyright 2022 Cloudera, Inc. All Rights Reserved.
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Amazon Web Services
+- name: Check for a Static Inventory file
+  stat:
+    path: "{{ init__dynamic_inventory_artefact }}"
+  register: __inventory_static
 
-awscli>=1.25.22
-boto>=2.49.0
-botocore>=1.27.22
-boto3>=1.24.22
+- name: Create a backup
+  when: __inventory_static.stat.exists
+  copy:
+    src: "{{ __inventory_static.stat.path }}"
+    dest: "{{ [init__dynamic_inventory_artefact | splitext | first, ansible_date_time.epoch] | join('.') }}"
+
+- name: Remove static inventory file
+  ansible.builtin.file:
+    path: "{{ init__dynamic_inventory_artefact }}"
+    state: absent

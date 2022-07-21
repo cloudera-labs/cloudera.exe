@@ -1,0 +1,3 @@
+default_enable_auto_repo_mirror: no
+default_download_link_expiry: 3600
+default_auto_repo_mirror_prefix: cache

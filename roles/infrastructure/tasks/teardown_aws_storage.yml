@@ -25,7 +25,7 @@
   loop: "{{ infra__aws_storage_locations }}"
 
 - name: Remove AWS Storage Utility Bucket
-  when: infra__teardown_download_mirror | bool
+  when: infra__teardown_auto_repo_mirror | bool
   amazon.aws.aws_s3:
     region: "{{ infra__region }}"
     bucket: "{{ infra__utlity_bucket_name }}"
