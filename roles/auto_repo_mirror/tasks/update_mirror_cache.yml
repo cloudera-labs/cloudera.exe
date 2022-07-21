@@ -1,0 +1,31 @@
+---
+
+- name: Refresh Listing of target cache contents
+  when:
+    - init__auto_repo_mirror_bucket_name is defined
+    - "'teardown' not in ansible_run_tags"
+  register: __infra_auto_repo_mirror_listing
+  failed_when:
+    - __auto_repo_mirror_lookup_initial.s3_keys is not defined
+    - "'cannot be found' not in __auto_repo_mirror_lookup_initial.msg"
+  amazon.aws.aws_s3:
+    bucket: "{{ init__auto_repo_mirror_bucket_name }}"
+    mode: list
+
+- name: Prepare updated Download Mirror contents as URLs
+  when: __infra_auto_repo_mirror_listing.s3_keys is defined
+  loop: "{{ __infra_auto_repo_mirror_listing.s3_keys }}"
+  loop_control:
+    loop_var: __auto_repo_mirror_s3_urls_item
+  ansible.builtin.set_fact:
+    __auto_repo_mirror_url_listing: "{{ __auto_repo_mirror_url_listing | default([]) + [['https:/', init__auto_repo_mirror_bucket_name + '.s3.amazonaws.com', __auto_repo_mirror_s3_urls_item ] | join('/') ] }}"
+
+- name: Persist Download Mirror to Definition path
+  when:
+    - __auto_repo_mirror_url_listing is defined
+    - __auto_repo_mirror_url_listing | length > 0
+  community.general.ini_file:
+    path: "{{ init__auto_repo_mirror_artefact }}"
+    section: "{{ globals.infra_type }}:{{ globals.region }}"
+    option: "{{ init__auto_repo_mirror_bucket_name }}"
+    value: "{{ __auto_repo_mirror_url_listing }}"

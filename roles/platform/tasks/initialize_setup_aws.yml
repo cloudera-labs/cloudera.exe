@@ -154,7 +154,9 @@
       register: __aws_security_group_knox_info
 
     - name: Set fact for AWS Security Group ID for Knox
-      when: __aws_security_group_knox_info is defined
+      when:
+        - __aws_security_group_knox_info is defined
+        - __aws_security_group_knox_info.security_groups | length > 0
       ansible.builtin.set_fact:
         plat__aws_security_group_knox_id: "{{ __aws_security_group_knox_info.security_groups[0].group_id }}"
 
