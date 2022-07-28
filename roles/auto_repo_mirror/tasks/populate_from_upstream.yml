@@ -48,6 +48,7 @@
     jid: "{{ __download_async_item.ansible_job_id }}"
   failed_when:
     - __download_async_item.failed == True
+    - __download_async_item.status_code != 404
     - __download_async_item.finished != 1
 
 # Unpack parcel tarballs

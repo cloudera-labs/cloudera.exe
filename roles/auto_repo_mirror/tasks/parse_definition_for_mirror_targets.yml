@@ -56,7 +56,13 @@
   loop_control:
     loop_var: __filtered_parcel_item
   ansible.builtin.set_fact:
-    init__file_mirror_targets: "{{ init__file_mirror_targets | default(__init_tarball_links) + [__filtered_parcel_item, __filtered_parcel_item + '.sha1', __filtered_parcel_item.replace(__filtered_parcel_item | basename, 'manifest.json') ] }}"
+    init__file_mirror_targets: "{{ init__file_mirror_targets | default(__init_tarball_links) + [__filtered_parcel_item, __filtered_parcel_item + '.sha1', __filtered_parcel_item + '.sha', __filtered_parcel_item.replace(__filtered_parcel_item | basename, 'manifest.json') ] }}"
+
+# Explicitly set version from parcel distro as Ansible controller could be different OS from target cluster
+- name: Determine Cloudera-Manager Distro and Version
+  ansible.builtin.set_fact:
+    init__cloudera_manager_distro_name: "{{ cm_distro_select[init__parcel_distro]['name'] }}"
+    init__cloudera_manager_distro_version: "{{ cm_distro_select[init__parcel_distro]['version'] }}"
 
 # This sets 'cloudera_manager_repo_url' on the calling host
 - name: Determine Cloudera Manager Repo
@@ -65,6 +71,8 @@
   vars:
     install_repo_on_host: no
     clusters: []
+    cloudera_manager_distro_name: "{{ init__cloudera_manager_distro_name }}"
+    cloudera_manager_distro_version: "{{ init__cloudera_manager_distro_version }}"
 
 - name: Add Cloudera Manager Repo to File Mirror list
   ansible.builtin.set_fact:
