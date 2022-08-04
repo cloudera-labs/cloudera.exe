@@ -35,7 +35,7 @@
     dest: "{{ infra__terraform_template_dir }}/infra/variables.tf"
   no_log: false
 
-# Copy the Terraform recourse files....
+# Copy the Terraform resource files....
 # ...network resources
 - name: Copy Terraform resource file for network resources
   ansible.builtin.copy:
@@ -70,7 +70,7 @@
     dest: "{{ infra__terraform_template_dir }}/infra/terraform.tfvars"
   no_log: false
 
-- name: Prompt to debug Terraform deployment 
-  ansible.builtin.pause:
-    prompt: "Terraform infra files created in {{ infra__terraform_template_dir }}/infra"
-  when: debug_terraform | default(false) | bool
+# - name: Prompt to debug Terraform deployment 
+#   ansible.builtin.pause:
+#     prompt: "Terraform infra files created in {{ infra__terraform_template_dir }}/infra"
+#   when: debug_terraform | default(false) | bool
