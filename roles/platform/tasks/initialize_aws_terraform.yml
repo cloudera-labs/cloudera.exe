@@ -42,11 +42,33 @@
     src: "{{ __aws_policy_tmpdir.path }}/"
     dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
 
-# Apply template for Terraform provider
-- name: Generate Terraform Provider
-  ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/provider.tf.j2'
+# Copy Terraform provider file
+- name: Copy Terraform Provider file
+  ansible.builtin.copy:
+    src: 'files/{{ plat__infra_type }}/provider.tf'
     dest: "{{ plat__terraform_template_dir }}/plat/provider.tf"
+
+# Copy Terraform variables file
+- name: Copy Terraform Variables declaration file
+  ansible.builtin.copy:
+    src: 'files/{{ infra__type }}/terraform_variables.tf'
+    dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
+  no_log: false
+
+# Copy the Terraform auth resource files....
+# # ...policies
+- name: Generate Terraform authz file for policies 
+  ansible.builtin.copy:
+    src: 'files/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf'
+    dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_policies.tf"
+  no_log: false
+
+# # ...roles
+# - name: Generate Terraform authz file for roles 
+#   ansible.builtin.template:
+#     src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
+#     dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"
+#   no_log: false
 
 # Apply template for Terraform backend state
 - name: Generate Terraform Backend State
@@ -54,24 +76,15 @@
     src: 'template/{{ plat__infra_type }}/backend_state.tf.j2'
     dest: "{{ plat__terraform_template_dir }}/plat/backend_state.tf"
 
-# Apply template for Terraform variables
-- name: Generate Terraform Variables
+# Create Terraform variable definitions from template
+- name: Generate Terraform Variables definition
   ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/terraform_variables.tf.j2'
-    dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
+    src: 'template/{{ infra__type }}/terraform.tfvars.j2'
+    dest: "{{ plat__terraform_template_dir }}/plat/terraform.tfvars"
   no_log: false
 
-# Apply template for Terraform auth resources....
-# ...policies
-- name: Generate Terraform authz file for policies 
-  ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf.j2'
-    dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_policies.tf"
-  no_log: false
 
-# ...roles
-- name: Generate Terraform authz file for roles 
-  ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf.j2'
-    dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"
-  no_log: false
+- name: Prompt to debug Terraform deployment 
+  ansible.builtin.pause:
+    prompt: "Terraform plat files created in {{ plat__terraform_template_dir }}/plat"
+  when: debug_terraform | default(false) | bool
