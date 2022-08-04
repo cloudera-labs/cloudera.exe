@@ -73,7 +73,7 @@
 
     - name: Set Service Principal Object UUID for Azure App
       ansible.builtin.set_fact:
-        plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | community.general.json_query('[0].objectId') }}"
+        plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | community.general.json_query('[0].id') }}"
 
     - name: Check that Azure Service Principal ID is now set
       ansible.builtin.assert:
