@@ -28,6 +28,11 @@ variable "env_prefix" {
   description = "Shorthand name for the environment. Used in resource descriptions"
 }
 
+variable "caller_account_id" {
+  type        = string
+  description = "ID of the Cloud Service Provider Account"
+}
+
 # ------- Policies -------
 # Cross Account Policy (name and document)
 variable "xaccount_policy_name" {
@@ -98,4 +103,45 @@ variable "bucket_access_policy_doc" {
   type        = string
   description = "Bucket Access Data Access Policy"
 
+}
+
+# ------- Policies -------
+# Cross Account Role (name and id)
+variable "xaccount_role_name" {
+  type        = string
+  description = "Cross account Assume role Name"
+}
+
+variable "xaccount_account_id" {
+  type        = string
+  description = "Account ID of the cross account"
+}
+
+variable "xaccount_external_id" {
+  type        = string
+  description = "External ID of the cross account"
+}
+
+# IDBroker service role
+variable "idbroker_role_name" {
+  type        = string
+  description = "IDBroker service role Name"
+}
+
+# Log service role
+variable "log_role_name" {
+  type        = string
+  description = "Log service role Name"
+}
+
+# CDP Datalake Admin role
+variable "datalake_admin_role_name" {
+  type        = string
+  description = "Datalake Admin role Name"
+}
+
+# CDP Ranger Audit role
+variable "ranger_audit_role_name" {
+  type        = string
+  description = "Ranger Audit role Name"
 }

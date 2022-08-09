@@ -44,8 +44,16 @@ bucket_access_policy_name = "{{ plat__aws_bucket_access_policy_name }}"
 bucket_access_policy_doc  = "{{ "./policy_docs/" ~ (__aws_policy_documents | json_query("results[?__policy_url_item.key==`bucket_access`].dest | [0]") | basename) }}"
 
 # ------- Roles -------
-xaccount_role_name = "{{ plat__aws_xaccount_role_name}}"
-
+xaccount_role_name = "{{ plat__aws_xaccount_role_name }}"
+xaccount_account_id = "{{ plat__aws_xaccount_account_id }}"
 xaccount_external_id = "{{ plat__aws_xaccount_external_id }}"
 
 idbroker_role_name = "{{ plat__aws_idbroker_role_name }}"
+
+log_role_name = "{{ plat__aws_log_role_name }}"
+
+datalake_admin_role_name = "{{ plat__aws_datalake_admin_role_name }}"
+caller_account_id = "{{ plat__aws_caller_account }}"
+
+ranger_audit_role_name = "{{ plat__aws_ranger_audit_role_name }}"
+

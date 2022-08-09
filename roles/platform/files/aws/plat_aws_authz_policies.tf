@@ -64,7 +64,7 @@ resource "aws_iam_policy" "cdp_datalake_admin_s3_data_access_policy" {
 }
 
 # ------- CDP Data Access Policies - bucket_access -------
-resource "aws_iam_policy" "cdp_bucket_access_data_access_policy" {
+resource "aws_iam_policy" "cdp_bucket_data_access_policy" {
     name        = var.bucket_access_policy_name
     description = "CDP Bucket S3 Access policy for ${var.env_prefix}"
 

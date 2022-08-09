@@ -60,13 +60,13 @@
 # Apply template for Terraform backend state
 - name: Generate Terraform Backend State
   ansible.builtin.template:
-    src: 'template/{{ infra__type }}/backend_state.tf.j2'
+    src: 'templates/{{ infra__type }}/backend_state.tf.j2'
     dest: "{{ infra__terraform_template_dir }}/infra/backend_state.tf"
 
 # Create Terraform variable definitions from template
 - name: Generate Terraform Variables definition
   ansible.builtin.template:
-    src: 'template/{{ infra__type }}/terraform.tfvars.j2'
+    src: 'templates/{{ infra__type }}/terraform.tfvars.j2'
     dest: "{{ infra__terraform_template_dir }}/infra/terraform.tfvars"
   no_log: false
 
