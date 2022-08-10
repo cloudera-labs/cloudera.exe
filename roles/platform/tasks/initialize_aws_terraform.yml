@@ -51,7 +51,7 @@
 # Copy Terraform variables file
 - name: Copy Terraform Variables declaration file
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/terraform_variables.tf'
+    src: 'files/{{ plat__infra_type }}/terraform_variables.tf'
     dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
   no_log: false
 
