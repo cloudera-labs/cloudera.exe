@@ -60,7 +60,7 @@ infra__dynamic_inventory_delete_storage: "{{ infra.dynamic_inventory.storage.del
 infra__teardown_deletes_data:       "{{ infra.teardown.delete_data | default(False) }}"
 infra__teardown_deletes_ssh_key:    "{{ infra.teardown.delete_ssh_key | default(False) }}"
 infra__teardown_deletes_network:    "{{ infra.teardown.delete_network | default(True) }}"
-infra__teardown_download_mirror:    "{{ infra.teardown.delete_mirror | default(False) }}"
+infra__teardown_auto_repo_mirror:    "{{ infra.teardown.delete_mirror | default(False) }}"
 
 infra__region:                      "{{ common__region }}"
 
@@ -158,8 +158,9 @@ infra__cdp_control_plane_ports:     "{{ env.cdp.control_plane.ports | default([4
 infra__cdp_control_plane_cidr:      "{{ env.cdp.control_plane.cidr | default(infra__cdp_control_plane_cidr_default) }}"
 
 # Utility Service for Download Mirror
-infra__create_utility_service:      "{{ globals.create_utility_service | default('no') | bool }}"
-infra__utlity_bucket_name:          "{{ globals.utility_bucket_name | default('') }}"
+infra__create_utility_service:        "{{ globals.create_utility_service | default('no') | bool }}"
+infra__utlity_bucket_name:            "{{ globals.utility_bucket_name | default('') }}"
+#infra__auto_repo_mirror_bucket_prefix: "{{ auto_repo_mirror_prefix | default('cache') }}"
 
 # Teardown
 infra__force_teardown:              "{{ common__force_teardown }}"
