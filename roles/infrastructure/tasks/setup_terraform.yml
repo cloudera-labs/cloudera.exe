@@ -24,11 +24,6 @@
     src: "{{ infra__terraform_template_dir }}/infra/"
     dest: "{{ infra__terraform_artefact_dir }}/infra"
 
-# - name: Prompt to debug Terraform deployment 
-#   ansible.builtin.pause:
-#     prompt: "Ready to do Terraform apply on infra files in {{ infra__terraform_workspace_dir }}/infra"
-#   when: debug_terraform | default(false) | bool
-
 - name: Applying Terraform
   community.general.terraform:
     project_path: "{{ infra__terraform_workspace_dir }}/infra"
