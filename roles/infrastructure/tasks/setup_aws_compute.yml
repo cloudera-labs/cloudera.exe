@@ -40,6 +40,7 @@
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
     network:
       assign_public_ip: yes
+      delete_on_termination: yes
 
 - name: Ensure all {{ infra__dynamic_inventory_count }} instances have Public IPs assigned
   register: __infra_dynamic_inventory_instances

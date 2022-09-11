@@ -56,7 +56,7 @@
   loop_control:
     loop_var: __filtered_parcel_item
   ansible.builtin.set_fact:
-    init__file_mirror_targets: "{{ init__file_mirror_targets | default(__init_tarball_links) + [__filtered_parcel_item, __filtered_parcel_item + '.sha1', __filtered_parcel_item + '.sha', __filtered_parcel_item.replace(__filtered_parcel_item | basename, 'manifest.json') ] }}"
+    init__file_mirror_targets: "{{ init__file_mirror_targets | default(__init_tarball_links) + [__filtered_parcel_item, __filtered_parcel_item + '.sha1', __filtered_parcel_item + '.sha', __filtered_parcel_item + '.sha256', __filtered_parcel_item.replace(__filtered_parcel_item | basename, 'manifest.json') ] }}"
 
 # Explicitly set version from parcel distro as Ansible controller could be different OS from target cluster
 - name: Determine Cloudera-Manager Distro and Version
@@ -120,4 +120,4 @@
     __auto_repo_mirror_spec:
       auto_repo_mirror_targets: "{{ init__file_mirror_targets }}"
       utility_bucket_name: "{{ init__auto_repo_mirror_bucket_name }}"
-      create_utility_service: init__file_mirror_targets | length > 0 | bool
+      create_utility_service: "{{ init__file_mirror_targets | length > 0 | bool }}"
