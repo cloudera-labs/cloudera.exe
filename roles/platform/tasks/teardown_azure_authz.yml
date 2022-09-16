@@ -74,8 +74,8 @@
 - name: Tear down Azure AD App Registration
   when: plat__teardown_deletes_xaccount and ( plat__azure_xaccount_app_uuid is defined ) and ( plat__azure_xaccount_app_uuid | length > 0 )
   command: >
-      az ad sp delete
-      --id {{ plat__azure_application_service_principal_objuuid }}
+      az ad app delete
+      --id {{ plat__azure_xaccount_app_uuid }}
 
 - name: Tear down Custom Role
   when: plat__teardown_deletes_roles
