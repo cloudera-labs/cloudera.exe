@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# You must have subscribed to Centos in the AWS Marketplace: https://aws.amazon.com/marketplace/pp?sku=aw0evgkw8e5c1q413zgy5pjce
+# You must have subscribed to the target OS in the AWS Marketplace, e.g. Centos https://aws.amazon.com/marketplace/pp?sku=aw0evgkw8e5c1q413zgy5pjce
 
 - name: Ensure required number of Dynamic Inventory VMs are deployed and tagged correctly during deployment
   loop_control:

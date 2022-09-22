@@ -33,7 +33,6 @@
     ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_utility_service.yml"
 
   - name: Set up provider-specific Infrastructure Compute
-    when: infra__dynamic_inventory_count
     ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_compute.yml"
 
 - name: Set up for Terraform deployment engine
