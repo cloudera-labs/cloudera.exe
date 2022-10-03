@@ -86,3 +86,13 @@ plat__azure_roles:
   storcnt: 'Storage Blob Data Contributor'
   contrib: 'Contributor'
   owner: 'Owner'
+
+
+plat__gcp_required_services:
+  - compute.googleapis.com
+  - runtimeconfig.googleapis.com
+  - iam.googleapis.com
+  - iamcredentials.googleapis.com
+  - storage.googleapis.com
+  - servicenetworking.googleapis.com
+  - sqladmin.googleapis.com
