@@ -197,6 +197,8 @@ env:
     version:
     scale:
   gcp:
+    auto_enable_services:
+    manage_identities:
     bindings:
       cross_account:
       logs:

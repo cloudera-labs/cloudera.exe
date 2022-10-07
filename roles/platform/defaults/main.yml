@@ -169,6 +169,9 @@ plat__gcp_storage_location_logs:              "{{ env.gcp.storage.path.logs | de
 plat__gcp_xaccount_policy_bindings:           "{{ env.gcp.bindings.cross_account | default(plat__gcp_xaccount_policy_bindings_default) }}"
 plat__gcp_log_role_perms:                     "{{ env.gcp.bindings.logs | default(plat__gcp_log_policy_bindings_default) }}"
 
+plat__gcp_manage_identities:                  "{{ env.gcp.manage_identities | default(true) }}"
+plat__gcp_enable_services:                    "{{ env.gcp.auto_enable_services | default(true) }}"
+
 # Azure
 plat__azure_app_suffix:                       "{{ env.azure.app.suffix | default(common__app_suffix) }}"
 plat__azure_role_suffix:                      "{{ env.azure.role.suffix | default(common__role_suffix) }}"

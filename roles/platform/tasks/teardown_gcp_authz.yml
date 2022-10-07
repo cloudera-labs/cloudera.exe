@@ -14,108 +14,111 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Delete CDP Cross Account Access during Teardown
-  when: plat__teardown_deletes_credential
-  cloudera.cloud.env_cred:
-    state: absent
-    name: "{{ plat__xacccount_credential_name }}"
+- name: Handle GCP Identities and Roles and Policies during Teardown
+  when: plat__gcp_manage_identities | bool
+  block:
+    - name: Delete CDP Cross Account Access during Teardown
+      when: plat__teardown_deletes_credential
+      cloudera.cloud.env_cred:
+        state: absent
+        name: "{{ plat__xacccount_credential_name }}"
 
-- name: Remove GCP Cross Account Service Account Keys during Teardown
-  when:
-    - plat__gcp_xaccount_keys is defined
-    - __gcp_xaccount_key_item.keyType == 'USER_MANAGED'
-  loop: "{{ plat__gcp_xaccount_keys }}"
-  loop_control:
-    loop_var: __gcp_xaccount_key_item
-  command: >
-    gcloud iam service-accounts keys delete
-    {{ __gcp_xaccount_key_item.name.split('/')[-1] }}
-    --iam-account "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+    - name: Remove GCP Cross Account Service Account Keys during Teardown
+      when:
+        - plat__gcp_xaccount_keys is defined
+        - __gcp_xaccount_key_item.keyType == 'USER_MANAGED'
+      loop: "{{ plat__gcp_xaccount_keys }}"
+      loop_control:
+        loop_var: __gcp_xaccount_key_item
+      command: >
+        gcloud iam service-accounts keys delete
+        {{ __gcp_xaccount_key_item.name.split('/')[-1] }}
+        --iam-account "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
 
-- name: Remove GCP Cross Account Service Account
-  when: plat__teardown_deletes_xaccount
-  google.cloud.gcp_iam_service_account:
-    name: "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-    project: "{{ plat__gcp_project }}"
-    state: absent
+    - name: Remove GCP Cross Account Service Account
+      when: plat__teardown_deletes_xaccount
+      google.cloud.gcp_iam_service_account:
+        name: "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+        project: "{{ plat__gcp_project }}"
+        state: absent
 
-- name: Tear down GCP Custom Log Role
-  when: plat__teardown_deletes_gcp_custom_roles
-  register: __gcp_role_teardown
-  failed_when:
-    - __gcp_role_teardown.msg is defined
-    - "'GCP returned error' in __gcp_role_teardown.msg"
-    - "'it is already deleted' not in __gcp_role_teardown.msg"
-  google.cloud.gcp_iam_role:
-    name: "{{ plat__gcp_log_role_name }}"
-    project: "{{ plat__gcp_project }}"
-    state: absent
+    - name: Tear down GCP Custom Log Role
+      when: plat__teardown_deletes_gcp_custom_roles
+      register: __gcp_role_teardown
+      failed_when:
+        - __gcp_role_teardown.msg is defined
+        - "'GCP returned error' in __gcp_role_teardown.msg"
+        - "'it is already deleted' not in __gcp_role_teardown.msg"
+      google.cloud.gcp_iam_role:
+        name: "{{ plat__gcp_log_role_name }}"
+        project: "{{ plat__gcp_project }}"
+        state: absent
 
-- name: Tear down Operational GCP Service Accounts Policies
-  when: plat__teardown_deletes_policies
-  register: __gcp_service_account_teardown
-  loop_control:
-    loop_var: __gcp_binding_item
-    label: __gcp_binding_item.member
-  failed_when:
-    - __gcp_service_account_teardown.rc == 1
-    - "'Policy bindings with the specified principal and role not found!' not in __gcp_service_account_teardown.stderr"
-  loop:
-    # Logs
-    - member: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      role: "projects/{{ plat__gcp_project }}/roles/{{ plat__gcp_log_role_name }}"
-    # Data Access
-    - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      role: "{{ plat__gcp_roles.storage_admin }}"
-    - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      role: "{{ plat__gcp_roles.storage_object_admin }}"
-      # Ranger Audit
-    - member: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      role: "{{ plat__gcp_roles.storage_object_admin }}"
-    # ID Broker  / Assumer Role
-    - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      role: "{{ plat__gcp_roles.iam_workload_identity_user }}"
-    - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      role: "{{ plat__gcp_roles.iam_service_account_user }}"
-    - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      role: "{{ plat__gcp_roles.iam_service_account_token_creator }}"
-  command: >
-    gcloud projects
-    remove-iam-policy-binding {{ plat__gcp_project }}
-    --member={{ __gcp_binding_item.member |quote }}
-    --role={{ __gcp_binding_item.role |quote }}
-    --all
+    - name: Tear down Operational GCP Service Accounts Policies
+      when: plat__teardown_deletes_policies
+      register: __gcp_service_account_teardown
+      loop_control:
+        loop_var: __gcp_binding_item
+        label: __gcp_binding_item.member
+      failed_when:
+        - __gcp_service_account_teardown.rc == 1
+        - "'Policy bindings with the specified principal and role not found!' not in __gcp_service_account_teardown.stderr"
+      loop:
+        # Logs
+        - member: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          role: "projects/{{ plat__gcp_project }}/roles/{{ plat__gcp_log_role_name }}"
+        # Data Access
+        - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          role: "{{ plat__gcp_roles.storage_admin }}"
+        - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          role: "{{ plat__gcp_roles.storage_object_admin }}"
+          # Ranger Audit
+        - member: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          role: "{{ plat__gcp_roles.storage_object_admin }}"
+        # ID Broker  / Assumer Role
+        - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          role: "{{ plat__gcp_roles.iam_workload_identity_user }}"
+        - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          role: "{{ plat__gcp_roles.iam_service_account_user }}"
+        - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          role: "{{ plat__gcp_roles.iam_service_account_token_creator }}"
+      command: >
+        gcloud projects
+        remove-iam-policy-binding {{ plat__gcp_project }}
+        --member={{ __gcp_binding_item.member |quote }}
+        --role={{ __gcp_binding_item.role |quote }}
+        --all
 
-- name: Tear down GCP Storage Policies
-  when: plat__teardown_deletes_policies
-  register: __gcp_storage_policy_teardown
-  loop_control:
-    loop_var: __gcp_pol_item
-  failed_when:
-    - __gcp_storage_policy_teardown.rc == 1
-    - "'BucketNotFoundException:' not in __gcp_storage_policy_teardown.stderr"
-  loop:
-    - account: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      bucket: "{{ plat__gcp_storage_location_logs }}"
-    - account: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      bucket: "{{ plat__gcp_storage_location_data }}"
-    - account: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-      bucket: "{{ plat__gcp_storage_location_data }}"
-  command: >
-    gsutil iam
-    ch -d {{ __gcp_pol_item.account |quote }}
-    gs://{{ __gcp_pol_item.bucket |quote }}
+    - name: Tear down GCP Storage Policies
+      when: plat__teardown_deletes_policies
+      register: __gcp_storage_policy_teardown
+      loop_control:
+        loop_var: __gcp_pol_item
+      failed_when:
+        - __gcp_storage_policy_teardown.rc == 1
+        - "'BucketNotFoundException:' not in __gcp_storage_policy_teardown.stderr"
+      loop:
+        - account: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          bucket: "{{ plat__gcp_storage_location_logs }}"
+        - account: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          bucket: "{{ plat__gcp_storage_location_data }}"
+        - account: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+          bucket: "{{ plat__gcp_storage_location_data }}"
+      command: >
+        gsutil iam
+        ch -d {{ __gcp_pol_item.account |quote }}
+        gs://{{ __gcp_pol_item.bucket |quote }}
 
-- name: Tear down Operational GCP Service Accounts
-  when: plat__teardown_deletes_roles
-  loop_control:
-    loop_var: __gcp_identity_item
-  loop:
-    - "{{ plat__gcp_log_identity_name }}"
-    - "{{ plat__gcp_datalakeadmin_identity_name }}"
-    - "{{ plat__gcp_ranger_audit_identity_name }}"
-    - "{{ plat__gcp_idbroker_identity_name }}"
-  google.cloud.gcp_iam_service_account:
-    name: "{{ __gcp_identity_item }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-    project: "{{ plat__gcp_project }}"
-    state: absent
+    - name: Tear down Operational GCP Service Accounts
+      when: plat__teardown_deletes_roles
+      loop_control:
+        loop_var: __gcp_identity_item
+      loop:
+        - "{{ plat__gcp_log_identity_name }}"
+        - "{{ plat__gcp_datalakeadmin_identity_name }}"
+        - "{{ plat__gcp_ranger_audit_identity_name }}"
+        - "{{ plat__gcp_idbroker_identity_name }}"
+      google.cloud.gcp_iam_service_account:
+        name: "{{ __gcp_identity_item }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
+        project: "{{ plat__gcp_project }}"
+        state: absent
