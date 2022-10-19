@@ -175,5 +175,3 @@
         gsutil iam
         ch {{ __gcp_pol_item.account |quote }}
         gs://{{ __gcp_pol_item.bucket |quote }}
-
-- pause:
