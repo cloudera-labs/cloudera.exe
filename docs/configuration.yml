@@ -276,6 +276,7 @@ globals:
   dynamic_inventory:
     vm:
       count:
+      os:
   force_teardown:
   gcloud_credential_file:
   infra_deployment_engine:
