@@ -145,6 +145,7 @@ plat__aws_policy_urls:                        "{{ plat__aws_policy_urls_default 
 
 # GCP
 plat__gcp_project:                            "{{ common__gcp_project }}"
+plat__gcp_subnet_id:                          "{{ common__gcp_subnet_id }}"
 
 plat__gcp_role_suffix:                        "{{ env.gcp.role.suffix | default(common__role_suffix) }}"
 plat__gcp_storage_suffix:                     "{{ env.gcp.storage.suffix | default(common__storage_suffix) }}"
