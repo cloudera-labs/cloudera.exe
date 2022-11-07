@@ -27,6 +27,9 @@
     template: "{{ ('template' in __datahub_config_item) | ternary(run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template | default(omit)) | list | first, omit, omit) }}"
     definition: "{{ ('definition' in __datahub_config_item) |  ternary(run__datahub_available_definitions | select('ansible.builtin.search', __datahub_config_item.definition | default(omit)) | list | first, omit, omit) }}"
     groups: "{{ __datahub_config_item.instance_groups | default(omit) }}"
+    extension: "{{ __datahub_config_item.extension | default(omit) }}"
+    subnets_filter: "{{ __datahub_config_item.subnets_filter | default(omit) }}"
+    multi_az: "{{ __datahub_config_item.multi_az | default(omit) }}"
     tags: "{{ __datahub_config_item.tags }}"
     wait: yes
   loop_control:

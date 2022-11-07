@@ -20,6 +20,14 @@ datahub:
     azure:
     gcp:
   definitions:
+    - name:
+      template:
+      definition:
+      instance_groups:
+      extension:
+      subnets_filter:
+      multi_az:
+      tags:
   image_catalog:
     name:
     url:
