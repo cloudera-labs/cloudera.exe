@@ -223,6 +223,19 @@
     loop_var: __df_readyflow_item
     label: "{{ __df_readyflow_item.flow_name }}"
 
+- name: Ensure requested CDP DF CustomFlows are imported
+  when: run__include_df
+  tags: df
+  cloudera.cloud.df_customflow:
+    name: "{{ __df_customflow_item.flow_name }}"
+    file: "{{ __df_customflow_item.file }}"
+    description: "{{ __df_customflow_item.description | default('') }}"
+    comments: "{{ __df_customflow_item.comments | default('') }}"
+  loop: "{{ run__df_customflows }}"
+  loop_control:
+    loop_var: __df_customflow_item
+    label: "{{ __df_customflow_item.flow_name }}"
+
 - name: Create CDP DF Deployments
   when:
     - run__include_df

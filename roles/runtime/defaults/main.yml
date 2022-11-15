@@ -96,6 +96,7 @@ run__df_terminate_deployments:      "{{ df.terminate_deployments | default(True)
 run__df_tags:                       "{{ df.tags | default(common__tags) }}"
 run__df_deployments:                "{{ df.deployments | default([]) }}"
 run__df_readyflows:                 "{{ df.readyflows | default([]) }}"
+run__df_customflows:                "{{ df.customflows | default([]) }}"
 run__df_delete_readyflows:          "{{ df.delete_imported_readyflows | default(False) }}"
 
 # Deploy
