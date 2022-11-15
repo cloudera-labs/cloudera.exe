@@ -18,3 +18,8 @@
   amazon.aws.aws_caller_info:
   register: __aws_caller_info
   failed_when: __aws_caller_info.account is not defined
+
+- name: Confirm AWS SSH Public Key ID exists
+  ansible.builtin.command: aws ec2 describe-key-pairs --region "{{ plat__region }}" --key-name "{{ plat__public_key_id }}"
+  register: __aws_ssh_key_pair
+  failed_when: __aws_ssh_key_pair.rc != 0

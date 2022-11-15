@@ -24,11 +24,38 @@
   when: not run__force_teardown
   ansible.builtin.include_tasks: "initialize_base.yml"
 
-- name: Discover CDP DF Deployments
-  register: run__df_service_info
+- name: Discover CDP Dataflow deployments
   when: run__include_df
   cloudera.cloud.df_service_info:
     name: "{{ run__env_name }}"
+  register: run__df_env_info
+
+- name: Discover CDP Data Warehouse cluster
+  cloudera.cloud.dw_cluster_info:
+    env: "{{ run__env_name }}"
+  register: __dw_list
+
+- name: Discover CDP Data Warehouse deployments
+  when: 
+    - run__include_dw
+    - not run__force_teardown | bool or not run__dw_force_delete | bool
+    - __dw_list.clusters | length > 0
+  block:
+    - name: Initialize CDP Data Warehouse cluster id
+      ansible.builtin.set_fact:
+        __dw_cluster_id: "{{ __dw_list.clusters | map(attribute='id') | first | default(omit) }}"
+
+    - name: Discover CDP Data Warehouse database catalogs
+      when: __dw_cluster_id is defined
+      cloudera.cloud.dw_database_catalog_info:
+        cluster_id: "{{ __dw_cluster_id }}"
+      register: __dw_dbc_list
+
+    - name: Discover CDP Data Warehouse virtual warehouses
+      when: __dw_cluster_id is defined
+      cloudera.cloud.dw_virtual_warehouse_info:
+        cluster_id: "{{ __dw_cluster_id }}"
+      register: __dw_vw_list
 
 - name: Initialize Purge of all Runtimes in Environment
   when:

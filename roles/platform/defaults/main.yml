@@ -120,6 +120,9 @@ plat__aws_storage_suffix:                     "{{ env.aws.storage.suffix | defau
 plat__aws_role_tags:                          "{{ env.aws.role.tags | default({}) }}"
 plat__aws_policy_tags:                        "{{ env.aws.policy.tags | default({}) }}"
 plat__aws_storage_tags:                       "{{ env.aws.storage.tags | default({}) }}"
+plat__aws_vpc_id:                             "{{ common__aws_vpc_id }}"
+plat__aws_public_subnet_ids:                  "{{ common__aws_public_subnet_ids }}"
+plat__aws_private_subnet_ids:                 "{{ common__aws_private_subnet_ids }}"
 
 plat__aws_xaccount_suffix:                    "{{ env.aws.role.label.cross_account | default(common__xaccount_suffix) }}"
 plat__aws_idbroker_suffix:                    "{{ common__aws_idbroker_suffix }}"
