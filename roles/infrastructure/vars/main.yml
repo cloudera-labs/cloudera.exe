@@ -29,10 +29,11 @@ infra__cdp_control_plane_cidr_default:  ['52.36.110.208/32', '52.40.165.49/32', 
 infra__dynamic_inventory_images_default:
   aws:
     el7:
-      search: 'CentOS Linux 7 x86_64 HVM EBS*'
+      search: 'CentOS-7*x86_64*'
       user: 'centos'
+      product-code: 'cvugziknvmxgqna9noibqnnsy'      
       owners:
-        - 'aws-marketplace'
+        - '679593333241'
     el8:
       search: 'RHEL-8.4*HVM*x86_64*'
       user: 'ec2-user'
