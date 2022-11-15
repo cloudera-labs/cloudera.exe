@@ -17,24 +17,24 @@
     path: "{{ plat__terraform_template_dir }}/plat"
     state: directory
 
-# Apply template for Terraform provider
-- name: Generate Terraform Provider
-  ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/provider.tf.j2'
+# Copy Terraform provider
+- name: Copy Terraform Provider file
+  ansible.builtin.copy:
+    src: 'files/{{ plat__infra_type }}/provider.tf'
     dest: "{{ plat__terraform_template_dir }}/plat/provider.tf"
+
+# Copy Terraform variables file
+- name: Copy Terraform Variables declaration file
+  ansible.builtin.copy:
+    src: 'files/{{ plat__infra_type }}/terraform_variables.tf'
+    dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
+  no_log: false
 
 # Apply template for Terraform backend state
 - name: Generate Terraform Backend State
   ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/backend_state.tf.j2'
+    src: 'templates/{{ plat__infra_type }}/backend_state.tf.j2'
     dest: "{{ plat__terraform_template_dir }}/plat/backend_state.tf"
-
-# Apply template for Terraform variables
-- name: Generate Terraform Variables
-  ansible.builtin.template:
-    src: 'template/{{ plat__infra_type }}/terraform_variables.tf.j2'
-    dest: "{{ plat__terraform_template_dir }}/plat/variables.tf"
-  no_log: false
 
 - name: Create a temporary directory for policy documents
   ansible.builtin.tempfile:
