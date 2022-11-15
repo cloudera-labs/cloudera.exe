@@ -201,6 +201,11 @@
       scope: "{{ plat__azure_datapath_uri }}"
       assignee: "{{ __azure_ranger_audit_identity.properties.principalId }}"
       desc: Assign Storage Blob Data Contributor Role to Ranger Audit Role at Data Container level
+    - role: "{{ __azure_storageblobdata_ctrb_role_id }}"
+      scope: "{{ plat__azure_logpath_uri }}"
+      assignee: "{{ __azure_ranger_audit_identity.properties.principalId }}"      
+      desc: Assign Storage Blob Data Contributor Role to Ranger Audit Role at Logs Container level
+
   loop_control:
     loop_var: __azure_rl_assgn_item
     label: "{{ __azure_rl_assgn_item.desc }}"
