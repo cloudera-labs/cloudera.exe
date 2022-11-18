@@ -137,6 +137,7 @@ common__azure_netapp_nfs_version:         "{{ infra.azure.netapp.nfs.version | d
 # GCP Infra
 common__gcp_project:                      "{{ infra.gcp.project | default('gcp-se') }}"
 common__gcp_region:                       "{{ infra.gcp.region | default('europe-west1') }}"
+common__gcp_subnet_id:                    "{{ infra.gcp.vpc.subnet_id | default(None) }}"
 
 # Plat
 common__xaccount_credential_suffix:       "{{ env.cdp.credential.suffix | default(common__xaccount_suffix) }}"
