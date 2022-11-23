@@ -167,6 +167,8 @@
       loop:
         - account: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"
           bucket: "{{ plat__gcp_storage_location_logs }}"
+        - account: "serviceAccount:{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"
+          bucket: "{{ plat__gcp_storage_location_backups }}"
         - account: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"
           bucket: "{{ plat__gcp_storage_location_data }}"
         - account: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"

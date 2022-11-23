@@ -103,6 +103,7 @@ common__ml_path:                          "{{ infra.storage.path.ml | default('d
 common__de_path:                          "{{ infra.storage.path.de | default('dataeng') }}"
 common__logs_path:                        "{{ infra.storage.path.logs | default(common__logs_suffix) }}"
 common__data_path:                        "{{ infra.storage.path.data | default(common__data_suffix) }}"
+common__backups_path:                     "{{ infra.storage.path.backups | default(common__logs_path) }}"
 common__ranger_audit_path:                "{{ infra.storage.path.ranger_audit | default('ranger/audit') }}"
 
 # AWS Infra
