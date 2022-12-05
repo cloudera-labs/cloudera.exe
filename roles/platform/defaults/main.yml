@@ -48,6 +48,7 @@ plat__cdp_iam_resource_suffix:                "{{ plat__cdp_iam_identities.resou
 plat__tags:                                   "{{ common__tags }}"
 plat__env_name:                               "{{ common__env_name }}"
 plat__vpc_name:                               "{{ common__vpc_name }}"
+plat__vpc_project:                            "{{ common__vpc_project }}"
 plat__storage_name:                           "{{ common__storage_name }}"
 
 plat__logs_path:                              "{{ common__logs_path }}"

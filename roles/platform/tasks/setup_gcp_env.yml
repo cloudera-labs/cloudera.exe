@@ -26,6 +26,7 @@
     log_location: "gs://{{ plat__gcp_storage_location_logs }}"
     log_identity: "{{ plat__gcp_log_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
     vpc_id: "{{ plat__vpc_name }}"
+    vpc_project_id: "{{ plat__vpc_project }}"
     subnet_ids:
       - "{{ plat__gcp_subnet_id if plat__gcp_subnet_id else plat__gcp_subnets_discovered[0].name }}"  # TODO - Check in validation_gcp.yml -- CDP on GCP only supports a single subnet deployment
     project: "{{ plat__gcp_project }}"
