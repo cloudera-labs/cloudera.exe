@@ -204,9 +204,13 @@
         loop_var: __dw_config
         index_var: __dw_config_index
 
+    - name: Ensure runtime configs is initialized
+      ansible.builtin.set_fact:
+        run__dw_vw_configs: "{{ run__dw_vw_configs | default([]) }}"
+
     - name: Construct CDP DW Virtual Warehouse configurations
       ansible.builtin.set_fact:
-        run__dw_vw_configs: "{{ run__dw_vw_configs | default([]) | union([config]) }}"
+        run__dw_vw_configs: "{{ run__dw_vw_configs | union([config]) }}"
       vars:
         config:
           dbc_name: "{{ __dw_config.0.name }}"
