@@ -1,3 +1,5 @@
+---
+
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Python internals
-wheel
-
-# CVE avoidance
-requests[security]>2.5.3
-urllib3>1.24.2
-cryptography>=2.3.1
-
-# Ansible 
-jmespath                # community.general.json_query
-molecule[lint]==3.4     # Pinned due to https://github.com/ansible-community/molecule/issues/3243
+collections:
+  - source: .
+    type: dir

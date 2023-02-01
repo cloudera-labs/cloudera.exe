@@ -1,3 +1,4 @@
+---
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Python internals
-wheel
+name: Reset Pull Request validation label
 
-# CVE avoidance
-requests[security]>2.5.3
-urllib3>1.24.2
-cryptography>=2.3.1
+on:
+  pull_request_target:
+    types:
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - 'release/**'
+      - 'devel'
+      - 'devel-pvc-base'
 
-# Ansible 
-jmespath                # community.general.json_query
-molecule[lint]==3.4     # Pinned due to https://github.com/ansible-community/molecule/issues/3243
+jobs:
+  reset:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reset the PR label
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: validated
