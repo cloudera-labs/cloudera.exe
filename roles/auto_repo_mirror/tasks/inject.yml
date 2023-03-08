@@ -97,6 +97,16 @@
           | select('search', init__parcel_distro)
           | list }}"
 
+    - name: Include Cloudera Manager Tarball
+      ansible.builtin.set_fact:
+        init__urls_to_sign: "{{ init__urls_to_sign
+            | default([]) + __auto_repo_mirror_ini_entry
+            | select('search', 'repo-as-tarball')
+            | select('search', cloudera_manager_version)
+            | select('search', cm_distro_select[init__parcel_distro]['version'] | string + '.tar')
+            | list }}"
+
+# TODO: Filter to relevent version manifests, not all manifests, just to be tidy
     - name: Ensure manifest is included in Download Mirror URLs if present
       loop: "{{ init__cluster_repo_entries }}"
       loop_control:

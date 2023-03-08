@@ -68,6 +68,7 @@
   block:
     # Prepare to sync cache dir to S3
     - name: Setup System Rhel8
+      ignore_errors: true  # newer versions of rhel8 do not need or have epel-release
       when:
         - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version | int >= 8
