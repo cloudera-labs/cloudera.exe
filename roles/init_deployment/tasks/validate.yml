@@ -1,0 +1,91 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: If Purge is defined, check it is boolean
+  when: purge is defined
+  ansible.builtin.assert:
+    that: purge|bool is sameas true or purge|bool is sameas false
+    fail_msg: "purge key is present in definition, but not a boolean as expected"
+    quiet: yes
+
+- name: Assert user has supplied an Admin Password
+  no_log: true
+  ansible.builtin.assert:
+    quiet: yes
+    that:
+      - admin_password is defined
+      - admin_password | length > 2
+    fail_msg: "You must supply an Admin Password of at least 2 chars"
+
+# Validate Name Prefix
+- name: Check supplied Namespace (Azure)
+  when:
+    - globals.infra_type == 'azure'
+    - "'teardown' not in {{ ansible_run_tags }}"
+  ansible.builtin.assert:
+    that:
+      - globals.name_prefix | length > 1
+      - globals.name_prefix | length < 5
+      - globals.name_prefix | regex_search('^[a-zA-Z]')
+    fail_msg: "You must supply a valid Namespace"
+    quiet: yes
+
+- name: Check supplied Namespace
+  when:
+    - globals.infra_type != 'azure'
+    - "'teardown' not in ansible_run_tags"
+  ansible.builtin.assert:
+    that:
+      - globals.name_prefix | length > 1
+      - globals.name_prefix | length < 8
+      - globals.name_prefix | regex_search('^[a-zA-Z]')
+    fail_msg: "You must supply a valid Namespace"
+    quiet: yes
+
+- name: Check Deployment Engine variable
+  ansible.builtin.assert:
+    that:
+      - globals.infra_deployment_engine in ['ansible', 'terraform']
+    fail_msg: "The 'infra_deployment_engine' variable must be one of 'ansible', 'terraform'"
+    quiet: yes
+
+- name: Check Supplied terraform_base_dir variable
+  when:
+    - globals.infra_deployment_engine == 'terraform'
+  ansible.builtin.assert:
+    that:
+      - globals.terraform.base_dir is defined
+      - globals.terraform.base_dir | length > 0
+    fail_msg: "You must supply a 'terraform_base_dir' where Terraform assets will be placed"
+    quiet: yes
+
+- name: Check Supplied terraform_auto_remote_state variable
+  when:
+    - globals.infra_deployment_engine == 'terraform'
+  ansible.builtin.assert:
+    that:
+      - (globals.terraform.auto_remote_state|bool is sameas true) or (globals.terraform.auto_remote_state|bool is sameas false)
+    fail_msg: "The terraform.auto_remote_state variable must be a boolean variable"
+    quiet: yes
+
+- name: Check Admin Password is CDP Cloud compliant
+  when: init__call_cdp_pbc | bool
+  ansible.builtin.assert:
+    that:
+      - admin_password is match('^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,64}$')
+    fail_msg: >-
+      Admin Password must comply with CDP Public requirements: 1 Upper, 1 Special, 1 Number, 8-64 chars.
+    quiet: yes

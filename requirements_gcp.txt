@@ -15,4 +15,4 @@
 # Google Cloud
     
 # NOTE: google-cloud-sdk, including the CLI, is installed as OS package.
-google-auth
+google-auth>=2.9.0

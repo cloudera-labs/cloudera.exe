@@ -1,0 +1,75 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Use default SSH public key id
+  when: globals.ssh.public_key_id is undefined
+  ansible.builtin.set_fact:
+    globals: "{{ globals | default({}) | combine(__default_ssh_key_id, recursive=True) }}"
+  vars:
+    __default_ssh_key_id:
+      ssh:
+        public_key_id: "{{ globals.name_prefix }}"
+
+- name: Generate SSH public and private keys
+  when: (globals.ssh.public_key_file is undefined or globals.ssh.public_key_file | length < 3) and globals.ssh.public_key_text is undefined
+  block:
+    - name: Generate a SSH keypair (public and private keys)
+      register: __generated_ssh_keys
+      community.crypto.openssh_keypair:
+        path: "{{ [default_sshkey_path, __generated_keypair_name] | path_join }}"
+        comment: "{{ globals.name_prefix }} (auto-generated)"
+        type: rsa
+        size: 4096
+        regenerate: never
+        force: no
+      vars:
+        __generated_keypair_name: "{{ globals.name_prefix + default_ssh_key_suffix }}"
+
+    - name: Set facts for the generated SSH keypair details
+      ansible.builtin.set_fact:
+        globals: "{{ globals | default({}) | combine(__generated_keypair, recursive=True) }}"
+      vars:
+        __generated_keypair:
+          ssh:
+            private_key_file: "{{ __generated_ssh_keys.filename }}"
+            public_key_file: "{{ [ __generated_ssh_keys.filename, 'pub' ] | join('.') }}"
+
+- name: Load SSH public key file to text
+  when: globals.ssh.public_key_file is defined
+  ansible.builtin.set_fact:
+    globals: "{{ globals | default({}) | combine(__public_key_globals , recursive=True) }}"
+  vars:
+    __public_key_globals:
+      ssh:
+        public_key_text: "{{ lookup('file', globals.ssh.public_key_file ) | default(omit) }}"
+
+- name: Validate SSH Private Key File has acceptable permissions
+  when: globals.ssh.private_key_file is defined
+  block:
+    - name: Get information for SSH Private Key File
+      ansible.builtin.stat:
+        path: "{{ globals.ssh.private_key_file }}"
+      register: __private_key_file_stat
+
+    - name: Assert that SSH Private Key has valid permissions
+      ansible.builtin.assert:
+        that:
+          - __private_key_file_stat.stat.mode == '0400' or __private_key_file_stat.stat.mode == '0600'
+        fail_msg:
+          - "SSH Private Key at {{ __private_key_file_stat.stat.path }} has invalid permissions"
+          - "Permissions are {{ __private_key_file_stat.stat.mode }}"
+          - "Permissions should be 0400 or 0600"
+        quiet: yes
