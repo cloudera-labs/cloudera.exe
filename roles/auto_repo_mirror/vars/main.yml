@@ -1,0 +1,13 @@
+cm_distro_select:
+  el7:
+    name: redhat
+    version: 7
+  el8:
+    name: redhat
+    version: 8
+  bionic:
+    name: ubuntu
+    version: 1804
+  focal:
+    name: ubuntu
+    version: 2004

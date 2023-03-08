@@ -35,7 +35,7 @@ infra__dynamic_inventory_images_default:
       owners:
         - '679593333241'
     el8:
-      search: 'RHEL-8.4*HVM*x86_64*'
+      search: 'RHEL-8.6*HVM-*x86_64*'
       user: 'ec2-user'
       owners:
         - '309956199498'

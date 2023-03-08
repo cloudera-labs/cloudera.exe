@@ -1,0 +1,18 @@
+---
+
+- name: Fetch necessary variables from Ansible Controller
+  ansible.builtin.set_fact:
+    globals: "{{ hostvars['localhost']['globals'] }}"
+
+- name: Prepare Cloudera Subscription Credentials
+  ansible.builtin.include_role:
+    name: cloudera.cluster.deployment.credential
+  when: globals.cloudera_license_file is defined
+  vars:
+    cloudera_manager_license_file: "{{ globals.cloudera_license_file }}"
+
+- name: Populate the Download Mirror with new files
+  when: globals.auto_repo_mirror_targets | length > 0
+  ansible.builtin.include_role:
+    name: cloudera.exe.auto_repo_mirror
+    tasks_from: populate_from_upstream
