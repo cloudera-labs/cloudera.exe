@@ -20,6 +20,14 @@ datahub:
     azure:
     gcp:
   definitions:
+    - name:
+      template:
+      definition:
+      instance_groups:
+      extension:
+      subnets_filter:
+      multi_az:
+      tags:
   image_catalog:
     name:
     url:
@@ -50,7 +58,7 @@ df:
   max_k8s_nodes:
   public_loadbalancer:
   loadbalancer_ip_ranges:
-  kube_ip_ranges:
+  k8s_ip_ranges:
   cluster_subnets:
   loadbalancer_subnets:
   teardown:

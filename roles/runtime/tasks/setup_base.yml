@@ -27,6 +27,9 @@
     template: "{{ ('template' in __datahub_config_item) | ternary(run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template | default(omit)) | list | first, omit, omit) }}"
     definition: "{{ ('definition' in __datahub_config_item) |  ternary(run__datahub_available_definitions | select('ansible.builtin.search', __datahub_config_item.definition | default(omit)) | list | first, omit, omit) }}"
     groups: "{{ __datahub_config_item.instance_groups | default(omit) }}"
+    extension: "{{ __datahub_config_item.extension | default(omit) }}"
+    subnets_filter: "{{ __datahub_config_item.subnets_filter | default(omit) }}"
+    multi_az: "{{ __datahub_config_item.multi_az | default(omit) }}"
     tags: "{{ __datahub_config_item.tags }}"
     wait: yes
   loop_control:
@@ -116,9 +119,11 @@
     nodes_max: "{{ run__df_nodes_max }}"
     public_loadbalancer: "{{ run__df_public_loadbalancer }}"
     loadbalancer_ip_ranges: "{{ run__df_lb_ip_ranges }}"
-    kube_ip_ranges: "{{ run__df_kube_ip_ranges }}"
+    k8s_ip_ranges: "{{ run__df_k8s_ip_ranges }}"
     cluster_subnets: "{{ run__df_cluster_subnets }}"
+    cluster_subnets_filter: "{{ run__df_cluster_subnets_filter }}"
     loadbalancer_subnets: "{{ run__df_lb_subnets }}"
+    loadbalancer_subnets_filter: "{{ run__df_lb_subnets_filter }}"
     tags: "{{ run__df_tags }}"
     state: present
     wait: no

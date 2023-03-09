@@ -102,6 +102,9 @@
           template: "{{ __datahub_config.template | default(include.template | default(omit) ) }}"
           definition: "{{ __datahub_config.definition | default(include.definition | default(omit) ) }}"
           instance_groups: "{{ (overlay | length > 0) | ternary(overlay | map('cloudera.exe.combine_onto', base, recursive=True) | list, omit) }}"
+          extension: "{{ __datahub_config.extension | default(omit) }}"
+          subnets_filter: "{{ __datahub_config.subnets_filter | default(omit) }}"
+          multi_az: "{{ __datahub_config.multi_az | default(omit) }}"
           tags: "{{ __datahub_config.tags | default(run__datahub_tags) }}"
       loop: "{{ run__datahub_definitions }}"
       loop_control:
