@@ -28,7 +28,7 @@
   when: run__include_df
   cloudera.cloud.df_service_info:
     name: "{{ run__env_name }}"
-  register: run__df_env_info
+  register: run__df_service_info
 
 - name: Discover CDP Data Warehouse cluster
   cloudera.cloud.dw_cluster_info:
