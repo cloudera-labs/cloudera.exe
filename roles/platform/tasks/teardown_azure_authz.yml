@@ -39,13 +39,10 @@
     api_version: '2018-11-30'
     idempotency: yes
     state: absent
-  loop:
-    - "{{ plat__azure_idbroker_identity_name }}"
-    - "{{ plat__azure_datalakeadmin_identity_name }}"
-    - "{{ plat__azure_log_identity_name }}"
-    - "{{ plat__azure_ranger_audit_identity_name }}"
+  loop: "{{ plat__azure_msis }}"
 
-- name: Wait for MSIs to be delisted
+
+- name: Wait for MSIs to be delisted - Non RAZ
   when:
     - plat__azure_metagroup_uri is defined
     - plat__azure_metagroup_uri | length > 0
@@ -64,6 +61,26 @@
     - plat__azure_ranger_audit_identity_name not in discovered_msi_list
   vars:
     discovered_msi_list: "{{ __azure_identity_list.response | map(attribute='name') | list }}"
+
+
+- name: Wait for MSIs to be delisted - RAZ
+  when:
+    - plat__azure_metagroup_uri is defined
+    - plat__azure_metagroup_uri | length > 0
+    - plat__enable_raz
+  azure.azcollection.azure_rm_resource_info:
+    resource_group: "{{ plat__azure_metagroup_name }}"
+    provider: ManagedIdentity
+    resource_type: userAssignedIdentities
+    api_version: '2018-11-30'
+  register: __azure_identity_list
+  delay: 5
+  retries: 10
+  until:
+    - plat__azure_raz_identity_name not in discovered_msi_list
+  vars:
+    discovered_msi_list: "{{ __azure_identity_list.response | map(attribute='name') | list }}"
+
 
 - name: Remove CDP Cross Account Credential for Azure
   when: plat__teardown_deletes_credential

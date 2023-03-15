@@ -86,6 +86,7 @@ plat__azure_roles:
   storcnt: 'Storage Blob Data Contributor'
   contrib: 'Contributor'
   owner: 'Owner'
+  stordel: 'Storage Blob Delegator'
 
 
 plat__gcp_required_services:

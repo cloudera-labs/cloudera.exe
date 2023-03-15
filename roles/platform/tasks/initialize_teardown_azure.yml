@@ -40,5 +40,5 @@
       - "{{ plat__azure_datalakeadmin_identity_name }}"
       - "{{ plat__azure_log_identity_name }}"
       - "{{ plat__azure_ranger_audit_identity_name }}"
-    role_assignment_assignee_list: "{{ msi_principal_id_list | union([plat__azure_application_service_principal_objuuid | default([])]) | list }}"
+    role_assignment_assignee_list: "{{ msi_principal_id_list | union([plat__azure_application_service_principal_objuuid] if plat__azure_application_service_principal_objuuid is defined else []) }}"
     

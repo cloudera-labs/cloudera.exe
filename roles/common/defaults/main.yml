@@ -45,6 +45,7 @@ common__data_suffix:                      "{{ globals.labels.data | default('dat
 common__external_data_suffix:             "{{ globals.labels.external_data | default('external') }}"
 common__datalake_admin_suffix:            "{{ globals.labels.datalake_admin | default('dladmin') }}"
 common__ranger_audit_suffix:              "{{ globals.labels.ranger_audit | default('audit') }}"
+common__raz_suffix:                       "{{ globals.labels.raz | default('raz') }}"
 common__cml_suffix:                       "{{ globals.labels.cml | default('cml') }}"
 common__cde_suffix:                       "{{ globals.labels.cde | default('cde') }}"
 common__igw_suffix:                       "{{ globals.labels.internet_gateway | default('igw') }}"
