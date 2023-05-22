@@ -31,13 +31,14 @@
     loop_var: __storage_tag
 
 - name: Create AWS Buckets
-  amazon.aws.aws_s3:
+  amazon.aws.s3_bucket:
     region: "{{ infra__region }}"
-    bucket: "{{ __aws_storage_location_item.bucket }}"
-    mode: create
-    permission: private
+    name: "{{ __aws_storage_location_item.bucket }}"
+    state: present
+    object_ownership: "{{ infra__aws_bucket_object_ownership }}"
   loop_control:
     loop_var: __aws_storage_location_item
+    label: "{{ __aws_storage_location_item.bucket }}"
   loop: "{{ infra__aws_storage_locations }}"
   register: __infra_aws_storage_locations_info
 
@@ -47,8 +48,10 @@
     bucket: "{{ __aws_storage_object_item.bucket }}"
     object: "{{ __aws_storage_object_item.path }}"
     mode: create  # Put will not work here due to the way the s3 module is written
+    permission: "{{ infra__aws_bucket_acl_permissions }}"
   loop_control:
     loop_var: __aws_storage_object_item
+    label: "{{ __aws_storage_object_item.bucket }}/{{ __aws_storage_object_item.path }}"
   loop: "{{ infra__aws_storage_locations }}"
 
 - name: Update AWS Buckets tags (overwrite)
@@ -65,11 +68,11 @@
 
 - name: Ensure Download Mirror Bucket exists in target region
   when: infra__create_utility_service
-  amazon.aws.aws_s3:
+  amazon.aws.s3_bucket:
     region: "{{ infra__region }}"
-    bucket: "{{ infra__utlity_bucket_name }}"
-    mode: create
-    permission: private
+    name: "{{ infra__utlity_bucket_name }}"
+    state: present
+    object_ownership: "{{ infra__aws_bucket_object_ownership }}"
 
 - name: Update Download Mirror Buckets tags (overwrite)
   when: infra__create_utility_service and __infra_aws_storage_tags_list is defined

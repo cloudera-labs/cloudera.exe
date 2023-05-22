@@ -16,20 +16,22 @@
 
 - name: Remove AWS Buckets
   when: infra__teardown_deletes_data
-  amazon.aws.aws_s3:
+  amazon.aws.s3_bucket:
     region: "{{ infra__region }}"
-    bucket: "{{ __aws_storage_location_item.bucket }}"
-    mode: delete
+    name: "{{ __aws_storage_location_item.bucket }}"
+    state: absent
+    force: yes
   loop_control:
     loop_var: __aws_storage_location_item
   loop: "{{ infra__aws_storage_locations }}"
 
 - name: Remove AWS Storage Utility Bucket
   when: infra__teardown_download_mirror | bool
-  amazon.aws.aws_s3:
+  amazon.aws.s3_bucket:
     region: "{{ infra__region }}"
-    bucket: "{{ infra__utlity_bucket_name }}"
-    mode: delete
+    name: "{{ infra__utlity_bucket_name }}"
+    state: absent
+    force: yes
 
 - name: Remove AWS EFS File Systems, if Discovered during Purge
   when:
