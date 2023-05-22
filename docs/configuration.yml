@@ -156,6 +156,7 @@ env:
       suffix:
       tags:
     storage:
+      bucket_acl_permissions: 
       suffix:
       tags:
   azure:

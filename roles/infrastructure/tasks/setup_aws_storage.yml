@@ -35,7 +35,7 @@
     region: "{{ infra__region }}"
     bucket: "{{ __aws_storage_location_item.bucket }}"
     mode: create
-    permission: private
+    permission: "{{ infra__aws_bucket_acl_permissions }}"
   loop_control:
     loop_var: __aws_storage_location_item
   loop: "{{ infra__aws_storage_locations }}"
