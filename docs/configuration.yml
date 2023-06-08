@@ -375,6 +375,8 @@ infra:
       tags:
     storage:
       tags:
+      bucket_object_ownership: 
+      bucket_acl_permissions: 
     private_endpoints:
   azure:
     metagroup:
