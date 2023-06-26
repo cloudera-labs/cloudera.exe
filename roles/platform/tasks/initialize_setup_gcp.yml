@@ -14,6 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Discover available zones for GCP region
+  block:
+    - name: Fetch list of availability zones filtered by region
+      ansible.builtin.command: >
+        gcloud compute zones list --filter region={{ plat__region }} --format json
+      register: __gcp_availability_zones_info
+
+    - name: Set fact for GCP availability zones
+      ansible.builtin.set_fact:
+        plat__gcp_availability_zones_discovered: "{{ __gcp_availability_zones_info.stdout | from_json | map(attribute='name') | list }}"
+
+    - name: Confirm availability zone access for CDP Environment
+      when: plat__gcp_availability_zones | length > 0
+      ansible.builtin.assert:
+        that:
+          - plat__gcp_availability_zones is subset(plat__gcp_availability_zones_discovered)
+        fail_msg: "The following zone(s) are not available in region '{{ plat__region }}': {{ plat__gcp_availability_zones | difference(plat__gcp_availability_zones_discovered) | join(', ') }}"
+        quiet: yes
+
 # https://docs.cloudera.com/management-console/cloud/requirements-gcp/topics/mc-gcp_apis.html
 - name: Ensure Google Services Enabled
   when: plat__gcp_enable_services | bool

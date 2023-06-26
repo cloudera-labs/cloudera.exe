@@ -245,6 +245,7 @@ env:
     enable_raz: 
   gcp:
     auto_enable_services:
+    availability_zones:
     manage_identities:
     bindings:
       cross_account:
