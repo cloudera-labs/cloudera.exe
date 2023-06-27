@@ -34,4 +34,4 @@
     tags: "{{ plat__tags }}"
     freeipa:
       instanceCountByGroup: "{{ plat__env_freeipa }}"
-    zones: "{{ plat__gcp_availability_zones | length > 0 | ternary(plat__gcp_availability_zones, omit) }}"
+    zones: "{{ (plat__gcp_availability_zones | length > 0) | ternary(plat__gcp_availability_zones, omit) }}"
