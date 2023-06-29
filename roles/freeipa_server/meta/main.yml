@@ -47,6 +47,3 @@ galaxy_info:
   - aws
   - gcloud
   - azure
-
-dependencies: ['freeipa.ansible_freeipa']
-
