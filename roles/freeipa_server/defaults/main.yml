@@ -23,5 +23,5 @@
 
 # ipaserver_recursion_acl_cidr:
 ipaserver_resolv_nameservers: [ '8.8.8.8' ]
-
+ipaserver_server_recursion: true
 enable_dns: false
