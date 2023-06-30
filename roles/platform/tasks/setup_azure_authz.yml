@@ -133,7 +133,7 @@
   register: __azure_identity_list
   delay: 5
   retries: 120 # 10 mins
-  until: discovered_msi_list is subset(plat__azure_msis)
+  until: plat__azure_msis is subset(discovered_msi_list)
   vars:
     discovered_msi_list: "{{ __azure_identity_list.response | map(attribute='name') | list }}"
 
