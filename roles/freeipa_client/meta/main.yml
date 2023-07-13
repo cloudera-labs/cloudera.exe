@@ -17,12 +17,9 @@
 galaxy_info:
   role_name: freeipa_client
   namespace: cloudera
-  author: Webster Mudge (wmudge@cloudera.com)
+  author: Webster Mudge Jim Enright Chuck Levesque
   description: >
-    Deployment and management of Cloudera Data Platform (CDP) Public Cloud core
-    services, e.g. Environments, Datalakes, Shared Data Experiences (SDX). In
-    addition to the CDP services, the role handles the deployment and management
-    of the cloud provider artifacts required for CDP operations, e.g. roles, policies.
+    Deployment of FreeIPA clients for Cloudera Data Platform (CDP) Base and ECS
   company: Cloudera
   namespace: cloudera
   license: Apache-2.0
@@ -44,6 +41,4 @@ galaxy_info:
   galaxy_tags:
   - cloudera
   - cdp
-  - aws
-  - gcloud
-  - azure
+  - freeipa
