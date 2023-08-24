@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Configure runlevel tags
-  ansible.builtin.set_fact:
-    run_teardown: "{{ 'teardown' in ansible_run_tags }}"
-    run_infrastructure: "{{ 'infra' in ansible_run_tags }}"
-    run_platform: "{{ 'plat' in ansible_run_tags }}"
-    run_pvc: "{{ 'pvc' in ansible_run_tags }}"
-    run_runtime: "{{ ansible_run_tags | difference(['infra', 'plat', 'teardown']) | length > 0 }}"
+# - name: Configure runlevel tags
+#   ansible.builtin.set_fact:
+#     run_teardown: "{{ 'teardown' in ansible_run_tags }}"
+#     run_infrastructure: "{{ 'infra' in ansible_run_tags }}"
+#     run_platform: "{{ 'plat' in ansible_run_tags }}"
+#     run_pvc: "{{ 'pvc' in ansible_run_tags }}"
+#     run_runtime: "{{ ansible_run_tags | difference(['infra', 'plat', 'teardown']) | length > 0 }}"
 
 - name: Determine if Specific Roles should be called
   ansible.builtin.set_fact:
-    init__call_cdp_pvc: "{{ mgmt is defined or cluster is defined }}"
+    # init__call_cdp_pvc: "{{ mgmt is defined or cluster is defined }}"
     init__call_cdp_pbc: "{{ env is defined or ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined or df is defined | default(False) }}"
