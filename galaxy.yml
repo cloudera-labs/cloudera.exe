@@ -16,7 +16,7 @@
 
 namespace: cloudera
 name: exe
-version: 1.7.5
+version: 2.0.0-rc1
 readme: README.md
 authors:
 - Webster Mudge <wmudge@cloudera.com>
@@ -38,12 +38,12 @@ tags:
 dependencies:
   'git+https://github.com/cloudera-labs/cloudera.cloud.git': 'main'
   'ansible.netcommon': '2.5.1'
-  'community.aws': '3.0.1'
+  #'community.aws': '3.0.1'
   'community.general': '4.5.0'
-  'amazon.aws': '3.0.0'
-  'azure.azcollection': '1.11.0'
-  'google.cloud': '1.0.2'
-  'netapp.azure': '21.10.0'
+  #'amazon.aws': '3.0.0'
+  #'azure.azcollection': '1.11.0'
+  #'google.cloud': '1.0.2'
+  #'netapp.azure': '21.10.0'
 
 repository: https://github.com/cloudera-labs/cloudera.exe
 # TODO: Set documentation URL
