@@ -20,26 +20,42 @@
   gather_facts: yes
   tasks:
 
-# Inherits 'infra', 'teardown', and 'never' from the playbook import
-# Does not apply other tags via the role imports
-# By using imports vs includes for roles, we can propagate
-# tags via --list-tags
-
 # TODO Need to propagate 'ml', 'dw', etc. to selected tasks within the roles, 
 # including those that would otherwise be 'always' - in this context; 'always'
 # should be reserved for the initialization of cloudera-deploy
-        
+
+    - name: Validate Platform configuration
+      ansible.builtin.import_role:
+        name: cloudera.exe.platform
+        tasks_from: validate
+      tags:
+        - validate
+        - initialize
+
+    - name: Validate Data Services configuration
+      ansible.builtin.import_role:
+        name: cloudera.exe.runtime
+        tasks_from: validate
+      tags:
+        - validate
+        - initialize
+       
     - name: Initialize Data Services teardown
       ansible.builtin.import_role:
         name: cloudera.exe.runtime
         tasks_from: initialize_teardown
       tags:
         - initialize
+        - run
+        - plat
 
     - name: Tear down Data Services
       ansible.builtin.import_role:
         name: cloudera.exe.runtime
         tasks_from: teardown
+      tags:
+        - run
+        - plat
 
     - name: Initialize Platform teardown
       ansible.builtin.import_role:
@@ -47,8 +63,11 @@
         tasks_from: initialize_teardown
       tags:
         - initialize
+        - plat
 
     - name: Tear down Platform
       ansible.builtin.import_role:
         name: cloudera.exe.platform
         tasks_from: teardown
+      tags:
+        - plat

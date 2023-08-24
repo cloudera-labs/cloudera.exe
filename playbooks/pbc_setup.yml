@@ -20,11 +20,6 @@
   gather_facts: yes
   tasks:
 
-# Inherits 'plat' and 'run' from playbook import
-# Applies 'validate', and 'initialize' via the role imports
-# By using imports vs includes for roles, we can propagate
-# tags via --list-tags
-
 # TODO Need to propagate 'ml', 'dw', etc. to selected tasks within the roles, 
 # including those that would otherwise be 'always' - in this context; 'always'
 # should be reserved for the initialization of cloudera-deploy
@@ -36,6 +31,8 @@
       tags:
         - validate
         - initialize
+        - plat
+        - run
 
     - name: Validate Data Services configuration
       ansible.builtin.import_role:
@@ -44,6 +41,7 @@
       tags:
         - validate
         - initialize
+        - run
 
     - name: Initialize Platform setup
       ansible.builtin.import_role:
@@ -51,11 +49,16 @@
         tasks_from: initialize_setup
       tags:
         - initialize
+        - plat
+        - run
 
     - name: Set up Platform
       ansible.builtin.import_role:
         name: cloudera.exe.platform
         tasks_from: setup
+      tags:
+        - plat
+        - run
 
     - name: Initialize Data Services setup
       ansible.builtin.import_role:
@@ -63,8 +66,11 @@
         tasks_from: initialize_setup
       tags:
         - initialize
+        - run
 
     - name: Set up Data Services
       ansible.builtin.import_role:
         name: cloudera.exe.runtime
         tasks_from: setup
+      tags:
+        - run
