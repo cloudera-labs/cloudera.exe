@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Default definition path
+definition_path: "./"
+
 # Default Paths
 default_local_temp_dir: '/tmp'
 default_sshkey_path: '~/.ssh'
@@ -27,20 +30,11 @@ default_ssh_key_suffix: _ssh_rsa
 default_cluster_definition_file: "vars/basic_cluster.yml"
 
 # Default Artefact Filenames
-default_profile_path: "{{ [default_config_path, 'profiles'] | path_join }}"
-default_profile_file: "default"
 default_definition_file: "definition.yml"
 default_cluster_file: "cluster.yml"
-default_pre_setup_tasklist: "pre_setup.yml"
-default_post_setup_tasklist: "post_setup.yml"
-default_pre_teardown_tasklist: "pre_teardown.yml"
-default_post_teardown_tasklist: "post_teardown.yml"
 
 include_inventory_file: ''
 auto_repo_mirror_file: "{{ [default_config_path, 'auto_repo_mirror.ini'] | path_join }}"
-
-# Default behavior
-use_default_cluster_definition: no
 
 # Default Deployment Controls
 default_infra_deployment_engine: ansible
