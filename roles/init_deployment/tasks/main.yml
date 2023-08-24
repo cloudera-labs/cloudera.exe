@@ -1,6 +1,6 @@
 ---
 
-# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+# Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,30 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Check versions
-- name: Get Python packages
-  register: __python_env_packages
-  command: pip freeze
-
-- name: Get Ansible Collections
-  register: __ansible_collection_list
-  command: ansible-galaxy collection list
-
-- name: Get Ansible Roles
-  register: __ansible_role_list
-  command: ansible-galaxy role list
-
-- name: Log Runtime information
-  ansible.builtin.debug:
-    msg:
-      - "Ansible Version: {{ ansible_version | to_yaml }}"
-      - "Ansible Collections: {{ __ansible_collection_list.stdout | to_nice_yaml }}"
-      - "Ansible Roles: {{ __ansible_role_list.stdout }}"
-      - "Python Version: {{ ansible_python_version }}"
-      - "Python Packages: {{ __python_env_packages.stdout }}"
-      - "Runner Version: '{{ lookup('env', 'CLDR_BUILD_VER') }}'"
-    verbosity: 1
 
 - name: Marshall Deployment Definition
   ansible.builtin.include_tasks: marshall.yml
