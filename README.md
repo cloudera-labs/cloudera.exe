@@ -26,11 +26,15 @@ The collection has several dependencies that should resolve automatically via th
 - [cloudera.cloud](https://github.com/cloudera-labs/cloudera.cloud.git) (on Cloudera Labs)
 - [ansible.netcommon](https://github.com/ansible-collections/ansible.netcommon)
 - [community.general](https://github.com/ansible-collections/community.general)
-- [community.aws](https://github.com/ansible-collections/community.aws)
-- [amazon.aws](https://github.com/ansible-collections/amazon.aws)
-- [azure.azcollection](https://github.com/ansible-collections/azure)
-- [google.cloud](https://github.com/ansible-collections/google.cloud)
-- [netapp.azure](https://github.com/ansible-collections/netapp.azure)
+
+You may want to install additional cloud provider collections depending on your target platform:
+
+| Cloud Provider | Dependency | Version |
+| Azure | [azure.azcollection](https://github.com/ansible-collections/azure) | `1.11.0` |
+|| [netapp.azure](https://github.com/ansible-collections/netapp.azure) | `21.10.0` |
+| AWS | [amazon.aws](https://github.com/ansible-collections/amazon.aws) | `3.0.0` |
+|| [community.aws](https://github.com/ansible-collections/community.aws) | `3.0.1` |
+| GCP | [google.cloud](https://github.com/ansible-collections/google.cloud) | `1.0.2` |
 
 ## Option #1: Install from GitHub
 
@@ -74,6 +78,9 @@ The collection requires Ansible `2.10.0` or higher.
 + `cloudera.cloud`
 + `ansible.netcommon`
 + `community.general`
+
+You will need to add the following, depending on your target deployment:
+
 + `community.aws`
 + `amazon.aws`
 + `azure.azcollection`
