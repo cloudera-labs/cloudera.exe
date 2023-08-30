@@ -85,6 +85,7 @@
     skip_validation: "{{ __de_config_item.raw.skip_validation | default(omit) }}"
     tags: "{{ __de_config_item.raw.tags | default(omit) }}"
     use_ssd: "{{ __de_config_item.raw.use_ssd | default(omit) }}"
+    loadbalancer_ips: "{{ __de_config_item.raw.loadbalancer_ips | default(omit) }}"
     whitelist_ips: "{{ __de_config_item.raw.whitelist_ips | default(omit) }}"
   loop_control:
     loop_var: __de_config_item

@@ -16,34 +16,28 @@
 
 namespace: cloudera
 name: exe
-version: 1.7.5
+version: 2.0.0-rc1
 readme: README.md
 authors:
 - Webster Mudge <wmudge@cloudera.com>
-- Daniel Chaffelson <dchaffelson@cloudera.com>
+- Daniel Chaffelson
 
 description: >
   A set of roles and other artifacts that encapsulate best practices and opinionated 
   deployment and management processes for Cloudera Data Platform (CDP) Public Cloud 
-  and Private Cloud, including Private Cloud Base, deployments.
+  and Private Cloud deployments.
 license_file: LICENSE
 tags:
 - cloudera
 - cdp
 - azure
-- ec2
+- aws
 - gcp
-- openstack
 
 dependencies:
   'git+https://github.com/cloudera-labs/cloudera.cloud.git': 'main'
   'ansible.netcommon': '2.5.1'
-  'community.aws': '3.0.1'
   'community.general': '4.5.0'
-  'amazon.aws': '3.0.0'
-  'azure.azcollection': '1.11.0'
-  'google.cloud': '1.0.2'
-  'netapp.azure': '21.10.0'
 
 repository: https://github.com/cloudera-labs/cloudera.exe
 # TODO: Set documentation URL

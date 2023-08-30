@@ -40,25 +40,9 @@
 # Set File Paths
 - name: Set Expected File Paths
   ansible.builtin.set_fact:
-    init__user_profile: "{{ abs_profile | default([profile_path | default(default_profile_path), profile | default(default_profile_file)] | path_join ) }}"
     init__definition_file: "{{ abs_definition | default( [definition_path, definition_file | default(default_definition_file)] | path_join ) }}"
     init__cluster_file: "{{ abs_cluster | default( [definition_path, cluster_file | default(default_cluster_file)] | path_join ) }}"
     init__auto_repo_mirror_artefact: "{{ auto_repo_mirror_file | default(auto_repo_mirror_file) }}"
-    init__pre_setup_tasklist: "{{ abs_pre_setup | default( [definition_path, pre_setup_tasklist | default(default_pre_setup_tasklist)] | path_join ) }}"
-    init__post_setup_tasklist: "{{ abs_post_setup | default( [definition_path, post_setup_tasklist | default(default_post_setup_tasklist)] | path_join ) }}"
-    init__pre_teardown_tasklist: "{{ abs_pre_teardown | default( [definition_path, pre_teardown_tasklist | default(default_pre_teardown_tasklist)] | path_join ) }}"
-    init__post_teardown_tasklist: "{{ abs_post_teardown | default( [definition_path, post_teardown_tasklist | default(default_post_teardown_tasklist)] | path_join ) }}"
-
-# Handle User Config
-- name: Check for User Config file
-  register: __user_config_stat
-  ansible.builtin.stat:
-    path: "{{ init__user_profile }}"
-
-- name: Load User Config
-  when: __user_config_stat.stat.exists
-  ansible.builtin.include_vars:
-    file: "{{ __user_config_stat.stat.path }}"
 
 # Handle Definition File
 - name: Seek Definition files in Definition Path
@@ -94,29 +78,10 @@
   ansible.builtin.set_fact:
     init__cluster_definition_file: "{{ __clus_file_stat.stat.path }}"
 
-# Override with default cluster definition if requested, regardless of files found
-- name: Use default cluster definition as override if requested
-  when: use_default_cluster_definition | bool
-  block:
-    - name: Copy basic cluster definition to tmp
-      copy:
-        src: "{{ default_cluster_definition_file }}"
-        dest: /tmp/basic_cluster.yml
-
-    - name: Set basic definition as target definition
-      ansible.builtin.set_fact:
-        init__cluster_definition_file: /tmp/basic_cluster.yml
-
-- name: Include vars from User Definition File to private dict to check for Globals
-  ansible.builtin.include_vars:
-    file: "{{ init__user_definition_file }}"
-    name: __def_vars
-
 # Note that this depends on the earlier set_fact for globals to take precedence over include_vars
 - name: Include Cluster definition file for current localhost use after User Definition is Loaded
   ansible.builtin.include_vars:
     file: "{{ init__cluster_definition_file }}"
-
 
 # Admin Password
 - name: Prompt User for a password if not provided in config or vault
@@ -124,7 +89,7 @@
   block:
     - name: Prompt User for Password if not supplied
       no_log: true
-      pause:
+      ansible.builtin.pause:
         prompt: "No admin password found in profile.yml or extra_vars, or provided password too short; please provide a Password"
       register: __user_input_password
 
@@ -208,8 +173,8 @@
         AWS_PROFILE: "{{ globals.aws_profile | default(omit) }}"
         AWS_REGION: "{{ globals.region | default(omit) }}"
 
-# This task is last to allow hard-coded 'globals' in the definition.yml to take top priority as a break-glass measure
-- name: Merge overwrite globals from Definition file with Globals on User File
-  when: __def_vars.globals is defined
-  ansible.builtin.set_fact:
-    globals: "{{ globals | combine(__def_vars.globals, recursive=True) }}"
+# # This task is last to allow hard-coded 'globals' in the definition.yml to take top priority as a break-glass measure
+# - name: Merge overwrite globals from Definition file with Globals on User File
+#   when: __def_vars.globals is defined
+#   ansible.builtin.set_fact:
+#     globals: "{{ globals | combine(__def_vars.globals, recursive=True) }}"
