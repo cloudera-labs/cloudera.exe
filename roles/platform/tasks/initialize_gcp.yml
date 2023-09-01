@@ -52,22 +52,3 @@
   loop: "{{ __gcp_subnets_discovered.resources }}"
   loop_control:
     loop_var: __gcp_subnet_item
-
-- name: Discover GCP Cross Account Service Account Keys
-  register: __gcp_xaccount_sa_discovered
-  failed_when:
-    - __gcp_xaccount_sa_discovered.rc == 1
-    - "'NOT_FOUND:' not in __gcp_xaccount_sa_discovered.stderr"
-    - "'Permission iam.serviceAccountKeys.list' not in __gcp_xaccount_sa_discovered.stderr"
-  command: >
-    gcloud iam service-accounts keys list
-    --iam-account "{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
-    --format="json"
-
-- name: Set discovered Cross Account Service Account keys if exists
-  when:
-    - __gcp_xaccount_sa_discovered is defined
-    - __gcp_xaccount_sa_discovered.stdout is defined
-    - __gcp_xaccount_sa_discovered.stdout | length > 0
-  ansible.builtin.set_fact:
-    plat__gcp_xaccount_keys: "{{ __gcp_xaccount_sa_discovered.stdout | from_json }}"
