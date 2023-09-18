@@ -15,6 +15,7 @@
 # limitations under the License.
 
 - name: Discover GCP VPC
+  when: not plat__gcp_subnet_id
   google.cloud.gcp_compute_network_info:
     project: "{{ plat__gcp_project }}"
     filters:
