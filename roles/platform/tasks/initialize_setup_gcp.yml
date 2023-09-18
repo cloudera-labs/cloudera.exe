@@ -15,6 +15,9 @@
 # limitations under the License.
 
 - name: Discover available zones for GCP region
+  when:
+    - plat__gcp_check_availability_zones
+    - plat__gcp_availability_zones | length > 0
   block:
     - name: Fetch list of availability zones filtered by region
       ansible.builtin.command: >
@@ -26,7 +29,6 @@
         plat__gcp_availability_zones_discovered: "{{ __gcp_availability_zones_info.stdout | from_json | map(attribute='name') | list }}"
 
     - name: Confirm availability zone access for CDP Environment
-      when: plat__gcp_availability_zones | length > 0
       ansible.builtin.assert:
         that:
           - plat__gcp_availability_zones is subset(plat__gcp_availability_zones_discovered)

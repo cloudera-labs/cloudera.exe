@@ -174,6 +174,7 @@ plat__gcp_log_role_perms:                     "{{ env.gcp.bindings.logs | defaul
 
 plat__gcp_manage_identities:                  "{{ env.gcp.manage_identities | default(true) }}"
 plat__gcp_enable_services:                    "{{ env.gcp.auto_enable_services | default(true) }}"
+plat__gcp_check_availability_zones:           "{{ infra.gcp.check_availability_zones | default(true) }}"
 
 # Azure
 plat__azure_app_suffix:                       "{{ env.azure.app.suffix | default(common__app_suffix) }}"
