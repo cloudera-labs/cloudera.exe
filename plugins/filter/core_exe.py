@@ -38,7 +38,7 @@ DOCUMENTATION = '''
             type: list
             elements: dict
             required: True
-        recursive::
+        recursive:
             description:
                 - If V(True), merge elements recursively.
             type: boolean
