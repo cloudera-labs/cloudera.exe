@@ -1,4 +1,4 @@
-# Testing
+# Testing cloudera.exe
 
 The collection uses `ansible-test` for unit and integration testing.
 
@@ -23,4 +23,3 @@ export ANSIBLE_COLLECTION_PATHS="$(pwd)/collections"
 ```
 
 You also need to provide AWS credentials and test configuration in the `integration_config.yml` file. This file is *not* included in the project, as it will contain sensitive data, but there is a template -- `integration_config.yml.template` -- that you can copy and update as needed.
-
