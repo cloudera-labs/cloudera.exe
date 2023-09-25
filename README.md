@@ -4,29 +4,29 @@
 
 `cloudera.exe` is an Ansible collection that offers runlevel management of your **[Cloudera Data Platform (CDP)](https://www.cloudera.com/products/cloudera-data-platform.html) Public Cloud and Private Cloud** deployments. The collection contains a number of utilities for common scenarios encountered when managing a CDP deployment, including:
 * Set up and management of external dependencies, e.g. database, Kerberos, LDAP
-* Playbooks for common deployment sequences
+* Execution of Common deployment sequences (via importable playbooks)
 
-The collection is unabashedly an _opinionated_ method of managing your CDP resources - it can set up your CDP infrastructure, configure the host machines, install and configure CDP and its services, and more. It interacts with both CDP Public Cloud and cloud provider endpoints as well as with Cloudera Manager for CDP Private Cloud deployments, i.e. it has opinions about how to get things done. If you are looking for automation resources that _only_ interact with CDP resources, please look at [`cloudera.cloud` for Public Cloud](https://github.com/cloudera-labs/cloudera.cloud) and [`cloudera.cluster` for Private Cloud and Cloudera Manager](https://github.com/cloudera-labs/cloudera.cluster).
+The collection is unabashedly an _opinionated_ approach of managing your CDP resources - it's resources can be used to set up your CDP infrastructure, configure the host machines, install and configure CDP and its services, and more. The collection interacts across several control planes from CDP Public Cloud and cloud provider endpoints to Cloudera Manager for CDP Private Cloud and Public Cloud Data Hubs. In short, it has opinions about how to get things done. If you are looking for automation resources that _only_ interact with CDP resources - that is, assets that are focused solely on Cloudera software - please look at [`cloudera.cloud` for Public Cloud](https://github.com/cloudera-labs/cloudera.cloud) and [`cloudera.cluster` for Private Cloud and Cloudera Manager](https://github.com/cloudera-labs/cloudera.cluster).
 
-Core to the collection is the [configuration file](./docs/configuration.yml) which many of the collection's roles use as a central "switchboard" for their functions. The collection works hand-in-hand with the [`cloudera-deploy` application](https://github.com/cloudera-labs/cloudera-deploy/) to execute that project's definitions; many of the functions in `cloudera-deploy` have relocated to this collection to streamline the former.
+Core to the collection is the [configuration file](./docs/configuration.yml) which many of the collection's roles use as a central "switchboard" for their functions. The collection works hand-in-hand with the [`cloudera-deploy` application](https://github.com/cloudera-labs/cloudera-deploy/) to execute _definitions_ which include variations on this configuration; many of the functions in `cloudera-deploy` have relocated to this collection to streamline its use.
 
 The collection provides _playbooks_, _roles_, and _plugins_ for working with CDP deployments. Notably, the playbooks encapsulate typical set up and tear down deployment operations, aka runlevels:
 
 | Name | Description |
 | --- | --- |
-| pbc_infra_setup.yml | Public Cloud infrastructure setup (AWS, Azure, GCP), using either Terraform or Ansible |
-| pbc_infra_teardown.yml | Public Cloud infrastructure teardown (AWS, Azure, GCP), using either Terraform or Ansible |
-| pbc_setup.yml | Public Cloud Datalake and Data Services setup |
-| pbc_teardown.yml | Public Cloud Datalake and Data Services teardown |
-| pvc_base_postfix.yml | Private Cloud setup, postfix |
-| pvc_base_prereqs_ext.yml | Private Cloud external dependencies, e.g. JVM, Kerberos, database |
-| pvc_base_prereqs_int.yml | Private Cloud internal dependencies, e.g. Cloudera Manager server and agent install |
-| pvc_base_setup.yml | Private Cloud cluster setup |
-| pvc_base_teardown.yml | Private Cloud cluster teardown |
+| `pbc_infra_setup.yml` | Public Cloud infrastructure setup (AWS, Azure, GCP), using either Terraform or Ansible |
+| `pbc_infra_teardown.yml` | Public Cloud infrastructure teardown (AWS, Azure, GCP), using either Terraform or Ansible |
+| `pbc_setup.yml` | Public Cloud Datalake and Data Services setup |
+| `pbc_teardown.yml` | Public Cloud Datalake and Data Services teardown |
+| `pvc_base_postfix.yml` | Private Cloud setup, postfix |
+| `pvc_base_prereqs_ext.yml` | Private Cloud external dependencies, e.g. JVM, Kerberos, database |
+| `pvc_base_prereqs_int.yml` | Private Cloud internal dependencies, e.g. Cloudera Manager server and agent install |
+| `pvc_base_setup.yml` | Private Cloud cluster setup |
+| `pvc_base_teardown.yml` | Private Cloud cluster teardown |
 
-`cloudera.exe`-powered applications, like `cloudera-deploy`, import these playbooks to enable runlevel-like operations.
+`cloudera.exe`-powered applications, like `cloudera-deploy`, import these playbooks to enable these runlevel operations.
 
-The other collection assets - the _roles_ and _plugins_ - are detailed in the [API documentation](https://cloudera-labs.github.io/cloudera.exe/) and are used to construct these operations. While they can be used separately, most expect the common configuration noted above.
+The other collection assets - the _roles_ and _plugins_ - are detailed in the [API documentation](https://cloudera-labs.github.io/cloudera.exe/). While these resource can be used separately, most expect the common configuration noted above and a sequence of execution defined within the noted playbooks.
 
 ## Quickstart
 
@@ -52,11 +52,11 @@ Are we missing something? Let us know by [creating a new issue](https://github.c
 
 For more information on how to get involved with the `cloudera.exe` Ansible collection, head over to [CONTRIBUTING.md](CONTRIBUTING.md).
 
-# Installation
+## Installation
 
 To install the `cloudera.exe` collection, you have several options. Please note that to date, we have not yet published this collection to the public Ansible Galaxy server, so you cannot install it via direct namespace declaration, rather you must specify a Git project and (optionally) branch.
 
-## Option #1: Install from GitHub
+### Option #1: Install from GitHub
 
 Create or edit the `requirements.yml` file in your project with the
 following:
@@ -80,7 +80,7 @@ You can also install the collection directly:
 ansible-galaxy collection install git+https://github.com/cloudera-labs/cloudera.exe.git@main
 ```
 
-## Option #2: Install the tarball
+### Option #2: Install the tarball
 
 Periodically, the collection is packaged into a distribution which you can
 install directly:
@@ -91,9 +91,11 @@ ansible-galaxy collection install <collection-tarball>
 
 See [Building the Collection](#building-the-collection) for details on creating a local tarball.
 
-# Requirements
+## Requirements
 
-The `cloudera.exe` expects `ansible-core>=2.10`.
+The `cloudera.exe` expects `ansible-core>=2.10,<2.13`.
+
+> **WARNING:** The current functionality of the `cloudera.cluster` dependency does not yet work with Ansible version `2.13` and later.
 
 The collection has the following _required_ dependencies:
 
@@ -106,7 +108,7 @@ The collection has the following _required_ dependencies:
 
 You will need to add the following, depending on your target deployment, but all are collectively _optional_ dependencies:
 
-** Private Cloud **
+**Private Cloud**
 
 See the [requirements for `cloudera-labs/cloudera.cluster`](https://github.com/wmudge/cloudera.cluster#requirements) for details.
 
@@ -118,7 +120,7 @@ See the [requirements for `cloudera-labs/cloudera.cluster`](https://github.com/w
 | `geerlingguy.postgresql` | role | `2.2.0` |
 | `geerlingguy.mysql` (patched) | role | `master` |
 
-** Terraform **
+**Terraform**
 
 If you intend to use Terraform as your infrastructure engine within the `cloudera.exe.infra` role, then install the following: 
 
@@ -126,7 +128,7 @@ If you intend to use Terraform as your infrastructure engine within the `clouder
 |------|------|---------|
 | `cloud.terraform` | collection | `1.1.1` |
 
-** AWS **
+**AWS**
 
 See the [AWS Execution Environment configuration](https://github.com/cloudera-labs/cldr-runner/blob/main/aws/execution-environment.yml) in `cloudera-labs/cldr-runner` for details on setting up the Python and system requirements.
 
@@ -135,7 +137,7 @@ See the [AWS Execution Environment configuration](https://github.com/cloudera-la
 | `amazon.aws` | collection | `3.0.0` |
 | `community.aws` | collection | `3.0.1` |
 
-** Azure **
+**Azure**
 
 See the [Azure Execution Environment configuration](https://github.com/cloudera-labs/cldr-runner/blob/main/azure/execution-environment.yml) in `cloudera-labs/cldr-runner` for details on setting up the Python and system requirements.
 
@@ -144,7 +146,7 @@ See the [Azure Execution Environment configuration](https://github.com/cloudera-
 | `azure.azcollection` | collection | `1.11.0` |
 | `netapp.azure` | collection | `21.10.0` |
 
-** GCP **
+**GCP**
 
 See the [GCP Execution Environment configuration](https://github.com/cloudera-labs/cldr-runner/blob/main/gcp/execution-environment.yml) in `cloudera-labs/cldr-runner` for details on setting up the Python and system requirements.
 
@@ -152,7 +154,7 @@ See the [GCP Execution Environment configuration](https://github.com/cloudera-la
 |------|------|---------|
 | `google.cloud` | collection | `1.0.2` |
 
-The collection also requires the following Python libraries to operate its modules:
+The collection also requires the following Python libraries to operate its modules and tasks:
 
   * [netaddr](https://pypi.org/project/netaddr/)
 
@@ -164,14 +166,14 @@ All collection dependencies, required and optional, can be found in `requirement
 
 You may wish to use a _virtual environment_ to manage the Python dependencies.
 
-# Using the Collection
+## Using the Collection
 
 This collection is designed to work hand-in-hand with the [`cloudera-deploy` application](https://github.com/cloudera-labs/cloudera-deploy), which uses the reference playbooks in the `playbooks` directory to drive the operations of its example definitions.
 
 Once installed, reference the collection in your playbooks and roles.
 
 For example, here we use the
-[`cloudera.exe.init_deployment` role](https://github.com/cloudera-labs/cloudera.exe/tree/main/roles/init_deployment) to read the core `configuration.yml` details and then import the Public Cloud playbooks to set up and provision an Environment and Datalake:
+[`cloudera.exe.init_deployment` role](https://github.com/cloudera-labs/cloudera.exe/tree/main/roles/init_deployment) to read the configuration details and then import the Public Cloud playbooks to set up and provision an Environment and Datalake:
 
 ```yaml
 - name: Marshal the variables
