@@ -95,7 +95,8 @@ See [Building the Collection](#building-the-collection) for details on creating 
 
 The `cloudera.exe` expects `ansible-core>=2.10,<2.13`.
 
-> **WARNING:** The current functionality of the `cloudera.cluster` dependency does not yet work with Ansible version `2.13` and later.
+> [!WARNING]
+> The current functionality of the `cloudera.cluster` dependency does not yet work with Ansible version `2.13` and later.
 
 The collection has the following _required_ dependencies:
 
@@ -164,6 +165,8 @@ All collection dependencies, required and optional, can be found in `requirement
 
 `ansible-builder` can discover and install all Python dependencies - current collection and dependencies - if you wish to use that application to construct your environment. Otherwise, you will need to read each collection and role dependency and follow its installation instructions.
 
+See the [Collection Metadata](https://ansible.readthedocs.io/projects/builder/en/latest/collection_metadata/) section for further details on how to install (and manage) collection dependencies.
+
 You may wish to use a _virtual environment_ to manage the Python dependencies.
 
 ## Using the Collection
@@ -196,11 +199,13 @@ For example, here we use the
   ansible.builtin.import_playbook: cloudera.exe.pbc_setup.yml
 ```
 
-> **NOTE:** You **must** run `cloudera.exe.init_deployment` before calling any of the collection's playbooks. This call must occur within the source project, otherwise Ansible's `playbook_dir` will change to the collection's installation directory and variable lookups might not work as expected.
+> [!IMPORTANT]
+> You **must** run `cloudera.exe.init_deployment` before calling any of the collection's playbooks. This call must occur within the source project, otherwise Ansible's `playbook_dir` will change to the collection's installation directory and variable lookups might not work as expected.
 
 ### Legacy Execution Modes
 
-> **WARNING:** These documents and their modes of operation are deprecated in version 2.x. For example, the use of Ansible tags to trigger coarse runlevels have been replaced by explicit playbook execution. However, the "inner" tag structures still remain and might be relevant to some execution modes.
+> [!WARNING]
+> These documents and their modes of operation are deprecated in version 2.x. For example, the use of Ansible tags to trigger coarse runlevels have been replaced by explicit playbook execution. However, the "inner" tag structures still remain and might be relevant to some execution modes.
 
 See the [execution examples](docs/runlevels.md#execution) in the Deployment Runlevels document.
 
