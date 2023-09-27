@@ -14,16 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace: cloudera
-name: exe
-version: 2.0.0-rc1
-readme: README.md
-authors:
-- Webster Mudge <wmudge@cloudera.com>
-- Daniel Chaffelson
+namespace:  cloudera
+name:       exe
+version:    2.0.0-rc1
+readme:     README.md
+authors:    []
 
 description: >
-  A set of roles and other artifacts that encapsulate best practices and opinionated 
+  A set of roles, modules, and plugins that encapsulate best practices and opinionated 
   deployment and management processes for Cloudera Data Platform (CDP) Public Cloud 
   and Private Cloud deployments.
 license_file: LICENSE
@@ -33,16 +31,25 @@ tags:
 - azure
 - aws
 - gcp
+- private cloud
+- public cloud
+- data services
+- cloudera manager
+- cm
 
 dependencies:
-  'git+https://github.com/cloudera-labs/cloudera.cloud.git': 'main'
-  'ansible.netcommon': '2.5.1'
-  'community.general': '4.5.0'
+  'git+https://github.com/cloudera-labs/cloudera.cloud.git':    'main'
+  'git+https://github.com/cloudera-labs/cloudera.cluster.git':  'main'
+  'ansible.netcommon':    '2.5.1'
+  'community.general':    '4.5.0'
 
-repository: https://github.com/cloudera-labs/cloudera.exe
-# TODO: Set documentation URL
-documentation: https://github.com/cloudera-labs/cloudera.exe
-homepage: https://github.com/cloudera-labs/cloudera.exe
-issues: https://github.com/cloudera-labs/cloudera.exe/issues
+repository:     https://github.com/cloudera-labs/cloudera.exe
+homepage:       https://github.com/cloudera-labs/cloudera.exe
+issues:         https://github.com/cloudera-labs/cloudera.exe/issues
+documentation:  https://cloudera-labs.github.io/cloudera.exe
 
-build_ignore: []
+build_ignore:
+- '.*'
+- docs
+- docsrc
+- site
