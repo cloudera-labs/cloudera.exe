@@ -1,4 +1,4 @@
-# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+# Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ galaxy_info:
     addition to the CDP services, the role handles the deployment and management
     of the cloud provider artifacts required for CDP operations, e.g. roles, policies.
   company: Cloudera
-  namespace: cloudera
   license: Apache-2.0
 
   min_ansible_version: 2.10
