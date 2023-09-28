@@ -38,8 +38,6 @@ tags:
 - cm
 
 dependencies:
-  'git+https://github.com/cloudera-labs/cloudera.cloud.git':    'main'
-  'git+https://github.com/cloudera-labs/cloudera.cluster.git':  'main'
   'ansible.netcommon':    '2.5.1'
   'community.general':    '4.5.0'
 
