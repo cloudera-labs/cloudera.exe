@@ -161,7 +161,7 @@ The collection also requires the following Python libraries to operate its modul
 
 The collection's Python dependencies alone, _not_ the required Python libraries of its collection dependencies, are in `requirements.txt`.
 
-All collection dependencies, required and optional, can be found in `requirements.yml`; only the _required_ dependencies are in `galaxy.yml`. `ansible-galaxy` will install only the _required_ collection dependencies; you will need to add the _optional_ collection dependencies as needed (see above).
+All collection dependencies, required and optional, can be found in `requirements.yml`; only the _required_ **non-Cloudera** dependencies are in `galaxy.yml`. `ansible-galaxy` will install only the _required_ **non-Cloudera** collection dependencies; you will need to add `cloudera.cloud`, `cloudera.cluster`, and the _optional_ collection dependencies as needed (see above).
 
 `ansible-builder` can discover and install all Python dependencies - current collection and dependencies - if you wish to use that application to construct your environment. Otherwise, you will need to read each collection and role dependency and follow its installation instructions.
 
