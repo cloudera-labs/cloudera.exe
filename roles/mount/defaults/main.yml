@@ -1,0 +1,7 @@
+---
+
+mount_volumes: []
+# mount_volumes:
+#   - device:
+#     mount:
+mount_provider: openstack # aws, openstack

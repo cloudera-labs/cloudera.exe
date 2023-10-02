@@ -1,0 +1,33 @@
+---
+# 'volume' is an entry from '__storage_volume_facts'
+
+- name: Create LVM volume group
+  community.general.lvg:
+    vg: "{{ volume.vg_name }}"
+    pvs: "{{ volume.partition }}"
+
+- name: Create logical volume
+  community.general.lvol:
+    vg: "{{ volume.vg_name }}"
+    lv:  "{{ volume.lv_name }}"
+    size: +100%FREE
+    force: yes
+
+- name: Format partition as XFS
+  community.general.filesystem:
+    dev: "{{ '/'.join(['/dev',volume.vg_name, volume.lv_name]) }}"
+    fstype: xfs
+
+- name: Create the mount directory
+  ansible.builtin.file:
+    path: "{{ volume.mount }}"
+    state: directory
+    mode: '0755'
+
+- name: Mount the logical volume
+  mount:
+    path: "{{ volume.mount }}"
+    src: "{{ '/'.join(['/dev',volume.vg_name, volume.lv_name]) }}"
+    fstype: xfs
+    state: mounted
+  
