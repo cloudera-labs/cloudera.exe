@@ -1,0 +1,57 @@
+{# Import using 'with context' #}
+
+{# Construct the hierarchy of nested groups from flat membership lists #}
+{% macro group_hierarchy() %}
+{% set hierarchy = {} %}
+{% for group in groups if group not in ('all', 'ungrouped') %}
+{%   set _ = hierarchy.update({ group: [] }) %}
+{%   for child in groups %}
+{%     if child not in ('all', 'ungrouped', group) and groups[child] is subset(groups[group]) and (groups[child] | length) != (groups[group] | length) %}
+{%       set _ = hierarchy[group].append(child) %}
+{%     endif %}
+{%   endfor %}
+{% endfor %}
+{% set reduced_hierarchy = {} %}
+{% for group, children in hierarchy.items() %}
+{%   set reduced_children = reduce(children) %}
+{%   set _ = reduced_hierarchy.update({ group: reduced_children | from_json }) if reduced_children | length > 0 %}
+{% endfor %}
+{{ reduced_hierarchy | to_json }}
+{% endmacro %}
+
+{# Remove from a list of children any child that is a subset of another child in the list #}
+{% macro reduce(children) %}
+{% set supersets = {} %}
+{% for p in children | permutations(2) %}
+{%   if groups[p[0]] is superset(groups[p[1]]) %}
+{%     set _ = supersets.update({ p[1]: True }) %}
+{%   endif %}
+{% endfor %}
+{{ children | difference(supersets.keys()) | to_json }}
+{% endmacro %}
+
+{# Collect and merge all the child hosts of a list of children groups #}
+{% macro group_hosts(children) %}
+{% set hosts = [] %}
+{% for child in children %}
+{%  set _ = hosts.extend(groups[child]) %}
+{% endfor %}
+{{ hosts | unique | to_json }}
+{% endmacro %}
+
+{# Configure SSH connection options for dynamic hosts #}
+{% macro all_variables() %}
+{% set ssh_options = [] %}
+{% set _ = ssh_options.append("-o StrictHostKeyChecking=no") if ssh_strict_hostkey_checking is defined and not (ssh_strict_hostkey_checking | bool) %}
+{% set _ = ssh_options.append("-o UserKnownHostsFile=/dev/null") if ssh_recycle_hostnames is defined and (ssh_recycle_hostnames | bool) %}
+{% set _ = ssh_options.append("-o ProxyCommand=\"ssh -o User=" + jump_host_user + " -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q " + jump_host_ip + "\"") if (jump_host_ip is defined and (jump_host_ip | length > 0))%}
+{% set _ = ssh_options.append("-C -o ControlMaster=auto -o ControlPersist=1200s -o BatchMode=yes") if ssh_multiplex is defined and (ssh_multiplex | bool) %}
+[all:vars]
+ansible_python_interpreter=auto
+{% if ssh_options | length > 0 -%} 
+ansible_ssh_common_args='{{ ssh_options | join(" ") }}'
+{%   if jump_host_ip is defined -%}
+ansible_timeout=60
+{%   endif %}
+{% endif %}
+{% endmacro %}

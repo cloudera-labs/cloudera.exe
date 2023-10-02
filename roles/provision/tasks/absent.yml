@@ -1,0 +1,22 @@
+---
+
+- name: Examine the local Terraform project directory
+  ansible.builtin.stat:
+    path: "{{ provision_directory }}"
+  register: tf_directory
+
+- name: Terraform 'destroy' the resources
+  when: tf_directory.stat.exists
+  community.general.terraform:
+    project_path: "{{ provision_directory }}/"
+    state: absent
+
+- name: Remove resources for remote S3 state storage
+  when: 
+    - provision_create_remote_storage
+    - provision_state_storage == 'remote_s3'
+  amazon.aws.s3_bucket:
+    region: "{{ provision_remote_storage_s3_region }}"
+    name: "{{ provision_remote_storage_s3_bucket }}"
+    state: absent
+    force: yes
