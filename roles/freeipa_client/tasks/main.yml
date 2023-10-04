@@ -15,7 +15,7 @@
 # limitations under the License.
 
 - name: Disable SELinux
-  ansible.builtin.selinux:
+  ansible.posix.selinux:
     state: disabled
   notify: restart host
 
