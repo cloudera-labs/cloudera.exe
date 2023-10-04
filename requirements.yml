@@ -51,6 +51,6 @@ collections:
   - name: community.postgresql
     version: 1.6.1
   - name: freeipa.ansible_freeipa
-    version: 1.6.2
+    version: 1.11.1
   - name: cloud.terraform
     version: 1.11.0
