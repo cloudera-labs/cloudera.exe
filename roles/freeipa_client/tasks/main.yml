@@ -15,7 +15,7 @@
 # limitations under the License.
 
 - name: Disable SELinux
-  ansible.builtin.selinux:
+  ansible.posix.selinux:
     state: disabled
   notify: restart host
 
@@ -58,6 +58,22 @@
               search {{ ipaserver_domain }}
               {{ ['nameserver '] | product(ipa_server_ips | sort) | map('join') | join('\n') }}
           notify: restart host
+
+        - name: Disable nm-cloud-setup if present
+          ignore_errors: yes
+          ansible.builtin.command: "{{ __nm_cloud_setup_disable_item }}"
+          loop_control:
+            loop_var: __nm_cloud_setup_disable_item
+          loop:
+            - systemctl disable nm-cloud-setup.service nm-cloud-setup.timer
+            - systemctl stop nm-cloud-setup.service nm-cloud-setup.timer
+            - ip rule del prio 30400
+            - rm -rf /etc/systemd/system/nm-cloud-setup.service.d
+
+        - name: Ensure NetworkManager is running to maintain DHCP
+          ansible.builtin.service:
+            name: NetworkManager
+            state: restarted
 
     - name: Set /etc/hostname to the FQDN
       ansible.builtin.copy:

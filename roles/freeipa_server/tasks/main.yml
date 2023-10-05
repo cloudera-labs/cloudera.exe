@@ -43,7 +43,7 @@
     loop_var: __pyver_item
       
 - name: Disable SELinux
-  ansible.builtin.selinux:
+  ansible.posix.selinux:
     state: disabled
   notify: restart host
 
