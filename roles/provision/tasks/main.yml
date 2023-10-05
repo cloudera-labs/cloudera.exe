@@ -1,0 +1,4 @@
+---
+
+- name: Execute provisioning state
+  ansible.builtin.include_tasks: "{{ provision_state }}.yml"

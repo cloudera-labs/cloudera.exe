@@ -1,0 +1,11 @@
+{% if provision_state_storage == "local" %}
+# Terraform state is stored locally in {{ provision_directory }}
+{% elif provision_state_storage == "remote_s3" %}
+terraform {
+  backend "s3" {
+    region                  = "{{ provision_remote_storage_s3_region | default(omit) }}"
+    bucket                  = "{{ provision_remote_storage_s3_bucket | default(omit) }}"
+    key                     = "{{ provision_name_prefix }}/terraform.tfstate"
+  }
+}
+{% endif %}

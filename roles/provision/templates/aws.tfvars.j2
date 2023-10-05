@@ -1,0 +1,160 @@
+# ------- AWS EC2 -------
+
+{% import 'instance_vars.j2' as inst with context %}
+# ------- TODO: Definition of input variables from a given configuration -------
+# ------- Global settings -------
+ssh_keypair_name            = "{{ provision_ssh_keypair_label }}"
+ssh_keypair_public_key_text = "{{ provision_ssh_keypair_public_key }}"
+
+region         = "{{ provision_aws_ec2_region }}"
+cluster_prefix = "{{ provision_name_prefix }}"
+env_tags       = {
+{%   for key, value in provision_tags.items() %}
+        {{ key }} = "{{ value }}"
+{%   endfor %}
+}
+
+# ------- Network Resources -------
+{% if provision_aws_ec2_vpc_name is defined %}
+vpc_name                 = "{{ provision_aws_ec2_vpc_name }}"
+{% endif %}
+{% if provision_aws_ec2_cidr is defined %}
+vpc_cidr                 = "{{ provision_aws_ec2_vpc_cidr }}"
+{% endif %}
+{% if provision_aws_ec2_enable_dns_support is defined %}
+vpc_enable_dns_support   = "{{ provision_aws_ec2_enable_dns_support }}"
+{% endif %}
+{% if provision_aws_ec2_enable_dns_hostnames is defined %}
+vpc_enable_dns_hostnames = "{{ provision_aws_ec2_enable_dns_hostnames }}"
+{% endif %}
+# igw_name =
+
+{% if provision_aws_ec2_public_subnets is defined %}
+public_subnets = [
+{%   for subnet in provision_aws_ec2_public_subnets %}
+    {
+        az         = "{{ subnet.az }}"
+{%     if subnet.name is defined %}
+        name       = "{{ subnet.name }}"
+{%     endif %}
+{%     if subnet.cidr is defined %}
+        cidr       = "{{ subnet.cidr }}"
+{%     endif %}
+{%     if subnet.cidr_range is defined %}
+        cidr_range = "{{ subnet.cidr_range }}"
+{%     endif %}
+{%     if subnet.tags is defined %}
+        tags       = "{{ subnet.tags | to_json }}"
+{%     endif %}
+    },
+{%   endfor %}
+]
+
+{% endif %}
+{% if provision_aws_ec2_private_subnets is defined %}
+private_subnets = [
+{%   for subnet in provision_aws_ec2_private_subnets %}
+    {
+        az         = "{{ subnet.az }}"
+{%     if subnet.name is defined %}
+        name       = "{{ subnet.name }}"
+{%     endif %}
+{%     if subnet.cidr is defined %}
+        cidr       = "{{ subnet.cidr }}"
+{%     endif %}
+{%     if subnet.cidr_range is defined %}
+        cidr_range = "{{ subnet.cidr_range }}"
+{%     endif %}
+{%     if subnet.tags is defined %}
+        tags       = "{{ subnet.tags | to_json }}"
+{%     endif %}
+    },
+{%   endfor %}
+]
+
+{% endif %}
+{% if provision_aws_ec2_default_security_group_ingress is defined %}
+security_group_rules_ingress = [
+{%   for rule in provision_aws_ec2_default_security_group_ingress %}
+    {
+        cidr = {{ rule.cidr | to_json }}
+        from_port = "{{ rule.from | string }}"
+        to_port = "{{ rule.to | string }}"
+        protocol = "{{ rule.protocol }}"
+    },
+{%   endfor %} 
+]
+
+{% endif %}
+
+# ------- Compute Resources -------
+{% if provision_instances is defined %}
+nodes = [
+{% for grouping in provision_instances %}
+{%-  for node in range(1, grouping.count + 1 | int) %}
+    {
+        name = "{{ [provision_name_prefix, grouping.hostname_prefix,'%02d' | format(node)] | join('-') }}"
+{%     if grouping.ami_filters is defined or provision_aws_ec2_default_ami is defined %} 
+        ami_filters = {
+        {% for k, v in (grouping.ami_filters.items() | default(provision_aws_ec2_default_ami)) %}
+            {{ k }} = {{ v | to_json }}{{ "," if not loop.last else "" }}
+{% endfor %}
+
+        }
+{%     endif %}
+{%     if grouping.ami_user is defined or provision_default_instance_user is defined %}
+        ami_user = "{{ grouping.ami_user | default(provision_default_instance_user) }}"
+{%     endif %}
+{%     if grouping.instance_type is defined %}
+        instance_type = "{{ grouping.instance_type }}"
+{%     endif %}
+{%     if grouping.elastic_ip is defined %}
+        elastic_ip = {{ grouping.elastic_ip | bool | string | lower }}
+{%     endif %}
+{%     if grouping.private_ip is defined %}
+        private_ip = "{{ grouping.private_ip }}"
+{%     endif %}
+{%     if grouping.subnet_index is defined %}
+        subnet_index = "{{ grouping.subnet_index }}"
+{%     endif %}
+        tags = {
+            hostname = "{{ [grouping.hostname_prefix,'%02d' | format(node)] | join('-') }}",
+{{ inst.instance_tags(grouping) }}
+        }
+{%     if grouping.root_volume is defined %}
+        root_volume = {
+{%       if grouping.root_volume.delete_on_termination is defined %}
+            delete_on_termination = {{ grouping.root_volume.delete_on_termination | bool | string | lower }}
+{%       endif %}
+{%       if grouping.root_volume.volume_size is defined %}
+            volume_size = "{{ grouping.root_volume.volume_size }}"
+{%       endif %}
+{%       if grouping.root_volume.volume_type is defined %}
+            volume_type = "{{ grouping.root_volume.volume_type }}"
+{%       endif %}
+        }
+{%     endif %}
+{%     if grouping.volumes is defined %}
+        volumes = [
+{%       for volume in grouping.volumes %}
+            {
+                device_name = "{{ volume.device }}"
+                mount       = "{{ volume.mount }}"
+                tags        = {
+                        Name    = "{{ [provision_name_prefix, grouping.hostname_prefix,('%02d' | format(node)), volume.device] | join('-') }}"
+                }
+{%         if volume.size is defined %}
+                volume_size = "{{ volume.size }}"
+{%         endif %}
+{%         if volume.type is defined %}
+                volume_type = "{{ volume.type }}"
+{%         endif %}
+            },
+{%      endfor %}
+        ]
+{%    endif %}
+    },
+{%   endfor -%}
+{% endfor %}
+]
+{% endif %}

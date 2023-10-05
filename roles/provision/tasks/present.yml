@@ -1,0 +1,78 @@
+---
+
+- name: Set up the local Terraform project directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ provision_directory }}"
+
+- name: Create resources for remote S3 state storage
+  when: 
+    - provision_create_remote_storage
+    - provision_state_storage == 'remote_s3'
+  amazon.aws.s3_bucket:
+    region: "{{ provision_remote_storage_s3_region }}"
+    name: "{{ provision_remote_storage_s3_bucket }}"
+    state: present
+    object_ownership: "BucketOwnerPreferred"
+
+- name: Copy the Terraform configuration files
+  ansible.builtin.copy:
+    dest: "{{ provision_directory }}"
+    src: "{{ provision_provider }}/"
+
+- name: Generate Terraform backend state 
+  ansible.builtin.template:
+    src: 'backend_state.tf.j2'
+    dest: "{{ [provision_directory, 'backend_state.tf'] | path_join }}"
+
+- name: Generate Terraform variables file
+  ansible.builtin.template:
+    src: "{{ provision_provider }}.tfvars.j2"
+    dest: "{{ [provision_directory, 'terraform.tfvars'] | path_join }}"
+  no_log: false
+
+- name: Terraform 'apply' the resources
+  community.general.terraform:
+    project_path: "{{ provision_directory }}/"
+    parallelism: "{{ provision_terraform_parallelism | default(omit) }}"
+    state: present
+    force_init: yes
+  register: tf_result
+
+- name: Establish jump host IP address
+  ansible.builtin.set_fact:
+    jump_host_ip: "{{ tf_result.outputs.nodes.value | community.general.json_query(query) | map(attribute='ipv4') | first | default(None) }}"
+    jump_host_user: "{{ tf_result.outputs.nodes.value | community.general.json_query(query) | map(attribute='instance_user') | first | default(None) }}"
+  vars:
+    query: "[?contains(not_null(groups,''),'jump_host')]"
+
+- name: Add hosts to in-memory inventory
+  ansible.builtin.add_host:
+    name: "{{ [node.hostname, provision_name_prefix, provision_domain_suffix] | join('.') | default(node.label) }}"
+    groups: "{{ node.groups }}"
+    storage_volumes: "{{ node.storage_volumes }}"
+    ansible_host: "{{ node.ipv4 }}"
+    ansible_user: "{{ node.instance_user }}"
+    label: "{{ node.label }}"
+    ansible_timeout: "{{ (jump_host_ip is defined and (jump_host_ip | length > 0)) | ternary(60, omit) }}"
+    ansible_ssh_common_args: "{{ (jump_host_ip is defined and (jump_host_ip | length > 0)) | ternary(jump, omit) }}"
+  vars: 
+    jump: -o ProxyCommand="ssh -o User={{ jump_host_user }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q {{ jump_host_ip | default() }}"
+  loop: "{{ tf_result.outputs.nodes.value }}"
+  loop_control:
+    loop_var: node
+    label: "{{ node.label }}"
+
+- name: Create the static INI file from the in-memory inventory
+  ansible.builtin.template:
+    src: inventory.ini.j2
+    dest: "{{ provision_inventory_file }}"
+
+- name: Populate host variables with Terraform infrastructure details
+  ansible.builtin.set_fact:
+    provision: "{{ outputs }}"
+  vars:
+    outputs:
+      nodes: "{{ tf_result.outputs.nodes.value }}"
+      vpc: "{{ tf_result.outputs.vpc.value | default(omit) }}"
+      subnets: "{{ tf_result.outputs.subnets.value | default(omit) }}"
