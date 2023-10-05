@@ -1,0 +1,64 @@
+---
+
+- name: Generate map of EBS volume attachments
+  when: mount_provider == 'aws'
+  block:
+    - name: Collect details on mapped EBS volumes
+      ansible.builtin.setup:
+        gather_subset:
+          - hardware
+        
+    - name: Map NVME volume attachments
+      when: device.key is match("nvme")
+      ansible.builtin.set_fact:
+        ebs_device_map: "{{ ebs_device_map | default({}) | combine({ volume : '/dev/' + device.key }) }}"
+      loop: "{{ ansible_devices | dict2items }}"
+      loop_control:
+        loop_var: device
+        label: "{{ device.key }}"
+      vars:
+        ebs_prefix: nvme-Amazon_Elastic_Block_Store_vol
+        volume: "vol-{{ device.value.links.ids | select('match', ebs_prefix) | map('regex_replace', '^' + ebs_prefix) | list | first }}"
+
+- name: Set required facts for volumes
+  ansible.builtin.set_fact:
+      __storage_volumes_facts: "{{ __storage_volumes_facts | default([]) | union([storage_volume_detail]) }}"
+  vars:
+    __device: "{{ ebs_device_map[volume.vol_id] | default(volume.device) }}"
+    __speared_device: "{{ __device | replace('/', '-') }}"
+    storage_volume_detail:
+      device: "{{ __device }}"
+      partition: "{{ __device + (mount_provider == 'aws') | ternary('p1', '1') }}"
+      vg_name: "{{ 'vg' + __speared_device }}"
+      lv_name: "{{ 'lv' + __speared_device }}"
+      mount: "{{ volume.mount }}"
+  loop: "{{ storage_volumes }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ __device }}"
+
+- name: Install lvm2 dependency
+  ansible.builtin.package:
+    name: lvm2
+    state: present
+
+- name: Create a new primary partition for LVM
+  community.general.parted:
+    device: "{{ volume.device }}"
+    number: 1
+    flags: [ lvm ]
+    state: present
+    part_start: "0%"
+    part_end: "100%"
+  loop: "{{ __storage_volumes_facts }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ volume.device }}"
+
+- name: Create and mount the volume
+  ansible.builtin.include_tasks: volume.yml
+  when: volume.mount not in (ansible_mounts | default([]) | map(attribute='mount') | list)
+  loop: "{{ __storage_volumes_facts }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ volume.device }}"
