@@ -18,8 +18,7 @@
 # Teardown CA
 - name: Teardown CA server
   hosts: "{{ target | default('ca_server') }}"
-  environment: "{{ globals.env_vars }}"
-  gather_facts: no
+  gather_facts: yes
   become: yes
   tasks:
     - ansible.builtin.include_role:
@@ -30,8 +29,7 @@
 
 - name: Teardown security artifact directories
   hosts: "{{ target | default('tls') }}"
-  environment: "{{ globals.env_vars }}"
-  gather_facts: no
+  gather_facts: yes
   become: yes
   roles:
     - role: cloudera.cluster.security.tls_clean
@@ -42,8 +40,7 @@
 # Teardown Cluster
 - name: Teardown ECS
   hosts: "{{ target | default('ecs_nodes') }}"
-  environment: "{{ globals.env_vars }}"
-  gather_facts: no
+  gather_facts: yes
   become: yes
   tasks:
     - ansible.builtin.include_role:
@@ -56,8 +53,7 @@
 
 - name: Cluster Teardown Process
   hosts: "{{ target | default('all') }}"
-  environment: "{{ globals.env_vars }}"
-  gather_facts: no
+  gather_facts: yes
   become: yes
   any_errors_fatal: true
   roles:
