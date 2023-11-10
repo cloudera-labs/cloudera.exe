@@ -365,6 +365,7 @@ infra:
         private_route_table:
         public_route_table_suffix:
         private_route_table_suffix:
+        prefix_list_suffix:
       existing:
         vpc_id:
         public_subnet_ids:
@@ -378,6 +379,9 @@ infra:
       bucket_object_ownership: 
       bucket_acl_permissions: 
     private_endpoints:
+    prefix_list:
+      suffix:
+    extra_prefix_list_name: 
   azure:
     metagroup:
       name:

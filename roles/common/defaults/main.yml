@@ -108,6 +108,7 @@ common__ranger_audit_path:                "{{ infra.storage.path.ranger_audit | 
 
 # AWS Infra
 common__aws_vpc_id:                       "{{ infra.aws.vpc.existing.vpc_id | default('') }}"
+common__aws_prefix_list_suffix:           "{{ infra.aws.prefix_list.suffix | default('prefix') }}"
 common__aws_public_subnet_ids:            "{{ infra.aws.vpc.existing.public_subnet_ids | default([]) }}"
 common__aws_private_subnet_ids:           "{{ infra.aws.vpc.existing.private_subnet_ids | default([]) }}"
 common__aws_region:                       "{{ infra.aws.region | default('eu-west-1') }}"

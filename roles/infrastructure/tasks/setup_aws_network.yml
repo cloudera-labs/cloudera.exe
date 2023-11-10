@@ -216,6 +216,19 @@
       ansible.builtin.set_fact:
         infra__aws_subnet_ids: "{{ infra__aws_public_subnet_ids | default([]) | union(infra__aws_private_subnet_ids) }}"
 
+- name: Manage AWS Prefix List for extra Security Group rules
+  ansible.builtin.include_tasks: setup_aws_network_prefix_list.yml
+
+- name: Update user and extra AWS Security Group rules with Prefix List
+  ansible.builtin.set_fact:
+    infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([entry]) }}"
+  vars:
+    entry:
+      proto: tcp
+      ports: "{{ infra__vpc_extra_ports }}"
+      ip_prefix: "{{ infra__aws_extra_prefix_list_id }}"
+      rule_desc: "Extra access CIDR blocks"
+
 - name: Create AWS Security Groups
   amazon.aws.ec2_group:
     state: present
@@ -243,7 +256,6 @@
   vars:
     knox: "results[?group_name=='{{ infra__security_group_knox_name }}'].group_id"
     default: "results[?group_name=='{{ infra__security_group_default_name }}'].group_id"
-
 
 - name: Setup AWS Private Endpoints
   when: infra__aws_private_endpoints | bool

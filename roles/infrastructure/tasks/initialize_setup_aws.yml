@@ -78,7 +78,16 @@
       ansible.builtin.set_fact:
         __infra_aws_ami_info: "{{ __infra_aws_ami_list.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}"
 
-- name: Prepare user and extra AWS Security Group rules
+- name: Prepare extra AWS Prefix List tags
+  ansible.builtin.set_fact:
+    infra__aws_extra_prefix_list_tags: "{{ infra__aws_extra_prefix_list_tags | default([]) | union([entry]) }}"
+  vars:
+    entry: 'Key={{ __extra_tag.key }},Value="{{ __extra_tag.value }}"'
+  loop: "{{ infra__tags | dict2items }}"
+  loop_control:
+    loop_var: __extra_tag
+
+- name: Prepare user AWS Security Group rules
   ansible.builtin.set_fact:
     infra__aws_security_group_rules:
       - proto: all
@@ -87,9 +96,7 @@
       - proto: all
         ports: "{{ infra__vpc_user_ports }}"
         cidr_ip: "{{ ipify_public_ip }}/32"
-      - proto: tcp
-        ports: "{{ infra__vpc_extra_ports }}"
-        cidr_ip: "{{ infra__vpc_extra_cidr }}"
+        rule_desc: "Creator IP address"
 
 - name: Add CCM Tunneled deployment AWS Security Group rules 
   when: infra__tunnel
