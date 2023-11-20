@@ -24,10 +24,10 @@ roles:
 collections:
   - name: https://github.com/cloudera-labs/cloudera.cloud.git
     type: git
-    version: main
+    version: "v2.2.0"
   - name: https://github.com/cloudera-labs/cloudera.cluster.git
     type: git
-    version: main
+    version: "v4.2.0"
   - name: ansible.netcommon
     version: 2.5.1
   - name: community.general
