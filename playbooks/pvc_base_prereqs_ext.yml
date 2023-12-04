@@ -215,9 +215,13 @@
   become: yes
   gather_facts: no
   roles:
-    - cloudera.cluster.security.tls_generate_csr
-    - cloudera.cluster.security.tls_signing
-    - cloudera.cluster.security.tls_install_certs
+    - role: cloudera.cluster.security.tls_presigned_certs
+      when: tls_signed_certs_dir is defined
+    - role: cloudera.cluster.security.tls_generate_csr
+      when: tls_signed_certs_dir is not defined
+    - role: cloudera.cluster.security.tls_signing
+      when: tls_signed_certs_dir is not defined
+    - role: cloudera.cluster.security.tls_install_certs
   vars:
     local_certs_dir: "{{ local_temp_dir }}/certs"
     local_csrs_dir: "{{ local_temp_dir }}/csrs"
