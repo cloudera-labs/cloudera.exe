@@ -121,7 +121,7 @@
         loop_var: __infra_ec2_elb_item
         #label: "{{ __infra_ec2_elb_item.load_balancer_name }}"
 
-    - name: List all AWS VPC NAT gatways
+    - name: List all AWS VPC NAT gateways
       community.aws.ec2_vpc_nat_gateway_info:
         region: "{{ infra__region }}"
         filters:

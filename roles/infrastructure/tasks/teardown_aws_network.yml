@@ -19,16 +19,25 @@
     - infra__teardown_deletes_network
     - infra__aws_vpc_id != ""
     - not infra__force_teardown
-  amazon.aws.ec2_group:
-    region: "{{ infra__region }}"
-    vpc_id: "{{ infra__aws_vpc_id }}"
-    name: "{{ __security_group_name_item }}"
-    state: absent
-  loop_control:
-    loop_var: __security_group_name_item
-  loop:
-    - "{{ infra__security_group_knox_name }}"
-    - "{{ infra__security_group_default_name }}"
+  block:
+    - name: Remove AWS Security Group resources
+      amazon.aws.ec2_group:
+        region: "{{ infra__region }}"
+        vpc_id: "{{ infra__aws_vpc_id }}"
+        name: "{{ __security_group_name_item }}"
+        state: absent
+      loop_control:
+        loop_var: __security_group_name_item
+      loop:
+        - "{{ infra__security_group_knox_name }}"
+        - "{{ infra__security_group_default_name }}"
+
+    - name: Remove AWS Prefix List for user and extra Security Group rules
+      when: infra__aws_extra_prefix_list_id is defined
+      ansible.builtin.command:
+        cmd: >
+          aws ec2 delete-managed-prefix-list
+          --prefix-list-id {{ infra__aws_extra_prefix_list_id }}
 
 - name: Tear down AWS Network
   when:

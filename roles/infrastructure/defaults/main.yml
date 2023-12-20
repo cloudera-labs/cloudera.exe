@@ -115,6 +115,8 @@ infra__aws_vpc_az_count:            "{{ infra.aws.vpc.az_count | default(3) }}"
 infra__aws_igw_name:                "{{ infra.aws.vpc.internet_gateway.name | default([infra__namespace, infra__aws_igw_suffix] | join('-')) }}"
 infra__aws_igw_suffix:              "{{ infra.aws.vpc.internet_gateway.suffix | default(common__igw_suffix) }}"
 
+infra__aws_prefix_list_suffix:      "{{ infra.aws.vpc.labels.prefix_list_suffix | default(common__aws_prefix_list_suffix) }}"
+infra__aws_extra_prefix_list_name:  "{{ infra.aws.extra_prefix_list_name | default([infra__namespace, 'extra', infra__aws_prefix_list_suffix] | join('-')) }}"
 infra__aws_public_route_table_suffix:  "{{ infra.aws.vpc.labels.public_route_table_suffix | default('public-rtb') }}"
 infra__aws_private_route_table_suffix: "{{ infra.aws.vpc.labels.private_route_table_suffix | default('private-rtb') }}"
 infra__aws_public_route_table_name: "{{ infra.aws.vpc.labels.public_route_table | default([infra__namespace, infra__aws_public_route_table_suffix] | join('-')) }}"
