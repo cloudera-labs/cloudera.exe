@@ -52,6 +52,7 @@ plat__storage_name:                           "{{ common__storage_name }}"
 
 plat__logs_path:                              "{{ common__logs_path }}"
 plat__data_path:                              "{{ common__data_path }}"
+plat__data_path:                              "{{ common__backups_path }}"
 
 plat__public_key_id:                          "{{ common__public_key_id }}"
 plat__public_key_text:                        "{{ common__public_key_text }}"
@@ -168,6 +169,7 @@ plat__gcp_idbroker_identity_name:             "{{ env.gcp.role.name.idbroker | d
 
 plat__gcp_storage_location_data:              "{{ env.gcp.storage.path.data | default([plat__storage_name, plat__data_path] | join('-')) }}"
 plat__gcp_storage_location_logs:              "{{ env.gcp.storage.path.logs | default([plat__storage_name, plat__logs_path] | join('-')) }}"
+plat__gcp_storage_location_backups:           "{{ env.gcp.storage.path.backups | default(plat__gcp_storage_location_logs) }}"
 
 plat__gcp_xaccount_policy_bindings:           "{{ env.gcp.bindings.cross_account | default(plat__gcp_xaccount_policy_bindings_default) }}"
 plat__gcp_log_role_perms:                     "{{ env.gcp.bindings.logs | default(plat__gcp_log_policy_bindings_default) }}"

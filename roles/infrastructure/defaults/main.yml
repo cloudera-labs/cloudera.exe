@@ -68,6 +68,7 @@ infra__storage_name:                "{{ common__storage_name }}"
 
 infra__logs_path:                   "{{ common__logs_path }}"
 infra__data_path:                   "{{ common__data_path }}"
+infra__backups_path:                "{{ common__backups_path }}"
 infra__ranger_audit_path:           "{{ common__ranger_audit_path }}"
 
 infra__public_key_path:             "{{ globals.ssh.key_path | default('~/.ssh') }}"
@@ -133,8 +134,9 @@ infra__aws_private_endpoints:       "{{ infra.aws.vpc.private_endpoints | defaul
 # GCP
 infra__gcp_project:                 "{{ common__gcp_project }}"
 
-infra__gcp_storage_location_data:   "{{ infra.gcp.storage.path.data | default([infra__storage_name, infra__data_path] | join('-')) }}"
-infra__gcp_storage_location_logs:   "{{ infra.gcp.storage.path.logs | default([infra__storage_name, infra__logs_path] | join('-')) }}"
+infra__gcp_storage_location_data:    "{{ infra.gcp.storage.path.data | default([infra__storage_name, infra__data_path] | join('-')) }}"
+infra__gcp_storage_location_logs:    "{{ infra.gcp.storage.path.logs | default([infra__storage_name, infra__logs_path] | join('-')) }}"
+infra__gcp_storage_location_backups: "{{ infra.gcp.storage.path.backups | default(infra__gcp_storage_location_logs) }}"
 
 infra__gcp_cloud_router_name_suffix:  "{{ infra.gcp.network.router.name_suffix | default('router') }}"
 infra__gcp_cloud_router_name:         "{{ infra.gcp.network.router.name | default([infra__namespace, infra__gcp_cloud_router_name_suffix] | join('-')) }}"
