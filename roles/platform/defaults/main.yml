@@ -52,7 +52,7 @@ plat__storage_name:                           "{{ common__storage_name }}"
 
 plat__logs_path:                              "{{ common__logs_path }}"
 plat__data_path:                              "{{ common__data_path }}"
-plat__data_path:                              "{{ common__backups_path }}"
+plat__backup_path:                            "{{ common__backups_path }}"
 
 plat__public_key_id:                          "{{ common__public_key_id }}"
 plat__public_key_text:                        "{{ common__public_key_text }}"
