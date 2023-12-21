@@ -38,7 +38,7 @@
     fail_msg: "Gcloud Collection failed to retrieve resources, you may need to run 'gcloud auth login' or 'gcloud init': {{ __gcp_vpc_info }}"
     quiet: yes
 
-- name: Set fact for Log and Data locations
+- name: Set fact for Log, Backups and Data locations
   ansible.builtin.set_fact:
     infra__gcp_storage_locations: "{{ infra__gcp_storage_locations | default([]) | union([__gcp_storage_location_item]) }}"
   loop_control:
@@ -46,3 +46,4 @@
   loop:
     - "{{ infra__gcp_storage_location_data }}"
     - "{{ infra__gcp_storage_location_logs }}"
+    - "{{ infra__gcp_storage_location_backups }}"
