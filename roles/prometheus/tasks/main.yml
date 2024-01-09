@@ -1,0 +1,88 @@
+---
+
+# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create Prometheus directory 
+  ansible.builtin.file:
+    path: "{{ prometheus_directory }}"
+    state: directory
+
+- name: Create a temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+  register: __prometheus_tmp
+
+- name: Download Prometheus tarball
+  ansible.builtin.get_url:
+    url: "{{ prometheus_tarball_url }}"
+    dest: "{{ __prometheus_tmp.path }}/{{ prometheus_tarball_file }}"
+
+- name: Extract tarball
+  ansible.builtin.unarchive:
+    src: "{{ __prometheus_tmp.path }}/{{ prometheus_tarball_file }}"  
+    dest: "{{ prometheus_directory }}"
+    extra_opts: --strip-components=1
+    remote_src: yes
+
+- name: Remove the temporary  directory 
+  when: __prometheus_tmp is defined
+  ansible.builtin.file:
+    path: "{{ __prometheus_tmp.path }}"
+    state: absent
+
+- name: Create Prometheus user
+  ansible.builtin.user:
+    name: "{{ prometheus_user }}"
+
+- name: Create directory for Prometheus TSDB 
+  ansible.builtin.file:
+    path: "{{ prometheus_tsdb_directory }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    state: directory
+    recurse: yes
+
+- name: Set ownership of all files inside  /etc/prometheus
+  ansible.builtin.file:
+    path: "{{ prometheus_directory }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    recurse: yes
+
+- name: Create Prometheus service template
+  ansible.builtin.template:
+    src: prometheus.service.j2
+    dest: "{{ prometheus_service_directory }}"
+  register: __prometheus_service
+
+- name: Start and enable prometheus service
+  when: __prometheus_service.changed
+  block:
+
+  - name: Reload systemd daemon
+    ansible.builtin.systemd:
+      daemon_reload: yes
+
+  - name: Enable and start prometheus service
+    ansible.builtin.systemd:
+      name: prometheus
+      state: started
+      enabled: yes
+    
+- name: Update Prometheus configuration
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+  notify: restart prometheus
