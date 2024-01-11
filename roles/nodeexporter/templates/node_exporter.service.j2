@@ -4,8 +4,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=prometheus
-ExecStart=/etc/node_exporter/node_exporter
+User={{ node_exporter_user }}
+ExecStart={{ node_exporter_directory }}/node_exporter
 
 [Install]
 WantedBy=default.target

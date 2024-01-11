@@ -1,6 +1,6 @@
 ---
 
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,5 +19,5 @@ node_exporter_tarball_url: https://github.com/prometheus/node_exporter/releases/
 node_exporter_tarball_file: node_exporter.tar.gz
 node_exporter_service_directory: /etc/systemd/system/node_exporter.service
 
-prometheus_user : prometheus
-prometheus_group : prometheus
+node_exporter_user: nodeexporter
+node_exporter_group: nodeexporter
