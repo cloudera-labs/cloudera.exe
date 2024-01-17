@@ -39,8 +39,8 @@
     src: "{{ __exporter_tmp.path }}/{{ node_exporter_tarball_file }}"  
     dest: "{{ node_exporter_directory }}"
     extra_opts: --strip-components=1
-    owner: "{{ prometheus_user }}"
-    group: "{{ prometheus_group }}"
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
     remote_src: yes
 
 - name: Remove the temporary  directory 
