@@ -1,0 +1,53 @@
+---
+
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Load OS variables
+  ansible.builtin.include_vars: "{{ ansible_facts['distribution'] }}.yml"
+
+- name: Import a key from a url
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ gpg_key_url }}"
+
+- name: Install Grafana packages
+  ansible.builtin.dnf:
+    name: "{{ grafana_tarball_url }}"
+    state: present
+
+- name: Connect Prometheus datasource
+  ansible.builtin.template:
+    src: prometheus_source.yml.j2
+    dest: "{{ grafana_datasource_directory }}"
+
+- name: Add configuration for reading dashboards
+  ansible.builtin.template:
+    src: providers.yml.j2
+    dest: "{{ grafana_providers_configuration }}"
+
+- name: Ensure that directory for dashboards exist
+  ansible.builtin.file:
+    path: "{{ grafana_dashboard_directory }}"
+    state: directory
+
+- name: Copy default node exporter dashboard
+  ansible.builtin.copy:
+    src: files/base_dashboard.json
+    dest: "{{ grafana_dashboard_directory }}/base_dashboard.json"
+
+- name: Start Grafana service
+  ansible.builtin.systemd:
+    name: grafana-server
+    state: started
