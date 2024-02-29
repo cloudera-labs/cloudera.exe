@@ -25,3 +25,4 @@
 ipaserver_resolv_nameservers: [ '8.8.8.8' ]
 ipaserver_server_recursion: true
 enable_dns: false
+needs_python2: True

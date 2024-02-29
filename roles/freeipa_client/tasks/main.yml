@@ -89,6 +89,10 @@
           {{ ansible_default_ipv4.address }} {{ inventory_hostname }} {{ inventory_hostname_short }}
       notify: restart host
 
+    - name: Check for existence of /etc/dhcp/dhclient.conf
+      ansible.builtin.stat: path=/etc/dhcp/dhclient.conf
+      register: dhclient_conf
+
     - name: Set /etc/dhcp/dhclient.conf for domain search and name servers
       ansible.builtin.lineinfile:
         path: /etc/dhcp/dhclient.conf
@@ -103,6 +107,7 @@
         entries:
           domain_search: supersede domain-search "{{ ipaserver_domain }}";
           domain_name_servers: supersede domain-name-servers {{ ipa_server_ips | sort | union(fallback_nameservers) | join(', ') }};
+      when: dhclient_conf.stat.exists
       notify: restart host
 
 - name: Flush handlers

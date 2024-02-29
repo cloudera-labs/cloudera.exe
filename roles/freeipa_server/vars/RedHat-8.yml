@@ -15,3 +15,4 @@
 # limitations under the License.
 
 ipaserver_packages: [ "@idm:DL1/server" ]
+needs_python2: True
