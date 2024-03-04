@@ -23,7 +23,7 @@
     key: "{{ gpg_key_url }}"
 
 - name: Install Grafana packages
-  ansible.builtin.dnf:
+  ansible.builtin.yum:
     name: "{{ grafana_tarball_url }}"
     state: present
 
