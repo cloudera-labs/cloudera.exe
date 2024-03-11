@@ -17,3 +17,10 @@
 collections:
   - source: .
     type: dir
+    
+roles:
+  - name: geerlingguy.postgresql
+    version: 3.5.0
+
+  - src: https://github.com/clevesque/ansible-role-mysql
+    version: master
