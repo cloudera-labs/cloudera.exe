@@ -131,7 +131,7 @@
   gather_facts: no
   become: yes
   roles:
-    - role: cloudera.cluster.prereqs.mysql_connector
+    - role: cloudera.exe.rdbms.client.mysql_connector
       when: database_type == 'mysql' or database_type == 'mariadb'
   tags:
     - mysql_connector
@@ -142,7 +142,7 @@
   gather_facts: no
   become: yes
   roles:
-    - role: cloudera.cluster.prereqs.oracle_connector
+    - role: cloudera.exe.rdbms.client.oracle_connector
       when: database_type == 'oracle'
   tags:
     - oracle_connector
@@ -153,7 +153,7 @@
   gather_facts: no
   become: yes
   roles:
-    - role: cloudera.cluster.prereqs.postgresql_connector
+    - role: cloudera.exe.rdbms.client.postgresql_connector
       when: database_type == 'postgresql'
   tags:
     - postgresql_connector
@@ -260,7 +260,7 @@
   hosts: "{{ target | default('db_server') }}"
   become: yes
   roles:
-    - cloudera.cluster.infrastructure.rdbms
+    - cloudera.exe.rdbms.server
   tags:
     - database
     - default_cluster

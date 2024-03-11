@@ -1,6 +1,6 @@
 ---
 
-# Copyright 2023 Cloudera, Inc.
+# Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 roles:
   - name: geerlingguy.postgresql
-    version: 2.2.0
+    version: 3.5.0
 
-  - src: https://github.com/dbeech/ansible-role-mysql
+  - src: https://github.com/clevesque/ansible-role-mysql
     version: master
 
 collections:
@@ -45,11 +45,11 @@ collections:
   - name: ansible.posix
     version: 1.3.0
   - name: community.crypto
-    version: 2.2.1
+    version: 2.17.1
   - name: community.mysql
-    version: 3.1.0
+    version: 3.8.0
   - name: community.postgresql
-    version: 1.6.1
+    version: 3.3.0
   - name: freeipa.ansible_freeipa
     version: 1.11.1
   - name: cloud.terraform

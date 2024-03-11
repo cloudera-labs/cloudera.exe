@@ -1,0 +1,7 @@
+---
+mysql_packages:
+  - mariadb
+  - mariadb-server
+  - mariadb-connector-c
+  - python3-PyMySQL
+  - perl-DBD-MySQL

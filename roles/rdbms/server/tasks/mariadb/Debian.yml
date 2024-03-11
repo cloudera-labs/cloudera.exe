@@ -1,5 +1,3 @@
----
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-collections:
-  - source: .
-    type: dir
-    
-roles:
-  - name: geerlingguy.postgresql
-    version: 3.5.0
+---
 
-  - src: https://github.com/clevesque/ansible-role-mysql
-    version: master
+- name: Install MariaDB apt key
+  apt_key:
+    url: https://mariadb.org/mariadb_release_signing_key.asc
+    state: present
+  when: not (skip_rdbms_repo_setup | default(False))
+
+- name: Install MariaDB apt repository
+  apt_repository:
+    repo: deb [arch=amd64,arm64,ppc64el] https://downloads.mariadb.com/MariaDB/mariadb-{{ database_version }}/repo/ubuntu/ bionic main
+    state: present
+  when: not (skip_rdbms_repo_setup | default(False))
+
+- name: Install MariaDB
+  include_role:
+    name: ansible-role-mysql
