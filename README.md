@@ -115,10 +115,10 @@ See the [requirements for `cloudera-labs/cloudera.cluster`](https://github.com/w
 
 | Name | Type | Version |
 |------|------|---------|
-| `community.mysql` | collection | `3.1.0` |
-| `community.postgresql` | collection | `1.6.1` |
+| `community.mysql` | collection | `3.8.0` |
+| `community.postgresql` | collection | `3.3.0` |
 | `freeipa.ansible_freeipa` | collection | `1.11.1` |
-| `geerlingguy.postgresql` | role | `2.2.0` |
+| `geerlingguy.postgresql` | role | `3.3.0` |
 | `geerlingguy.mysql` (patched) | role | `master` |
 
 **Terraform**
