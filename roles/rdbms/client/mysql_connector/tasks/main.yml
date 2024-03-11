@@ -50,30 +50,11 @@
     remote_src: yes
     mode: 0644
 
-# MySql on rhel8 fix
-- name: Fix MySQL on RHEL8
+## Fix for RHEL8,9
+- name: Install Mysql packages for python - PyMySQL
   when:
     - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version == "8"
-  block:
-    - name: Remove mariadb packages if needed
-      package:
-        name: mariadb-devel
-        state: absent
-
-    - name: Install mysql-devel package
-      package:
-        name: mysql-devel
-        state: installed
-
-    - name: Send my_config.h for RHEL 8
-      template:
-        src: my_config.h
-        dest: /usr/include/mysql/my_config.h
-
-## TODO Fix for RHEL8
-    - name: Install Mysql packages for python - PyMySQL
-      shell: /usr/local/bin/pip install PyMySQL --force-reinstall --ignore-installed
-      ignore_errors: true
-
-  
+    - ansible_distribution_major_version >= "8"
+  shell: /usr/local/bin/pip install PyMySQL --force-reinstall --ignore-installed
+  ignore_errors: true
+      

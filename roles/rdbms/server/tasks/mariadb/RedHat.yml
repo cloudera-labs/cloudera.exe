@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc.
+# Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,23 +14,20 @@
 
 ---
 
-- name: Import GPG Key
-  rpm_key:
-    key: "{{ mysql_repo_key }}"
-    state: present
-  when: 
+- name: Install MariaDB repository
+  yum_repository:
+    name: MariaDB
+    description: MariaDB {{ database_version }} repository for RHEL
+    baseurl: https://yum.mariadb.org/{{ database_version }}/rhel{{ ansible_distribution_major_version }}-amd64
+    gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+  when: not (skip_rdbms_repo_setup | default(False))
+ 
+- name: Disable modularity appstream, when el8 
+  command: yum -y module disable mysql mariadb
+  when:    
     - not (skip_rdbms_repo_setup | default(False))
-
-- name: Install MySQL Community repository
-  yum:
-    name: "{{ mysql_repo }}"
-    update_cache: true
-    lock_timeout: 180
-    state: present 
-  when: 
-    - not (skip_rdbms_repo_setup | default(False))
+    - ansible_distribution_major_version == "8"
     
-    
-- name: Install MySQL
+- name: Install Mariadb
   include_role:
     name: ansible-role-mysql

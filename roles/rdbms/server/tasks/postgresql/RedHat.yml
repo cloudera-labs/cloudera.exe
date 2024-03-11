@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@
 
 - name: Fix UTF-8 template
   include_tasks:
-    file: template_fix.yml
+    file: postgresql/template_fix.yml
 
 - name: Remove repositories and clean metadata
   yum_repository:
