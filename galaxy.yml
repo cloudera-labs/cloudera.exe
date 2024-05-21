@@ -16,9 +16,12 @@
 
 namespace:  cloudera
 name:       exe
-version:    2.3.0
+version:    2.3.1
 readme:     README.md
-authors:    []
+authors:
+  - Jim Enright @jenright
+  - Ronald Suplina @rsuplina
+  - Webster Mudge @wmudge
 
 description: >
   A set of roles, modules, and plugins that encapsulate best practices and opinionated 
@@ -31,10 +34,10 @@ tags:
 - azure
 - aws
 - gcp
-- private cloud
-- public cloud
-- data services
-- cloudera manager
+- private_cloud
+- public_cloud
+- data_service
+- cloudera_manager
 - cm
 
 dependencies:
