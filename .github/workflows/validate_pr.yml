@@ -81,3 +81,10 @@ jobs:
         with:
           name: pr_number
           path: pr/
+
+  import-galaxy:
+    needs: validate
+    permissions:
+      contents: read
+    name: Import collection with Galaxy importer
+    uses: ansible-community/github-action-test-galaxy-import/.github/workflows/test-galaxy-import.yml@main
