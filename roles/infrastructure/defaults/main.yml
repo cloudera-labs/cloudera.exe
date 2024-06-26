@@ -31,12 +31,12 @@ infra__deployment_engine:                 "{{ common__infra_deployment_engine }}
 # Location of output from template module which creates Terraform
 infra__terraform_template_dir:            "{{ common__terraform_template_dir }}"
 infra__terraform_artefact_dir:            "{{ common__terraform_artefact_dir }}"
-infra__terraform_workspace_dir:           "{{ common__terraform_workspace_dir }}"      
+infra__terraform_workspace_dir:           "{{ common__terraform_workspace_dir }}"
 
 infra__terraform_allowed_state_storage:   "{{ common__terraform_allowed_state_storage }}"
 infra__terraform_state_storage:           "{{ common__terraform_state_storage }}"
-infra__terraform_remote_state_bucket:     "{{ common__terraform_remote_state_bucket }}"      
-infra__terraform_remote_state_lock_table: "{{ common__terraform_remote_state_lock_table }}"      
+infra__terraform_remote_state_bucket:     "{{ common__terraform_remote_state_bucket }}"
+infra__terraform_remote_state_lock_table: "{{ common__terraform_remote_state_lock_table }}"
 
 # Infra
 infra__type:                        "{{ common__infra_type }}"

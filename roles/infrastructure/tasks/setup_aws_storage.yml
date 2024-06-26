@@ -58,7 +58,7 @@
   when: __infra_aws_storage_tags_list is defined
   ansible.builtin.command: >
     aws s3api put-bucket-tagging
-    --bucket {{ __infra_aws_storage_location_item.bucket }} 
+    --bucket {{ __infra_aws_storage_location_item.bucket }}
     --tagging TagSet=[{{ __infra_aws_storage_tags_list | join(',') }}]
   loop_control:
     loop_var: __infra_aws_storage_location_item
@@ -78,7 +78,7 @@
   when: infra__create_utility_service and __infra_aws_storage_tags_list is defined
   ansible.builtin.command: >
     aws s3api put-bucket-tagging
-    --bucket {{ infra__utlity_bucket_name }} 
+    --bucket {{ infra__utlity_bucket_name }}
     --tagging TagSet=[{{ __infra_aws_storage_tags_list | join(',') }}]
   loop_control:
     loop_var: __infra_aws_storage_location_item

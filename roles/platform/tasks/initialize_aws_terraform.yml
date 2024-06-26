@@ -38,7 +38,7 @@
 
 # Copy the AWS policy documents to plat__terraform_template_dir
 - name: Copy AWS policy documents to Terraform template directory
-  ansible.builtin.copy:  
+  ansible.builtin.copy:
     src: "{{ __aws_policy_tmpdir.path }}/"
     dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
 
@@ -57,14 +57,14 @@
 
 # Copy the Terraform auth resource files....
 # ...policies
-- name: Generate Terraform authz file for policies 
+- name: Generate Terraform authz file for policies
   ansible.builtin.copy:
     src: 'files/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_policies.tf'
     dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_policies.tf"
   no_log: false
 
 # ...roles
-- name: Generate Terraform authz file for roles 
+- name: Generate Terraform authz file for roles
   ansible.builtin.copy:
     src: 'files/{{ plat__infra_type }}/plat_{{ plat__infra_type }}_authz_roles.tf'
     dest: "{{ plat__terraform_template_dir }}/plat/plat_authz_roles.tf"

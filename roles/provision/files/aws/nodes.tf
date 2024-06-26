@@ -25,7 +25,7 @@ variable "nodes" {
       tags                  = optional(map(string), {})
     })), [])
   }))
-  
+
   description = "List of infrastructure nodes"
   default     = []
 }
@@ -52,7 +52,7 @@ locals {
 
   volumes = flatten([
     for idx, node in var.nodes:
-    [ 
+    [
       for node_vol in node.volumes:
         {
           node_index    = idx
@@ -63,7 +63,7 @@ locals {
           type          = node_vol.volume_type
           subnet_index  = node.subnet_index
         }
-    ] 
+    ]
   ])
 }
 
@@ -79,7 +79,7 @@ resource "aws_instance" "inventory" {
 
   # TODO Alternatively, render by looking up the subnet name
   subnet_id               = local.existing_subnets[each.value.subnet_index].id
-  private_ip              = each.value.private_ip  
+  private_ip              = each.value.private_ip
 
   root_block_device {
     delete_on_termination = each.value.root_volume.delete_on_termination
@@ -89,13 +89,13 @@ resource "aws_instance" "inventory" {
 
   associate_public_ip_address = local.existing_subnets[each.value.subnet_index].map_public_ip_on_launch
 
-  tags                     = merge(each.value.tags, { Name = each.value.name }) 
+  tags                     = merge(each.value.tags, { Name = each.value.name })
 
   lifecycle {
     precondition {
       condition     = length(var.public_subnets) > 0 || length(var.private_subnets) > 0
       error_message = "Unable to provision, no subnets available. You must define at least one subnet, public or private."
-    } 
+    }
   }
 }
 
@@ -138,7 +138,7 @@ resource "aws_volume_attachment" "inventory" {
 locals {
   # Details for all attached volumes
   attached_volumes = [
-      for idx, volume in local.volumes: 
+      for idx, volume in local.volumes:
         {
             "vol_name" = aws_ebs_volume.inventory[index(local.volumes, volume)].tags["Name"]
             "vol_id"   = aws_volume_attachment.inventory[index(local.volumes, volume)].volume_id
@@ -148,11 +148,11 @@ locals {
         }
         if length(aws_ebs_volume.inventory) > 0
     ]
-  
+
   # Attached volume details grouped by instance
   attached_volumes_by_instance = {
     for vol in local.attached_volumes :
-      vol.instance => 
+      vol.instance =>
       {
         vol_name = vol.vol_name
         vol_id   = vol.vol_id
@@ -164,10 +164,10 @@ locals {
 
 output "nodes" {
   value = [
-    for idx, v in aws_instance.inventory : 
+    for idx, v in aws_instance.inventory :
       {
-        # The top-level keys are used by 'add_host' within the provision role; 
-        # use the nested 'metadata' tags within a 'module_defaults' declaration 
+        # The top-level keys are used by 'add_host' within the provision role;
+        # use the nested 'metadata' tags within a 'module_defaults' declaration
         # to add additional, ad-hoc 'add_host' variables
         "id"  = v.id
         "label" = v.tags["Name"]

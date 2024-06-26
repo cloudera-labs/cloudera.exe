@@ -26,8 +26,8 @@ sudoers__sudo_users:                       []
 sudoers__sudo_groups:                      [] # the groups that are members of the sudo_rule
 
 # Flag to determine if we want to remove (=True) or retain (=False) existing users in sudo rule
-sudoers__purge_users:                   False                         
+sudoers__purge_users:                   False
 # Flag to determine if we want to remove (=True) or retain (=False) existing group members in sudo rule
-sudoers__purge_groups:                  False                         
+sudoers__purge_groups:                  False
 
 sudoers__sudorule_name:                          admin_all_rule

@@ -24,8 +24,8 @@ authors:
   - Webster Mudge @wmudge
 
 description: >
-  A set of roles, modules, and plugins that encapsulate best practices and opinionated 
-  deployment and management processes for Cloudera Data Platform (CDP) Public Cloud 
+  A set of roles, modules, and plugins that encapsulate best practices and opinionated
+  deployment and management processes for Cloudera Data Platform (CDP) Public Cloud
   and Private Cloud deployments.
 license_file: LICENSE
 tags:

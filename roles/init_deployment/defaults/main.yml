@@ -43,4 +43,4 @@ default_infra_region: us-east-1  # westeurope, gcp?
 default_parcel_distro: el7  # el8, bionic, focal
 
 # Terraform defaults
-default_terraform_base_dir: "{{ [default_config_path, 'terraform'] | path_join }}" 
+default_terraform_base_dir: "{{ [default_config_path, 'terraform'] | path_join }}"

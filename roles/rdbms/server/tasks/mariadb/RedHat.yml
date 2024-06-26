@@ -21,13 +21,13 @@
     baseurl: https://yum.mariadb.org/{{ database_version }}/rhel{{ ansible_distribution_major_version }}-amd64
     gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
   when: not (skip_rdbms_repo_setup | default(False))
- 
-- name: Disable modularity appstream, when el8 
+
+- name: Disable modularity appstream, when el8
   command: yum -y module disable mysql mariadb
-  when:    
+  when:
     - not (skip_rdbms_repo_setup | default(False))
     - ansible_distribution_major_version == "8"
-    
+
 - name: Install Mariadb
   include_role:
     name: ansible-role-mysql

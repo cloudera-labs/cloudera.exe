@@ -28,7 +28,7 @@ module "vpc" {
 
   name = var.vpc_name
   cidr = "10.10.0.0/16"
-  
+
   enable_nat_gateway = true
   igw_tags           = var.tags
   nat_eip_tags       = var.tags

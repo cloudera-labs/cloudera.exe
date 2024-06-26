@@ -45,7 +45,7 @@ Destroys all cloud provider and CDP assets, subject to configuration allowances.
 The runlevel is invoked with the `teardown` tag.
 
 ## Validation
-Checks the incoming configuration parameters for errors and misalignment. No external interaction. This runlevel is in scope of the `cloudera.exe` collection. 
+Checks the incoming configuration parameters for errors and misalignment. No external interaction. This runlevel is in scope of the `cloudera.exe` collection.
 
 The runlevel is invoked with the `validate` tag.
 
@@ -55,7 +55,7 @@ Checks and initializes authentication and authorization for the cloud and VM con
 The runlevel is not directly invocable.
 
 ## Infrastructure
-Manages cloud-provider resources, VM control planes, instance OS and services management, networking, etc. This runlevel is in scope of the `cloudera.exe` collection. 
+Manages cloud-provider resources, VM control planes, instance OS and services management, networking, etc. This runlevel is in scope of the `cloudera.exe` collection.
 
 The runlevel is invoked with the `infra` tag.
 
@@ -72,7 +72,7 @@ The runlevel is invoked with the `run` tag.
 ## Installation
 Executes post-runtime and platform configurations. This runlevel is outside the scope of the `cloudera.exe` collection. Actual runtime projects should define or import additional runlevel roles and/or tasks as required.
 
-The suggested tag for this runlevel is `install`. 
+The suggested tag for this runlevel is `install`.
 
 ## Application
 Executes user- and application-specific tasks, e.g. table definitions, security policy configurations, data loading and management. This runlevel is outside the scope of the `cloudera.exe` collection. Actual runtime projects should define or import additional runlevel roles and/or tasks as required.

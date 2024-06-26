@@ -2,7 +2,7 @@
 # First create the assume role policy document
 data "aws_iam_policy_document" "cdp_xaccount_role_policy_doc" {
   version       = "2012-10-17"
-  
+
   statement {
     actions = ["sts:AssumeRole"]
     effect  = "Allow"
@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "cdp_xaccount_role_policy_doc" {
 # Create the IAM role that uses the above assume_role_policy document
 resource "aws_iam_role" "cdp_xaccount_role" {
     name                = var.xaccount_role_name
-    description         = "CDP Cross Account role for ${var.env_prefix}"  
+    description         = "CDP Cross Account role for ${var.env_prefix}"
 
     assume_role_policy  = data.aws_iam_policy_document.cdp_xaccount_role_policy_doc.json
 
@@ -41,7 +41,7 @@ resource "aws_iam_role_policy_attachment" "cdp_xaccount_role_attach" {
 # First create the Assume role policy document
 data "aws_iam_policy_document" "cdp_idbroker_role_policy_doc" {
   version       = "2012-10-17"
-  
+
   statement {
     actions = ["sts:AssumeRole"]
     effect  = "Allow"
@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "cdp_idbroker_role_policy_doc" {
 # Create the IAM role that uses the above assume_role_policy document
 resource "aws_iam_role" "cdp_idbroker_role" {
     name                = var.idbroker_role_name
-    description         = "CDP IDBroker role for ${var.env_prefix}"  
+    description         = "CDP IDBroker role for ${var.env_prefix}"
 
     assume_role_policy  = data.aws_iam_policy_document.cdp_idbroker_role_policy_doc.json
 
@@ -77,7 +77,7 @@ resource "aws_iam_role_policy_attachment" "cdp_idbroker_role_attach1" {
 
 # Attach AWS Log Location Policy to the Role
 resource "aws_iam_role_policy_attachment" "cdp_idbroker_role_attach2" {
-  
+
   role       = aws_iam_role.cdp_idbroker_role.name
   policy_arn = aws_iam_policy.cdp_log_data_access_policy.arn
 }
@@ -87,7 +87,7 @@ resource "aws_iam_role_policy_attachment" "cdp_idbroker_role_attach2" {
 # First create the Assume role policy document
 data "aws_iam_policy_document" "cdp_log_role_policy_doc" {
   version       = "2012-10-17"
-  
+
   statement {
     actions = ["sts:AssumeRole"]
     effect  = "Allow"
@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "cdp_log_role_policy_doc" {
 # Create the IAM role that uses the above assume_role_policy document
 resource "aws_iam_role" "cdp_log_role" {
     name                = var.log_role_name
-    description         = "CDP Log role for ${var.env_prefix}"  
+    description         = "CDP Log role for ${var.env_prefix}"
 
     assume_role_policy  = data.aws_iam_policy_document.cdp_log_role_policy_doc.json
 
@@ -117,14 +117,14 @@ resource "aws_iam_instance_profile" "cdp_log_role_instance_profile" {
 
 # Attach AWS Log Location Policy to the Role
 resource "aws_iam_role_policy_attachment" "cdp_log_role_attach1" {
-  
+
   role       = aws_iam_role.cdp_log_role.name
   policy_arn = aws_iam_policy.cdp_log_data_access_policy.arn
 }
 
 # Attach AWS Bucket Access Policy to the Role
 resource "aws_iam_role_policy_attachment" "cdp_log_role_attach2" {
-  
+
   role       = aws_iam_role.cdp_log_role.name
   policy_arn = aws_iam_policy.cdp_bucket_data_access_policy.arn
 }
@@ -133,7 +133,7 @@ resource "aws_iam_role_policy_attachment" "cdp_log_role_attach2" {
 # First create the Assume role policy document
 data "aws_iam_policy_document" "cdp_datalake_admin_role_policy_doc" {
   version       = "2012-10-17"
-  
+
   statement {
     actions = ["sts:AssumeRole"]
     effect  = "Allow"
@@ -148,7 +148,7 @@ data "aws_iam_policy_document" "cdp_datalake_admin_role_policy_doc" {
 # Create the IAM role that uses the above assume_role_policy document
 resource "aws_iam_role" "cdp_datalake_admin_role" {
     name                = var.datalake_admin_role_name
-    description         = "CDP Datalake Admin role for ${var.env_prefix}"  
+    description         = "CDP Datalake Admin role for ${var.env_prefix}"
 
     assume_role_policy  = data.aws_iam_policy_document.cdp_datalake_admin_role_policy_doc.json
 
@@ -163,14 +163,14 @@ resource "aws_iam_instance_profile" "cdp_datalake_admin_role_instance_profile" {
 
 # Attach AWS Datalake Admin S3 Policy to the Role
 resource "aws_iam_role_policy_attachment" "cdp_datalake_admin_role_attach1" {
-  
+
   role       = aws_iam_role.cdp_datalake_admin_role.name
   policy_arn = aws_iam_policy.cdp_datalake_admin_s3_data_access_policy.arn
 }
 
 # Attach AWS Bucket Access Policy to the Role
 resource "aws_iam_role_policy_attachment" "cdp_datalake_admin_role_attach2" {
-  
+
   role       = aws_iam_role.cdp_datalake_admin_role.name
   policy_arn = aws_iam_policy.cdp_bucket_data_access_policy.arn
 }
@@ -179,7 +179,7 @@ resource "aws_iam_role_policy_attachment" "cdp_datalake_admin_role_attach2" {
 # First create the Assume role policy document
 data "aws_iam_policy_document" "cdp_ranger_audit_role_policy_doc" {
   version       = "2012-10-17"
-  
+
   statement {
     actions = ["sts:AssumeRole"]
     effect  = "Allow"
@@ -194,7 +194,7 @@ data "aws_iam_policy_document" "cdp_ranger_audit_role_policy_doc" {
 # Create the IAM role that uses the above assume_role_policy document
 resource "aws_iam_role" "cdp_ranger_audit_role" {
     name                = var.ranger_audit_role_name
-    description         = "CDP Ranger Audit role for ${var.env_prefix}"  
+    description         = "CDP Ranger Audit role for ${var.env_prefix}"
 
     assume_role_policy  = data.aws_iam_policy_document.cdp_ranger_audit_role_policy_doc.json
 
@@ -209,14 +209,14 @@ resource "aws_iam_instance_profile" "cdp_ranger_audit_role_instance_profile" {
 
 # Attach AWS Ranger Audit S3 Policy to the Role
 resource "aws_iam_role_policy_attachment" "cdp_ranger_audit_role_attach1" {
-  
+
   role       = aws_iam_role.cdp_ranger_audit_role.name
   policy_arn = aws_iam_policy.cdp_ranger_audit_s3_data_access_policy.arn
 }
 
 # Attach AWS Bucket Access Policy to the Role
 resource "aws_iam_role_policy_attachment" "cdp_ranger_audit_role_attach2" {
-  
+
   role       = aws_iam_role.cdp_ranger_audit_role.name
   policy_arn = aws_iam_policy.cdp_bucket_data_access_policy.arn
 }

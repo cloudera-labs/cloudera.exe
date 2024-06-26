@@ -5,7 +5,7 @@ provision_directory: tf_deployment
 
 provision_inventory_file: "{{ undef(hint='Static inventory file') }}" # inventory_static.ini
 
-# provision_terraform_parallelism: 
+# provision_terraform_parallelism:
 provision_state_storage: local # remote_s3
 # provision_remote_storage_s3_region:
 # provision_remote_storage_s3_bucket:
@@ -27,5 +27,5 @@ provision_aws_ec2_vpc_enable_dns_hostnames: true
 #provision_aws_ec2_public_subnets:
 #provision_aws_ec2_private_subnets:
 
-#provision_default_instance_user: 
+#provision_default_instance_user:
 provision_instances: "{{ undef(hint='Instance definitions') }}"

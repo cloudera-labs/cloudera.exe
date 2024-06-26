@@ -98,7 +98,7 @@
         cidr_ip: "{{ ipify_public_ip }}/32"
         rule_desc: "Creator IP address"
 
-- name: Add CCM Tunneled deployment AWS Security Group rules 
+- name: Add CCM Tunneled deployment AWS Security Group rules
   when: infra__tunnel
   ansible.builtin.set_fact:
     infra__aws_security_group_rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
@@ -129,7 +129,7 @@
     storage_location:
       bucket: "{{ infra__storage_name }}"
       path: "{{ infra__ml_path }}"
-    
+
 - name: Set fact to include DE data location
   when: infra__de_deploy
   ansible.builtin.set_fact:

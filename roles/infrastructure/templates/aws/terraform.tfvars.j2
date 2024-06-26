@@ -18,7 +18,7 @@ igw_name = "{{ infra__aws_igw_name }}"
 # Public Network infrastructure
 {% if infra__aws_subnet_ids is not defined %}
 public_subnets = [
-{% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}  
+{% for __aws_public_subnet_item in infra__vpc_public_subnets_info %}
 {
   name = "{{ __aws_public_subnet_item.name }}",
   cidr = "{{ __aws_public_subnet_item.cidr }}",

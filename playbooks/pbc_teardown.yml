@@ -20,7 +20,7 @@
   gather_facts: yes
   tasks:
 
-# TODO Need to propagate 'ml', 'dw', etc. to selected tasks within the roles, 
+# TODO Need to propagate 'ml', 'dw', etc. to selected tasks within the roles,
 # including those that would otherwise be 'always' - in this context; 'always'
 # should be reserved for the initialization of cloudera-deploy
 
@@ -39,7 +39,7 @@
       tags:
         - validate
         - initialize
-       
+
     - name: Initialize Data Services teardown
       ansible.builtin.import_role:
         name: cloudera.exe.runtime

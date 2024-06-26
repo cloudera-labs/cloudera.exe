@@ -36,7 +36,7 @@
   register: __dw_list
 
 - name: Discover CDP Data Warehouse deployments
-  when: 
+  when:
     - run__include_dw
     - not run__force_teardown | bool or not run__dw_force_delete | bool
     - __dw_list.clusters | length > 0

@@ -23,7 +23,7 @@
     name: "{{ node_exporter_user }}"
     group: "{{ node_exporter_group }}"
 
-- name: Create node_exporter directory 
+- name: Create node_exporter directory
   ansible.builtin.file:
     path: "{{ node_exporter_directory }}"
     state: directory
@@ -40,14 +40,14 @@
 
 - name: Extract tarball
   ansible.builtin.unarchive:
-    src: "{{ __exporter_tmp.path }}/{{ node_exporter_tarball_file }}"  
+    src: "{{ __exporter_tmp.path }}/{{ node_exporter_tarball_file }}"
     dest: "{{ node_exporter_directory }}"
     extra_opts: --strip-components=1
     owner: "{{ node_exporter_user }}"
     group: "{{ node_exporter_group }}"
     remote_src: yes
 
-- name: Remove the temporary  directory 
+- name: Remove the temporary  directory
   when: __exporter_tmp is defined
   ansible.builtin.file:
     path: "{{ __exporter_tmp.path }}"

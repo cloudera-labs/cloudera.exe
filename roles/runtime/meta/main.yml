@@ -15,7 +15,7 @@
 galaxy_info:
   author: Webster Mudge (wmudge@cloudera.com)
   description: >
-    Deployment and management of Cloudera Data Platform (CDP) Public Cloud 
+    Deployment and management of Cloudera Data Platform (CDP) Public Cloud
     Experiences, e.g. Machine Learning, Data Engineering, Data Warehousing.
   company: Cloudera, Inc.
   license: Apache-2.0

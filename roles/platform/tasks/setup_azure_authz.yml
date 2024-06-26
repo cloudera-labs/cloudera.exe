@@ -45,7 +45,7 @@
         - name: Wait for consistency
           ansible.builtin.pause:
             seconds: "{{ plat__azure_consistency_wait }}"
-    
+
     - name: Request Azure Cross Account App Creation
       no_log: True
       register: __azure_xaccount_app_info
@@ -53,7 +53,7 @@
         az ad sp create-for-rbac
         --name {{ plat__azure_xaccount_app_name }}
         --role {{ plat__azure_xaccount_use_custom_role | ternary(__azure_xaccount_role_info.id, plat__azure_roles.contrib) }}
-        --scope {{ plat__azure_xaccount_rg_scope | ternary(plat__azure_metagroup_uri, plat__azure_subscription_uri) }} 
+        --scope {{ plat__azure_xaccount_rg_scope | ternary(plat__azure_metagroup_uri, plat__azure_subscription_uri) }}
 
     - name: Register Azure Cross Account App info
       no_log: True
@@ -144,7 +144,7 @@
     __azure_log_identity: "{{ __azure_identity_list.response | selectattr('name', 'eq', plat__azure_log_identity_name) | first }}"
     __azure_ranger_audit_identity: "{{ __azure_identity_list.response | selectattr('name', 'eq', plat__azure_ranger_audit_identity_name) | first }}"
     __azure_raz_identity: "{{ __azure_identity_list.response | selectattr('name', 'eq', plat__azure_raz_identity_name) | first | default(omit) }}"
-  
+
 - name: Refresh listing of Azure Role Definitions
   register: __azure_role_definition_info
   no_log: yes   # Extremely verbose output
@@ -197,14 +197,14 @@
       desc: Assign Storage Blob Data Contributor Role to Ranger Audit Role at Data Container level
     - role: "{{ __azure_storageblobdata_ctrb_role_id }}"
       scope: "{{ plat__azure_logpath_uri }}"
-      assignee: "{{ __azure_ranger_audit_identity.properties.principalId }}"      
+      assignee: "{{ __azure_ranger_audit_identity.properties.principalId }}"
       desc: Assign Storage Blob Data Contributor Role to Ranger Audit Role at Logs Container level
 
   loop_control:
     loop_var: __azure_rl_assgn_item
     label: "{{ __azure_rl_assgn_item.desc }}"
   failed_when:
-    - "'rc' in __infra_az_sp_assign_result" 
+    - "'rc' in __infra_az_sp_assign_result"
     - __infra_az_sp_assign_result.rc != 0
     - "'The role assignment already exists' not in __infra_az_sp_assign_result.module_stderr"
 
@@ -232,6 +232,6 @@
     loop_var: __azure_rl_assgn_raz_item
     label: "{{ __azure_rl_assgn_raz_item.desc }}"
   failed_when:
-    - "'rc' in __infra_az_sp_assign_raz_result" 
+    - "'rc' in __infra_az_sp_assign_raz_result"
     - __infra_az_sp_assign_raz_result.rc != 0
     - "'The role assignment already exists' not in __infra_az_sp_assign_raz_result.module_stderr"

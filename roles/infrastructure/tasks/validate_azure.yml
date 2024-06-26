@@ -21,7 +21,7 @@
 
 - name: Check public key text
   ansible.builtin.assert:
-    that: 
+    that:
       - "infra__public_key_text is defined"
       - "infra__public_key_text is string"
       - "infra__public_key_text | trim | length > 0"
@@ -39,7 +39,7 @@
 
 - name: Check storage name - {{ infra__azure_storage_name }}
   ansible.builtin.assert:
-    that: 
+    that:
       - "infra__azure_storage_name | trim | length < 25"
       - "infra__azure_storage_name is match(regex1)"
     fail_msg: "Azure storage name parameter, 'infra__azure_storage_name' with value '{{ infra__azure_storage_name }}', is invalid. Azure requires lowercase letters and numbers only and 24 characters or less. Please check your name_prefix and any suffix modifications."

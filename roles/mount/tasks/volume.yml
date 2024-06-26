@@ -30,4 +30,3 @@
     src: "{{ '/'.join(['/dev',volume.vg_name, volume.lv_name]) }}"
     fstype: xfs
     state: mounted
-  

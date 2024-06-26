@@ -151,7 +151,7 @@
     plat__azure_msis: "{{ plat__azure_msis | default([]) | union([__azure_msi_item]) }}"
   loop_control:
     loop_var: __azure_msi_item
-  loop: 
+  loop:
     - "{{ plat__azure_idbroker_identity_name }}"
     - "{{ plat__azure_datalakeadmin_identity_name }}"
     - "{{ plat__azure_log_identity_name }}"

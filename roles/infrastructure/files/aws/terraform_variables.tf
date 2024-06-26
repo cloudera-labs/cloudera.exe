@@ -45,7 +45,7 @@ variable "public_subnets" {
     az       = string
     tags     = map(string)
   }))
-  
+
   description = "List of Public Subnets"
   default    = []
 }
@@ -70,14 +70,14 @@ variable "private_subnets" {
 
 variable "nat_gateway_name" {
   type        = string
-  
+
   description = "Nat Gateway"
   default     = "CDP_NAT_Gateway"
 }
 
 variable "private_route_table_name" {
   type        = string
-  
+
   description = "Private Route Table"
   default     = "CDP_Private_RT"
 }
@@ -85,13 +85,13 @@ variable "private_route_table_name" {
 # Security Groups
 variable "security_group_default_name" {
   type        = string
-  
+
   description = "Default Security Group for CDP environment"
 }
 
 variable "security_group_knox_name" {
   type        = string
-  
+
   description = "Knox Security Group for CDP environment"
 }
 
@@ -102,7 +102,7 @@ variable "security_group_rules_ingress" {
     to_port    = string
     protocol   = string
   }))
-  
+
   description = "Ingress rules for Security Group"
   default    = []
 }
@@ -157,7 +157,7 @@ variable "dynamic_inventory_tags" {
 
 variable "dynamic_inventory_public_key_id" {
   type        = string
-  
+
   description = "Name of the Public SSH key for the dynamic inventory VMs"
 }
 
@@ -188,7 +188,7 @@ variable "utility_vm_tags" {
 
 variable "utility_vm_public_key_id" {
   type        = string
-  
+
   description = "Name of the Public SSH key for the Utility VM"
 
   default     = ""

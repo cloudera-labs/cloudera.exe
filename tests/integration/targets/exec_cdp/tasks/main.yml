@@ -28,7 +28,7 @@
         name: cloudera.exe.platform
         tasks_from: initialize_setup.yml
       environment: "{{ env_vars }}"
-    
+
     - name: Set up the CDP Public Cloud environment
       ansible.builtin.import_role:
         name: cloudera.exe.platform
@@ -43,7 +43,7 @@
         name: cloudera.exe.platform
         tasks_from: initialize_teardown.yml
       environment: "{{ env_vars }}"
-    
+
     - name: Tear down the CDP Public Cloud environment
       ansible.builtin.import_role:
         name: cloudera.exe.platform

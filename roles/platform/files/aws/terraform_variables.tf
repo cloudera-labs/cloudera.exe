@@ -79,7 +79,7 @@ variable "ranger_audit_s3_policy_doc" {
 
 }
 
-# CDP Data Access Policies - datalake_admin_s3 
+# CDP Data Access Policies - datalake_admin_s3
 variable "datalake_admin_s3_policy_name" {
   type        = string
   description = "Datalake Admin S3 Data Access Policy Name"

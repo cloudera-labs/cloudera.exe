@@ -83,7 +83,7 @@
             loop_var: __aws_subnet_item
             label: "{{ __aws_subnet_item.subnet_id }}"
           loop: "{{ __aws_subnets_info.subnets | selectattr('map_public_ip_on_launch') }}"
-        
+
         - name: Set fact for AWS Public Subnet IDs
           ansible.builtin.set_fact:
             run__aws_public_subnet_ids: "{{ __aws_public_subnet_ids | default([]) }}"
@@ -108,7 +108,7 @@
             loop_var: __aws_subnet_item
             label: "{{ __aws_subnet_item.subnet_id }}"
           loop: "{{ __aws_subnets_info.subnets | rejectattr('map_public_ip_on_launch') }}"
-        
+
         - name: Set fact for AWS Private Subnet IDs
           ansible.builtin.set_fact:
             run__aws_private_subnet_ids: "{{ __aws_private_subnet_ids | default([]) }}"

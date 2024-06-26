@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Create Prometheus directory 
+- name: Create Prometheus directory
   ansible.builtin.file:
     path: "{{ prometheus_directory }}"
     state: directory
@@ -31,12 +31,12 @@
 
 - name: Extract tarball
   ansible.builtin.unarchive:
-    src: "{{ __prometheus_tmp.path }}/{{ prometheus_tarball_file }}"  
+    src: "{{ __prometheus_tmp.path }}/{{ prometheus_tarball_file }}"
     dest: "{{ prometheus_directory }}"
     extra_opts: --strip-components=1
     remote_src: yes
 
-- name: Remove the temporary  directory 
+- name: Remove the temporary  directory
   when: __prometheus_tmp is defined
   ansible.builtin.file:
     path: "{{ __prometheus_tmp.path }}"
@@ -47,7 +47,7 @@
     name: "{{ prometheus_user }}"
     system: True
 
-- name: Create directory for Prometheus TSDB 
+- name: Create directory for Prometheus TSDB
   ansible.builtin.file:
     path: "{{ prometheus_tsdb_directory }}"
     owner: "{{ prometheus_user }}"
@@ -81,7 +81,7 @@
       name: prometheus
       state: started
       enabled: yes
-    
+
 - name: Update Prometheus configuration
   ansible.builtin.template:
     src: prometheus.yml.j2

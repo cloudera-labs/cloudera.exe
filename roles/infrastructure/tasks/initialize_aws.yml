@@ -195,5 +195,3 @@
 - name: Set fact for discovered EC2 Compute inventory
   ansible.builtin.set_fact:
     infra__discovered_compute_inventory: "{{ __infra_dynamic_inventory_discovered.instances + __infra_utility_compute_discovered.instances }}"
-
-

@@ -21,7 +21,7 @@ boto>=2.49.0
 botocore>=1.12.249
 boto3>=1.9.249
 
-# Ansible 
+# Ansible
 jmespath                # community.general.json_query
 netaddr                 # ansible.netcommon.ipaddr
 

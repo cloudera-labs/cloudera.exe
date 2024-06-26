@@ -63,7 +63,7 @@
       until: __dw_vw_teardowns_async.finished
       retries: 30
       delay: 10
-  
+
   rescue:
     - name: Execute CDP Data Warehouse virtual warehouse teardown (compactor VWs)
       cloudera.cloud.dw_virtual_warehouse:

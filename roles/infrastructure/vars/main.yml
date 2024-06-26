@@ -31,7 +31,7 @@ infra__dynamic_inventory_images_default:
     el7:
       search: 'CentOS-7*x86_64*'
       user: 'centos'
-      product-code: 'cvugziknvmxgqna9noibqnnsy'      
+      product-code: 'cvugziknvmxgqna9noibqnnsy'
       owners:
         - '679593333241'
     el8:
@@ -54,7 +54,7 @@ infra__all_ports_security_rule:
   aws: -1
   azure: 0-65535
 
-infra__aws_gateway_vpc_private_endpoints: 
+infra__aws_gateway_vpc_private_endpoints:
   - 'com.amazonaws.{{infra__region}}.s3'
 
 infra__aws_interface_vpc_private_endpoints:

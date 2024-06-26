@@ -15,8 +15,8 @@
 galaxy_info:
   author: Jim Enright (jenright@cloudera.com)
   description: >
-    Create a passwordless sudo rule and add specified users and/or groups as members to this rule. 
-    Existing group members and users can be purged or retained depending on the value of 
+    Create a passwordless sudo rule and add specified users and/or groups as members to this rule.
+    Existing group members and users can be purged or retained depending on the value of
     the sudoers__purge_groups and sudoers__purge_users flags.
   company: Cloudera
   license: Apache-2.0

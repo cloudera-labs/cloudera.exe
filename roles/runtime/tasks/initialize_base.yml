@@ -235,7 +235,7 @@
       ansible.builtin.assert:
         that:
           - __dw_vw_config.tags | dict2items | rejectattr('value', 'regex', '[^-_a-zA-Z0-9.=:+@]+') | list
-        fail_msg: 
+        fail_msg:
           - "A tag in Data Warehouse, '{{ __dw_vw_config.name }}', does not meet requirements;"
           - "current tags: {{ __dw_vw_config.tags}}."
           - "Allowed characters in tags are letters, numbers and the following characters: _.:/=+-@"

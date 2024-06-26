@@ -6,4 +6,3 @@ warn_list:
   - ignore-errors
   - no-changed-when
   - var-spacing
-  

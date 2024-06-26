@@ -16,7 +16,7 @@ resource "aws_internet_gateway" "cdp_igw" {
   tags   = merge(var.env_tags,{Name = var.igw_name})
 }
 
-# AWS VPC Public Subnets 
+# AWS VPC Public Subnets
 resource "aws_subnet" "cdp_public_subnets" {
     for_each                = {for idx, subnet in var.public_subnets: idx => subnet}
 
@@ -67,7 +67,7 @@ resource "aws_subnet" "cdp_private_subnets" {
 
 # Elastic IP for each NAT gateway
 resource "aws_eip" "cdp_nat_gateway_eip" {
-  
+
   for_each  =  {for idx, subnet in var.public_subnets: idx => subnet}
 
   vpc       = true
@@ -77,7 +77,7 @@ resource "aws_eip" "cdp_nat_gateway_eip" {
 #  Network Gateways (NAT)
 resource "aws_nat_gateway" "cdp_nat_gateway" {
 
-  # for_each          = { for s in aws_subnet.cdp_public_subnets : s.id => s } 
+  # for_each          = { for s in aws_subnet.cdp_public_subnets : s.id => s }
   count             = length(aws_subnet.cdp_public_subnets)
 
   subnet_id         = aws_subnet.cdp_public_subnets[count.index].id
@@ -108,7 +108,7 @@ resource "aws_route_table" "cdp_private_route_table" {
 
 # Associate the Private Route Tables with the Private Subnets
 resource "aws_route_table_association" "cdp_private_subnets" {
-  
+
   count = length(aws_subnet.cdp_private_subnets)
 
   subnet_id       = aws_subnet.cdp_private_subnets[count.index].id
@@ -124,7 +124,7 @@ resource "aws_security_group" "cdp_default_sg" {
 
   tags         = merge(var.env_tags,{Name = var.security_group_default_name})
 
-  # Create self reference ingress rule to allow 
+  # Create self reference ingress rule to allow
   # communication among resources in the security group.
   ingress {
       from_port = 0
@@ -163,7 +163,7 @@ resource "aws_security_group" "cdp_knox_sg" {
 
   tags         = merge(var.env_tags,{Name = var.security_group_knox_name})
 
-  # Create self reference ingress rule to allow 
+  # Create self reference ingress rule to allow
   # communication among resources in the security group.
   ingress {
       from_port = 0

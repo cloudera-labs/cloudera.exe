@@ -28,8 +28,8 @@ plat__terraform_workspace_dir:                "{{ common__terraform_workspace_di
 
 plat__terraform_allowed_state_storage:       "{{ common__terraform_allowed_state_storage }}"
 plat__terraform_state_storage:               "{{ common__terraform_state_storage }}"
-plat__terraform_remote_state_bucket:         "{{ common__terraform_remote_state_bucket }}"      
-plat__terraform_remote_state_lock_table:     "{{ common__terraform_remote_state_lock_table }}"      
+plat__terraform_remote_state_bucket:         "{{ common__terraform_remote_state_bucket }}"
+plat__terraform_remote_state_lock_table:     "{{ common__terraform_remote_state_lock_table }}"
 
 plat__infra_type:                             "{{ common__infra_type }}"
 plat__region:                                 "{{ common__region }}"

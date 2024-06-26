@@ -36,7 +36,7 @@
   block:
     - name: Delete Cloud NAT
       ansible.builtin.command: >
-        gcloud compute routers nats describe {{ infra__gcp_cloud_nat_name }}        
+        gcloud compute routers nats describe {{ infra__gcp_cloud_nat_name }}
         --router={{ infra__gcp_cloud_router_name }}
         --router-region={{ infra__region }}
       ignore_errors: true
@@ -44,9 +44,9 @@
 
     - name: Delete Cloud NAT if discovered
       when:
-        - __gcp_nat_discovered is succeeded 
+        - __gcp_nat_discovered is succeeded
       ansible.builtin.command: >
-        gcloud compute routers nats delete {{ infra__gcp_cloud_nat_name }}        
+        gcloud compute routers nats delete {{ infra__gcp_cloud_nat_name }}
         --router={{ infra__gcp_cloud_router_name }}
         --router-region={{ infra__region }}
 

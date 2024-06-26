@@ -22,7 +22,7 @@
           name_prefix: "{{ globals.name_prefix }}"
           region: "{{ infra.aws.region }}"
           vpc_name: "{{ infra.vpc.name }}"
-          sg_names: 
+          sg_names:
             knox: "{{ infra.security_group.knox.name }}"
             default: "{{ infra.security_group.default.name }}"
           tags:
