@@ -1,0 +1,8 @@
+mysql_repo: https://repo.mysql.com/mysql80-community-release-el8.rpm 
+
+mysql_packages:
+  - mysql
+  - mysql-server
+  - mysql-connector-c++
+  - python3-PyMySQL
+  - perl-DBD-MySQL

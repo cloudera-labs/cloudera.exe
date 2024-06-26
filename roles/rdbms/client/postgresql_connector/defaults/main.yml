@@ -1,6 +1,4 @@
----
-
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-collections:
-  - source: .
-    type: dir
-    
-roles:
-  - name: geerlingguy.postgresql
-    version: 3.5.0
+---
 
-  - src: https://github.com/clevesque/ansible-role-mysql
-    version: master
+local_temp_dir: '/tmp'
+postgresql_connector_url: https://jdbc.postgresql.org/download/postgresql-42.7.2.jar
+postgresql_connector_checksum: md5:bb897217989c97a463d8f571069d158a
+install_py3_psycopg2: false

@@ -1,0 +1,7 @@
+mysql_repo: https://repo.mysql.com/mysql80-community-release-el7.rpm 
+
+mysql_packages:
+  - mysql
+  - mysql-server
+  - MySQL-python
+  - perl-DBD-MySQL
