@@ -118,3 +118,18 @@
     run__aws_subnet_ids: "{{ run__aws_public_subnet_ids | union(run__aws_private_subnet_ids) }}"
     run__public_subnet_ids: "{{ run__aws_public_subnet_ids }}"
     run__private_subnet_ids: "{{ run__aws_private_subnet_ids }}"
+
+- name: Prepare for CDP DF Service experiences
+  when: run__include_df
+  block:
+    - name: Configure public networking for CDP DF Service
+      when: not run__tunnel # L0
+      ansible.builtin.set_fact:
+        run__df_cluster_subnets: "{{ run__df_cluster_subnets | length > 1 | ternary(run__df_cluster_subnets, run__datahub_public_subnet_ids) }}"
+        run__df_lb_subnets: "{{ run__df_lb_subnets | length > 1 | ternary(run__df_lb_subnets, run__datahub_public_subnet_ids) }}"
+    
+    - name: Configure public and/or private networking for CDP DF Service
+      when: run__tunnel  # L1 and L2
+      ansible.builtin.set_fact:
+        run__df_cluster_subnets: "{{ run__df_cluster_subnets | length > 1 | ternary(run__df_cluster_subnets, run__datahub_private_subnet_ids) }}"
+        run__df_lb_subnets: "{{ run__df_lb_subnets | length > 1 | ternary(run__df_lb_subnets, run__datahub_private_subnet_ids) }}"  
