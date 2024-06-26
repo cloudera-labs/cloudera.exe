@@ -8,7 +8,7 @@
         patterns: "*.private_key"
       register: __ssh_keys
       failed_when: __ssh_keys.files | length != 1
-    
+
     - name: Update the global configuration with the discovered deployment SSH key label
       ansible.builtin.set_fact:
         globals: "{{ globals | combine(ssh_entry, recursive=True) }}"

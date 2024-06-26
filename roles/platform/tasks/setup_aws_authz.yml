@@ -57,7 +57,7 @@
   when: __plat_aws_policy_tags_list is defined
   ansible.builtin.command: >
     aws iam tag-policy
-    --policy-arn {{ __aws_xaccount_policy.policy.arn }} 
+    --policy-arn {{ __aws_xaccount_policy.policy.arn }}
     --tags {{ __plat_aws_policy_tags_list | join(' ') }}
   register: __aws_xaccount_policy_tags
   failed_when: __aws_xaccount_policy_tags.rc != 0
@@ -89,7 +89,7 @@
   when: __plat_aws_role_tags_list is defined
   ansible.builtin.command: >
     aws iam tag-role
-    --role-name {{ plat__aws_xaccount_role_name }} 
+    --role-name {{ plat__aws_xaccount_role_name }}
     --tags {{ __plat_aws_role_tags_list | join(' ') }}
   register: __aws_xaccount_role_tags
   failed_when: __aws_xaccount_role_tags.rc != 0
@@ -123,7 +123,7 @@
   when: __plat_aws_policy_tags_list is defined
   ansible.builtin.command: >
     aws iam tag-policy
-    --policy-arn {{ __aws_idbroker_assume_role_policy.policy.arn }} 
+    --policy-arn {{ __aws_idbroker_assume_role_policy.policy.arn }}
     --tags {{ __plat_aws_policy_tags_list | join(' ') }}
   register: __aws_idbroker_assume_role_policy_tags
   failed_when: __aws_idbroker_assume_role_policy_tags.rc != 0
@@ -160,7 +160,7 @@
   when: __plat_aws_policy_tags_list is defined
   ansible.builtin.command: >
     aws iam tag-policy
-    --policy-arn {{ __aws_cdp_data_policy_tags_item.policy.arn }} 
+    --policy-arn {{ __aws_cdp_data_policy_tags_item.policy.arn }}
     --tags {{ __plat_aws_policy_tags_list | join(' ') }}
   loop_control:
     loop_var: __aws_cdp_data_policy_tags_item
@@ -210,7 +210,7 @@
   when: __plat_aws_role_tags_list is defined
   ansible.builtin.command: >
     aws iam tag-role
-    --role-name {{ __aws_service_role_tags_item.iam_role.role_name }} 
+    --role-name {{ __aws_service_role_tags_item.iam_role.role_name }}
     --tags {{ __plat_aws_role_tags_list | join(' ') }}
   loop: "{{ __aws_service_role_info.results }}"
   register: __aws_service_role_tags_info
@@ -258,7 +258,7 @@
   when: __plat_aws_role_tags_list is defined
   ansible.builtin.command: >
     aws iam tag-role
-    --role-name {{ __aws_data_access_role_tags_item.iam_role.role_name }} 
+    --role-name {{ __aws_data_access_role_tags_item.iam_role.role_name }}
     --tags {{ __plat_aws_role_tags_list | join(' ') }}
   loop: "{{ __aws_data_access_role_info.results }}"
   register: __aws_data_access_role_tags_info

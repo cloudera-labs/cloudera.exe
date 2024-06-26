@@ -14,7 +14,7 @@ resource "aws_iam_policy" "cdp_xaccount_policy" {
 # First create the assume role policy document
 data "aws_iam_policy_document" "cdp_idbroker_policy_doc" {
   version       = "2012-10-17"
-  
+
   statement {
     sid         = "VisualEditor0"
     actions     = ["sts:AssumeRole"]

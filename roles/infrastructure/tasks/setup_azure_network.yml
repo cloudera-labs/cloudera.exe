@@ -91,7 +91,7 @@
         --name "{{ infra__vpc_svcnet_name | quote }}"
         --address-prefixes "{{ infra__vpc_svcnet_cidr | quote }}"
         --delegations "Microsoft.NetApp/volumes"
-    
+
     - name: Fetch Netapp svcnet uri if exists
       ansible.builtin.command: >
         az network vnet subnet show
@@ -100,7 +100,7 @@
         --name "{{ infra__vpc_svcnet_name |quote }}"
         --query "id" -o tsv
       register: __azure_netapp_subnet_info
-    
+
     - name: Set fact for NetApp Svcnet URI if exists
       ansible.builtin.set_fact:
         infra__azure_netapp_subnet_uri: "{{ __azure_netapp_subnet_info.stdout | default('') }}"

@@ -83,7 +83,7 @@
     - restart_stale
     - full_cluster
  # ENDBLOCK # Setup HDFS Encryption
- 
+
  # STARTBLOCK # WXM Setup
 - name: Handle WXM Setup
   hosts: "{{ target | default('cluster_master_nodes[0]') }}"

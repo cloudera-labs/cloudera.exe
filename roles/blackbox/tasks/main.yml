@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Create Blackbox directory 
+- name: Create Blackbox directory
   ansible.builtin.file:
     path: "{{ blackbox_directory }}"
     state: directory
@@ -31,12 +31,12 @@
 
 - name: Extract tarball
   ansible.builtin.unarchive:
-    src: "{{ __blackbox_tmp.path }}/{{ blackbox_tarball_file }}"  
+    src: "{{ __blackbox_tmp.path }}/{{ blackbox_tarball_file }}"
     dest: "{{ blackbox_directory }}"
     extra_opts: --strip-components=1
     remote_src: yes
 
-- name: Remove the temporary  directory 
+- name: Remove the temporary  directory
   when: __blackbox_tmp is defined
   ansible.builtin.file:
     path: "{{ __blackbox_tmp.path }}"

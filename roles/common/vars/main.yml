@@ -23,4 +23,3 @@ common__cdp_control_planes:
   us-west-1:  "crn:altus:iam:us-west-1:altus"
   eu-1:       "crn:altus:iam:eu-1:altus"
   ap-1:       "crn:altus:iam:ap-1:altus"
-  

@@ -17,7 +17,7 @@ galaxy_info:
   namespace: cloudera
   author: Webster Mudge (wmudge@cloudera.com)
   description: >
-    Shared configuration variables managed by role dependency. 
+    Shared configuration variables managed by role dependency.
   company: Cloudera
   license: Apache-2.0
 

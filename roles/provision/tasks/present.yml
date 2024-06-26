@@ -6,7 +6,7 @@
     path: "{{ provision_directory }}"
 
 - name: Create resources for remote S3 state storage
-  when: 
+  when:
     - provision_create_remote_storage
     - provision_state_storage == 'remote_s3'
   amazon.aws.s3_bucket:
@@ -20,7 +20,7 @@
     dest: "{{ provision_directory }}"
     src: "{{ provision_provider }}/"
 
-- name: Generate Terraform backend state 
+- name: Generate Terraform backend state
   ansible.builtin.template:
     src: 'backend_state.tf.j2'
     dest: "{{ [provision_directory, 'backend_state.tf'] | path_join }}"
@@ -56,7 +56,7 @@
     label: "{{ node.label }}"
     ansible_timeout: "{{ (jump_host_ip is defined and (jump_host_ip | length > 0)) | ternary(60, omit) }}"
     ansible_ssh_common_args: "{{ (jump_host_ip is defined and (jump_host_ip | length > 0)) | ternary(jump, omit) }}"
-  vars: 
+  vars:
     jump: -o ProxyCommand="ssh -o User={{ jump_host_user }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q {{ jump_host_ip | default() }}"
   loop: "{{ tf_result.outputs.nodes.value }}"
   loop_control:

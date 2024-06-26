@@ -15,8 +15,8 @@
 galaxy_info:
   author: Webster Mudge (wmudge@cloudera.com)
   description: >
-    Deployment and management of cloud provider and/or infrastucture provider 
-    artifacts for Cloudera Data Platform (CDP) Public Cloud and Private Cloud, 
+    Deployment and management of cloud provider and/or infrastucture provider
+    artifacts for Cloudera Data Platform (CDP) Public Cloud and Private Cloud,
     including Private Cloud Base, in addition to artifacts required for auxillary
     services, e.g. Keycloak, external data locations.
   company: Cloudera

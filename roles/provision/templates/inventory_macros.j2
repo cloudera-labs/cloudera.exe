@@ -48,7 +48,7 @@
 {% set _ = ssh_options.append("-C -o ControlMaster=auto -o ControlPersist=1200s -o BatchMode=yes") if ssh_multiplex is defined and (ssh_multiplex | bool) %}
 [all:vars]
 ansible_python_interpreter=auto
-{% if ssh_options | length > 0 -%} 
+{% if ssh_options | length > 0 -%}
 ansible_ssh_common_args='{{ ssh_options | join(" ") }}'
 {%   if jump_host_ip is defined -%}
 ansible_timeout=60

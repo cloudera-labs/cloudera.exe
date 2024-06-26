@@ -42,7 +42,7 @@ variable "public_subnets" {
     az          = string
     name        = optional(string)
     cidr        = optional(string)
-    cidr_range  = optional(number, 4) 
+    cidr_range  = optional(number, 4)
     tags        = optional(map(string), {})
   }))
 
@@ -61,7 +61,7 @@ variable "private_subnets" {
     az          = string
     name        = optional(string)
     cidr        = optional(string)
-    cidr_range  = optional(number, 4) 
+    cidr_range  = optional(number, 4)
     tags        = optional(map(string), {})
   }))
 
@@ -106,7 +106,7 @@ variable "security_group_rules_ingress" {
   default    = []
 }
 
-# ------- Virtual Network ------- 
+# ------- Virtual Network -------
 resource "aws_vpc" "cluster" {
   cidr_block            = var.vpc_cidr
   tags                  = { Name = var.vpc_name != null ? var.vpc_name : var.cluster_prefix }
@@ -123,12 +123,12 @@ resource "aws_internet_gateway" "igw" {
 
 locals {
   public_subnets = [
-    for idx, subnet in var.public_subnets : 
+    for idx, subnet in var.public_subnets :
       merge(subnet, { name = subnet.name != null ? subnet.name : "${var.cluster_prefix}-public-${format("%02d", idx+1)}" })
   ]
 
   private_subnets = [
-    for idx, subnet in var.private_subnets : 
+    for idx, subnet in var.private_subnets :
       merge(subnet, { name = subnet.name != null ? subnet.name : "${var.cluster_prefix}-private-${format("%02d", idx+1)}" })
   ]
 
@@ -140,7 +140,7 @@ locals {
 
 resource "aws_subnet" "public_subnets" {
   for_each                = {for idx, subnet in local.public_subnets: idx => subnet}
-  
+
   vpc_id                  = aws_vpc.cluster.id
   cidr_block              = each.value.cidr != null ? each.value.cidr : local.cidr_allocation[each.value.name]
   map_public_ip_on_launch = true

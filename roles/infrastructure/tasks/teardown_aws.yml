@@ -22,4 +22,3 @@
     name: "{{ infra__public_key_id }}"
     region: "{{ infra__region }}"
     state: absent
-  

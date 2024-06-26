@@ -47,11 +47,11 @@ resource "aws_s3_bucket_acl" "cdp_storage_acl" {
 resource "aws_s3_object" "cdp_storage_object" {
 
     for_each      = {for idx, object in var.storage_locations: idx => object}
-    
+
     # Bucket is either from 'cdp_storage_delete_data' or 'cdp_storage_retain_data' resource depending on teardown_deletes_data'
     bucket        = var.teardown_deletes_data ? aws_s3_bucket.cdp_storage_delete_data[each.value.bucket].id : aws_s3_bucket.cdp_storage_retain_data[each.value.bucket].id
 
-    key           = each.value.object    
+    key           = each.value.object
     content_type  = "application/x-directory"
 }
 

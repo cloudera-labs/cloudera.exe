@@ -121,7 +121,7 @@ dw:
     template:
   dbc:
     suffix:
-    default_suffix: 
+    default_suffix:
   tags:
   overlay_network:
   private_load_balancer:
@@ -189,7 +189,7 @@ env:
         identity:
         log:
         ranger_audit:
-        raz: 
+        raz:
         xaccount:
       name:
         cross_account:
@@ -197,7 +197,7 @@ env:
         idbroker:
         log:
         ranger_audit:
-        raz: 
+        raz:
       name_suffix:
         admin:
         assignment:
@@ -242,7 +242,7 @@ env:
     user_sync:
     version:
     scale:
-    enable_raz: 
+    enable_raz:
   gcp:
     auto_enable_services:
     availability_zones:
@@ -377,12 +377,12 @@ infra:
       tags:
     storage:
       tags:
-      bucket_object_ownership: 
-      bucket_acl_permissions: 
+      bucket_object_ownership:
+      bucket_acl_permissions:
     private_endpoints:
     prefix_list:
       suffix:
-    extra_prefix_list_name: 
+    extra_prefix_list_name:
   azure:
     metagroup:
       name:
@@ -506,4 +506,4 @@ data:
       suffix:
   teardown:
       delete_policies:
-      delete_roles: 
+      delete_roles:

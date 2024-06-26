@@ -77,9 +77,9 @@
 
 # Cloud Router and Cloud NAT for L2 networking
 - name: Create a Cloud Router
-  when: 
+  when:
     - infra__tunnel
-    - not infra__public_endpoint_access 
+    - not infra__public_endpoint_access
   google.cloud.gcp_compute_router:
     name: "{{ infra__gcp_cloud_router_name }}"
     network: "{{ __gcp_vpc_info }}"
@@ -93,11 +93,11 @@
 - name: Discover Cloud NAT and Create if required
   when:
     - infra__tunnel
-    - not infra__public_endpoint_access 
+    - not infra__public_endpoint_access
   block:
     - name: Discover Cloud NAT
       ansible.builtin.command: >
-        gcloud compute routers nats describe {{ infra__gcp_cloud_nat_name }}        
+        gcloud compute routers nats describe {{ infra__gcp_cloud_nat_name }}
         --router={{ infra__gcp_cloud_router_name }}
         --router-region={{ infra__region }}
       ignore_errors: true
@@ -105,7 +105,7 @@
 
     - name: Create Cloud NAT if not discovered
       when:
-        - __gcp_nat_discovered is failed 
+        - __gcp_nat_discovered is failed
       ansible.builtin.command: >
         gcloud compute routers nats create {{ infra__gcp_cloud_nat_name }}
         --router={{ infra__gcp_cloud_router_name }}
