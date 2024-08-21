@@ -13,5 +13,12 @@
 # limitations under the License.
 
 ---
+galaxy_info:
+  description: >
+    Set up single database to support Cloudera Data Platform (CDP) Private Cloud
+    deployments.
+  company: Cloudera
+  license: Apache-2.0
+  
 dependencies:
   - role: cloudera.cluster.infrastructure.ca_common
