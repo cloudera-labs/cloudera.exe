@@ -19,6 +19,6 @@ galaxy_info:
     deployments.
   company: Cloudera
   license: Apache-2.0
-  
+
 dependencies:
   - role: cloudera.cluster.infrastructure.ca_common
