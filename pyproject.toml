@@ -1,0 +1,26 @@
+[project]
+name = "exe"
+description = "cloudera.exe Ansible collection"
+readme = "README.md"
+dependencies = [
+  "ansible-core~=2.12.0"
+]
+requires-python = "~=3.8.0"
+dynamic = ["version"]
+
+[tool.hatch.version]
+path = "galaxy.yml"
+pattern = "version:\\s+(?P<version>[\\d\\.]+)"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "pre-commit",
+  "coverage[toml]",
+  "pytest",
+  "pytest-cov",
+]
+installer = "uv"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
