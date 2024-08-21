@@ -12,26 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-
 - name: Install PostgreSQL common repository
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: pgdg-common
     description: PostgreSQL common for RHEL/CentOS
     baseurl: https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-$releasever-$basearch
     gpgkey: https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
 
 - name: Install PostgreSQL version repository
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: pgdg
     description: PostgreSQL {{ postgresql_version }} for RHEL/CentOS
     baseurl: https://download.postgresql.org/pub/repos/yum/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch
     gpgkey: https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
 
-- name: disable default Postgres module in Rhel 8
-  command: dnf module disable -y postgresql
+- name: Disable default Postgres module in RHEL 8
+  ansible.builtin.command: dnf module disable -y postgresql
   register: __postgres_module_result
   changed_when:
     - '"Disabling modules" in __postgres_module_result.stdout'
@@ -40,19 +38,19 @@
     - ansible_distribution_major_version | int >= 8
 
 - name: Install PostgreSQL
-  include_role:
+  ansible.builtin.include_role:
     name: geerlingguy.postgresql
 
 - name: Fix UTF-8 template
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: postgresql/template_fix.yml
 
 - name: Remove repositories and clean metadata
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ item }}"
     state: absent
   with_items:
     - pgdg-common
     - pgdg
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
   notify: yum clean metadata

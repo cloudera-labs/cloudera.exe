@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-
 - name: Install MariaDB repository
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: MariaDB
     description: MariaDB {{ database_version }} repository for RHEL
     baseurl: https://yum.mariadb.org/{{ database_version }}/rhel{{ ansible_distribution_major_version }}-amd64
     gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
 
-- name: Disable modularity appstream, when el8
-  command: yum -y module disable mysql mariadb
+- name: Disable modularity appstream, when RHEL 8
+  ansible.builtin.command: yum -y module disable mysql mariadb
   when:
-    - not (skip_rdbms_repo_setup | default(False))
+    - not skip_rdbms_repo_setup
     - ansible_distribution_major_version == "8"
 
 - name: Install Mariadb
-  include_role:
+  ansible.builtin.include_role:
     name: ansible-role-mysql

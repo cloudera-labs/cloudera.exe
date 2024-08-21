@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,20 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-
 - name: Install MariaDB apt key
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://mariadb.org/mariadb_release_signing_key.asc
     state: present
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
 
 - name: Install MariaDB apt repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: deb [arch=amd64,arm64,ppc64el] https://downloads.mariadb.com/MariaDB/mariadb-{{ database_version }}/repo/ubuntu/ bionic main
     state: present
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
 
 - name: Install MariaDB
-  include_role:
+  ansible.builtin.include_role:
     name: ansible-role-mysql
