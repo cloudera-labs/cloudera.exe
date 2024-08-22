@@ -1,0 +1,93 @@
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+
+# TODO: Check index.txt.attr and see if unique_subject = no for intermediate ca
+
+- name: Set fact for all CSRs to sign
+  ansible.builtin.set_fact:
+    __csrs_to_sign: "{{ (__csrs_to_sign | default([])) + ([csr_item]) }}"
+  vars:
+    csr_item:
+      local_file: "{{ item }}"
+      csr_filename: "{{ item | basename }}"
+      file_suffix: "{{ item | basename | splitext | first }}"
+  loop: "{{ csrs_to_sign }}"
+
+- name: Copy all CSRs from controller to CA server
+  when: copy_from_controller
+  ansible.builtin.copy:
+    src: "{{ item.local_file }}"
+    dest: "{{ ca_server_intermediate_path_csr }}/{{ item.csr_filename }}"
+    mode: 0644
+  loop: "{{ __csrs_to_sign }}"
+
+- name: Backup and remove old certs if required
+  when: override_old_certs
+  block:
+    - name: Create backup directory for old certs
+      ansible.builtin.file:
+        path: "{{ cert_backup_directory }}"
+        state: directory
+        mode: '0755'
+
+    - name: Backup old certs
+      block:
+        - name: Check if cert exists
+          ansible.builtin.stat:
+            path: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
+          loop: "{{ __csrs_to_sign }}"
+          register: __old_certs
+
+        - name: Copy existing certs to backup directory  
+          when: item.stat.exists
+          ansible.builtin.copy:
+            src:  "{{ item.stat.path }}"
+            dest:  "{{ cert_backup_directory }}"
+            remote_src: True 
+          loop: "{{ __old_certs.results }}"
+
+        - name: Remove old certs
+          when: item.stat.exists
+          ansible.builtin.file: 
+            path: "{{ item.stat.path }}"
+            state: absent
+          loop: "{{ __old_certs.results }}"
+
+- name: Sign CSRs
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: >
+      exec 100>/tmp/ca_server.lock;
+      flock 100 &&
+      {{ openssl_path }} ca
+      -batch
+      -config {{ ca_server_intermediate_path }}/openssl.cnf
+      -extensions cloudera_req
+      -days 730
+      -notext
+      -md sha256
+      -in {{ ca_server_intermediate_path_csr }}/{{ item.csr_filename }}
+      -out {{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem
+      -passin pass:{{ ca_server_intermediate_key_password }}
+    creates: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
+  loop: "{{ __csrs_to_sign }}"
+
+- name: Bring signed certs back to controller
+  ansible.builtin.fetch:
+    src: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
+    dest: "{{ local_certs_dir }}/{{ item.file_suffix }}.pem"
+    flat: yes
+  loop: "{{ __csrs_to_sign }}"    

@@ -1,0 +1,131 @@
+---
+
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Pre - Initialization of local working directories
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Create temporary build directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: pvc_tls_
+      register: __pvc_tls_tempdir
+
+    - debug:
+        var: __pvc_tls_tempdir
+
+    - name: Create a directory for csrs and signed certs
+      ansible.builtin.file:
+        path: "{{ [__pvc_tls_tempdir.path, item] | path_join }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - csrs
+        - certs
+        - ca_certs
+
+- name: Play 1 - Generate CSR on each host
+  hosts: "{{ target | default('cluster') }}"
+  become: yes
+  gather_facts: yes
+  tasks:
+  
+  - name: Call tls_generate_csr role
+    ansible.builtin.import_role:
+      name: cloudera.exe.tls_generate_csr
+    vars:
+      local_csrs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'csrs') | path_join }}"
+
+- name: Get the list of CSRs to sign
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Set fact for all CSRs in {{ local_csrs_dir }}"
+      ansible.builtin.find:
+        paths: "{{ local_csrs_dir }}"
+        file_type: file
+      register: __csrs_to_sign
+      vars:
+        local_csrs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'csrs') | path_join }}"
+
+    - name: Set fact for csrs to sign
+      ansible.builtin.set_fact:
+        local_csrs_to_sign: "{{ __csrs_to_sign.files | json_query('[*].path') | flatten }}"
+
+- name: Play 2 - Sign the CSR
+  hosts: ca_server
+  become: yes
+  gather_facts: yes
+  tasks:
+
+    - name: Call tls_signing role
+      ansible.builtin.import_role:
+        name: cloudera.exe.tls_signing
+      vars:
+        csrs_to_sign: "{{ hostvars['localhost']['local_csrs_to_sign'] }}"
+        copy_from_controller: true
+        local_certs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'certs') | path_join }}"
+
+- name: Play 3 - Install the sign certs on each host
+  hosts: "{{ target | default('cluster') }}"
+  become: yes
+  gather_facts: yes
+  tasks:
+  
+  - name: Call tls_install_certs role
+    ansible.builtin.import_role:
+      name: cloudera.exetls_install_certs
+    vars:
+      local_tls_signed_certs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'certs') | path_join }}"
+
+- name: Post 1 - Restart CM Server service
+  hosts: cloudera_manager
+  become: yes
+  gather_facts: yes
+  tasks:
+
+  - name: Restart CM Server service
+    when: 
+      - restart_services | default(False)  
+    ansible.builtin.service:
+      name: cloudera-scm-server
+      state: restarted
+
+- name: Post 2 - Restart DB Server service
+  hosts: db_server
+  become: yes
+  gather_facts: yes
+  tasks:
+
+  - name: Restart DB Server service
+    when:
+      - restart_services | default(False)
+    ansible.builtin.service:
+      name: "{{ db_service_name }}"
+      state: reloaded
+
+- name: Post 3 - Restart CM Agent service
+  hosts: cluster
+  become: yes
+  gather_facts: yes
+  tasks:
+
+  - name: Restart CM Agent service
+    when: 
+      - restart_services | default(False)  
+    ansible.builtin.service:
+      name: cloudera-scm-agent
+      state: restarted
