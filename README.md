@@ -36,7 +36,7 @@ The other collection assets - the _roles_ and _plugins_ - are detailed in the [A
 
 ## API
 
-See the [API documentation](https://cloudera-labs.github.io/cloudera.exe/) for details for each plugin and role within the collection. 
+See the [API documentation](https://cloudera-labs.github.io/cloudera.exe/) for details for each plugin and role within the collection.
 
 ## Roadmap
 
@@ -123,7 +123,7 @@ See the [requirements for `cloudera-labs/cloudera.cluster`](https://github.com/w
 
 **Terraform**
 
-If you intend to use Terraform as your infrastructure engine within the `cloudera.exe.infra` role, then install the following: 
+If you intend to use Terraform as your infrastructure engine within the `cloudera.exe.infra` role, then install the following:
 
 | Name | Type | Version |
 |------|------|---------|
@@ -220,7 +220,7 @@ For more information on the collection, check out:
 To create a local collection tarball, run:
 
 ```bash
-ansible-galaxy collection build 
+ansible-galaxy collection build
 ```
 
 ## Building the API Documentation

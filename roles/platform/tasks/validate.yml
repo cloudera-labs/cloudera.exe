@@ -79,5 +79,3 @@
 - name: Include Terraform provider-specific Platform validation Tasks
   ansible.builtin.include_tasks: "validate_{{ plat__infra_type | lower }}_{{ plat__infra_deployment_engine }}.yml"
   when: plat__infra_deployment_engine == 'terraform'
-
-  

@@ -57,7 +57,7 @@
   when: __infra_aws_policy_tags_list
   ansible.builtin.command: >
     aws iam tag-policy
-    --policy-arn {{ __infra_aws_utility_bucket_policy.policy.arn }} 
+    --policy-arn {{ __infra_aws_utility_bucket_policy.policy.arn }}
     --tags {{ __infra_aws_policy_tags_list | join(' ') }}
   register: __infra_aws_utility_bucket_policy_tags
   failed_when: __infra_aws_utility_bucket_policy_tags.rc != 0
@@ -82,7 +82,7 @@
   when: __infra_aws_role_tags_list
   ansible.builtin.command: >
     aws iam tag-role
-    --role-name {{ infra__utlity_bucket_name }} 
+    --role-name {{ infra__utlity_bucket_name }}
     --tags {{ __infra_aws_role_tags_list | join(' ') }}
   register: __infra_aws_storage_utility_role_tags
   failed_when: __infra_aws_storage_utility_role_tags.rc != 0

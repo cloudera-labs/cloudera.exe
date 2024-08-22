@@ -16,7 +16,7 @@
 
 - name: Check public key ID
   ansible.builtin.assert:
-    that: 
+    that:
       - "__auth_item is defined"
       - "__auth_item is string"
       - "__auth_item | trim | length > 0"
@@ -34,7 +34,7 @@
   block:
   - name: Check infra__terraform_template_dir
     ansible.builtin.assert:
-      that: 
+      that:
         - "infra__terraform_template_dir is defined"
         - "infra__terraform_template_dir | length > 0"
       fail_msg: "Required infra__terraform_template_dir variable for Terraform is not valid."
@@ -42,7 +42,7 @@
 
   - name: Check infra__terraform_workspace_dir
     ansible.builtin.assert:
-      that: 
+      that:
         - "infra__terraform_workspace_dir is defined"
         - "infra__terraform_workspace_dir | length > 0"
       fail_msg: "Required infra__terraform_workspace_dir variable for Terraform is not valid."
@@ -50,7 +50,7 @@
 
   - name: Check infra__terraform_artefact_dir
     ansible.builtin.assert:
-      that: 
+      that:
         - "infra__terraform_artefact_dir is defined"
         - "infra__terraform_artefact_dir | length > 0"
       fail_msg: "Required infra__terraform_artefact_dir variable for Terraform is not valid."
@@ -58,7 +58,7 @@
 
   - name: Check infra__terraform_state_storage
     ansible.builtin.assert:
-      that: 
+      that:
         - "infra__terraform_state_storage is defined"
         - "infra__terraform_state_storage in infra__terraform_allowed_state_storage"
       fail_msg: "Required infra__terraform_state_storage variable for Terraform needs to be \
@@ -67,7 +67,7 @@
 
   - name: Check remote state variables are defined for remote_s3
     ansible.builtin.assert:
-      that: 
+      that:
         - "infra__terraform_remote_state_bucket | length > 0"
         - "infra__terraform_remote_state_lock_table | length > 0"
       fail_msg: "Required infra__terraform_remote_state_bucket and infra__terraform_remote_state_lock_table variables \

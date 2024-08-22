@@ -48,7 +48,7 @@
     __aws_policy_download_dir: "{{ __aws_policy_tmpdir.path }}"
 
 - name: Copy AWS policy documents to Terraform template directory
-  ansible.builtin.copy:  
+  ansible.builtin.copy:
     src: "{{ __aws_policy_tmpdir.path }}/"
     dest: "{{ plat__terraform_template_dir }}/plat/policy_docs/"
 

@@ -12,7 +12,7 @@
     state: absent
 
 - name: Remove resources for remote S3 state storage
-  when: 
+  when:
     - provision_create_remote_storage
     - provision_state_storage == 'remote_s3'
   amazon.aws.s3_bucket:

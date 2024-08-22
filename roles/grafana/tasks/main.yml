@@ -17,4 +17,3 @@
 
 - name: Include distribution specific tasks
   ansible.builtin.include_tasks: "Grafana-{{ ansible_facts['distribution'] }}.yml"
-

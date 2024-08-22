@@ -40,7 +40,7 @@
     loop_var: __data_storage_location
     label: "s3a://{{ __data_storage_location }}"
 
-- name: Set fact for AWS data access policy Resource with storage locations 
+- name: Set fact for AWS data access policy Resource with storage locations
   ansible.builtin.set_fact:
     __data_aws_data_access_policy_contents: "{{ document | combine({ 'Statement' : [modified_statement] | union(remaining_sid_statements) | union(remaining_other_statements) }, recursive=True) }}"
   vars:
@@ -58,7 +58,7 @@
     policy_description: "{{ __data_storage['read_only'] | default(False) | ternary('Read-only', 'Read-write') }} external data storage policy for {{ data__namespace }}"
     policy: "{{ __data_aws_data_access_policy_contents | to_json }}"
     state: present
-    
+
 - name: Set fact for external data AWS role name
   ansible.builtin.set_fact:
     __data_aws_access_role_name: "{{ __data_storage.role.name | default(__data_role_name) }}"

@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-
-- name: Install PostgreSQL apt key
-  apt_key:
+- name: Install PostgreSQL repository key
+  ansible.builtin.apt_key:
     url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
     state: present
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
 
-- name: Install PostgreSQL apt repository
-  apt_repository:
+- name: Install PostgreSQL repository
+  ansible.builtin.apt_repository:
     repo: "deb https://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
     state: present
-  when: not (skip_rdbms_repo_setup | default(False))
+  when: not skip_rdbms_repo_setup
 
 - name: Install PostgreSQL
-  include_role:
+  ansible.builtin.include_role:
     name: geerlingguy.postgresql
 
 - name: Install python-psycopg2
@@ -36,5 +34,5 @@
     state: latest
 
 - name: Fix UTF-8 template
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: template_fix.yml

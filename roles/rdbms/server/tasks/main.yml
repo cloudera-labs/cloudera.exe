@@ -14,18 +14,18 @@
 
 ---
 - name: Include database type variables
-  include_vars:
+  ansible.builtin.include_vars:
     file: "{{ database_type }}/common.yml"
-    
+
 - name: Include database type and OS specific variables
-  include_vars:
+  ansible.builtin.include_vars:
     file: "{{ item }}"
   with_first_found:
-      - "{{ database_type }}/{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml" 
+      - "{{ database_type }}/{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
       - "{{ database_type }}/{{ ansible_os_family }}.yml"
 
 - name: Install database
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: "{{ item }}"
   with_first_found:
     - "{{ database_type }}/{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"

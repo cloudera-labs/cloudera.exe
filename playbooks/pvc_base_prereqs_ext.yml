@@ -157,7 +157,7 @@
       when: database_type == 'postgresql'
   tags:
     - postgresql_connector
-    - full_cluster    
+    - full_cluster
 # ENDBLOCK # Prepare Nodes
 
 # STARTBLOCK # Create Cluster Service Infrastructure

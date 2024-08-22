@@ -34,12 +34,12 @@
         __data_role_name: "{{ __data_storage.role.datalake_admin | default(True) | ternary(data__aws_datalake_admin_role_name, __data_role_name_default) }}"
         __data_role_name_default: "{{ [data__namespace, data__external_data_suffix, __data_storage.role.suffix | default(data__aws_role_suffix)] | join('-') }}"
 
-    - name: Query the external data AWS role 
+    - name: Query the external data AWS role
       community.aws.iam_role_info:
         region: "{{ data__region }}"
         name: "{{ __data_aws_access_role_name }}"
       register: __data_aws_access_role_info
-        
+
     - name: Set facts for existing managed policies for external data AWS role
       when: __data_aws_access_role_info.iam_roles | length > 0
       ansible.builtin.set_fact:

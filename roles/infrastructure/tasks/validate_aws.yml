@@ -16,7 +16,7 @@
 
 - name: Check public key ID
   ansible.builtin.assert:
-    that: 
+    that:
       - "__auth_item is defined"
       - "__auth_item is string"
       - "__auth_item | trim | length > 0"
@@ -32,7 +32,7 @@
 
 # TODO: Revisit this logic, we could just provide a blank VPC for L0, L1, or L2
 - name: Validate existing AWS Subnet details if provided for a private network
-  #when: infra__aws_vpc_id != "" 
+  #when: infra__aws_vpc_id != ""
   when: no
   block:
     - name: Check for non-empty AWS private subnets

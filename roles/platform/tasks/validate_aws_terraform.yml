@@ -31,7 +31,7 @@
   block:
   - name: Check plat__terraform_template_dir
     ansible.builtin.assert:
-      that: 
+      that:
         - "plat__terraform_template_dir is defined"
         - "plat__terraform_template_dir | length > 0"
       fail_msg: "Required plat__terraform_template_dir variable for Terraform is not valid."
@@ -39,7 +39,7 @@
 
   - name: Check plat__terraform_workspace_dir
     ansible.builtin.assert:
-      that: 
+      that:
         - "plat__terraform_workspace_dir is defined"
         - "plat__terraform_workspace_dir | length > 0"
       fail_msg: "Required plat__terraform_workspace_dir variable for Terraform is not valid."
@@ -47,7 +47,7 @@
 
   - name: Check plat__terraform_artefact_dir
     ansible.builtin.assert:
-      that: 
+      that:
         - "plat__terraform_artefact_dir is defined"
         - "plat__terraform_artefact_dir | length > 0"
       fail_msg: "Required plat__terraform_artefact_dir variable for Terraform is not valid."
@@ -55,7 +55,7 @@
 
   - name: Check plat__terraform_state_storage
     ansible.builtin.assert:
-      that: 
+      that:
         - "plat__terraform_state_storage is defined"
         - "plat__terraform_state_storage in plat__terraform_allowed_state_storage"
       fail_msg: "Required plat__terraform_state_storage variable for Terraform needs to be \
@@ -64,7 +64,7 @@
 
   - name: Check remote state variables are defined for remote_s3
     ansible.builtin.assert:
-      that: 
+      that:
         - "plat__terraform_remote_state_bucket | length > 0"
         - "plat__terraform_remote_state_lock_table | length > 0"
       fail_msg: "Required plat__terraform_remote_state_bucket and plat__terraform_remote_state_lock_table variables \

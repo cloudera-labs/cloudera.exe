@@ -62,7 +62,7 @@ provisioner:
                   type: impala
                 - name: ${FOUNDRY_NAME_PREFIX:-r01}-dbc-autoscale
                   autoscaling:
-                    min_nodes: 0  
+                    min_nodes: 0
             - name: ${FOUNDRY_NAME_PREFIX:-r01}-named
               virtual_warehouses:
                 - name: ${FOUNDRY_NAME_PREFIX:-r01}-named-default

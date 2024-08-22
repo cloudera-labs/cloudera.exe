@@ -54,7 +54,7 @@
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
           register: existing_endpoints
-        
+
         - name: Delete VPC Endpoints
           community.aws.ec2_vpc_endpoint:
             state: absent

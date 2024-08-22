@@ -19,7 +19,7 @@ instanceType: "{{ run__datahub_compute[run__infra_type].std_gp }}"
 rootVolumeSize: 100
 recoveryMode: MANUAL
 recipeNames: []
-attachedVolumeConfiguration: 
+attachedVolumeConfiguration:
   - volumeSize: 100
     volumeCount: 1
     volumeType: "{{ run__datahub_storage[run__infra_type].std }}"

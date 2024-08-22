@@ -12,7 +12,7 @@ Other roles use the shared dependencies and tagging approach, yet are not direct
 
 # Task Lists
 
-Each of the three core roles (`infrastructure`, `platform`, and `runtime`) consist of four entrypoint task lists: 
+Each of the three core roles (`infrastructure`, `platform`, and `runtime`) consist of four entrypoint task lists:
 
 + `validate.yml`
 + `initialize.yml`
@@ -23,7 +23,7 @@ These tasks lists are referenced by the `ansible.builtin.include_role` module's 
 
 # Variables
 
-The variables used by any `cloudera.exe` role are defined _completely_ within the role's `defaults` and prefixed to isolate variables to that role alone. Roles also reference a [canonical set of variables](configuration.md) to normalize usage. (See [Configuration Mapping](#configuration-mapping) for customization options). 
+The variables used by any `cloudera.exe` role are defined _completely_ within the role's `defaults` and prefixed to isolate variables to that role alone. Roles also reference a [canonical set of variables](configuration.md) to normalize usage. (See [Configuration Mapping](#configuration-mapping) for customization options).
 
 Variables that are shared among roles should be defined within the `cloudera.exe.common` role, which is a dependency for each of the core roles, and then mapped into a prefixed role default.
 
@@ -44,9 +44,9 @@ This mapping isolates changes to shared variables to a single location (`clouder
 
 # Tags
 
-The core roles - `infrastructure`, `platform`, and `runtime` -- are designed to be invoked by [Ansible tags](https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html). 
+The core roles - `infrastructure`, `platform`, and `runtime` -- are designed to be invoked by [Ansible tags](https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html).
 
-Roles like `cloudera.exe.sequence` have a tagging structure which "cascades" execution to provide runlevel prerequisites. For example, the `plat` tag (representing the [Platform](runlevels.md#platform) runlevel) invokes the _teardown_ sequence for [Runtime](runlevels.md#runtime) and then the _setup_ sequence for [Infrastructure](runlevels.md#infrastructure) and then Platform itself, reconciling the state of each setup if needed. 
+Roles like `cloudera.exe.sequence` have a tagging structure which "cascades" execution to provide runlevel prerequisites. For example, the `plat` tag (representing the [Platform](runlevels.md#platform) runlevel) invokes the _teardown_ sequence for [Runtime](runlevels.md#runtime) and then the _setup_ sequence for [Infrastructure](runlevels.md#infrastructure) and then Platform itself, reconciling the state of each setup if needed.
 
 The _validate_ sequence for the [Validation](runlevels.md#validation) runlevel is always invoked, as is the _initialization_ sequence -- the [Initialization](runlevels.md#initialization) for each affected high-level runlevel.
 
@@ -82,12 +82,12 @@ globals:
   tasks:
     - name: Import the core Runlevels
       ansible.builtin.import_role:
-        name: cloudera.exe.sequence 
+        name: cloudera.exe.sequence
 ```
 
 ## Tag Extension
 
-Playbook developers that import the `cloudera.exe.sequence` role (or other future "orchestration" roles) can add both additional and existing "runlevel" tags to invoke other roles or tasks. This technique is well-suited for extending the core to handle [additional runlevels](#additional-runlevels). 
+Playbook developers that import the `cloudera.exe.sequence` role (or other future "orchestration" roles) can add both additional and existing "runlevel" tags to invoke other roles or tasks. This technique is well-suited for extending the core to handle [additional runlevels](#additional-runlevels).
 
 For example, to add a pre-deploy role:
 
@@ -125,7 +125,7 @@ For example, to add a pre-deploy role:
         - dh
     - name: Import the core Runlevels (and their tags)
       ansible.builtin.import_role:
-        name: cloudera.exe.sequence 
+        name: cloudera.exe.sequence
 ```
 
 This example above can execute just the _pre-setup_ role:
@@ -180,7 +180,7 @@ For example, adding an explicit `install` tag to execute the [Installation](runl
         - dw
         - opdb
         - dh
-    
+
     - name: Validate Platform Configuration
       ansible.builtin.include_role:
         name: cloudera.exe.platform

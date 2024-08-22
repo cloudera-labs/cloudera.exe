@@ -57,4 +57,3 @@
     - ansible_distribution_major_version >= "8"
   shell: /usr/local/bin/pip install PyMySQL --force-reinstall --ignore-installed
   ignore_errors: true
-      

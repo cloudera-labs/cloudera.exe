@@ -15,7 +15,7 @@
 galaxy_info:
   author: Webster Mudge (wmudge@cloudera.com)
   description: >
-    Collection and publishing of available services and general information for Cloudera Data 
+    Collection and publishing of available services and general information for Cloudera Data
     Platform (CDP) Public Cloud or Private Cloud deployments.
   company: Cloudera
   license: Apache-2.0

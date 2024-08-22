@@ -279,7 +279,7 @@
         filters:
           vpc-id: "{{ infra__aws_vpc_id }}"
       register: __aws_route_table_list_again
-    
+
     - name: Set fact for All Route Table IDs (Skip if infra__aws_private_endpoints is false)
       ansible.builtin.set_fact:
         infra__route_table_ids: "{{ infra__route_table_ids | default([]) | union([route_table_id]) }}"
@@ -326,7 +326,7 @@
           group-name:
             - default
       register: __aws_vpc_default_sg
-    
+
     - name: Add Subnets and Security Groups to Interface VPC Endpoints (Skip if infra__aws_private_endpoints is false)
       when:
         - __aws_interface_vpc_endpoints is defined
@@ -335,7 +335,7 @@
         aws ec2 modify-vpc-endpoint
         --region {{ infra__region }}
         --vpc-endpoint-id {{ __infra_vpce_loop_var.result.vpc_endpoint_id }}
-        --add-subnet-ids {{ infra__aws_public_subnet_ids | join(' ') }} 
+        --add-subnet-ids {{ infra__aws_public_subnet_ids | join(' ') }}
         --add-security-group-ids {{ __aws_vpce_security_group_info.group_id }}
         --remove-security-group-ids {{ __aws_vpc_default_sg.security_groups[0].group_id }}
         --private-dns-enabled
