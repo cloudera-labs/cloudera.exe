@@ -51,17 +51,17 @@
           loop: "{{ __csrs_to_sign }}"
           register: __old_certs
 
-        - name: Copy existing certs to backup directory  
+        - name: Copy existing certs to backup directory
           when: item.stat.exists
           ansible.builtin.copy:
             src:  "{{ item.stat.path }}"
             dest:  "{{ cert_backup_directory }}"
-            remote_src: True 
+            remote_src: True
           loop: "{{ __old_certs.results }}"
 
         - name: Remove old certs
           when: item.stat.exists
-          ansible.builtin.file: 
+          ansible.builtin.file:
             path: "{{ item.stat.path }}"
             state: absent
           loop: "{{ __old_certs.results }}"
@@ -90,4 +90,4 @@
     src: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
     dest: "{{ local_certs_dir }}/{{ item.file_suffix }}.pem"
     flat: yes
-  loop: "{{ __csrs_to_sign }}"    
+  loop: "{{ __csrs_to_sign }}"

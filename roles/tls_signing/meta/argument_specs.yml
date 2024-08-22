@@ -34,13 +34,13 @@ argument_specs:
         type: "bool"
         default: true
       override_old_certs:
-        description: 
+        description:
           - Flag to specify if existing signed certs of the same name should be overridden.
           - If C(true) then a backup of the existing certs are taken to the location specified by C(cert_backup_directory).
         type: "bool"
         default: true
       cert_backup_directory:
-        description: 
+        description:
           - Directory where existing signed certs should be backed up.
           - Used if the C(override_old_certs) is set to C(true).
         type: "str"
@@ -52,7 +52,7 @@ argument_specs:
       ca_server_intermediate_path_certs:
         description: Path to intermediate CA certificates directory
         type: "str"
-        default: "{{ ca_server_intermediate_path }}/certs"        
+        default: "{{ ca_server_intermediate_path }}/certs"
       ca_server_intermediate_path_csr:
         description: Path to intermediate CA CSR directory
         type: "str"

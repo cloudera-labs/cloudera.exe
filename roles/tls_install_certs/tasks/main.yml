@@ -46,7 +46,7 @@
 
 - name: Validate certificate
   ansible.builtin.shell:
-    cmd: {{ openssl_path }} verify -verbose -CAfile {{ tls_ca_chain_path }} {{ tls_cert_path }}
+    cmd: "{{ openssl_path }} verify -verbose -CAfile {{ tls_ca_chain_path }} {{ tls_cert_path }}"
 
 # Update the keystore with the renewed cert
 # Reference: https://support.smartbear.com/collaborator/faq/how-to-update-an-expired-certificate-in-the-existi/
@@ -58,7 +58,7 @@
     action: export
     path: "{{ __temp_keystore }}"
     passphrase: "{{ tls_keystore_password }}"
-    friendly_name: "{{ keystore_alias | default(inventory_hostname) }}" 
+    friendly_name: "{{ keystore_alias | default(inventory_hostname) }}"
     privatekey_path: "{{ tls_key_path_plaintext_generic }}"
     certificate_path: "{{ tls_cert_path_generic }}"
     other_certificates:

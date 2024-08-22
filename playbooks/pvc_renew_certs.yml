@@ -42,7 +42,7 @@
   become: yes
   gather_facts: yes
   tasks:
-  
+
   - name: Call tls_generate_csr role
     ansible.builtin.import_role:
       name: cloudera.exe.tls_generate_csr
@@ -84,7 +84,7 @@
   become: yes
   gather_facts: yes
   tasks:
-  
+
   - name: Call tls_install_certs role
     ansible.builtin.import_role:
       name: cloudera.exetls_install_certs
@@ -98,8 +98,8 @@
   tasks:
 
   - name: Restart CM Server service
-    when: 
-      - restart_services | default(False)  
+    when:
+      - restart_services | default(False)
     ansible.builtin.service:
       name: cloudera-scm-server
       state: restarted
@@ -124,8 +124,8 @@
   tasks:
 
   - name: Restart CM Agent service
-    when: 
-      - restart_services | default(False)  
+    when:
+      - restart_services | default(False)
     ansible.builtin.service:
       name: cloudera-scm-agent
       state: restarted
