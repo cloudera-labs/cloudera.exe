@@ -13,12 +13,15 @@
 # limitations under the License.
 
 ---
+
+# csrs_to_sign:
+copy_from_controller: True
+
 keytool_path: /usr/bin/keytool
 openssl_path: /usr/bin/openssl
 
 ca_server_intermediate_path: /ca/intermediate
 ca_server_intermediate_path_certs: "{{ ca_server_intermediate_path }}/certs"
-ca_server_intermediate_path_crl: "{{ ca_server_intermediate_path }}/crl"
 ca_server_intermediate_path_csr: "{{ ca_server_intermediate_path }}/csr"
 ca_server_intermediate_key_password: password
 

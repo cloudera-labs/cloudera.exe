@@ -14,9 +14,7 @@
 
 ---
 
-keytool_path: /usr/bin/keytool
 openssl_path: /usr/bin/openssl
-update_ca_trust_path: /usr/bin/update-ca-trust
 
 base_dir_security: /opt/cloudera/security
 base_dir_security_pki: "{{ base_dir_security }}/pki"
@@ -33,11 +31,4 @@ tls_ca_chain_path: "{{ base_dir_security_pki }}/chain.pem"
 tls_keystore_path: "{{ base_dir_security_pki }}/{{ inventory_hostname }}.jks"
 tls_keystore_password: changeme
 
-tls_truststore_path: "{{ base_dir_security_pki }}/truststore.jks"
-tls_uber_truststore_path: "{{ base_dir_security_pki }}/full_truststore.jks"
-tls_truststore_password: changeme
-
-jdk_java_cacerts_password: changeit
-
-__temp_keychain: "{{ base_dir_security_pki }}/tmp_keychain.pem"
 __temp_keystore: "{{ base_dir_security_pki }}/tmp_keystore.p12"
