@@ -33,18 +33,11 @@ argument_specs:
         description: "Flag to specify if the CSRs should be copied from the Ansible controller."
         type: "bool"
         default: true
-      override_old_certs:
+      backup_old_certs:
         description:
-          - Flag to specify if existing signed certs of the same name should be overridden.
-          - If C(true) then a backup of the existing certs are taken to the location specified by C(cert_backup_directory).
+          - Flag to specify if existing signed certs of the same name should be backed up.
         type: "bool"
         default: true
-      cert_backup_directory:
-        description:
-          - Directory where existing signed certs should be backed up.
-          - Used if the C(override_old_certs) is set to C(true).
-        type: "str"
-        default: "{{ ca_server_intermediate_path }}/cert_backup_{{ ansible_date_time.iso8601 | default('')}}"
       ca_server_intermediate_path:
         description: Common base directory for all intermediate CA resources
         type: "str"

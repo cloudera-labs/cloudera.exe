@@ -26,12 +26,14 @@
   loop_control:
     loop_var: dir
 
-- ansible.builtin.set_fact:
+- name: Read subject attribute from certificate DN template file
+  ansible.builtin.set_fact:
     subject_attr: "{{ lookup('template', 'certificate_dn.j2') | from_yaml }}"
 
-- ansible.builtin.set_fact:
-    openssl_subject: "/{{ subject_attr | map('regex_replace', '/', '\\/') | join('/') }}"
-    keytool_subject: "{{ subject_attr | map('regex_replace', ',', '\\,') | join(',') }}"
+- name: Derive openssl subjects from subject attribute
+  ansible.builtin.set_fact:
+    openssl_subject: "{{ openssl_subject | default({}) | combine( {item.split('=')[0] : item.split('=')[1]}) }}"
+  loop: "{{ subject_attr }}" 
 
 - name: Create openssl.cnf for CSR generation
   ansible.builtin.template:
@@ -41,16 +43,22 @@
     mode: 0644
 
 - name: Generate CSR
-  ansible.builtin.shell:
-    cmd: >
-      {{ openssl_path }} req
-      -key {{ tls_key_path }}
-      -passin pass:{{ tls_key_password }}
-      -subj "{{ openssl_subject }}"
-      -config {{ tls_csr_config_path }}
-      -new
-      -out {{ tls_csr_path }}
-    creates: "{{ tls_csr_path }}"
+  community.crypto.openssl_csr:
+    path: "{{ tls_csr_path }}"
+    privatekey_path: "{{ tls_key_path }}"
+    privatekey_passphrase: "{{ tls_key_password }}"
+    subject: "{{ openssl_subject }}"
+    backup: true
+    basic_constraints:
+      - "CA:FALSE"
+    keyUsage:
+      - "nonRepudiation"
+      - "digitalSignature"
+      - "keyEncipherment"
+    extendedKeyUsage:
+      - "serverAuth"
+      - "clientAuth"
+    subject_alt_name: "DNS:{{ inventory_hostname }}"
 
 - name: Bring CSRs back to controller
   ansible.builtin.fetch:

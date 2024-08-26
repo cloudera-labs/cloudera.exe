@@ -21,7 +21,8 @@
     path: "{{ local_tls_signed_certs_dir }}/{{ inventory_hostname }}.pem"
   register: signed_cert
 
-- ansible.builtin.fail:
+- name: Fail is the signed certificate is not available for this host
+  ansible.builtin.fail:
     msg: >
       "Signed cert for {{ inventory_hostname }} could not be found. If manual signing is
       required, do this now and re-run the playbook with 'tls_signed_certs_dir' variable set.
@@ -45,18 +46,24 @@
     group: root
 
 - name: Validate certificate
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: "{{ openssl_path }} verify -verbose -CAfile {{ tls_ca_chain_path }} {{ tls_cert_path }}"
 
 # Update the keystore with the renewed cert
 # Reference: https://support.smartbear.com/collaborator/faq/how-to-update-an-expired-certificate-in-the-existi/
 # ....Step 1: Create chain including signed host cert
 # ....Step 2: Create PKCS12 keystore with chain and key. Alias name is {{ inventory_hostname }}
-# NOTE: Step 1 & 2 are handled by the task below
+# NOTE: Step 1 & 2 are handled by the tasks below
+- name: Create temporary keystore file name 
+  ansible.builtin.tempfile:
+    state: file
+    suffix: tmp_keystore.p12
+  register: __pvc_tls_temp_keystore
+
 - name: Generate a temporary PKCS12 keystore with renewed cert
   community.crypto.openssl_pkcs12:
     action: export
-    path: "{{ __temp_keystore }}"
+    path: "{{ __pvc_tls_temp_keystore.path }}"
     passphrase: "{{ tls_keystore_password }}"
     friendly_name: "{{ keystore_alias | default(inventory_hostname) }}"
     privatekey_path: "{{ tls_key_path_plaintext_generic }}"
@@ -68,7 +75,7 @@
 # ....Step 3: Update the {{ tls_keystore_path }} with the above keystore
 - name: Import the temporary keystore to {{ tls_keystore_path }}
   community.general.java_cert:
-    pkcs12_path: "{{ __temp_keystore }}"
+    pkcs12_path: "{{ __pvc_tls_temp_keystore.path }}"
     pkcs12_alias: "{{ keystore_alias | default(inventory_hostname) }}"
     pkcs12_password: "{{ tls_keystore_password }}"
     cert_alias: "{{ keystore_alias | default(inventory_hostname) }}"
@@ -79,5 +86,5 @@
 
 - name: Remove the temporary keystore
   ansible.builtin.file:
-    path: "{{ __temp_keystore }}"
+    path: "{{ __pvc_tls_temp_keystore.path }}"
     state: absent

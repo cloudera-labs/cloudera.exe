@@ -17,13 +17,13 @@
 # csrs_to_sign:
 copy_from_controller: True
 
-keytool_path: /usr/bin/keytool
-openssl_path: /usr/bin/openssl
-
 ca_server_intermediate_path: /ca/intermediate
-ca_server_intermediate_path_certs: "{{ ca_server_intermediate_path }}/certs"
-ca_server_intermediate_path_csr: "{{ ca_server_intermediate_path }}/csr"
-ca_server_intermediate_key_password: password
+ca_server_intermediate_private_key: "{{ ca_server_intermediate_path }}/private/intermediate.key.pem"
+ca_server_intermediate_private_key_password: password
 
-override_old_certs: True
-cert_backup_directory: "{{ ca_server_intermediate_path }}/cert_backup_{{ ansible_date_time.iso8601 | default('')}}"
+ca_server_intermediate_path_certs: "{{ ca_server_intermediate_path }}/certs"
+ca_server_intermediate_cert: "{{ ca_server_intermediate_path_certs }}/intermediate.cert.pem"
+
+ca_server_intermediate_path_csr: "{{ ca_server_intermediate_path }}/csr"
+
+backup_old_certs: True

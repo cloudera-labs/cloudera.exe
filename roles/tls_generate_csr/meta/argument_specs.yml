@@ -23,10 +23,6 @@ argument_specs:
     author:
       - "Jim Enright <jenright@cloudera.com>"
     options:
-      openssl_path:
-        description: "Absolute path to the C(openssl) executable"
-        default: "/usr/bin/openssl"
-        type: "str"
       base_dir_security:
         description: "Base directory for Cloudera CDP security related files"
         type: "str"

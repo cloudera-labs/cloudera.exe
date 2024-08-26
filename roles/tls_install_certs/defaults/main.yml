@@ -25,10 +25,8 @@ tls_cert_path_generic: "{{ base_dir_security_pki }}/host.pem"
 tls_key_path_generic: "{{ base_dir_security_pki }}/host.key"
 tls_key_path_plaintext_generic: "{{ tls_key_path_generic }}.unenc"
 
-
 tls_ca_chain_path: "{{ base_dir_security_pki }}/chain.pem"
 
 tls_keystore_path: "{{ base_dir_security_pki }}/{{ inventory_hostname }}.jks"
 tls_keystore_password: changeme
 
-__temp_keystore: "{{ base_dir_security_pki }}/tmp_keystore.p12"

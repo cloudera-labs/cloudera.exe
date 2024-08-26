@@ -24,9 +24,6 @@
         prefix: pvc_tls_
       register: __pvc_tls_tempdir
 
-    - debug:
-        var: __pvc_tls_tempdir
-
     - name: Create a directory for csrs and signed certs
       ansible.builtin.file:
         path: "{{ [__pvc_tls_tempdir.path, item] | path_join }}"
@@ -87,7 +84,7 @@
 
   - name: Call tls_install_certs role
     ansible.builtin.import_role:
-      name: cloudera.exetls_install_certs
+      name: cloudera.exe.tls_install_certs
     vars:
       local_tls_signed_certs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'certs') | path_join }}"
 
