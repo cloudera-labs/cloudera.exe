@@ -17,7 +17,6 @@ openssl_path: /usr/bin/openssl
 
 base_dir_security: /opt/cloudera/security
 base_dir_security_pki: "{{ base_dir_security }}/pki"
-tls_csr_config_path: "{{ base_dir_security_pki }}/csr.cnf"
 tls_csr_path: "{{ base_dir_security_pki }}/{{ inventory_hostname }}.csr"
 
 # local_csrs_dir: "/tmp/csrs"

@@ -35,13 +35,6 @@
     openssl_subject: "{{ openssl_subject | default({}) | combine( {item.split('=')[0] : item.split('=')[1]}) }}"
   loop: "{{ subject_attr }}"
 
-- name: Create openssl.cnf for CSR generation
-  ansible.builtin.template:
-    src: csr.cnf.j2
-    dest: "{{ tls_csr_config_path }}"
-    owner: root
-    mode: 0644
-
 - name: Generate CSR
   community.crypto.openssl_csr:
     path: "{{ tls_csr_path }}"
