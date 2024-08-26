@@ -34,56 +34,18 @@
     mode: 0644
   loop: "{{ __csrs_to_sign }}"
 
-- name: Backup and remove old certs if required
-  when: override_old_certs
-  block:
-    - name: Create backup directory for old certs
-      ansible.builtin.file:
-        path: "{{ cert_backup_directory }}"
-        state: directory
-        mode: '0755'
-
-    - name: Backup old certs
-      block:
-        - name: Check if cert exists
-          ansible.builtin.stat:
-            path: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
-          loop: "{{ __csrs_to_sign }}"
-          register: __old_certs
-
-        - name: Copy existing certs to backup directory
-          when: item.stat.exists
-          ansible.builtin.copy:
-            src:  "{{ item.stat.path }}"
-            dest:  "{{ cert_backup_directory }}"
-            remote_src: True
-          loop: "{{ __old_certs.results }}"
-
-        - name: Remove old certs
-          when: item.stat.exists
-          ansible.builtin.file:
-            path: "{{ item.stat.path }}"
-            state: absent
-          loop: "{{ __old_certs.results }}"
-
 - name: Sign CSRs
-  ansible.builtin.shell:
-    executable: /bin/bash
-    cmd: >
-      exec 100>/tmp/ca_server.lock;
-      flock 100 &&
-      {{ openssl_path }} ca
-      -batch
-      -config {{ ca_server_intermediate_path }}/openssl.cnf
-      -extensions cloudera_req
-      -days 730
-      -notext
-      -md sha256
-      -in {{ ca_server_intermediate_path_csr }}/{{ item.csr_filename }}
-      -out {{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem
-      -passin pass:{{ ca_server_intermediate_key_password }}
-    creates: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
+  community.crypto.x509_certificate:
+    path: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
+    csr_path: "{{ ca_server_intermediate_path_csr }}/{{ item.csr_filename }}"
+    backup: "{{ backup_old_certs }}"
+    provider: ownca
+    ownca_path: "{{ ca_server_intermediate_cert }}"
+    ownca_privatekey_path: "{{ ca_server_intermediate_private_key }}"
+    ownca_privatekey_passphrase: "{{ ca_server_intermediate_private_key_password }}"
+    selfsigned_not_after: "+730d"
   loop: "{{ __csrs_to_sign }}"
+  register: __signed_certs
 
 - name: Bring signed certs back to controller
   ansible.builtin.fetch:
