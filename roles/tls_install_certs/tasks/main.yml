@@ -54,7 +54,7 @@
 # ....Step 1: Create chain including signed host cert
 # ....Step 2: Create PKCS12 keystore with chain and key. Alias name is {{ inventory_hostname }}
 # NOTE: Step 1 & 2 are handled by the tasks below
-- name: Create temporary keystore file name 
+- name: Create temporary keystore file name
   ansible.builtin.tempfile:
     state: file
     suffix: tmp_keystore.p12

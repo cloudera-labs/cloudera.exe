@@ -33,7 +33,7 @@
 - name: Derive openssl subjects from subject attribute
   ansible.builtin.set_fact:
     openssl_subject: "{{ openssl_subject | default({}) | combine( {item.split('=')[0] : item.split('=')[1]}) }}"
-  loop: "{{ subject_attr }}" 
+  loop: "{{ subject_attr }}"
 
 - name: Create openssl.cnf for CSR generation
   ansible.builtin.template:

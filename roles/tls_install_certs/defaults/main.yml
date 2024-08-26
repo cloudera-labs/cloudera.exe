@@ -29,4 +29,3 @@ tls_ca_chain_path: "{{ base_dir_security_pki }}/chain.pem"
 
 tls_keystore_path: "{{ base_dir_security_pki }}/{{ inventory_hostname }}.jks"
 tls_keystore_password: changeme
-
