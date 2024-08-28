@@ -63,7 +63,7 @@
     query: 'InstanceTypeOfferings[].InstanceType'
 
 - name: Find AMI for Dynamic Inventory Deployment
-  when: infra__dynamic_inventory_count
+  when: infra__dynamic_inventory_count | int > 0
   block:
     - name: List suitable AMIs within our region
       amazon.aws.ec2_ami_info:
