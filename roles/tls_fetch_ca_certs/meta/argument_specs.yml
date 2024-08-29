@@ -1,0 +1,44 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+
+argument_specs:
+  main:
+    short_description: "Bring CA root and intermediate cert back to controller"
+    description:
+      - Fetch the named root and intermediate CA TLS Certificates from the CA Server.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    options:
+      ca_server_intermediate_path:
+        description: "Path to intermediate CA cert on the CA server"
+        default: "/ca/intermediate/certs"
+        type: "str"
+      ca_server_intermediate_cert_name:
+        description: "Name of the intermediate CA cert file"
+        type: "str"
+        default: "intermediate.cert.pem"
+      ca_server_root_path:
+        description: "Path to root CA cert on the CA server"
+        default: "/ca/certs"
+        type: "str"
+      ca_server_root_cert_name:
+        description: "Name of the root CA cert file"
+        type: "str"
+        default: "ca.cert.pem"
+      local_ca_certs_dir:
+        description: "Directory on Ansible controller to store the root and intermediate CA cert files"
+        type: "str"
+        required: true

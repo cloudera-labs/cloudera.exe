@@ -1,0 +1,65 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+
+argument_specs:
+  main:
+    short_description: "Copy and install the signed TLS certificates to each cluster"
+    description:
+      - Copies the signed TLS cert to each cluster host.
+      - Updates the Java keystore with the renewed certificate
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    options:
+      openssl_path:
+        description: "Absolute path to the C(openssl) executable"
+        default: "/usr/bin/openssl"
+        type: "str"
+      base_dir_security:
+        description: "Base directory for Cloudera CDP security related files"
+        type: "str"
+        default: "/opt/cloudera/security"
+      base_dir_security_pki:
+        description: "Base directory for Cloudera CDP PKI security related files"
+        type: "str"
+        default: "{{ base_dir_security }}/pki"
+      tls_cert_path:
+        description: "Location where the signed TLS certificate should be copied."
+        type: "str"
+        default: "{{ base_dir_security_pki }}/{{ inventory_hostname }}.pem"
+      tls_cert_path_generic:
+        description: "Host agnostic file name for the signed TLS certificate"
+        type: "str"
+        default: "{{ base_dir_security_pki }}/host.pem"
+      tls_key_path_generic:
+        description: "Host agnostic file name for the encrypted TLS key"
+        type: "str"
+        default: "{{ base_dir_security_pki }}/host.key"
+      tls_key_path_plaintext_generic:
+        description: "Host agnostic file name for the unencrypted TLS key"
+        type: "str"
+        default: "{{ tls_key_path_generic }}.unenc"
+      tls_ca_chain_path:
+        description: "Full path to the TLS CA chain file"
+        type: "str"
+        default: "{{ base_dir_security_pki }}/chain.pem"
+      tls_keystore_path:
+        description: "Full path to Java Keystore file"
+        type: "str"
+        default: "{{ base_dir_security_pki }}/{{ inventory_hostname }}.jks"
+      tls_keystore_password:
+        description: "Password for the Java Keystore"
+        type: "str"
+        default: "changeme"
