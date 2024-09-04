@@ -29,4 +29,6 @@ base_dir_security_pki: "{{ base_dir_security }}/pki"
 
 tls_chain_path: "{{ base_dir_security_pki }}/chain.pem"
 tls_cert_path_generic: "{{ base_dir_security_pki }}/host.pem"
+
+tls_key_path_generic: "{{ base_dir_security_pki }}/host.key"
 tls_key_path_plaintext_generic: "{{ tls_key_path_generic }}.unenc"
