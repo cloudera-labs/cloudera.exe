@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Install keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+
 - name: Install PostgreSQL repository key
-  ansible.builtin.apt_key:
+  ansible.builtin.get_url:
     url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
-    state: present
+    dest: /etc/apt/keyrings/postgresql.asc
   when: not skip_rdbms_repo_setup
 
 - name: Install PostgreSQL repository
   ansible.builtin.apt_repository:
-    repo: "deb https://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/postgresql.asc] https://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
     state: present
   when: not skip_rdbms_repo_setup
 

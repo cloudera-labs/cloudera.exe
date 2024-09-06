@@ -18,7 +18,7 @@
     suffix: "-sql"
   register: __sql
 
-- name: Allow allow access for the postgres user
+- name: Enable access for the postgres user
   ansible.builtin.file:
     path: "{{ __sql.path }}"
     owner: postgres
