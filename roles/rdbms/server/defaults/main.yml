@@ -18,17 +18,12 @@ database_tls: false
 database_type: postgresql
 database_version: 14
 
-skip_rdbms_repo_setup: False
+skip_rdbms_repo_setup: false
 
 # MYSQL
 mysql_require_secure_transport: "OFF"  # If TLS-enabled, honor or not
 
-# From cloudera.cluster.infrastructure.ca_common
-base_dir_security: /opt/cloudera/security
-base_dir_security_pki: "{{ base_dir_security }}/pki"
-
+base_dir_security_pki: "/opt/cloudera/security/pki"
 tls_chain_path: "{{ base_dir_security_pki }}/chain.pem"
 tls_cert_path_generic: "{{ base_dir_security_pki }}/host.pem"
-
-tls_key_path_generic: "{{ base_dir_security_pki }}/host.key"
-tls_key_path_plaintext_generic: "{{ tls_key_path_generic }}.unenc"
+tls_key_path_plaintext_generic: "{{ base_dir_security_pki }}/host.key.unenc"
