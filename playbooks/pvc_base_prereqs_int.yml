@@ -140,7 +140,9 @@
   become: yes
   roles:
     - role: cloudera.cluster.prereqs.kerberos
-      when: krb5_kdc_host is defined or 'krb5_server' in groups
+      when: 
+        - krb5_kdc_host is defined or 'krb5_server' in groups
+        - not (freeipa_sidecar is defined and freeipa_sidecar)
   tags:
     - kerberos
     - prereqs
