@@ -1,0 +1,74 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+
+argument_specs:
+  main:
+    short_description: Install standalone RDBMS instance
+    description:
+      - Install and configure a standalone RDBMS instance for use with Cloudera Manager.
+      - Database options include PostgreSQL, MySQL, and MariaDB.
+      - Supports TLS connections.
+    options:
+      database_tls:
+        description: Flag to enable TLS configuration.
+        type: bool
+        default: false
+      database_type:
+        description: Database product to install.
+        type: str
+        required: false
+        default: postgresql
+        choices:
+          - postgresql
+          - mysql
+          - mariadb
+      database_version:
+        description: Database product version to install.
+        type: str
+        required: false
+        default: 14
+      skip_rdbms_repo_setup:
+        description: Flag to enable RDBMS repository set up on target host.
+        type: bool
+        required: false
+        default: false
+      mysql_require_secure_transport:
+        description: Value for the C(require_secure_transport) parameter in the C([mysqld]) configuration. (MySQL only)
+        type: str
+        required: false
+        default: "OFF"
+      base_dir_security_pki:
+        description:
+          - Directory on target host housing typical PKI files.
+          - Used to establish a base directory for the other TLS options.
+        type: path
+        required: false
+        default: "/opt/cloudera/security/pki"
+      tls_chain_path:
+        description: File on the target host consisting of an ordered list of certificates, including TLS certificates and Certificate Authority (CA) certificates.
+        type: path
+        required: false
+        default: "O(base_dir_security_pki)/chain.pem"
+      tls_cert_path_generic:
+        description: File on the target host consisting of the TLS certificate for the server.
+        type: path
+        required: false
+        default: "O(base_dir_security_pki)/host.pem"
+      tls_key_path_plaintext_generic:
+        description: File on the target host consisting of the unencrypted TLS private key for the server.
+        type: path
+        required: false
+        default: "O(base_dir_security_pki)/host.key.unenc"
