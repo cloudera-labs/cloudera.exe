@@ -14,14 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Tear down external storage location policies
-  ansible.builtin.include_tasks: "teardown_{{ data__infra_type }}_policies.yml"
-  loop: "{{ __data_storage_read_only | union(__data_storage_read_write) }}"
-  loop_control:
-    loop_var: __data_storage
-
-- name: Tear down external storage location access roles
-  ansible.builtin.include_tasks: "teardown_{{ data__infra_type }}_roles.yml"
+- name: Tear down external storage locations
+  ansible.builtin.include_tasks: "teardown_{{ data__infra_type }}.yml"
   loop: "{{ __data_storage_read_only | union(__data_storage_read_write) }}"
   loop_control:
     loop_var: __data_storage

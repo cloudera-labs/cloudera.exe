@@ -1,6 +1,6 @@
 ---
 
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,12 +34,12 @@
         __data_role_name: "{{ __data_storage.role.datalake_admin | default(True) | ternary(data__aws_datalake_admin_role_name, __data_role_name_default) }}"
         __data_role_name_default: "{{ [data__namespace, data__external_data_suffix, __data_storage.role.suffix | default(data__aws_role_suffix)] | join('-') }}"
 
-    - name: Query the external data AWS role
+    - name: Query the external data AWS role 
       community.aws.iam_role_info:
         region: "{{ data__region }}"
         name: "{{ __data_aws_access_role_name }}"
       register: __data_aws_access_role_info
-
+        
     - name: Set facts for existing managed policies for external data AWS role
       when: __data_aws_access_role_info.iam_roles | length > 0
       ansible.builtin.set_fact:
@@ -68,4 +68,20 @@
       community.aws.iam_managed_policy:
         region: "{{ data__region }}"
         policy_name: "{{ __data_aws_external_policy_name }}"
+        state: absent
+
+- name: Tear down AWS external role
+  when: __data_storage.role.delete | default(data__teardown_deletes_roles)
+  block:
+    - name: Set fact for external data AWS role name
+      ansible.builtin.set_fact:
+        __data_aws_access_role_name: "{{ __data_storage.role.name | default(__data_role_name) }}"
+      vars:
+        __data_role_name: "{{ __data_storage.role.datalake_admin | default(True) | ternary(data__aws_datalake_admin_role_name, __data_role_name_default) }}"
+        __data_role_name_default: "{{ [data__namespace, data__external_data_suffix, __data_storage.role.suffix | default(data__aws_role_suffix)] | join('-') }}"
+
+    - name: Delete external data AWS role
+      community.aws.iam_role:
+        region: "{{ data__region }}"
+        name: "{{ __data_aws_access_role_name }}"
         state: absent
