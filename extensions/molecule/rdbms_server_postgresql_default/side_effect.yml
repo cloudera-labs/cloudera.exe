@@ -14,13 +14,18 @@
 
 - name: Add test users to PostgreSQL
   hosts: all
-  gather_facts: no
+  gather_facts: yes
   become: yes
-  become_user: postgres
   tasks:
+
+    - name: Install PostgreSQL Python library
+      ansible.builtin.pip:
+        name: psycopg2-binary
+
     - name: Create test database
       community.postgresql.postgresql_db:
         name: test
+      become_user: postgres
 
     - name: Add authorized user
       community.postgresql.postgresql_user:
@@ -28,6 +33,7 @@
         name: user_one
         password: authorized
         comment: Authorized User
+      become_user: postgres
 
     - name: Add non-authorized user
       community.postgresql.postgresql_user:
@@ -35,3 +41,4 @@
         name: user_two
         password: ""
         comment: Unauthorized User
+      become_user: postgres
