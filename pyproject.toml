@@ -27,6 +27,7 @@ testpaths = [
 ]
 filterwarnings = [
   "ignore:AnsibleCollectionFinder has already been configured",
+  "ignore:'crypt' is deprecated and slated for removal in Python 3.13:DeprecationWarning",
 ]
 
 [build-system]
