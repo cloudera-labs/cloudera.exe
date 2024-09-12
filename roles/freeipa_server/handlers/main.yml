@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: restart host
-  ansible.builtin.reboot:
+- name: restart network
+  ansible.builtin.service:
+    name: NetworkManager
+    state: restarted
 
 - name: restart dns
   ansible.builtin.service:
