@@ -35,7 +35,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Download the PR number artifact
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
@@ -67,3 +67,15 @@ jobs:
         with:
           labels: validated
           number: ${{ steps.read.outputs.pr_number }}
+
+      - name: "Label the PR (replacement)"
+        uses: "actions/github-script@v7"
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              name: 'validated'
+            });
+        if: github.event_name == 'pull_request'
