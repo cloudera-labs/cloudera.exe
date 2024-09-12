@@ -27,7 +27,7 @@
     loop_var: __data_store_azure_location
  
 - name: Process Azure role assignments for external data storage locations
-  azure.azcollection.azure_rm_roleassignment: # This Azure module is not idempotent on removals
+  azure.azcollection.azure_rm_roleassignment:
     state: present
     scope: "{{ __azure_data_location_assignment.scope }}"
     name: "{{ __azure_data_location_assignment.name }}"
@@ -36,3 +36,7 @@
   loop: "{{ __azure_data_location_storage_assignments }}"
   loop_control:
     loop_var: __azure_data_location_assignment
+  register: __data_azure_assignment_results
+  until: __data_azure_assignment_results is not failed
+  retries: 3
+  delay: 3

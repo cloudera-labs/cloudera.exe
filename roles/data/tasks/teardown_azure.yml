@@ -28,7 +28,7 @@
   when: __data_storage.assignment.delete | default(data__teardown_deletes_assignments)
   block:
     - name: Process Azure role assignment removal for external data storage locations
-      azure.azcollection.azure_rm_roleassignment: # This Azure module is not idempotent on removals
+      azure.azcollection.azure_rm_roleassignment:
         state: absent
         scope: "{{ __azure_data_location_assignment.scope }}"
         assignee_object_id: "{{ __azure_data_location_assignment.assignee }}"
