@@ -35,7 +35,7 @@
         login_user: user_one
         login_password: authorized
         ssl_mode: verify-ca
-        ca_cert: ca-certificate.pem
+        ca_cert: ./ca-certificate.pem
       delegate_to: localhost
       register: authorized_user
       failed_when: not authorized_user.is_available
@@ -48,6 +48,7 @@
         login_user: user_two
         login_password: no_password_is_set
         ssl_mode: verify-ca
+        ca_cert: ./ca-certificate.pem
       delegate_to: localhost
       register: not_authorized_user
       failed_when: not_authorized_user.is_available

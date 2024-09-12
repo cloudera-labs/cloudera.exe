@@ -18,7 +18,7 @@
   tasks:
     - name: Create CA private key
       community.crypto.openssl_privatekey:
-        path: ca-certificate.key
+        path: ./ca-certificate.key
         mode: 0600
 
     - name: Create CSR for CA certificate
@@ -36,7 +36,7 @@
 
     - name: Create self-signed CA certificate from CSR
       community.crypto.x509_certificate:
-        path: ca-certificate.pem
+        path: ./ca-certificate.pem
         csr_content: "{{ __ca_csr.csr }}"
         privatekey_path: ca-certificate.key
         provider: selfsigned

@@ -45,7 +45,16 @@ dependency:
   name: galaxy
   options:
     requirements-file: requirements.yml
+    collections-path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
+    role-file: requirements.yml
+    roles-path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
 provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      collections_path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
+  ansible_args:
+    - -vvv
   playbooks:
     converge: ../rdbms_server_postgresql_default/converge.yml
     prepare: prepare.yml
@@ -78,7 +87,7 @@ scenario:
     - create
     - prepare
     - converge
-    # - idempotence  # geerlinguy.postgresql has non-ideopotent tasks, too.
+    # - idempotence  # geerlinguy.postgresql has non-idempotent tasks, too.
     - side_effect
     - verify
     - cleanup
