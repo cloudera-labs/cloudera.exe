@@ -21,6 +21,14 @@ dependencies = [
 ]
 installer = "uv"
 
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
+filterwarnings = [
+  "ignore:AnsibleCollectionFinder has already been configured",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
