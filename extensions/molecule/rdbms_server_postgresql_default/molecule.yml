@@ -19,25 +19,40 @@ driver:
 platforms:
   - name: rhel9.4
     image: ubi9/ubi:9.4
-    pre_build_image: true
+    dockerfile: ../default/Dockerfile-rhel.j2
     command: /sbin/init
+    published_ports:
+      - 0.0.0.0:6432:5432/tcp
   - name: rhel8.10
     image: ubi8/ubi:8.10
-    pre_build_image: true
+    dockerfile: ../default/Dockerfile-rhel.j2
     command: /sbin/init
+    published_ports:
+      - 0.0.0.0:7432:5432/tcp
   - name: ubuntu22.04
     image: ubuntu:22.04
-    pre_build_image: true
-    command: /sbin/init
+    dockerfile: ../default/Dockerfile-ubuntu.j2
+    command: /lib/systemd/systemd
+    published_ports:
+      - 0.0.0.0:8432:5432/tcp
   - name: ubuntu20.04
     image: ubuntu:20.04
-    pre_build_image: true
-    command: /sbin/init
+    dockerfile: ../default/Dockerfile-ubuntu.j2
+    command: /lib/systemd/systemd
+    published_ports:
+      - 0.0.0.0:9432:5432/tcp
 dependency:
   name: galaxy
   options:
     requirements-file: requirements.yml
+    collections-path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
+    role-file: requirements.yml
+    roles-path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
 provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      collections_path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
   inventory:
     host_vars:
       rhel9.4:
@@ -57,7 +72,7 @@ scenario:
     - create
     - prepare
     - converge
-    # - idempotence  # geerlinguy.postgresql has non-ideopotent tasks, too.
+    # - idempotence  # geerlinguy.postgresql has non-idempotent tasks, too.
     - side_effect
     - verify
     - cleanup
