@@ -26,9 +26,11 @@ data__storage:                                "{{ data.storage | default([]) }}"
 data__external_data_suffix:                   "{{ common__external_data_suffix }}"
 data__policy_suffix:                          "{{ data.policy.suffix | default(common__policy_suffix) }}"
 data__role_suffix:                            "{{ data.role.suffix | default(common__role_suffix) }}"
+data__assignment_suffix:                      "{{ data.assignment.suffix | default(common__assignment_suffix) }}"
 
 data__teardown_deletes_policies:              "{{ data.teardown.delete_policies | default(False) }}"
 data__teardown_deletes_roles:                 "{{ data.teardown.delete_roles | default(False) }}"
+data__teardown_deletes_assignments:           "{{ data.teardown.delete_assignments | default(False) }}"
 
 # AWS
 data__aws_policy_suffix:                      "{{ data.policy.aws.suffix | default(data__policy_suffix) }}"
@@ -42,3 +44,10 @@ data__aws_read_write_policy_url:              "{{ data.policy.aws.read_write.url
 
 data__aws_idbroker_role_name:                 "{{ common__aws_idbroker_role_name }}"
 data__aws_datalake_admin_role_name:           "{{ common__aws_datalake_admin_role_name }}"
+
+# Azure
+data__azure_metagroup_name:                   "{{ common__azure_metagroup_name }}"
+data__azure_contributor_name_suffix:          "{{ common__azure_contributor_name_suffix }}"
+data__azure_reader_name_suffix:               "{{ env.azure.role.name_suffix.reader | default('reader') }}"
+data__azure_datalakeadmin_identity_name:      "{{ common__azure_datalakeadmin_identity_name }}"
+data__azure_assignment_suffix:                "{{ data.assignment.azure.suffix | default(data__assignment_suffix) }}"

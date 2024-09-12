@@ -1,0 +1,44 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# TODO: This can move to initialize, as it is shared between setup and teardown for Azure
+
+# Outer loop variable: __data_storage
+# Inner loop variable: __data_store_azure_location
+
+- name: Resolve location-specific Resource Group URI
+  when: __data_store_azure_location.resource_group is defined
+  azure.azcollection.azure_rm_resourcegroup_info:
+    name: "{{ __data_store_azure_location.resource_group }}"
+  register: __azure_data_location_resource_metagroup_info
+
+- name: Set fact Azure Resource Group URI
+  ansible.builtin.set_fact:
+    __azure_data_location_metagroup_uri: "{{ __azure_data_location_resource_metagroup_info.resourcegroups[0].id | default(data__azure_metagroup_uri) }}"
+
+- name: Set fact Azure data storage assignment name
+  ansible.builtin.set_fact:
+    __azure_data_location_assignment_name: "{{ [data__namespace, __data_store.read_only | default(False) | ternary(data__azure_reader_name_suffix, data__azure_contributor_name_suffix), __data_store_azure_location.storage_account, __data_store_azure_location.container, __data_store_azure_location.assignment.azure.suffix | default(data__azure_assignment_suffix)] | join('-') }}"
+
+- name: Set fact for Azure storage location Role Assignments
+  ansible.builtin.set_fact:
+    __azure_data_location_storage_assignments: "{{ __azure_data_location_storage_assignments | default([]) | union([entry]) }}"
+  vars:
+    entry:
+      name: "{{ __azure_data_location_assignment_name | to_uuid }}"
+      scope: "{{ __azure_data_location_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ __data_store_azure_location.storage_account }}/blobServices/default/containers/{{ __data_store_azure_location.container }}"
+      assignee: "{{ __azure_datalakeadmin_identity_uuid }}"
+      desc: external data location assignment

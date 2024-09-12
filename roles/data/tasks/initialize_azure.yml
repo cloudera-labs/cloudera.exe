@@ -1,0 +1,76 @@
+---
+
+# Copyright 2021 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Get Azure Resource Group matching Namespace, if exists
+  azure.azcollection.azure_rm_resourcegroup_info:
+    name: "{{ data__azure_metagroup_name }}"
+  register: __azure_resource_metagroup_info
+
+- name: Set fact Azure Resource Group URI, if exists
+  ansible.builtin.set_fact:
+    data__azure_metagroup_uri: "{{ __azure_resource_metagroup_info.resourcegroups[0].id | default('') }}"
+
+- name: Query for the Azure Datalake Admin Identity 
+  command: "az identity list -g {{ data__azure_metagroup_name }}"
+  register: __azure_identity_list
+  failed_when: __azure_identity_list.rc != 0
+  delay: 5
+  retries: 10
+  until:
+    #- plat__azure_idbroker_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    - data__azure_datalakeadmin_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    #- plat__azure_log_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+    #- plat__azure_ranger_audit_identity_name in ( __azure_identity_list.stdout | from_json | community.general.json_query('[*].name') )
+
+- name: Extract Azure Identity Principals
+  ansible.builtin.set_fact:
+    #__azure_idbroker_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_idbroker_uuid) | first }}"
+    #__azure_idbroker_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_idbroker_uri) | first }}"
+    __azure_datalakeadmin_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_dtadmin_uuid) | first }}"
+    #__azure_datalakeadmin_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_dtadmin_uri) | first }}"
+    #__azure_log_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_log_rl_uuid) | first }}"
+    #__azure_log_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_log_rl_uri) | first }}"
+    #__azure_ranger_audit_identity_uuid: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_rngr_rl_uuid) | first }}"
+    #__azure_ranger_audit_identity_uri: "{{ __azure_identity_list.stdout | from_json | community.general.json_query(jq_rngr_rl_uri) | first }}"
+  vars:
+    #jq_idbroker_uuid: "[?name=='{{ plat__azure_idbroker_identity_name }}'].principalId"
+    #jq_idbroker_uri: "[?name=='{{ plat__azure_idbroker_identity_name }}'].id"
+    jq_dtadmin_uuid: "[?name=='{{ data__azure_datalakeadmin_identity_name }}'].principalId"
+    #jq_dtadmin_uri: "[?name=='{{ data__azure_datalakeadmin_identity_name }}'].id"
+    #jq_log_rl_uuid: "[?name=='{{ plat__azure_log_identity_name }}'].principalId"
+    #jq_log_rl_uri: "[?name=='{{ plat__azure_log_identity_name }}'].id"
+    #jq_rngr_rl_uuid: "[?name=='{{ plat__azure_ranger_audit_identity_name }}'].principalId"
+    #jq_rngr_rl_uri: "[?name=='{{ plat__azure_ranger_audit_identity_name }}'].id"
+
+- name: Retrieve Storage Blob Data Contributor Role definition
+  azure_rm_roledefinition_info:
+    scope: data__azure_metagroup_uri
+    role_name: Storage Blob Data Contributor
+  register: __azure_storage_blob_data_contributor_info
+
+- name: Set fact Storage Blob Data Contributor Role URI
+  ansible.builtin.set_fact:
+    __azure_storage_blob_data_contributor_uri: "{{ __azure_storage_blob_data_contributor_info.id }}"
+
+- name: Get Storage Blob Data Reader Role definition
+  azure_rm_roledefinition_info:
+    scope: data__azure_metagroup_uri
+    role_name: Storage Blob Data Reader
+  register: __azure_storage_blob_data_reader_info
+
+- name: Set fact Storage Blob Data Reader Role URI
+  ansible.builtin.set_fact:
+    __azure_storage_blob_data_reader_uri: "{{ __azure_storage_blob_data_reader_info.id }}"

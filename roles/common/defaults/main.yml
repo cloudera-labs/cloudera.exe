@@ -54,6 +54,7 @@ common__group_suffix:                     "{{ globals.labels.group | default('gr
 common__admin_suffix:                     "{{ globals.labels.admin | default('admin') }}"
 common__user_suffix:                      "{{ globals.labels.user | default('user') }}"
 common__ngw_suffix:                       "{{ globals.labels.nat_gateway | default('ngw') }}"
+common__assignment_suffix:                "{{ globals.labels.assignment | default('assign') }}"
 
 common__unique_storage_name_suffix:       "{{ globals.storage.name | default((common__region + common__aws_profile) if 'aws' in common__infra_type else common__region) }}"
 
@@ -136,6 +137,11 @@ common__azure_netapp_account_name:        "{{ infra.azure.netapp.account.name | 
 common__azure_netapp_pool_name:           "{{ infra.azure.netapp.pool.name | default([common__namespace, common__azure_netapp_suffix, common__azure_pool_suffix] | join('-')) }}"
 common__azure_netapp_vol_name:            "{{ infra.azure.netapp.volume.name | default([common__namespace, common__azure_netapp_suffix, common__azure_volume_suffix] | join('-')) }}"
 common__azure_netapp_nfs_version:         "{{ infra.azure.netapp.nfs.version | default('3') }}"
+
+common__azure_contributor_name_suffix:          "{{ env.azure.role.name_suffix.contributor | default('contributor') }}"
+common__azure_identity_suffix:                  "{{ env.azure.role.label.identity | default(common__identity_suffix) }}"
+common__azure_datalake_admin_suffix:            "{{ env.azure.role.label.datalake_admin | default(common__datalake_admin_suffix) }}"
+common__azure_datalakeadmin_identity_name:      "{{ env.azure.role.name.datalake_admin | default([common__namespace, common__azure_datalake_admin_suffix, common__azure_identity_suffix] | join('-')) }}"
 
 # GCP Infra
 common__gcp_project:                      "{{ infra.gcp.project | default('gcp-se') }}"

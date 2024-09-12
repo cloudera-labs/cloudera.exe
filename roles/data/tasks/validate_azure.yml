@@ -14,5 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Validate external data storage locations
-  ansible.builtin.include_tasks: "validate_{{ data__infra_type }}.yml"
+- name: Confirm required data location parameters
+  ansible.builtin.assert:
+    that:
+      - __data_location.storage_account is defined
+      - __data_location.storage_account is string
+      - __data_location.container is defined
+      - __data_location.container is string
+    fail_msg: "Each Azure external data location must provide both 'storage_account' and 'container' names."
+    quiet: yes
+  loop: "{{ __data_storage.locations.azure }}"
+  loop_control:
+    loop_var: __data_location
