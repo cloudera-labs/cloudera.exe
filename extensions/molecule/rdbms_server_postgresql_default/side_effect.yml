@@ -17,8 +17,17 @@
   gather_facts: yes
   become: yes
   tasks:
+    - name: Install psycopg2 build prerequisites
+      when: 
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version == "8"
+      ansible.builtin.package:
+        name:
+          - gcc
+          - python36-devel
+          - libpq-devel
 
-    - name: Install PostgreSQL Python library
+    - name: Install psycopg2 library
       ansible.builtin.pip:
         name: psycopg2-binary
 
