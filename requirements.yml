@@ -42,8 +42,9 @@ collections:
     version: 1.0.2
   - name: ansible.posix
     version: 1.3.0
-  - name: community.crypto
-    version: 2.17.1
+  # Is included via cloudera.cluster
+  # - name: community.crypto
+  #   version: 2.2.1
   - name: community.mysql
     version: 3.8.0
   - name: community.postgresql
@@ -51,4 +52,4 @@ collections:
   - name: freeipa.ansible_freeipa
     version: 1.11.1
   - name: cloud.terraform
-    version: 1.11.0
+    version: 3.0.0

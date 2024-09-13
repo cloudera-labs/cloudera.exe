@@ -18,7 +18,7 @@
   become: yes
   tasks:
     - name: Install psycopg2 build prerequisites
-      when: 
+      when:
         - ansible_os_family == "RedHat"
         - ansible_distribution_major_version == "8"
       ansible.builtin.package:
