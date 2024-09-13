@@ -20,11 +20,11 @@ dependency:
     requirements-file: requirements.yml
 platforms:
   - name: rhel9.4
-    image: ubi9/ubi:9.4
+    image: registry.access.redhat.com/ubi9/ubi:9.4
     dockerfile: Dockerfile-rhel.j2
     command: /sbin/init
   - name: rhel8.10
-    image: ubi8/ubi:8.10
+    image: registry.access.redhat.com/ubi8/ubi:8.10
     dockerfile: Dockerfile-rhel.j2
     command: /sbin/init
   - name: ubuntu22.04
