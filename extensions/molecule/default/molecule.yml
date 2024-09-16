@@ -17,7 +17,8 @@ driver:
 dependency:
   name: galaxy
   options:
-    requirements-file: requirements.yml
+    requirements-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+    role-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
 platforms:
   - name: rhel9.4
     image: registry.access.redhat.com/ubi9/ubi:9.4

@@ -42,7 +42,8 @@ platforms:
 dependency:
   name: galaxy
   options:
-    requirements-file: requirements.yml
+    requirements-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+    role-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
 provisioner:
   playbooks:
     converge: ../rdbms_server_postgresql_default/converge.yml
