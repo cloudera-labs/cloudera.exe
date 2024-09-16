@@ -15,6 +15,5 @@
 collections:
   - containers.podman
   - community.postgresql
-
 roles:
   - geerlingguy.postgresql

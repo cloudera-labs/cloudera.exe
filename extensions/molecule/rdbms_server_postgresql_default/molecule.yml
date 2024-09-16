@@ -44,15 +44,10 @@ platforms:
 dependency:
   name: galaxy
   options:
-    requirements-file: requirements.yml
-    collections-path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
-    role-file: requirements.yml
-    roles-path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
+    requirements-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+    role-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
 provisioner:
   name: ansible
-  config_options:
-    defaults:
-      collections_path: "${MOLECULE_SCENARIO_DIRECTORY}/.cache"
   inventory:
     host_vars:
       rhel9.4:
