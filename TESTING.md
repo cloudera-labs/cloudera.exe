@@ -4,14 +4,86 @@ The collection is migrating from `ansible-test` to `pytest` and `molecule` for u
 
 ## Setup
 
-Typically, you will want to set up a development `virtualenv`, install `ansible-core~=2.16.0`, and then load the development Python requirements from the `requirements-dev.txt` file in the project root.
+To set up a development and test environment for the collection, you need to:
+
+1. Set up the Ansible Collection and Role paths
+1. Install Ansible and the Python dependencies
+1. Install the collection and its dependencies
+1. Configure the PYTHONPATH to use the correct location of the collections code
+1. Install the Molecule driver dependencies
+
+### Ansible Collection and Role Paths
+
+You have to install your Ansible collections, both the collection under test and its dependencies, into the `ansible_collections/<namespace>/<name>` folder structure.  For the collection under test, run the following _in the parent directory of your choosing_:
 
 ```bash
-pip install ansible-core~=2.16.0
-pip install -r requirements-dev.txt
+git clone https://github.com/cloudera-labs/cloudera.exe.git ansible_collections/cloudera/exe
 ```
 
-Running the `molecule` tests requires `podman` as the container engine, so you will need to install that service on your test machine.
+Then create the `roles` directory in the _parent directory_:
+
+```bash
+mkdir roles
+```
+
+Lastly, set the Ansible [COLLECTION](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#envvar-ANSIBLE_COLLECTIONS_PATH) and [ROLE](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#envvar-ANSIBLE_ROLES_PATH) configurations for these two locations:
+
+```bash
+export ANSIBLE_COLLECTIONS_PATH=$(pwd)
+export ANSIBLE_ROLES_PATH="$(pwd)/roles"
+```
+
+### Set the PYTHONPATH
+
+Include the `ANSIBLE_COLLECTIONS_PATH` variable to the `PYTHONPATH` to allow module imports.
+
+```bash
+export PYTHONPATH="${ANSIBLE_COLLECTIONS_PATH}":"${PYTHONPATH}"
+```
+
+### Ansible
+
+Set up a development `virtualenv` and install `ansible-core~=2.16.0` and `ansible-navigator`.
+
+```bash
+pip install ansible-core~=2.16.0 ansible-navigator
+```
+
+> ![warning]
+> Installing `>=2.17` will require that the target hosts run Python 3.7. This requirement extends to RHEL 8.x and its `platform-python`, which means that `2.17` will not work on these platforms.
+
+### Python Dependencies
+
+Install the development and collection Python requirements from the `requirements-dev.txt` and `requirements.txt` files respectively in the project root.
+
+```bash
+pip install -r ansible_collections/cloudera/exe/requirements.txt
+pip install -r ansible_collections/cloudera/exe/requirements-dev.txt
+```
+
+### Collection Dependencies
+
+You also need to install the collection's dependencies and install them into the `ANSIBLE_COLLECTIONS_PATH`:
+
+```bash
+ansible-galaxy collection install -r ansible_collections/cloudera/exe/requirements.yml -p "${ANSIBLE_COLLECTIONS_PATH}"
+```
+
+And install any role dependencies as well into the `ANSIBLE_ROLES_PATH`:
+
+```bash
+ansible-galaxy role install -r ansible_collections/cloudera/exe/requirements.yml -p "${ANSIBLE_ROLES_PATH}"
+```
+
+If the collection has any system requirements, run `bindep` on its requirements file:
+
+```bash
+bindep -f ansible_collections/cloudera/exe/bindep.txt
+```
+
+### Molecule
+
+Running the `molecule` tests requires `podman` as the container engine, so you will need to install that service on your test machine. Read more about [Podman](https://podman.io/) or [Podman Desktop](https://podman-desktop.io/).
 
 ## Testing
 
@@ -19,7 +91,7 @@ You can either run standalone `molecule`, for roles and more advanced integratio
 
 ### Running standalone `molecule` tests
 
-Currently, `molecule` scenarios are located in the `extensions/molecule` directory. To run a scenario, execute `cd extensions` and then run `molecule`. For example:
+Currently, `molecule` scenarios are located in the `extensions/molecule` directory of the collection. To run a scenario, change to `extensions` as your current working directory and then run `molecule`. For example:
 
 | Command | Description |
 | --- | --- |
@@ -60,10 +132,10 @@ molecule converge -s rdbms_server_postgresql_14_tls -- -vvv -t tls_config
 
 We use the `ansible-pytest` plugin to run unit and integration tests for the collection.
 
-To see what tests (unit and integration) are available, run the following from the root of the collection:
+To see what tests (unit and integration) are available, run the following from the `ANSIBLE_COLLECTIONS_PATH` directory:
 
 ```bash
-pytest --collect-only
+pytest ansible_collections/cloudera/exe --collect-only
 ```
 
 You should see something like:
@@ -99,18 +171,18 @@ collected 8 items
 To run a selected test, execute with a regex:
 
 ```bash
-pytest -k "postgresql_14_tls"
+pytest ansible_collections/cloudera/exe -k "postgresql_14_tls"
 ```
 
 To run a Molecule scenario on a selected platform, i.e. target host, set the platform via the environment variable:
 
 ```bash
-MOLECULE_PLATFORM_NAME="rhel9.4" pytest -k "postgresql_14_tls"
+MOLECULE_PLATFORM_NAME="rhel9.4" pytest ansible_collections/cloudera/exe -k "postgresql_14_tls"
 ```
 
 > [!warning]
-> The above execution copies the current collection into the required Ansible collection path structure within the working directory. That is, running `pytest` at the root of the **collection** creates a `collection/ansible_collections/<namespace>/<name>` **within** the collection.
-> To get around this, you can run `pytest` in at the root of the **Ansible collections path**. That is, run `pytest ansible_collections/<namespace>/<name> ...` so that `pytest` doesn't have to bootstrap the collections path.
+> If you run `pytest` in the root of the collection, `pytest` will copies the current collection into the required Ansible collection path structure within the working directory. That is, running `pytest` at the root of the **collection** creates a `collection/ansible_collections/<namespace>/<name>` **within** the collection.
+> Thus, our recommendation is that you can run `pytest` in at the root of the **Ansible collections path**. That is, run `pytest ansible_collections/<namespace>/<name> ...` so that `pytest` doesn't have to bootstrap the collections path.
 
 ## Linting and Commits
 
