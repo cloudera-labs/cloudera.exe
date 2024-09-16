@@ -49,7 +49,7 @@ Set up a development `virtualenv` and install `ansible-core~=2.16.0` and `ansibl
 pip install ansible-core~=2.16.0 ansible-navigator
 ```
 
-> ![warning]
+> [!warning]
 > Installing `>=2.17` will require that the target hosts run Python 3.7. This requirement extends to RHEL 8.x and its `platform-python`, which means that `2.17` will not work on these platforms.
 
 ### Python Dependencies
