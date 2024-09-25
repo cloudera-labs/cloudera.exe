@@ -16,3 +16,6 @@
 
 - name: yum clean metadata
   ansible.builtin.command: yum clean metadata
+
+- name: dnf clean metadata
+  ansible.builtin.command: dnf clean metadata
