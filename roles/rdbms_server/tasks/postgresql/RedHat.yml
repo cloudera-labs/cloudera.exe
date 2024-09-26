@@ -16,7 +16,7 @@
   ansible.builtin.yum_repository:
     name: pgdg-common
     description: PostgreSQL common for RHEL/CentOS
-    baseurl: https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-$releasever-$basearch
+    baseurl: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-$releasever-$basearch"
     gpgkey: "https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-{{ (ansible_architecture == 'arm64') | ternary('AARCH64-', '') }}RHEL"
   when: not skip_rdbms_repo_setup
 
@@ -24,8 +24,8 @@
   ansible.builtin.yum_repository:
     name: pgdg
     description: PostgreSQL {{ postgresql_version }} for RHEL/CentOS
-    baseurl: https://download.postgresql.org/pub/repos/yum/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch
-    gpgkey: https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-{{ (ansible_architecture == 'arm64') | ternary('AARCH64-', '') }}RHEL
+    baseurl: "https://download.postgresql.org/pub/repos/yum/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch"
+    gpgkey: "https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-{{ (ansible_architecture == 'arm64') | ternary('AARCH64-', '') }}RHEL"
   when: not skip_rdbms_repo_setup
 
 - name: Disable default Postgres module in RHEL 8 or greater
