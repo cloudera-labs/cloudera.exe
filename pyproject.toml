@@ -21,6 +21,15 @@ dependencies = [
 ]
 installer = "uv"
 
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
+filterwarnings = [
+  "ignore:AnsibleCollectionFinder has already been configured",
+  "ignore:'crypt' is deprecated and slated for removal in Python 3.13:DeprecationWarning",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

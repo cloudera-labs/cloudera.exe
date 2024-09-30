@@ -1,0 +1,38 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+driver:
+  name: podman
+dependency:
+  name: galaxy
+  options:
+    requirements-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+    role-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+platforms:
+  - name: rhel9.4
+    image: registry.access.redhat.com/ubi9/ubi:9.4
+    dockerfile: Dockerfile-rhel.j2
+    command: /sbin/init
+  - name: rhel8.10
+    image: registry.access.redhat.com/ubi8/ubi:8.10
+    dockerfile: Dockerfile-rhel.j2
+    command: /sbin/init
+  - name: ubuntu22.04
+    image: ubuntu:22.04
+    dockerfile: Dockerfile-ubuntu.j2
+    command: /lib/systemd/systemd
+  - name: ubuntu20.04
+    image: ubuntu:20.04
+    dockerfile: Dockerfile-ubuntu.j2
+    command: /lib/systemd/systemd

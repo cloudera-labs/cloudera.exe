@@ -1,0 +1,125 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Establish CA certificate
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Create CA private key
+      community.crypto.openssl_privatekey:
+        path: ./ca-certificate.key
+        mode: 0600
+
+    - name: Create CSR for CA certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: ca-certificate.key
+        common_name: Molecule CA
+        use_common_name_for_san: false
+        basic_constraints:
+          - 'CA:TRUE'
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+        key_usage_critical: true
+      register: __ca_csr
+
+    - name: Create self-signed CA certificate from CSR
+      community.crypto.x509_certificate:
+        path: ./ca-certificate.pem
+        csr_content: "{{ __ca_csr.csr }}"
+        privatekey_path: ca-certificate.key
+        provider: selfsigned
+        mode: 0644
+
+- name: Set up TLS certificates
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Update pip
+      ansible.builtin.pip:
+        name: pip
+        state: latest
+
+    - name: Install Rust (RHEL 8)
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version == 8
+      ansible.builtin.package:
+        name: rust
+
+    - name: Install Python Rust setup tools
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version == 8
+      ansible.builtin.pip:
+        name: setup_rust
+
+    - name: Install cryptography Python library
+      ansible.builtin.pip:
+        name: cryptography
+
+    - name: Establish postgres group
+      ansible.builtin.group:
+        name: postgres
+
+    - name: Establish PKI directory
+      ansible.builtin.file:
+        path: /opt/security/pki
+        state: directory
+        mode: 0755
+
+    - name: Copy CA certificate from controller
+      ansible.builtin.copy:
+        src: ca-certificate.pem
+        dest: /opt/security/pki/ca-certificate.pem
+        mode: 0644
+
+    - name: Create host private key
+      community.crypto.openssl_privatekey:
+        path: /opt/security/pki/host.key
+        return_content: yes
+        group: postgres
+        mode: 0640
+      register: __key
+
+    - name: Write unencrypted host private key
+      ansible.builtin.copy:
+        dest: /opt/security/pki/host.key.unenc
+        content: "{{ __key.privatekey }}"
+        group: postgres
+        mode: 0640
+
+    - name: Create CSR for host certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: /opt/security/pki/host.key
+        use_common_name_for_san: false
+      register: __csr
+
+    - name: Sign host certificate with self-signed CA certificate
+      community.crypto.x509_certificate_pipe:
+        csr_content: "{{ __csr.csr }}"
+        provider: ownca
+        ownca_path: ca-certificate.pem
+        ownca_privatekey_path: ca-certificate.key
+        ownca_not_after: +1d
+        ownca_not_before: "-1d"
+      delegate_to: localhost
+      register: __cert
+
+    - name: Write host certificate
+      ansible.builtin.copy:
+        dest: /opt/security/pki/host.pem
+        content: "{{ __cert.certificate }}"
+        mode: 0640
+        group: postgres

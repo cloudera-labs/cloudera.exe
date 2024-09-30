@@ -16,20 +16,20 @@
   ansible.builtin.yum_repository:
     name: pgdg-common
     description: PostgreSQL common for RHEL/CentOS
-    baseurl: https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-$releasever-$basearch
-    gpgkey: https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL
+    baseurl: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-$releasever-$basearch"
+    gpgkey: "https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-{{ (ansible_architecture in ['aarch64', 'arm64']) | ternary('AARCH64-', '') }}RHEL"
   when: not skip_rdbms_repo_setup
 
 - name: Install PostgreSQL version repository
   ansible.builtin.yum_repository:
     name: pgdg
     description: PostgreSQL {{ postgresql_version }} for RHEL/CentOS
-    baseurl: https://download.postgresql.org/pub/repos/yum/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch
-    gpgkey: https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL
+    baseurl: "https://download.postgresql.org/pub/repos/yum/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch"
+    gpgkey: "https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-{{ (ansible_architecture in ['aarch64', 'arm64']) | ternary('AARCH64-', '') }}RHEL"
   when: not skip_rdbms_repo_setup
 
 - name: Disable default Postgres module in RHEL 8 or greater
-  ansible.builtin.command: dnf module disable -y postgresql
+  ansible.builtin.command: dnf module disable -qy postgresql
   register: __postgres_module_result
   changed_when:
     - '"Disabling modules" in __postgres_module_result.stdout'
@@ -49,10 +49,24 @@
 
 - name: Remove repositories and clean metadata
   ansible.builtin.yum_repository:
-    name: "{{ item }}"
+    name: "{{ repo }}"
     state: absent
-  with_items:
+  loop:
     - pgdg-common
     - pgdg
+  loop_control:
+    loop_var: repo
   when: not skip_rdbms_repo_setup
   notify: yum clean metadata
+
+- name: Install psycopg2 build prerequisites
+  when: ansible_distribution_major_version == "8"
+  ansible.builtin.package:
+    name:
+      - gcc
+      - libpq-devel
+
+# This fails if the PSQL repositories are not removed
+- name: Install psycopg2 library
+  ansible.builtin.pip:
+    name: psycopg2-binary

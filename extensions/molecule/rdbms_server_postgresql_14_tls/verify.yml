@@ -1,0 +1,54 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Confirm local database access
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping database locally
+      community.postgresql.postgresql_ping:
+      become: yes
+      become_user: postgres
+      register: postgres_user
+      failed_when: not postgres_user.is_available
+
+- name: Confirm external database access
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping database as authorized user
+      community.postgresql.postgresql_ping:
+        login_host: "0.0.0.0"
+        port: "{{ psql_port }}"
+        db: test
+        login_user: user_one
+        login_password: authorized
+        ssl_mode: verify-ca
+        ca_cert: ./ca-certificate.pem
+      delegate_to: localhost
+      register: authorized_user
+      failed_when: not authorized_user.is_available
+
+    - name: Ping database as non-authorized user
+      community.postgresql.postgresql_ping:
+        login_host: "0.0.0.0"
+        port: "{{ psql_port }}"
+        db: test
+        login_user: user_two
+        login_password: no_password_is_set
+        ssl_mode: verify-ca
+        ca_cert: ./ca-certificate.pem
+      delegate_to: localhost
+      register: not_authorized_user
+      failed_when: not_authorized_user.is_available

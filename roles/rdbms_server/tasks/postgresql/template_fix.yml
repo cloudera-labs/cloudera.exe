@@ -26,7 +26,7 @@
 
 - name: Copy SQL to change template to UTF-8
   ansible.builtin.copy:
-    src: files/utf8-template.sql
+    src: utf8-template.sql
     dest: "{{ __sql.path }}/utf8-template.sql"
     owner: postgres
     group: postgres
