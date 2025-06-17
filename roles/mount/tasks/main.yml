@@ -9,7 +9,7 @@
           - hardware
 
     - name: Map NVME volume attachments
-      when: 
+      when:
         - device.key is match("nvme")
         - volume != "UNKNOWN"
       ansible.builtin.set_fact:
