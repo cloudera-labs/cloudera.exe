@@ -1,25 +1,49 @@
 [project]
 name = "exe"
+dynamic = ["version"]
 description = "cloudera.exe Ansible collection"
 readme = "README.md"
-dependencies = [
-  "ansible-core~=2.12.0"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+keywords = []
+authors = [
+  { name = "Webster Mudge", email = "wmudge@cloudera.com" },
 ]
-requires-python = "~=3.8.0"
-dynamic = ["version"]
+classifiers = []
+dependencies = []
 
 [tool.hatch.version]
 path = "galaxy.yml"
 pattern = "version:\\s+(?P<version>[\\d\\.]+)"
 
 [tool.hatch.envs.default]
+python = "3.12"
+skip-install = true
 dependencies = [
   "pre-commit",
   "coverage[toml]",
   "pytest",
+  "pytest-mock",
   "pytest-cov",
+  "molecule",
+  "molecule-plugins",
+  "molecule-plugins[ec2]",
+  "tox-ansible",
+  "ansible-core<2.17", # For RHEL 8 support
+  "netaddr",
+  "psycopg2-binary",
+  "cryptography",
 ]
-installer = "uv"
+
+[tool.hatch.envs.lint]
+python = "3.12"
+skip-install = true
+extra-dependencies = [
+  "ansible-lint",
+]
+
+[tool.hatch.envs.lint.scripts]
+run = "pre-commit run -a"
 
 [tool.pytest.ini_options]
 testpaths = [
@@ -31,5 +55,5 @@ filterwarnings = [
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
