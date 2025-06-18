@@ -9,7 +9,9 @@
           - hardware
 
     - name: Map NVME volume attachments
-      when: device.key is match("nvme")
+      when:
+        - device.key is match("nvme")
+        - volume != "UNKNOWN"
       ansible.builtin.set_fact:
         ebs_device_map: "{{ ebs_device_map | default({}) | combine({ volume : '/dev/' + device.key }) }}"
       loop: "{{ ansible_devices | dict2items }}"
@@ -18,7 +20,7 @@
         label: "{{ device.key }}"
       vars:
         ebs_prefix: nvme-Amazon_Elastic_Block_Store_vol
-        volume: "vol-{{ device.value.links.ids | select('match', ebs_prefix) | map('regex_replace', '^' + ebs_prefix) | list | first }}"
+        volume: "vol-{{ (device.value.links.ids | select('match', ebs_prefix) | map('regex_replace', '^' + ebs_prefix) | list | first) | default('UNKNOWN') }}"
 
 - name: Set required facts for volumes
   ansible.builtin.set_fact:
