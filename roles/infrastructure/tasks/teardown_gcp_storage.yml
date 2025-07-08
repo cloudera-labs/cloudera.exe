@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,5 +22,5 @@
   loop: "{{ infra__gcp_storage_locations }}"
   loop_control:
     loop_var: __gcp_storage_location_item
-  command: >
+  ansible.builtin.command: >
     gsutil -m rm -r gs://{{ __gcp_storage_location_item }}

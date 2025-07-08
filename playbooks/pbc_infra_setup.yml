@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 - name: Set up CDP Public Cloud infrastructure (Ansible-based)
   hosts: "{{ target | default('localhost') }}"
   environment: "{{ globals.env_vars }}"
-  gather_facts: yes
+  gather_facts: true
   tasks:
     - name: Validate CDP Public Cloud infrastructure configuration
       ansible.builtin.import_role:

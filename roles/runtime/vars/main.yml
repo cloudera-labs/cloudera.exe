@@ -23,23 +23,23 @@ run__datahub_compute:
 
 run__datahub_compute_default:
   aws:
-    std_gp: 'm5.2xlarge'
-    lrg_gp: 'm5.4xlarge'
-    std_mem: 'r5.4xlarge'
-    dsk_mem: 'r5d.4xlarge'
+    std_gp: "m5.2xlarge"
+    lrg_gp: "m5.4xlarge"
+    std_mem: "r5.4xlarge"
+    dsk_mem: "r5d.4xlarge"
     std_gpu: "p2.8xlarge"
   azure:
-    std_gp: 'Standard_D8_v3'
-    lrg_gp: 'Standard_D16_v3'
-    std_mem: 'Standard_D16_v3'
-    dsk_mem: 'Standard_D8_v3'
-    std_gpu: 'Standard_D8_v3'
+    std_gp: "Standard_D8_v3"
+    lrg_gp: "Standard_D16_v3"
+    std_mem: "Standard_D16_v3"
+    dsk_mem: "Standard_D8_v3"
+    std_gpu: "Standard_D8_v3"
   gcp:
-    std_gp: 'e2-standard-8'
-    lrg_gp: 'e2-standard-8'
-    std_mem: 'e2-standard-8'
-    dsk_mem: 'e2-standard-8'
-    std_gpu: 'e2-standard-8'
+    std_gp: "e2-standard-8"
+    lrg_gp: "e2-standard-8"
+    std_mem: "e2-standard-8"
+    dsk_mem: "e2-standard-8"
+    std_gpu: "e2-standard-8"
 
 run__datahub_storage:
   aws: "{{ run__datahub_storage_default['aws'] | combine(run__datahub_storage_aws) }}"
@@ -48,20 +48,19 @@ run__datahub_storage:
 
 run__datahub_storage_default:
   aws:
-    std: 'standard'
-    fast: 'st1'
-    eph: 'ephemeral'
+    std: "standard"
+    fast: "st1"
+    eph: "ephemeral"
   azure:
-    std: 'StandardSSD_LRS'
-    fast: 'StandardSSD_LRS'
-    eph: 'StandardSSD_LRS'
+    std: "StandardSSD_LRS"
+    fast: "StandardSSD_LRS"
+    eph: "StandardSSD_LRS"
   gcp:
-    std: 'pd-standard'
-    fast: 'pd-standard'
-    eph: 'pd-standard'
-
+    std: "pd-standard"
+    fast: "pd-standard"
+    eph: "pd-standard"
 
 run__de_compute_default:
-  aws: 'm5.2xlarge'
-  azure: 'Standard_D8_v3'
-  gcp: 'e2-standard-8'
+  aws: "m5.2xlarge"
+  azure: "Standard_D8_v3"
+  gcp: "e2-standard-8"

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 - name: Set IDBroker Mappings for CDP on Azure
   cloudera.cloud.env_idbroker:
     name: "{{ plat__env_name }}"
-    sync: no
+    sync: false
     data_access: "{{ __azure_datalakeadmin_identity.id }}"
     ranger_audit: "{{ __azure_ranger_audit_identity.id }}"
     ranger_cloud_access: "{{ (plat__enable_raz | bool) | ternary(__azure_raz_identity.id, omit) }}"

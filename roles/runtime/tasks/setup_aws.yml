@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +18,7 @@
   tags: dh
   block:
     - name: Retrieve AWS EC2 instance details
-      community.aws.ec2_instance_info:
+      amazon.aws.ec2_instance_info:
         region: "{{ run__region }}"
         filters:
           "tag:Name": "{{ run__namespace }}*"
@@ -47,7 +46,7 @@
         aws_public_subnets: "{{ run__aws_public_subnet_ids }}"
         aws_private_subnets: "{{ run__aws_private_subnet_ids if run__dw_private_worker_nodes else [] }}"
         state: present
-        wait: yes
+        wait: true
       register: __dw_cluster_build
 
     - name: Set fact for DW Cluster
@@ -70,11 +69,11 @@
     - name: Create Additional CDP DW Database catalogs
       when: not __dw_dbc_config.use_default_dbc
       cloudera.cloud.dw_database_catalog:
-        cluster_id : "{{ __dw_cluster_id }}"
+        cluster_id: "{{ __dw_cluster_id }}"
         name: "{{ __dw_dbc_config.name }}"
         load_demo_data: "{{ __dw_dbc_config.load_demo_data }}"
         state: present
-        wait: yes
+        wait: true
       async: 3600 # 1 hour timeout
       poll: 0
       loop: "{{ run__dw_dbc_configs }}"
@@ -99,7 +98,7 @@
     - name: Set CDP DW Database catalog name to id map
       when: __dw_dbc_build_async.database_catalog is defined
       ansible.builtin.set_fact:
-        run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({ __dw_dbc_build_async.database_catalog.name : __dw_dbc_build_async.database_catalog.id}) }}"
+        run__dw_dbc_ids: "{{ run__dw_dbc_ids | default({}) | combine({__dw_dbc_build_async.database_catalog.name: __dw_dbc_build_async.database_catalog.id}) }}"
       loop: "{{ __dw_dbc_builds_async.results }}"
       loop_control:
         loop_var: __dw_dbc_build_async
@@ -118,7 +117,7 @@
         application_configs: "{{ __dw_vw_config.configs.application_configs | default(omit) }}"
         ldap_groups: "{{ __dw_vw_config.configs.ldap_groups | default(omit) }}"
         enable_sso: "{{ __dw_vw_config.configs.enable_sso | default(omit) }}"
-        wait: yes
+        wait: true
       async: 3600 # 1 hour timeout
       poll: 0
       register: __dw_vw_builds

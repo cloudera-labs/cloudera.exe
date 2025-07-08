@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +15,22 @@
 
 - name: Request Azure Storage Account Creation with HNS
   register: __infra_az_stor_acccount_test
-  ignore_errors: yes
+  ignore_errors: true
   azure.azcollection.azure_rm_resource:
     state: present
     resource_group: "{{ infra__azure_metagroup_name }}"
     provider: Storage
     resource_type: storageAccounts
     resource_name: "{{ infra__azure_storage_name }}"
-    api_version: '2019-04-01'
-    idempotency: yes
+    api_version: "2019-04-01"
+    idempotency: true
     body:
       sku:
         name: "{{ infra__azure_storage_class }}"
       kind: "{{ infra__azure_storage_kind }}"
       properties:
-        isHnsEnabled: yes
-      location:  "{{ infra__region }}"
+        isHnsEnabled: true
+      location: "{{ infra__region }}"
       tags: "{{ infra__tags }}"
 
 - name: Check Storage Account creation result for failure
@@ -41,13 +40,13 @@
   block:
     - name: Test Azure Storage Account creation for StorageAccountAlreadyTaken
       ansible.builtin.assert:
-        quiet: yes
+        quiet: true
         that: '"StorageAccountAlreadyTaken" not in __infra_az_stor_acccount_test.module_stderr'
         fail_msg: "Your proposed Storage Account Name {{ infra__azure_storage_name }} is already taken, please use another"
 
     - name: Fail on any other Azure Storage Account Creation Error
       ansible.builtin.assert:
-        quiet: yes
+        quiet: true
         that: '"StorageAccountAlreadyTaken" in __infra_az_stor_acccount_test.module_stderr'
         fail_msg: "Failed to Create Azure Storage Account with unanticipated error: {{ __infra_az_stor_acccount_test }}"
 

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@
       - "__auth_item is string"
       - "__auth_item | trim | length > 0"
     fail_msg: "AWS authentication parameter, '{{ __auth_item }}', is invalid."
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __auth_item
   loop:
@@ -33,7 +32,7 @@
 # TODO: Revisit this logic, we could just provide a blank VPC for L0, L1, or L2
 - name: Validate existing AWS Subnet details if provided for a private network
   #when: infra__aws_vpc_id != ""
-  when: no
+  when: false
   block:
     - name: Check for non-empty AWS private subnets
       when: infra__aws_private_subnet_ids | unique | count < 3

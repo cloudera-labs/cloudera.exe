@@ -14,7 +14,7 @@
 
 ---
 
-local_temp_dir: '/tmp'
+local_temp_dir: "/tmp"
 postgresql_connector_url: https://jdbc.postgresql.org/download/postgresql-42.7.2.jar
 postgresql_connector_checksum: md5:bb897217989c97a463d8f571069d158a
 install_py3_psycopg2: false

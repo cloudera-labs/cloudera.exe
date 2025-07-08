@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: DEPRECATION WARNING
   ansible.builtin.debug:
     msg:
@@ -28,8 +27,8 @@
   ansible.builtin.include_vars:
     file: "{{ item }}"
   with_first_found:
-      - "{{ database_type }}/{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
-      - "{{ database_type }}/{{ ansible_os_family }}.yml"
+    - "{{ database_type }}/{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ database_type }}/{{ ansible_os_family }}.yml"
 
 - name: Install database
   ansible.builtin.include_tasks:

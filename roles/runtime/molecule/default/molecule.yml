@@ -46,10 +46,10 @@ provisioner:
           aws:
             region: ${FOUNDRY_AWS_REGION:-us-east-2}
         env:
-          tunnel: yes                   # L1 Networking
+          tunnel: yes # L1 Networking
           public_endpoint_access: yes
         dw:
-          force_delete: yes  # Non-force delete is inconsistent until we can filter 'compactor' VWs
+          force_delete: yes # Non-force delete is inconsistent until we can filter 'compactor' VWs
           tags:
             project: "${FOUNDRY_NAME_PREFIX:-r01}-CDW-testing"
           definitions:

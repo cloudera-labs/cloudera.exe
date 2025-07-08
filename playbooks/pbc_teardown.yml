@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +16,8 @@
 - name: Tear down CDP Public Cloud
   hosts: "{{ target | default('localhost') }}"
   environment: "{{ globals.env_vars }}"
-  gather_facts: yes
+  gather_facts: true
   tasks:
-
 # TODO Need to propagate 'ml', 'dw', etc. to selected tasks within the roles,
 # including those that would otherwise be 'always' - in this context; 'always'
 # should be reserved for the initialization of cloudera-deploy

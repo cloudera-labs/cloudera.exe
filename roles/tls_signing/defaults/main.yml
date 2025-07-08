@@ -15,7 +15,7 @@
 ---
 
 # csrs_to_sign:
-copy_from_controller: True
+copy_from_controller: true
 
 ca_server_intermediate_path: /ca/intermediate
 ca_server_intermediate_private_key: "{{ ca_server_intermediate_path }}/private/intermediate.key.pem"
@@ -26,4 +26,4 @@ ca_server_intermediate_cert: "{{ ca_server_intermediate_path_certs }}/intermedia
 
 ca_server_intermediate_path_csr: "{{ ca_server_intermediate_path }}/csr"
 
-backup_old_certs: True
+backup_old_certs: true

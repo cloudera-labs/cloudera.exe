@@ -16,8 +16,8 @@
 
 mysql_repo_key: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
 
-mysql_root_password: 'Super$ecret1'
-mysql_user_password: 'Super$ecret1'
+mysql_root_password: "Super$ecret1"
+mysql_user_password: "Super$ecret1"
 mysql_daemon: mysqld
 mysql_log_error: /var/log/mysqld.log
 mysql_syslog_tag: mysqld

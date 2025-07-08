@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +28,7 @@
       ansible.builtin.assert:
         that: __aws_vpc_info.vpcs | length == 1
         fail_msg: "No AWS VPC discovered"
-        quiet: yes
+        quiet: true
 
     - name: Set fact for AWS VPC ID
       when: __aws_vpc_info is defined
@@ -61,7 +60,7 @@
       ansible.builtin.assert:
         that: __aws_subnets_info.subnets | length > 0
         fail_msg: "No subnets discovered for AWS VPC"
-        quiet: yes
+        quiet: true
 
     - name: Set fact for AWS Public Subnet IDs if established by Infrastructure
       when: not run__aws_public_subnet_ids and infra__aws_public_subnet_ids is defined

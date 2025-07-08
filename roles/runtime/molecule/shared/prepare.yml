@@ -1,5 +1,4 @@
 ---
-
 - name: Prepare
   hosts: localhost
   tasks:
@@ -35,13 +34,13 @@
       community.general.terraform:
         project_path: "{{ molecule_scenario_directory }}/deployment/"
         state: present
-        force_init: yes
+        force_init: true
 
     - name: Create the testing SSH key
       amazon.aws.ec2_key:
         name: "{{ [globals.name_prefix, lookup('password', '/dev/null chars=ascii_lowercase,digits length=8')] | join('-') }}"
         region: "{{ infra.aws.region }}"
-        force: yes
+        force: true
       register: __aws_ssh_key
 
     - name: Save the private key locally

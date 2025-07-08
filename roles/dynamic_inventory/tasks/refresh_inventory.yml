@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,8 +36,7 @@
     dest: "{{ __tmp_add_inventory_file }}"
 
 - name: Refresh inventory
-  meta: refresh_inventory
-
+  ansible.builtin.meta: refresh_inventory
 - name: Remove temporary static inventory file
   when:
     - __add_inventory_static.stat.exists

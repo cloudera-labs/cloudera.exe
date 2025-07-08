@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +25,8 @@
 
 - name: Set fact for CDP Admin Group Resource Role assignments
   ansible.builtin.set_fact:
-    plat__cdp_env_admin_group_resource_role_assignments: "{{ plat__cdp_env_admin_group_resource_role_assignments | default([]) | union([resource_role_assignment]) }}"
+    plat__cdp_env_admin_group_resource_role_assignments: "{{ plat__cdp_env_admin_group_resource_role_assignments | default([]) | union([resource_role_assignment])
+      }}"
   vars:
     resource_role_assignment:
       resource: "{{ plat__cdp_env_crn }}"
@@ -100,14 +100,14 @@
       ansible.builtin.uri:
         url: "{{ plat__cdp_datalake_cm_api.rstrip('/') }}/version"
         timeout: 60
-        return_content: no
+        return_content: false
         status_code: 200
         url_username: "{{ plat__cdp_workload_username }}"
         url_password: "{{ plat__env_admin_password }}"
         validate_certs: false
-      run_once: yes
+      run_once: true
       register: __cdp_datalake_cm_api_response
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Request User Sync for CDP Datalake, if needed
       when: __cdp_datalake_cm_api_response.status != 200

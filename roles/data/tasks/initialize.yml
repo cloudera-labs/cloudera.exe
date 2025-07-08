@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,8 @@
 - name: Set facts for data location types
   ansible.builtin.set_fact:
     __data_storage_read_only: "{{ data__storage | selectattr('read_only', 'defined') | selectattr('read_only') | list }}"
-    __data_storage_read_write: "{{ data__storage | selectattr('read_only', 'defined') | rejectattr('read_only') | list | union(data__storage | selectattr('read_only', 'undefined') | list) }}"
+    __data_storage_read_write: "{{ data__storage | selectattr('read_only', 'defined') | rejectattr('read_only') | list | union(data__storage | selectattr('read_only',
+      'undefined') | list) }}"
 
 - name: Initialize cloud provider details
   ansible.builtin.include_tasks: "initialize_{{ data__infra_type | lower }}.yml"

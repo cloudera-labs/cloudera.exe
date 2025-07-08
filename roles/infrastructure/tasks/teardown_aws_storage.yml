@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +19,7 @@
     region: "{{ infra__region }}"
     name: "{{ __aws_storage_location_item.bucket }}"
     state: absent
-    force: yes
+    force: true
   loop_control:
     loop_var: __aws_storage_location_item
   loop: "{{ infra__aws_storage_locations }}"
@@ -31,7 +30,7 @@
     region: "{{ infra__region }}"
     name: "{{ infra__utlity_bucket_name }}"
     state: absent
-    force: yes
+    force: true
 
 - name: Remove AWS EFS File Systems, if Discovered during Purge
   when:
@@ -41,7 +40,7 @@
   community.aws.efs:
     state: absent
     id: "{{ __infra_efs_item.file_system_id }}"
-    wait: yes
+    wait: true
   loop: "{{ __infra_efs_fs.results | community.general.json_query('[*].efs') | flatten }}"
   loop_control:
     loop_var: __infra_efs_item

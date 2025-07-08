@@ -1,5 +1,4 @@
 ---
-
 - name: Cleanup CDP deployment and SSH key
   hosts: localhost
   tasks:
@@ -36,7 +35,7 @@
       community.general.terraform:
         project_path: "{{ molecule_scenario_directory }}/deployment/"
         state: absent
-        force_init: yes
+        force_init: true
 
     - name: Delete the deployment state directory
       when: __deployment.stat.exists

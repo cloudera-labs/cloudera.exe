@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace:  cloudera
-name:       exe
-version:    2.4.1
-readme:     README.md
+namespace: cloudera
+name: exe
+version: 2.4.1
+readme: README.md
 authors:
   - Jim Enright @jenright
   - Ronald Suplina @rsuplina
@@ -29,28 +29,28 @@ description: >
   and Private Cloud deployments.
 license_file: LICENSE
 tags:
-- cloudera
-- cdp
-- azure
-- aws
-- gcp
-- private_cloud
-- public_cloud
-- data_service
-- cloudera_manager
-- cm
+  - cloudera
+  - cdp
+  - azure
+  - aws
+  - gcp
+  - private_cloud
+  - public_cloud
+  - data_service
+  - cloudera_manager
+  - cm
 
 dependencies:
-  'ansible.netcommon':    '2.5.1'
-  'community.general':    '4.5.0'
+  "ansible.netcommon": "2.5.1"
+  "community.general": "4.5.0"
 
-repository:     https://github.com/cloudera-labs/cloudera.exe
-homepage:       https://github.com/cloudera-labs/cloudera.exe
-issues:         https://github.com/cloudera-labs/cloudera.exe/issues
-documentation:  https://cloudera-labs.github.io/cloudera.exe
+repository: https://github.com/cloudera-labs/cloudera.exe
+homepage: https://github.com/cloudera-labs/cloudera.exe
+issues: https://github.com/cloudera-labs/cloudera.exe/issues
+documentation: https://cloudera-labs.github.io/cloudera.exe
 
 build_ignore:
-- '.*'
-- docs
-- docsrc
-- site
+  - ".*"
+  - docs
+  - docsrc
+  - site

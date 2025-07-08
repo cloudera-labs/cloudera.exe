@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +18,12 @@
   ansible.builtin.assert:
     that: purge|bool is sameas true or purge|bool is sameas false
     fail_msg: "purge key is present in definition, but not a boolean as expected"
-    quiet: yes
+    quiet: true
 
 - name: Assert user has supplied an Admin Password
   no_log: true
   ansible.builtin.assert:
-    quiet: yes
+    quiet: true
     that:
       - admin_password is defined
       - admin_password | length > 2
@@ -41,7 +40,7 @@
       - globals.name_prefix | length < 5
       - globals.name_prefix | regex_search('^[a-zA-Z]')
     fail_msg: "You must supply a valid Namespace"
-    quiet: yes
+    quiet: true
 
 - name: Check supplied Namespace (AWS, GCP)
   when:
@@ -53,14 +52,14 @@
       - globals.name_prefix | length < 8
       - globals.name_prefix | regex_search('^[a-zA-Z]')
     fail_msg: "You must supply a valid Namespace"
-    quiet: yes
+    quiet: true
 
 - name: Check Deployment Engine variable
   ansible.builtin.assert:
     that:
       - globals.infra_deployment_engine in ['ansible', 'terraform']
     fail_msg: "The 'infra_deployment_engine' variable must be one of 'ansible', 'terraform'"
-    quiet: yes
+    quiet: true
 
 - name: Check Supplied terraform_base_dir variable
   when:
@@ -70,7 +69,7 @@
       - globals.terraform.base_dir is defined
       - globals.terraform.base_dir | length > 0
     fail_msg: "You must supply a 'terraform_base_dir' where Terraform assets will be placed"
-    quiet: yes
+    quiet: true
 
 - name: Check Supplied terraform_auto_remote_state variable
   when:
@@ -79,7 +78,7 @@
     that:
       - (globals.terraform.auto_remote_state|bool is sameas true) or (globals.terraform.auto_remote_state|bool is sameas false)
     fail_msg: "The terraform.auto_remote_state variable must be a boolean variable"
-    quiet: yes
+    quiet: true
 
 - name: Check Admin Password is CDP Cloud compliant
   when: init__call_cdp_pbc | bool
@@ -88,4 +87,4 @@
       - admin_password is match('^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,64}$')
     fail_msg: >-
       Admin Password must comply with CDP Public requirements: 1 Upper, 1 Special, 1 Number, 8-64 chars.
-    quiet: yes
+    quiet: true

@@ -46,7 +46,7 @@ provisioner:
           aws:
             region: ${FOUNDRY_AWS_REGION:-us-east-2}
         env:
-          tunnel: yes                   # L1 Networking
+          tunnel: yes # L1 Networking
           public_endpoint_access: yes
 verifier:
   name: ansible

@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,15 +31,15 @@
     dest: "{{ __sql.path }}/utf8-template.sql"
     owner: postgres
     group: postgres
-    mode: 0660
+    mode: "0660"
 
 - name: Run SQL to change template to UTF-8
   ansible.builtin.command: "psql -f {{ __sql.path }}/utf8-template.sql"
-  become: yes
+  become: true
   become_user: postgres
 
 - name: Remove temporary SQL directory
   ansible.builtin.file:
     path: "{{ __sql.path }}"
     state: absent
-  become: yes
+  become: true

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +21,7 @@
   ansible.builtin.assert:
     that: "__aws_cli.rc == 0"
     fail_msg: "AWS CLI failed to execute: {{ __aws_cli.stdout }} ({{ __aws_cli.stderr }})"
-    quiet: yes
+    quiet: true
 
 - name: Validate access to AWS Endpoints using supplied Credentials
   amazon.aws.aws_caller_info:
@@ -43,10 +42,10 @@
   ansible.builtin.assert:
     that: "__aws_az_info.availability_zones | length >= infra__aws_vpc_az_count | int"
     fail_msg: "Not enough Availability Zones in the AWS Region, found less than {{ infra__aws_vpc_az_count }} threshold"
-    quiet: yes
+    quiet: true
 
 - name: List available AWS EC2 Instance Types in region
-  command: "aws ec2 describe-instance-type-offerings --region {{ infra__region }}"
+  ansible.builtin.command: "aws ec2 describe-instance-type-offerings --region {{ infra__region }}"
   register: __aws_ec2_types
 
 - name: Check required AWS EC2 Instance Types
@@ -54,13 +53,13 @@
     that: "__ec2_type_item.value in (__aws_ec2_types.stdout | from_json | community.general.json_query(query))"
     fail_msg: |
       EC2 Instance Type {{ __ec2_type_item.value }} is required, but not available in Region {{ infra__region }}.
-      You might try 'aws ec2 describe-instance-type-offerings --filters Name=instance-type,Values={{__ec2_type_item.value}}'"
-    quiet: yes
+      You might try 'aws ec2 describe-instance-type-offerings --filters Name=instance-type,Values={{ __ec2_type_item.value }}'"
+    quiet: true
   loop_control:
     loop_var: __ec2_type_item
   loop: "{{ infra__dynamic_inventory_vm_type_default[infra__type] | dict2items }}"
   vars:
-    query: 'InstanceTypeOfferings[].InstanceType'
+    query: "InstanceTypeOfferings[].InstanceType"
 
 - name: Find AMI for Dynamic Inventory Deployment
   when: infra__dynamic_inventory_count | int > 0
@@ -74,7 +73,7 @@
         owners: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].owners }}"
       register: __infra_aws_ami_list
 
-    - name:  Filter to latest Image
+    - name: Filter to latest Image
       ansible.builtin.set_fact:
         __infra_aws_ami_info: "{{ __infra_aws_ami_list.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}"
 
@@ -142,7 +141,8 @@
 - name: Set facts for dynamic inventory metadata
   ansible.builtin.set_fact:
     infra__dynamic_inventory_tags: "{{ infra__tags | combine(infra__dynamic_inventory_tag) }}"
-    infra__dynamic_inventory_connectors: "{{ 'ansible_user=' + infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user + provided_ssh_private_key_file }}"
+    infra__dynamic_inventory_connectors: "{{ 'ansible_user=' + infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user + provided_ssh_private_key_file
+      }}"
   vars:
     provided_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary('', ' ansible_ssh_private_key_file=' + infra__private_key_file) }}"
 

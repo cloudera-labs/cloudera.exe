@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +27,7 @@
     backup_location: "gs://{{ plat__gcp_storage_location_backups }}"
     vpc_id: "{{ plat__vpc_name }}"
     subnet_ids:
-      - "{{ plat__gcp_subnet_id if plat__gcp_subnet_id else plat__gcp_subnets_discovered[0].name }}"  # TODO - Check in validation_gcp.yml -- CDP on GCP only supports a single subnet deployment
+      - "{{ plat__gcp_subnet_id if plat__gcp_subnet_id else plat__gcp_subnets_discovered[0].name }}" # TODO - Check in validation_gcp.yml -- CDP on GCP only supports a single subnet deployment
     project: "{{ plat__gcp_project }}"
     tunnel: "{{ plat__tunnel }}"
     workload_analytics: "{{ plat__workload_analytics }}"

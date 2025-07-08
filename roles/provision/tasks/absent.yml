@@ -1,5 +1,4 @@
 ---
-
 - name: Examine the local Terraform project directory
   ansible.builtin.stat:
     path: "{{ provision_directory }}"
@@ -19,4 +18,4 @@
     region: "{{ provision_remote_storage_s3_region }}"
     name: "{{ provision_remote_storage_s3_bucket }}"
     state: absent
-    force: yes
+    force: true

@@ -34,7 +34,7 @@ clusters:
         NODEMANAGER:
           yarn_nodemanager_resource_memory_mb: 4096
           yarn_nodemanager_resource_cpu_vcores: 4
-          yarn_nodemanager_local_dirs:  /tmp/nm
+          yarn_nodemanager_local_dirs: /tmp/nm
           yarn_nodemanager_log_dirs: /var/log/nm
         GATEWAY:
           mapred_submit_replication: 3
@@ -54,7 +54,6 @@ clusters:
 mgmt:
   name: Cloudera Management Service
   services: [ALERTPUBLISHER, EVENTSERVER, HOSTMONITOR, REPORTSMANAGER, SERVICEMONITOR]
-
 hosts:
   configs:
     host_default_proc_memswap_thresholds:

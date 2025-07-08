@@ -164,3 +164,6 @@ cython_debug/
 
 # UV package manager
 uv.lock
+
+# Ansible tests
+.ansible

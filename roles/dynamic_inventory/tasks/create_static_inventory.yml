@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,8 +28,8 @@
     loop_var: __infra_inventory_compute_item
   ansible.builtin.replace:
     name: "{{ __tmp_dynamic_inventory_artefact }}"
-    regexp: '(\s+){{ __infra_inventory_compute_item.0 }}(\s+)'
-    replace: '\1{{ __infra_inventory_compute_item.1 }}\2'
+    regexp: "(\\s+){{ __infra_inventory_compute_item.0 }}(\\s+)"
+    replace: "\\1{{ __infra_inventory_compute_item.1 }}\\2"
 
 - name: Stat the Temporary Artefact
   ansible.builtin.stat:
@@ -54,7 +53,7 @@
   ansible.builtin.copy:
     src: "{{ __tmp_inventory_static.stat.path }}"
     dest: "{{ init__dynamic_inventory_artefact }}"
-    force: yes
+    force: true
 
 - name: Remove Temporary Artefact file
   ansible.builtin.file:

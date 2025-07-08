@@ -1,3 +1,4 @@
+---
 # Copyright 2023 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,10 +41,7 @@
     - name: Update AWS Prefix List maximum length
       when: infra__aws_extra_prefix_list_additions or infra__aws_extra_prefix_list_deletions
       ansible.builtin.command:
-        cmd:
-          aws ec2 modify-managed-prefix-list
-          --prefix-list-id {{ infra__aws_extra_prefix_list_id }}
-          --max-entries {{ infra__vpc_extra_cidr | count }}
+        cmd: aws ec2 modify-managed-prefix-list --prefix-list-id {{ infra__aws_extra_prefix_list_id }} --max-entries {{ infra__vpc_extra_cidr | count }}
 
     - name: Add entries to AWS Prefix List
       when: infra__aws_extra_prefix_list_additions

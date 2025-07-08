@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +19,8 @@
     location: "{{ infra__region }}"
     name: "{{ infra__vpc_name }}"
     address_prefixes_cidr: "{{ [infra__vpc_cidr] }}"
-    purge_address_prefixes: yes
-    purge_dns_servers: yes
+    purge_address_prefixes: true
+    purge_dns_servers: true
     tags: "{{ infra__tags }}"
     state: present
   register: __azure_vnet_info
@@ -36,7 +35,7 @@
     location: "{{ infra__region }}"
     name: "{{ __azure_network_security_group_name_item }}"
     tags: "{{ infra__tags }}"
-    purge_rules: yes
+    purge_rules: true
     rules: "{{ infra__azure_security_group_rules }}"
     state: present
   loop_control:
@@ -65,7 +64,7 @@
       - { service: "Microsoft.Sql" }
       - { service: "Microsoft.Storage" }
     state: present
-  ignore_errors: yes  # Not idempotent
+  ignore_errors: true # Not idempotent
   loop_control:
     loop_var: __azure_subnet_item
   loop: "{{ infra__vpc_public_subnets_info | union(infra__vpc_private_subnets_info) }}"
@@ -77,7 +76,7 @@
     loop_var: __azure_subnet_item
   loop: "{{ infra__vpc_public_subnets_info | union(infra__vpc_private_subnets_info) }}"
 
-  # TODO: Check new collection release to see if Delegations are now included
+# TODO: Check new collection release to see if Delegations are now included
 - name: Create Azure NetApp Svcnet if deploying CML
   when:
     - infra__ml_deploy

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +22,7 @@
   community.general.terraform:
     project_path: "{{ infra__terraform_workspace_dir }}/infra"
     state: "absent"
-    force_init: yes
+    force_init: true
   register: tf_result
   retries: 3
   delay: 10

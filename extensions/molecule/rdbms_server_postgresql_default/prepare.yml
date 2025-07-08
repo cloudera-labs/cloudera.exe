@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,5 +15,5 @@
 
 - name: Set up TLS certificates
   hosts: all
-  gather_facts: yes
+  gather_facts: true
   tasks:

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@
       - "{{ __auth_fact_item }} is string"
       - "{{ __auth_fact_item }} | trim | length > 0"
     fail_msg: "Authentication parameter, '{{ __auth_fact_item }}', is invalid."
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __auth_fact_item
   loop:

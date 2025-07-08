@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +27,7 @@
   community.general.terraform:
     project_path: "{{ infra__terraform_workspace_dir }}/infra"
     state: "present"
-    force_init: yes
+    force_init: true
   register: tf_result
   retries: 3
   delay: 10
@@ -48,7 +47,7 @@
 # Get information about Dynamic Inventory VMs if created via Terraform
 - name: Fetch EC2 Instance info for Dynamic Inventory Nodes
   register: __infra_dynamic_inventory_discovered
-  community.aws.ec2_instance_info:
+  amazon.aws.ec2_instance_info:
     region: "{{ infra__region }}"
     filters: "{{ __filters | items2dict }}"
   vars:
@@ -71,7 +70,7 @@
   when: infra__create_utility_service
   block:
     - name: Discover the Utility Instance details
-      community.aws.ec2_instance_info:
+      amazon.aws.ec2_instance_info:
         region: "{{ infra__region }}"
         filters: "{{ __filters | items2dict }}"
       vars:
@@ -82,7 +81,7 @@
 
     - name: Add discovered Utility Instance to host group
       ansible.builtin.add_host:
-        hostname: "{{__infra_utility_compute_discovered.instances[0].public_ip_address}}"
+        hostname: "{{ __infra_utility_compute_discovered.instances[0].public_ip_address }}"
         ansible_user: "{{ infra__dynamic_inventory_images_default[infra__type][infra__dynamic_inventory_os].user }}"
         ansible_ssh_private_key_file: "{{ (infra__private_key_file == '') | ternary(omit, infra__private_key_file) }}"
         groupname: cldr_utility

@@ -13,9 +13,8 @@
 # limitations under the License.
 
 ---
-
-- name: yum clean metadata
+- name: Yum clean metadata
   ansible.builtin.command: yum clean metadata
 
-- name: dnf clean metadata
+- name: Dnf clean metadata
   ansible.builtin.command: dnf clean metadata

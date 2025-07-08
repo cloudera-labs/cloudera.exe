@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +33,7 @@
     src: "{{ __prometheus_tmp.path }}/{{ prometheus_tarball_file }}"
     dest: "{{ prometheus_directory }}"
     extra_opts: --strip-components=1
-    remote_src: yes
+    remote_src: true
 
 - name: Remove the temporary  directory
   when: __prometheus_tmp is defined
@@ -45,7 +44,7 @@
 - name: Create Prometheus user
   ansible.builtin.user:
     name: "{{ prometheus_user }}"
-    system: True
+    system: true
 
 - name: Create directory for Prometheus TSDB
   ansible.builtin.file:
@@ -53,14 +52,14 @@
     owner: "{{ prometheus_user }}"
     group: "{{ prometheus_group }}"
     state: directory
-    recurse: yes
+    recurse: true
 
 - name: Set ownership of all files inside  /etc/prometheus
   ansible.builtin.file:
     path: "{{ prometheus_directory }}"
     owner: "{{ prometheus_user }}"
     group: "{{ prometheus_group }}"
-    recurse: yes
+    recurse: true
 
 - name: Create Prometheus service template
   ansible.builtin.template:
@@ -71,16 +70,15 @@
 - name: Start and enable prometheus service
   when: __prometheus_service.changed
   block:
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
 
-  - name: Reload systemd daemon
-    ansible.builtin.systemd:
-      daemon_reload: yes
-
-  - name: Enable and start prometheus service
-    ansible.builtin.systemd:
-      name: prometheus
-      state: started
-      enabled: yes
+    - name: Enable and start prometheus service
+      ansible.builtin.systemd:
+        name: prometheus
+        state: started
+        enabled: true
 
 - name: Update Prometheus configuration
   ansible.builtin.template:

@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +15,18 @@
 
 - name: Confirm local database access
   hosts: all
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Ping database locally
       community.postgresql.postgresql_ping:
-      become: yes
+      become: true
       become_user: postgres
       register: postgres_user
       failed_when: not postgres_user.is_available
 
 - name: Confirm external database access
   hosts: all
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Ping database as authorized user
       community.postgresql.postgresql_ping:

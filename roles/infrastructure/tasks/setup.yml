@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,22 +21,22 @@
 - name: Set up for Ansible deployment engine
   when: infra__deployment_engine == 'ansible'
   block:
-  - name: Set up provider-specific Infrastructure network
-    ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_network.yml"
+    - name: Set up provider-specific Infrastructure network
+      ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_network.yml"
 
-  - name: Set up provider-specific Infrastructure storage
-    ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_storage.yml"
+    - name: Set up provider-specific Infrastructure storage
+      ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_storage.yml"
 
-  - name: Set Up localised provider-specific Storage Utility Service
-    when: infra__create_utility_service
-    ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_utility_service.yml"
+    - name: Set Up localised provider-specific Storage Utility Service
+      when: infra__create_utility_service
+      ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_utility_service.yml"
 
-  - name: Set up provider-specific Infrastructure Compute
-    when: infra__dynamic_inventory_count | int > 0
-    ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_compute.yml"
+    - name: Set up provider-specific Infrastructure Compute
+      when: infra__dynamic_inventory_count | int > 0
+      ansible.builtin.include_tasks: "setup_{{ infra__type | lower }}_compute.yml"
 
 - name: Set up for Terraform deployment engine
   when: infra__deployment_engine == 'terraform'
   block:
-  - name: Set up Terraform Infrastructure artifacts
-    ansible.builtin.include_tasks: "setup_{{ infra__deployment_engine }}.yml"
+    - name: Set up Terraform Infrastructure artifacts
+      ansible.builtin.include_tasks: "setup_{{ infra__deployment_engine }}.yml"

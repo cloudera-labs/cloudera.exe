@@ -59,7 +59,7 @@ DOCUMENTATION = """
 
 EXAMPLES = """
     # ab => {'a':1, 'b':2, 'c': 4}
-    ab: {{ {'a':1, 'b':2} | cloudera.exe.combine_onto({'b':3, 'c':4}) }}
+    ab: "{{ {'a':1, 'b':2} | cloudera.exe.combine_onto({'b':3, 'c':4}) }}"
 
     many: "{{ dict1 | cloudera.exe.combine_onto(dict2, dict3, dict4) }}"
 
@@ -89,7 +89,7 @@ def combine_onto(*terms, **kwargs):
     list_merge = kwargs.pop("list_merge", "replace")
     if kwargs:
         raise AnsibleFilterError(
-            "'recursive' and 'list_merge' are the only valid keyword arguments"
+            "'recursive' and 'list_merge' are the only valid keyword arguments",
         )
 
     # allow the user to do `[dict1, dict2, ...] | combine`

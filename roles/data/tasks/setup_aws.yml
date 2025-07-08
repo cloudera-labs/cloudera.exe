@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,13 +23,15 @@
 
 - name: Set fact for AWS data access policy name
   ansible.builtin.set_fact:
-    data__aws_data_access_policy_name: "{{ __data_storage.policy.name | default([data__namespace, data__external_data_suffix, __data_aws_policy_label, __data_storage.policy.suffix | default(data__aws_policy_suffix)] | join('-')) }}"
+    data__aws_data_access_policy_name: "{{ __data_storage.policy.name | default([data__namespace, data__external_data_suffix, __data_aws_policy_label, __data_storage.policy.suffix
+      | default(data__aws_policy_suffix)] | join('-')) }}"
   vars:
     __data_aws_policy_label: "{{ __data_storage['read_only'] | default(False) | ternary(data__aws_read_only_policy_suffix, data__aws_read_write_policy_suffix) }}"
 
 - name: Set fact for data storage location declarations
   ansible.builtin.set_fact:
-    __data_aws_data_access_locations: "{{ __data_aws_data_access_locations | default({}) | combine({ data__aws_data_access_policy_name: locations | unique }, recursive=True, list_merge='append') }}"
+    __data_aws_data_access_locations: "{{ __data_aws_data_access_locations | default({}) | combine({data__aws_data_access_policy_name: locations | unique}, recursive=True,
+      list_merge='append') }}"
   vars:
     locations:
       - "arn:aws:s3:::{{ __data_storage_location }}"
@@ -42,20 +43,22 @@
 
 - name: Set fact for AWS data access policy Resource with storage locations
   ansible.builtin.set_fact:
-    __data_aws_data_access_policy_contents: "{{ document | combine({ 'Statement' : [modified_statement] | union(remaining_sid_statements) | union(remaining_other_statements) }, recursive=True) }}"
+    __data_aws_data_access_policy_contents: "{{ document | combine({'Statement': [modified_statement] | union(remaining_sid_statements) | union(remaining_other_statements)},
+      recursive=True) }}"
   vars:
     sid: "{{ __data_storage['read_only'] | default(False) | ternary('AllowListingOfDataLakeFolder', 'VisualEditor3') }}"
     document: "{{ lookup('file', __aws_data_access_policy_document.dest) | from_json }}"
     target_statement: "{{ document.Statement | selectattr('Sid', 'defined') | selectattr('Sid', 'equalto', sid) | first }}"
     remaining_sid_statements: "{{ document.Statement | selectattr('Sid', 'defined') | rejectattr('Sid', 'equalto', sid) }}"
     remaining_other_statements: "{{ document.Statement | selectattr('Sid', 'undefined') }}"
-    modified_statement: "{{ target_statement | combine({ 'Resource': __data_aws_data_access_locations[data__aws_data_access_policy_name] }, recursive=True) }}"
+    modified_statement: "{{ target_statement | combine({'Resource': __data_aws_data_access_locations[data__aws_data_access_policy_name]}, recursive=True) }}"
 
 - name: Create AWS managed policy for data access storage locations
   community.aws.iam_managed_policy:
     region: "{{ data__region }}"
     policy_name: "{{ data__aws_data_access_policy_name }}"
-    policy_description: "{{ __data_storage['read_only'] | default(False) | ternary('Read-only', 'Read-write') }} external data storage policy for {{ data__namespace }}"
+    policy_description: "{{ __data_storage['read_only'] | default(False) | ternary('Read-only', 'Read-write') }} external data storage policy for {{ data__namespace
+      }}"
     policy: "{{ __data_aws_data_access_policy_contents | to_json }}"
     state: present
 
@@ -70,8 +73,8 @@
   community.aws.iam_role:
     region: "{{ data__region }}"
     name: "{{ __data_aws_access_role_name }}"
-    purge_policies: no
-    purge_tags: no
+    purge_policies: false
+    purge_tags: false
     assume_role_policy_document:
       Version: "2012-10-17"
       Statement:

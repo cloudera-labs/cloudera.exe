@@ -22,7 +22,7 @@
 #ipadm_password:
 
 # ipaserver_recursion_acl_cidr:
-ipaserver_resolv_nameservers: [ '8.8.8.8' ]
+ipaserver_resolv_nameservers: ["8.8.8.8"]
 ipaserver_server_recursion: true
 enable_dns: false
-needs_python2: True
+needs_python2: true

@@ -1,3 +1,4 @@
+---
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,18 +21,18 @@
 # Copy Terraform provider file
 - name: Copy Terraform Provider file
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/provider.tf'
+    src: "files/{{ infra__type }}/provider.tf"
     dest: "{{ infra__terraform_template_dir }}/infra/provider.tf"
 
 # Copy Terraform variables file
 - name: Copy Terraform Variables declaration file
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/terraform_variables.tf'
+    src: "files/{{ infra__type }}/terraform_variables.tf"
     dest: "{{ infra__terraform_template_dir }}/infra/variables.tf"
   no_log: false
 
 # Apply template for Terraform backend state
 - name: Generate Terraform Backend State
   ansible.builtin.template:
-    src: 'templates/{{ infra__type }}/backend_state.tf.j2'
+    src: "templates/{{ infra__type }}/backend_state.tf.j2"
     dest: "{{ infra__terraform_template_dir }}/infra/backend_state.tf"

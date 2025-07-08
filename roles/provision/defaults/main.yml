@@ -9,7 +9,7 @@ provision_inventory_file: "{{ undef(hint='Static inventory file') }}" # inventor
 provision_state_storage: local # remote_s3
 # provision_remote_storage_s3_region:
 # provision_remote_storage_s3_bucket:
-provision_create_remote_storage: False
+provision_create_remote_storage: false
 
 provision_name_prefix: "{{ undef(hint='Deployment name prefix') }}"
 provision_domain_suffix: "{{ undef(hint='DNS domain suffix') }}"
@@ -17,7 +17,6 @@ provision_ssh_keypair_label: "{{ undef(hint='SSH keypair label') }}"
 provision_ssh_keypair_public_key: "{{ undef(hint='SSH keypair public key text') }}"
 provision_owner_email: "{{ undef(hint='Resource owner email') }}"
 provision_tags: {}
-
 provision_aws_ec2_region: "{{ undef(hint='AWS EC2 region') }}"
 #provision_aws_ec2_default_ami_filters: "{{ undef(hint='AWS EC2 filters for default AMI') }}"
 #provision_aws_ec2_default_ami_owners: "{{ undef(hint='AWS EC2 AMI owner filter') }}"

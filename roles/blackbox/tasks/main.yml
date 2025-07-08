@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +33,7 @@
     src: "{{ __blackbox_tmp.path }}/{{ blackbox_tarball_file }}"
     dest: "{{ blackbox_directory }}"
     extra_opts: --strip-components=1
-    remote_src: yes
+    remote_src: true
 
 - name: Remove the temporary  directory
   when: __blackbox_tmp is defined
@@ -49,23 +48,23 @@
 - name: Create Blackbox user
   ansible.builtin.user:
     name: "{{ blackbox_user }}"
-    system: True
+    system: true
 
 - name: Set ownership of all files inside /etc/blackbox
   ansible.builtin.file:
     path: "{{ blackbox_directory }}"
     owner: "{{ blackbox_user }}"
     group: "{{ blackbox_group }}"
-    recurse: yes
+    recurse: true
 
 - name: Copy blackbox binary to /usr/local/bin
   ansible.builtin.copy:
-    remote_src: yes
+    remote_src: true
     src: "{{ blackbox_directory }}/blackbox_exporter"
     dest: "{{ blackbox_bin_directory }}/blackbox_exporter"
     owner: "{{ blackbox_user }}"
     group: "{{ blackbox_group }}"
-    mode: '0755'
+    mode: "0755"
 
 - name: Create Blackbox service template
   ansible.builtin.template:
@@ -76,13 +75,12 @@
 - name: Start and enable Blackbox service
   when: __blackbox_service.changed
   block:
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
 
-  - name: Reload systemd daemon
-    ansible.builtin.systemd:
-      daemon_reload: yes
-
-  - name: Start Blackbox service
-    ansible.builtin.systemd:
-      name: blackbox
-      state: started
-      enabled: yes
+    - name: Start Blackbox service
+      ansible.builtin.systemd:
+        name: blackbox
+        state: started
+        enabled: true

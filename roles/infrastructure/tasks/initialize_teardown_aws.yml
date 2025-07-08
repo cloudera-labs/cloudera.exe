@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
 
 - name: List VPC Endpoints
   when: infra__aws_private_endpoints | bool
-  community.aws.ec2_vpc_endpoint_info:
+  amazon.aws.ec2_vpc_endpoint_info:
     region: "{{ infra__region }}"
     filters:
       vpc-id: "{{ infra__aws_vpc_id }}"
@@ -39,7 +38,7 @@
 
     - name: Discover all AWS VPC EC2 instances
       register: __infra_vpc_ec2_instances
-      community.aws.ec2_instance_info:
+      amazon.aws.ec2_instance_info:
         region: "{{ infra__region }}"
         filters: "{{ __filters | items2dict }}"
       vars:
@@ -53,8 +52,7 @@
 
     - name: List AWS EKS clusters
       register: __infra_eks_cluster_list
-      command: "aws eks list-clusters --region {{ infra__region }}"
-
+      ansible.builtin.command: "aws eks list-clusters --region {{ infra__region }}"
     - name: Describe all AWS EKS clusters
       register: __infra_eks_cluster_details
       ansible.builtin.command: "aws eks describe-cluster --name {{ __infra_eks_cluster_item }} --region {{ infra__region }}"
@@ -122,14 +120,14 @@
         #label: "{{ __infra_ec2_elb_item.load_balancer_name }}"
 
     - name: List all AWS VPC NAT gateways
-      community.aws.ec2_vpc_nat_gateway_info:
+      amazon.aws.ec2_vpc_nat_gateway_info:
         region: "{{ infra__region }}"
         filters:
           vpc-id: "{{ infra__aws_vpc_id }}"
       register: __infra_aws_nat_gateways
 
     - name: List all AWS VPC Security Groups
-      register:  __infra_aws_sgs
+      register: __infra_aws_sgs
       amazon.aws.ec2_group_info:
         region: "{{ infra__region }}"
         filters:
@@ -145,7 +143,7 @@
 - name: Discover AWS RDS for forced teardown
   when: infra__force_teardown | bool
   block:
-    - name: list AWS RDS Instances in region
+    - name: List AWS RDS Instances in region
       community.aws.rds_instance_info:
         region: "{{ infra__region }}"
       register: __infra_aws_rds_list

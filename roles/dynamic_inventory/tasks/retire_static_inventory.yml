@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +14,13 @@
 # limitations under the License.
 
 - name: Check for a Static Inventory file
-  stat:
+  ansible.builtin.stat:
     path: "{{ init__dynamic_inventory_artefact }}"
   register: __inventory_static
 
 - name: Create a backup
   when: __inventory_static.stat.exists
-  copy:
+  ansible.builtin.copy:
     src: "{{ __inventory_static.stat.path }}"
     dest: "{{ [init__dynamic_inventory_artefact | splitext | first, ansible_date_time.epoch] | join('.') }}"
 

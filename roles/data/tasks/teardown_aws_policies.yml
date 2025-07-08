@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,8 @@
   block:
     - name: Set fact for AWS external policy name
       ansible.builtin.set_fact:
-        __data_aws_external_policy_name: "{{ __data_storage.policy.name | default([data__namespace, data__external_data_suffix, __data_storage_policy_label, __data_storage_policy_suffix] | join('-')) }}"
+        __data_aws_external_policy_name: "{{ __data_storage.policy.name | default([data__namespace, data__external_data_suffix, __data_storage_policy_label, __data_storage_policy_suffix]
+          | join('-')) }}"
       vars:
         __data_storage_readonly: "{{ __data_storage['read_only'] | default(False) }}"
         __data_storage_policy_label: "{{ __data_storage_readonly | ternary(data__aws_read_only_policy_suffix, data__aws_read_write_policy_suffix) }}"
@@ -43,7 +43,8 @@
     - name: Set facts for existing managed policies for external data AWS role
       when: __data_aws_access_role_info.iam_roles | length > 0
       ansible.builtin.set_fact:
-        __data_aws_access_role_remaining_policies: "{{ __data_aws_access_role.managed_policies | rejectattr('policy_name', 'equalto', __data_aws_external_policy_name) | list }}"
+        __data_aws_access_role_remaining_policies: "{{ __data_aws_access_role.managed_policies | rejectattr('policy_name', 'equalto', __data_aws_external_policy_name)
+          | list }}"
       vars:
         __data_aws_access_role: "{{ __data_aws_access_role_info.iam_roles | first }}"
 
@@ -52,8 +53,8 @@
       community.aws.iam_role:
         region: "{{ data__region }}"
         name: "{{ __data_aws_access_role_name }}"
-        purge_policies: yes
-        purge_tags: no
+        purge_policies: true
+        purge_tags: false
         assume_role_policy_document:
           Version: "2012-10-17"
           Statement:

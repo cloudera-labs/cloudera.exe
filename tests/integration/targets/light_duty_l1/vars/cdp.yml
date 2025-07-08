@@ -23,11 +23,11 @@ env:
     credential:
       name: "{{ globals.name_prefix }}-{{ globals.infra_type }}-lgt-l1-test"
   datalake:
-    scale: LIGHT_DUTY  # same as env.enable_ha=False
-  tunnel: yes
-  public_endpoint_access: yes
-  workload_analytics: no
+    scale: LIGHT_DUTY # same as env.enable_ha=False
+  tunnel: true
+  public_endpoint_access: true
+  workload_analytics: false
   teardown:
-    delete_credential: yes
+    delete_credential: true
   azure:
-    single_resource_group: yes
+    single_resource_group: true

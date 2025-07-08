@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +22,7 @@
     env: "{{ run__env_name }}"
     name: "{{ __opdb_config.name }}"
     state: absent
-    wait: yes
+    wait: true
   loop_control:
     loop_var: __opdb_config
     label: "{{ __opdb_config.name | default('opdb') }}"
@@ -43,7 +42,7 @@
         cluster_id: "{{ __dw_cluster_id }}"
         id: "{{ __vw_id.id }}"
         state: absent
-        wait: yes
+        wait: true
       loop: "{{ __dw_vw_list.virtual_warehouses | default([]) }}"
       loop_control:
         loop_var: __vw_id
@@ -70,7 +69,7 @@
         cluster_id: "{{ __dw_cluster_id }}"
         id: "{{ __dw_vw_compactor_item.__dw_vw_teardown_item.__vw_id.id }}"
         state: absent
-        wait: yes
+        wait: true
       loop: "{{ ansible_failed_result.results }}"
       when: __dw_vw_compactor_item.failed | bool
       loop_control:
@@ -102,7 +101,7 @@
     cluster_id: "{{ __dw_cluster_id }}"
     id: "{{ __dbc_id.id }}"
     state: absent
-    wait: yes
+    wait: true
   loop: "{{ __dw_dbc_list.database_catalogs | default([]) }}"
   loop_control:
     loop_var: __dbc_id
@@ -122,7 +121,7 @@
     force: "{{ run__df_force_delete }}"
     terminate: "{{ run__df_terminate_deployments }}"
     state: absent
-    wait: no
+    wait: false
   loop_control:
     loop_var: __df_teardown_req_item
   loop: "{{ run__df_service_info.services }}"
@@ -174,7 +173,7 @@
     name: "{{ __datahub_config_item.name }}"
     state: absent
     force: "{{ run__datahub_force_teardown }}"
-    wait: yes
+    wait: true
   loop_control:
     loop_var: __datahub_config_item
     label: "{{ __datahub_config_item.name | default('datahub') }}"
@@ -251,7 +250,7 @@
   cloudera.cloud.dw_cluster:
     env: "{{ run__env_name }}"
     state: absent
-    wait: yes
+    wait: true
     force: "{{ run__dw_force_delete or run__force_teardown }}"
 
 - name: Wait for CDP OpDB deployments to decommission
@@ -280,7 +279,7 @@
     force: "{{ run__df_force_delete }}"
     terminate: "{{ run__df_terminate_deployments }}"
     state: absent
-    wait: yes
+    wait: true
   loop_control:
     loop_var: __df_teardown_wait_item
   loop: "{{ run__df_service_info.services }}"

@@ -22,4 +22,4 @@
 # ipaadmin_password:
 
 enable_dns: false
-fallback_nameservers: [ "8.8.8.8" ]
+fallback_nameservers: ["8.8.8.8"]

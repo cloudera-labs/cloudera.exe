@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +17,23 @@
 
 - name: Replace placeholder values in AWS default policy documents
   ansible.builtin.replace:
-    path: "{{ __aws_policy_document_item.dest }}"  # Outer loop variable (is the result of get_url)
+    path: "{{ __aws_policy_document_item.dest }}" # Outer loop variable (is the result of get_url)
     regexp: "{{ __aws_policy_regexp_item.regexp }}"
     replace: "{{ __aws_policy_regexp_item.replace }}"
   loop_control:
     loop_var: __aws_policy_regexp_item
   loop:
-    - regexp: '\${LOGS_LOCATION_BASE}'
+    - regexp: "\\${LOGS_LOCATION_BASE}"
       replace: "{{ plat__storage_name }}"
-    - regexp: '\${LOGS_BUCKET}'
+    - regexp: "\\${LOGS_BUCKET}"
       replace: "{{ plat__storage_name }}"
-    - regexp: '\${STORAGE_LOCATION_BASE}'
+    - regexp: "\\${STORAGE_LOCATION_BASE}"
       replace: "{{ plat__storage_name }}"
-    - regexp: '\${DATALAKE_BUCKET}'
+    - regexp: "\\${DATALAKE_BUCKET}"
       replace: "{{ plat__storage_name }}"
-    - regexp: '\${STORAGE_LOCATION_BASE}'
+    - regexp: "\\${STORAGE_LOCATION_BASE}"
       replace: "{{ plat__storage_name }}"
-    - regexp: '\${DATALAKE_BUCKET}'
+    - regexp: "\\${DATALAKE_BUCKET}"
       replace: "{{ plat__storage_name }}"
-    - regexp: '\${ARN_PARTITION}'
+    - regexp: "\\${ARN_PARTITION}"
       replace: "{{ plat__aws_arn_partition }}"

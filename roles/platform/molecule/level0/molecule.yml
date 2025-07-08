@@ -46,7 +46,7 @@ provisioner:
           aws:
             region: ${FOUNDRY_AWS_REGION:-us-east-2}
         env:
-          tunnel: no                   # L0 Networking
+          tunnel: no # L0 Networking
 verifier:
   name: ansible
 lint: |

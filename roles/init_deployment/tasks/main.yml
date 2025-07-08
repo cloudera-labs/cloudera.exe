@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,4 +28,4 @@
 
 - name: Explicitly finalise Initialisation to avoid duplicate init
   ansible.builtin.set_fact:
-    init__completed: True
+    init__completed: true

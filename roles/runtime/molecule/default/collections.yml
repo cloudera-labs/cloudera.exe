@@ -1,6 +1,5 @@
 ---
 roles: []
-
 collections:
   - name: https://github.com/cloudera-labs/cloudera.cloud
     type: git

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 - name: Remove CDP Cross Account Credential for AWS
   when: plat__teardown_deletes_credential
   cloudera.cloud.env_cred:
-    name: "{{ plat__xacccount_credential_name }}"  # TODO: Make specific to AWS Teardown as credentials can be for multiple environments
+    name: "{{ plat__xacccount_credential_name }}" # TODO: Make specific to AWS Teardown as credentials can be for multiple environments
     state: absent
 
 - name: Ensure the Terraform workspace directory exists
@@ -29,7 +28,7 @@
   community.general.terraform:
     project_path: "{{ plat__terraform_workspace_dir }}/plat"
     state: "absent"
-    force_init: yes
+    force_init: true
   register: tf_result
   retries: 3
   delay: 10

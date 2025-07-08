@@ -1,5 +1,4 @@
 ---
-
 - name: Set up the local Terraform project directory
   ansible.builtin.file:
     state: directory
@@ -22,7 +21,7 @@
 
 - name: Generate Terraform backend state
   ansible.builtin.template:
-    src: 'backend_state.tf.j2'
+    src: "backend_state.tf.j2"
     dest: "{{ [provision_directory, 'backend_state.tf'] | path_join }}"
 
 - name: Generate Terraform variables file
@@ -36,7 +35,7 @@
     project_path: "{{ provision_directory }}/"
     parallelism: "{{ provision_terraform_parallelism | default(omit) }}"
     state: present
-    force_init: yes
+    force_init: true
   register: tf_result
 
 - name: Establish jump host IP address
@@ -57,7 +56,8 @@
     ansible_timeout: "{{ (jump_host_ip is defined and (jump_host_ip | length > 0)) | ternary(60, omit) }}"
     ansible_ssh_common_args: "{{ (jump_host_ip is defined and (jump_host_ip | length > 0)) | ternary(jump, omit) }}"
   vars:
-    jump: -o ProxyCommand="ssh -o User={{ jump_host_user }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q {{ jump_host_ip | default() }}"
+    jump: -o ProxyCommand="ssh -o User={{ jump_host_user }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q {{ jump_host_ip | default()
+      }}"
   loop: "{{ tf_result.outputs.nodes.value }}"
   loop_control:
     loop_var: node

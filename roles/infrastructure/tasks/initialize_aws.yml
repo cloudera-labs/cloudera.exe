@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +47,7 @@
               - __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count | int
               - __aws_private_subnets_info.subnets | map(attribute='map_public_ip_on_launch') | reject() | length > 0
             fail_msg: "The private subnets should be provided from at least 2 AZs and should have public IP addressing disabled."
-            quiet: yes
+            quiet: true
 
         - name: Generate Private Subnet details for update
           ansible.builtin.set_fact:
@@ -59,11 +58,13 @@
           loop: "{{ __aws_private_subnets_info.subnets }}"
           vars:
             entry:
-              name: "{{ __private_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-')) }}"
+              name: "{{ __private_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx | string] | join('-'))
+                }}"
               cidr: "{{ __private_subnet_item.cidr_block }}"
               tags:
                 "kubernetes.io/role/internal-elb": "1"
-                "Name": "{{ __private_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-')) }}"
+                "Name": "{{ __private_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx | string] | join('-'))
+                  }}"
 
         - name: Set facts for existing AWS Private Subnet IDs and associate VPC ID
           ansible.builtin.set_fact:
@@ -85,7 +86,7 @@
               - __aws_public_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count >= infra__aws_vpc_az_count | int
               - __aws_public_subnets_info.subnets | map(attribute='map_public_ip_on_launch') | select() | length > 0
             fail_msg: "The public subnets should be associated with at least 2 AZs and should have public IP addressing enabled."
-            quiet: yes
+            quiet: true
 
         - name: Confirm additional AWS Public Subnet AZ count if providing Public Endpoint access
           when: infra__public_endpoint_access
@@ -94,7 +95,7 @@
               - infra__aws_private_subnet_ids
               - infra__aws_public_subnet_ids | unique | count >= __aws_private_subnets_info.subnets | map(attribute='availability_zone') | list | unique | count
             fail_msg: "The number of public subnets should be at least as many as the number of associated AZs of the private subnets."
-            quiet: yes
+            quiet: true
 
         - name: Generate Public Subnet details for update
           ansible.builtin.set_fact:
@@ -105,13 +106,15 @@
           loop: "{{ __aws_public_subnets_info.subnets }}"
           vars:
             entry:
-              name: "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-')) }}"
+              name: "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx | string] | join('-'))
+                }}"
               cidr: "{{ __public_subnet_item.cidr_block }}"
               map_public: "{{ __public_subnet_item.map_public_ip_on_launch }}"
               assign_instances_ipv6: "{{ __public_subnet_item.assign_ipv6_address_on_creation }}"
               tags:
                 "kubernetes.io/role/elb": "1"
-                "Name": "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-')) }}"
+                "Name": "{{ __public_subnet_item.tags['Name'] | default([infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx | string] | join('-'))
+                  }}"
 
         - name: Set facts for existing AWS Public Subnet IDs
           ansible.builtin.set_fact:
@@ -142,7 +145,8 @@
   block:
     # Using CLI due to hardcoded module behavior - see https://github.com/boto/boto3/issues/2929
     - name: Query AWS VPC ID by unique name and CIDR (CLI version)
-      ansible.builtin.command: "aws ec2 describe-vpcs --region {{ infra__region }} --filters Name=cidr,Values={{ infra__vpc_cidr }} Name=tag:Name,Values={{ infra__vpc_name }}"
+      ansible.builtin.command: "aws ec2 describe-vpcs --region {{ infra__region }} --filters Name=cidr,Values={{ infra__vpc_cidr }} Name=tag:Name,Values={{ infra__vpc_name
+        }}"
       register: __aws_vpc_list_discovered
 
     - name: Check VPC list for singular response (CLI version)
@@ -174,7 +178,7 @@
 
 - name: Fetch EC2 Instance info for Dynamic Inventory Nodes
   register: __infra_dynamic_inventory_discovered
-  community.aws.ec2_instance_info:
+  amazon.aws.ec2_instance_info:
     region: "{{ infra__region }}"
     filters: "{{ __filters | items2dict }}"
   vars:
@@ -184,7 +188,7 @@
 
 - name: Fetch EC2 Instance info for Utility VM
   register: __infra_utility_compute_discovered
-  community.aws.ec2_instance_info:
+  amazon.aws.ec2_instance_info:
     region: "{{ infra__region }}"
     filters: "{{ __filters | items2dict }}"
   vars:

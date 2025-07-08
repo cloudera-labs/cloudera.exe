@@ -1,5 +1,4 @@
 ---
-
 - name: Fetch necessary variables from Ansible Controller
   ansible.builtin.set_fact:
     globals: "{{ hostvars['localhost']['globals'] }}"

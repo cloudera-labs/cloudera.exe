@@ -13,22 +13,21 @@
 # limitations under the License.
 
 ---
-
 - name: Download MySQL Connector/J
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ mysql_connector_url }}"
     dest: "{{ mysql_connector_download_dir }}/mysql-connector-java.zip"
     checksum: "{{ mysql_connector_checksum }}"
-    mode: 0644
-  become: no
+    mode: "0644"
+  become: false
   run_once: true
   delegate_to: localhost
 
 - name: Create /usr/share/java directory
-  file:
+  ansible.builtin.file:
     path: /usr/share/java
     state: directory
-    mode: 0755
+    mode: "0755"
 
 - name: Install unzip package
   ansible.builtin.package:
@@ -37,23 +36,23 @@
     state: present
 
 - name: Extract MySQL Connector/J zip file
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ mysql_connector_download_dir }}/mysql-connector-java.zip"
     dest: "{{ mysql_connector_extract_dir }}"
     exclude:
       - src
 
 - name: Copy MySQL Connector/J jar file to correct location
-  copy:
+  ansible.builtin.copy:
     src: "{{ mysql_connector_local_path }}"
     dest: /usr/share/java/mysql-connector-java.jar
-    remote_src: yes
-    mode: 0644
+    remote_src: true
+    mode: "0644"
 
 ## Fix for RHEL8,9
 - name: Install Mysql packages for python - PyMySQL
   when:
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version >= "8"
-  shell: /usr/local/bin/pip install PyMySQL --force-reinstall --ignore-installed
+  ansible.builtin.command: /usr/local/bin/pip install PyMySQL --force-reinstall --ignore-installed
   ignore_errors: true

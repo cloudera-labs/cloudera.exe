@@ -13,12 +13,11 @@
 # limitations under the License.
 
 ---
-
 - name: Prepare directories for TLS
   ansible.builtin.file:
     state: directory
     path: "{{ dir }}"
-    mode: 0755
+    mode: "0755"
     owner: root
   loop:
     - "{{ base_dir_security }}"
@@ -32,7 +31,7 @@
 
 - name: Derive openssl subjects from subject attribute
   ansible.builtin.set_fact:
-    openssl_subject: "{{ openssl_subject | default({}) | combine( {item.split('=')[0] : item.split('=')[1]}) }}"
+    openssl_subject: "{{ openssl_subject | default({}) | combine({item.split('=')[0]: item.split('=')[1]}) }}"
   loop: "{{ subject_attr }}"
 
 - name: Generate CSR
@@ -57,4 +56,4 @@
   ansible.builtin.fetch:
     src: "{{ tls_csr_path }}"
     dest: "{{ local_csrs_dir }}/"
-    flat: yes
+    flat: true

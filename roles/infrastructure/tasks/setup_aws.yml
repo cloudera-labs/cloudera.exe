@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +16,11 @@
 - name: Ensure designated SSH keypair is in region
   amazon.aws.ec2_key:
     name: "{{ infra__public_key_id }}"
-    force: no
+    force: false
     key_material: "{{ (infra__public_key_text | length > 0) | ternary(infra__public_key_text, omit) }}"
     region: "{{ infra__region }}"
     state: present
-  no_log: yes
+  no_log: true
   register: __aws_ec2_ssh_keypair
 
 - name: Save the private key locally if created

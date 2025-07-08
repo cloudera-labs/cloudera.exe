@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 - name: Set public key text from file if not set
   when: plat__public_key_text | trim | length < 1 and plat__public_key_file
   ansible.builtin.set_fact:
-    plat__public_key_text: "{{ lookup('file', plat__public_key_file ) }}"
+    plat__public_key_text: "{{ lookup('file', plat__public_key_file) }}"
 
 - name: Check public key text
   ansible.builtin.assert:
@@ -26,4 +25,4 @@
       - "plat__public_key_text is string"
       - "plat__public_key_text | trim | length > 0"
     fail_msg: "Azure authentication parameter, 'plat__public_key_text', is invalid."
-    quiet: yes
+    quiet: true

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +17,7 @@
   google.cloud.gcp_compute_network:
     project: "{{ infra__gcp_project }}"
     name: "{{ infra__vpc_name }}"
-    auto_create_subnetworks: 'false'
+    auto_create_subnetworks: "false"
     state: present
   register: __gcp_vpc_info
 
@@ -29,7 +28,7 @@
     name: "{{ __gcp_subnet_item.name }}"
     network: "{{ __gcp_vpc_info }}"
     ip_cidr_range: "{{ __gcp_subnet_item.cidr }}"
-    private_ip_google_access: yes
+    private_ip_google_access: true
     state: present
   loop_control:
     loop_var: __gcp_subnet_item
@@ -68,14 +67,12 @@
   register: __gcp_peer_vnet_info
 
 - name: Create VPC Peering for CloudSQL
-  command: >
+  ansible.builtin.command: >
     gcloud services vpc-peerings connect
     --project={{ infra__gcp_project }}
     --network={{ infra__vpc_name }}
     --service=servicenetworking.googleapis.com
     --ranges={{ infra__vpc_svcnet_name }}
-
-# Cloud Router and Cloud NAT for L2 networking
 - name: Create a Cloud Router
   when:
     - infra__tunnel
