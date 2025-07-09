@@ -51,3 +51,4 @@ repos:
     hooks:
       - id: ansible-lint
         name: lint ansible
+        entry: python3 -m ansiblelint -v --force-color --offline
