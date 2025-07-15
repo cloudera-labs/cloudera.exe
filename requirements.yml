@@ -22,14 +22,14 @@ roles:
     version: master
 
 collections:
-  - name: cloudera.cloud
-    version: 2.4.0
-  - name: cloudera.cluster
-    version: 4.4.0
+  - name: https://github.com/cloudera-labs/cloudera.cloud
+    type: git
+    version: devel
+  - name: https://github.com/cloudera-labs/cloudera.cluster
+    type: git
+    version: devel
   - name: ansible.netcommon
     version: 2.5.1
-  - name: community.general
-    version: 4.5.0
   - name: amazon.aws
     version: 3.0.0
   - name: community.aws
@@ -42,14 +42,16 @@ collections:
     version: 1.0.2
   - name: ansible.posix
     version: 1.3.0
-  # Is included via cloudera.cluster
-  # - name: community.crypto
-  #   version: 2.2.1
-  - name: community.mysql
-    version: 3.8.0
-  - name: community.postgresql
-    version: 3.3.0
-  - name: freeipa.ansible_freeipa
-    version: 1.11.1
   - name: cloud.terraform
     version: 3.0.0
+  # Included via cloudera.cluster -- TODO Uncomment post-6.0.0 release of cluster
+  # - name: community.crypto
+  #   version: 2.2.1
+  # - name: community.general
+  #   version: 4.5.0
+  # - name: community.mysql
+  #   version: 3.8.0
+  # - name: community.postgresql
+  #   version: 3.3.0
+  # - name: freeipa.ansible_freeipa
+  #   version: 1.11.1
