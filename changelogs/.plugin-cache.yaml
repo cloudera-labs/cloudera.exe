@@ -1,26 +1,106 @@
 objects:
   role:
+    auto_repo_mirror:
+      description: Populate repository mirror
+      name: auto_repo_mirror
+      version_added: 2.0.0
+    blackbox:
+      description: Deploy Blackbox exporter.
+      name: blackbox
+      version_added: 2.4.0
+    common:
+      description: Shared configuration variables
+      name: common
+      version_added: 1.0.0
+    data:
+      description: Manage external data locations
+      name: data
+      version_added: 1.0.0
+    dynamic_inventory:
+      description: Provision dynamic inventory
+      name: dynamic_inventory
+      version_added: 2.0.0
+    freeipa_client:
+      description: Deploy FreeIPA clients.
+      name: freeipa_client
+      version_added: 2.0.0
+    freeipa_host_group:
+      description: Create FreeIPA host group
+      name: freeipa_host_group
+      version_added: 1.2.0
+    freeipa_server:
+      description: Deploy FreeIPA server.
+      name: freeipa_server
+      version_added: 2.0.0
+    grafana:
+      description: Deploy Grafana.
+      name: grafana
+      version_added: 2.4.0
+    info:
+      description: Retrieve CDP details
+      name: info
+      version_added: 1.0.0
+    infrastructure:
+      description: Deploy cloud provider infrastructure
+      name: infrastructure
+      version_added: 1.0.0
+    init_deployment:
+      description: Marshal deployment configuration.
+      name: init_deployment
+      version_added: 2.0.0
+    mount:
+      description: Mount partitions.
+      name: mount
+      version_added: 2.0.1
+    nodeexporter:
+      description: Deploy Node exporter.
+      name: nodeexporter
+      version_added: 2.4.0
+    platform:
+      description: Deploy CDP Public Cloud core services
+      name: platform
+      version_added: 1.0.0
+    prometheus:
+      description: Deploy Prometheus.
+      name: prometheus
+      version_added: 2.4.0
+    provision:
+      description: Provision Cloudera-specific inventory.
+      name: provision
+      version_added: 2.0.1
     rdbms_server:
       description: Install standalone RDBMS instance
       name: rdbms_server
       version_added: null
+    runtime:
+      description: Deploy CDP Public Cloud Experiences
+      name: runtime
+      version_added: 1.0.0
+    sequence:
+      description: Execute run-level operations for CDP Public Cloud
+      name: sequence
+      version_added: 1.0.0
+    sudoers:
+      description: Create sudo rule
+      name: sudoers
+      version_added: 1.2.0
     tls_fetch_ca_certs:
       description: Bring CA root and intermediate cert back to controller
       name: tls_fetch_ca_certs
-      version_added: null
+      version_added: 3.0.0
     tls_generate_csr:
       description: Generates a CSR on each host and copies it back to the Ansible
         controller
       name: tls_generate_csr
-      version_added: null
+      version_added: 3.0.0
     tls_install_certs:
       description: Copy and install the signed TLS certificates to each cluster
       name: tls_install_certs
-      version_added: null
+      version_added: 3.0.0
     tls_signing:
       description: Sign of CSRs by a CA Server
       name: tls_signing
-      version_added: null
+      version_added: 3.0.0
 plugins:
   become: {}
   cache: {}
@@ -31,7 +111,7 @@ plugins:
     combine_onto:
       description: combine two dictionaries
       name: combine_onto
-      version_added: null
+      version_added: 1.0.0
   httpapi: {}
   inventory: {}
   lookup: {}
@@ -41,4 +121,4 @@ plugins:
   strategy: {}
   test: {}
   vars: {}
-version: 1.1.0
+version: 2.4.1

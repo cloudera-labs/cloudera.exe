@@ -1,5 +1,3 @@
----
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,30 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-galaxy_info:
-  role_name: freeipa_server
-  namespace: cloudera
-  author: Webster Mudge Jim Enright Chuck Levesque
-  description: >
-    Deployment of sidecar FreeIPA Server for Cloudera Data Platform (CDP) Base and ECS
-  company: Cloudera
-  license: Apache-2.0
-
-  min_ansible_version: 2.10
-
-  platforms:
-    - name: Debian
-      versions: all
-    - name: Fedora
-      versions: all
-    - name: GenericLinux
-      versions: all
-    - name: MacOSX
-      versions: all
-    - name: Ubuntu
-      versions: all
-
-  galaxy_tags:
-    - cloudera
-    - cdp
-    - freeipa
+argument_specs:
+  main:
+    short_description: Deploy CDP Public Cloud core services
+    description: |
+      Deployment and management of Cloudera Data Platform (CDP) Public Cloud core
+      services, e.g. Environments, Datalakes, Shared Data Experiences (SDX). In
+      addition to the CDP services, the role handles the deployment and management
+      of the cloud provider artifacts required for CDP operations, e.g. roles, policies.
+    author: Webster Mudge (wmudge@cloudera.com)
+    version_added: 1.0.0

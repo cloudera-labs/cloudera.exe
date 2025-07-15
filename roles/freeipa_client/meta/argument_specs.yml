@@ -1,4 +1,3 @@
----
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,30 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-galaxy_info:
-  author: Webster Mudge (wmudge@cloudera.com)
-  description: >
-    Runlevel execution using tags for deploying and managing Cloudera Data Platform
-    (CDP) Public Cloud.
-  company: Cloudera, Inc.
-  license: Apache-2.0
-
-  min_ansible_version: 2.10
-
-  platforms:
-    - name: Debian
-      versions: all
-    - name: Fedora
-      versions: all
-    - name: GenericLinux
-      versions: all
-    - name: MacOSX
-      versions: all
-    - name: Ubuntu
-      versions: all
-
-  galaxy_tags:
-    - cloudera
-    - cdp
-
-dependencies: ["cloudera.exe.common"]
+argument_specs:
+  main:
+    short_description: Deploy FreeIPA clients.
+    description: Deployment of FreeIPA clients for Cloudera Data Platform (CDP) Base and ECS.
+    author:
+    - Webster Mudge
+    - Jim Enright
+    - Chuck Levesque
+    version_added: 2.0.0

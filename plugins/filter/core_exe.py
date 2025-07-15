@@ -26,6 +26,7 @@ short_description: combine two dictionaries
 description:
     - Create a dictionary (hash/associative array) as a result of merging existing dictionaries.
     - This is the reverse of the C(ansible.builtin.combine) filter.
+version_added: 1.0.0
 positional: _input, _dicts
 options:
     _input:

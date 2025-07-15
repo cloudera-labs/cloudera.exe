@@ -21,6 +21,7 @@ argument_specs:
       - Fetch the named root and intermediate CA TLS Certificates from the CA Server.
     author:
       - "Jim Enright <jenright@cloudera.com>"
+    version_added: 3.0.0
     options:
       ca_server_intermediate_path:
         description: "Path to intermediate CA cert on the CA server"

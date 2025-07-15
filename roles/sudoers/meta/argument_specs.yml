@@ -1,5 +1,3 @@
----
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,30 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-galaxy_info:
-  role_name: freeipa_client
-  namespace: cloudera
-  author: Webster Mudge Jim Enright Chuck Levesque
-  description: >
-    Deployment of FreeIPA clients for Cloudera Data Platform (CDP) Base and ECS
-  company: Cloudera
-  license: Apache-2.0
-
-  min_ansible_version: 2.10
-
-  platforms:
-    - name: Debian
-      versions: all
-    - name: Fedora
-      versions: all
-    - name: GenericLinux
-      versions: all
-    - name: MacOSX
-      versions: all
-    - name: Ubuntu
-      versions: all
-
-  galaxy_tags:
-    - cloudera
-    - cdp
-    - freeipa
+argument_specs:
+  main:
+    short_description: Create sudo rule
+    description: |
+      Create a passwordless sudo rule and add specified users and/or groups as members to this rule.
+      Existing group members and users can be purged or retained depending on the value of
+      the sudoers__purge_groups and sudoers__purge_users flags.
+    author: Jim Enright (jenright@cloudera.com)
+    version_added: 1.2.0
