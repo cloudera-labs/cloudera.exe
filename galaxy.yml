@@ -1,6 +1,4 @@
----
-
-# Copyright 2024 Cloudera, Inc. All Rights Reserved.
+# Copyright 2025 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+---
+
 namespace: cloudera
 name: exe
-version: 2.4.1
+version: 3.0.0-rc.1
 readme: README.md
 authors:
   - Jim Enright @jenright
@@ -25,18 +25,18 @@ authors:
 
 description: >
   A set of roles, modules, and plugins that encapsulate best practices and opinionated
-  deployment and management processes for Cloudera Data Platform (CDP) Public Cloud
-  and Private Cloud deployments.
+  deployment and management processes for Cloudera on cloud and on premise deployments.
 license_file: LICENSE
 tags:
+  - application
+  - cloud
+  - tools
   - cloudera
   - cdp
-  - azure
-  - aws
-  - gcp
+  - cdh
   - private_cloud
-  - public_cloud
-  - data_service
+  - on_premise
+  - data_services
   - cloudera_manager
   - cm
 
