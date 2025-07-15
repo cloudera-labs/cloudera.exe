@@ -1,0 +1,44 @@
+objects:
+  role:
+    rdbms_server:
+      description: Install standalone RDBMS instance
+      name: rdbms_server
+      version_added: null
+    tls_fetch_ca_certs:
+      description: Bring CA root and intermediate cert back to controller
+      name: tls_fetch_ca_certs
+      version_added: null
+    tls_generate_csr:
+      description: Generates a CSR on each host and copies it back to the Ansible
+        controller
+      name: tls_generate_csr
+      version_added: null
+    tls_install_certs:
+      description: Copy and install the signed TLS certificates to each cluster
+      name: tls_install_certs
+      version_added: null
+    tls_signing:
+      description: Sign of CSRs by a CA Server
+      name: tls_signing
+      version_added: null
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  filter:
+    combine_onto:
+      description: combine two dictionaries
+      name: combine_onto
+      version_added: null
+  httpapi: {}
+  inventory: {}
+  lookup: {}
+  module: {}
+  netconf: {}
+  shell: {}
+  strategy: {}
+  test: {}
+  vars: {}
+version: 1.1.0
