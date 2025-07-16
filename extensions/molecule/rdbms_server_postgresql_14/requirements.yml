@@ -14,8 +14,8 @@
 # limitations under the License.
 
 collections:
-  - containers.podman
-  - community.postgresql
+  - name: containers.podman
+  - name: community.postgresql
 
 roles:
-  - geerlingguy.postgresql
+  - name: geerlingguy.postgresql
