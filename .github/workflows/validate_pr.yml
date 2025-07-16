@@ -59,7 +59,7 @@ jobs:
       - name: Report installed Python dependencies
         run: pip freeze
 
-      - name: Validate collection
+      - name: Test collection
         run: |
           pushd /usr/share/ansible/collections/ansible_collections/cloudera/exe
           #ansible-lint

@@ -45,6 +45,12 @@ jobs:
           ansible-galaxy collection install -r builder/requirements.yml -p /usr/share/ansible/collections
           ansible-galaxy role install -r builder/requirements.yml -p /usr/share/ansible/roles
 
+      - name: Set up Ansible collection dependencies
+        run: |
+          ansible-builder introspect --write-pip final_python.txt --write-bindep final_bindep.txt /usr/share/ansible/collections
+          [[ -f final_python.txt ]] && pip install -r final_python.txt || echo "No Python dependencies found."
+          [[ -f final_bindep.txt ]] && bindep --file final_bindep.txt || echo "No system dependencies found."
+
       - name: Execute pre-commit
         uses: pre-commit/action@v3.0.1
         env:
