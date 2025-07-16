@@ -1,0 +1,57 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Lint Collection
+
+on:
+  pull_request:
+  push:
+    branches: [main, devel]
+jobs:
+  pre-commit:
+    name: Execute ansible-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Ansible
+        run: |
+          sudo update-alternatives --install /usr/bin/python python $(which python3) 1
+          python -m pip install --upgrade pip
+          python -m pip install "ansible-core<2.17" ansible-builder bindep pycodestyle voluptuous pylint pyyaml ansible-lint
+
+      - name: Install Ansible collections and roles
+        run: |
+          mkdir -p /usr/share/ansible/collections /usr/share/ansible/roles
+          ansible-galaxy collection install . -p /usr/share/ansible/collections
+          ansible-galaxy collection install -r requirements.yml -p /usr/share/ansible/collections
+          ansible-galaxy role install -r requirements.yml -p /usr/share/ansible/roles
+
+      - name: Set up Ansible collection dependencies
+        run: |
+          ansible-builder introspect --write-pip final_python.txt --write-bindep final_bindep.txt /usr/share/ansible/collections
+          [[ -f final_python.txt ]] && pip install -r final_python.txt || echo "No Python dependencies found."
+          [[ -f final_bindep.txt ]] && bindep --file final_bindep.txt || echo "No system dependencies found."
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
+        with:
+          setup_python: false
