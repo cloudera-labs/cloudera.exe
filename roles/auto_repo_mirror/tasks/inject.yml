@@ -116,7 +116,7 @@
       loop: "{{ init__urls_to_sign }}"
       loop_control:
         loop_var: __s3_bucket_uri
-      amazon.aws.aws_s3:
+      amazon.aws.s3_object:
         bucket: "{{ __s3_bucket_uri | regex_replace('^.+//(.+)\\.s3.+$', '\\1') }}"
         object: "{{ __s3_bucket_uri | regex_replace('^.+amazonaws\\.com(.+)$', '\\1') }}"
         ignore_nonexistent_bucket: true

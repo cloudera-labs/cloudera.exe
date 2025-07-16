@@ -54,7 +54,7 @@
     modified_statement: "{{ target_statement | combine({'Resource': __data_aws_data_access_locations[data__aws_data_access_policy_name]}, recursive=True) }}"
 
 - name: Create AWS managed policy for data access storage locations
-  community.aws.iam_managed_policy:
+  amazon.aws.iam_managed_policy:
     region: "{{ data__region }}"
     policy_name: "{{ data__aws_data_access_policy_name }}"
     policy_description: "{{ __data_storage['read_only'] | default(False) | ternary('Read-only', 'Read-write') }} external data storage policy for {{ data__namespace
@@ -70,7 +70,7 @@
     __data_role_name_default: "{{ [data__namespace, data__external_data_suffix, __data_storage.role.suffix | default(data__aws_role_suffix)] | join('-') }}"
 
 - name: Attach AWS data access storage policy to external data AWS role
-  community.aws.iam_role:
+  amazon.aws.iam_role:
     region: "{{ data__region }}"
     name: "{{ __data_aws_access_role_name }}"
     purge_policies: false

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 - name: Query for the AWS ID Broker role
-  community.aws.iam_role_info:
+  amazon.aws.iam_role_info:
     region: "{{ data__region }}"
     name: "{{ data__aws_idbroker_role_name }}"
   register: __data_idbroker_role_info
