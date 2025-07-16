@@ -17,7 +17,7 @@ argument_specs:
     short_description: Deploy FreeIPA server.
     description: Deployment of sidecar FreeIPA Server for Cloudera Data Platform (CDP) Base and ECS.
     author:
-    - Webster Mudge
-    - Jim Enright
-    - Chuck Levesque
+      - Webster Mudge
+      - Jim Enright
+      - Chuck Levesque
     version_added: 2.0.0
