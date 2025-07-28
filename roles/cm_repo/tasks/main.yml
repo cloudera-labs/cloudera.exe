@@ -1,0 +1,50 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Load support matrix variables for OS
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "../../prereq_supported/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "../../prereq_supported/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "../../prereq_supported/vars/{{ ansible_facts['distribution'] }}.yml"
+    - "../../prereq_supported/vars/{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "../../prereq_supported/vars/{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "../../prereq_supported/vars/{{ ansible_facts['os_family'] }}.yml"
+    - "../../prereq_supported/vars/default.yml"
+
+- name: Assert that OS is supported for Cloudera Manager version
+  ansible.builtin.assert:
+    that:
+      - support_matrix | selectattr('manager_version', 'version', cloudera_manager_version, 'le') | length > 0
+    fail_msg: >
+      Cloudera Manager version {{ cloudera_manager_version }} not supported for
+      OS {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.
+    quiet: true
+
+- name: Load Cloudera Manager package repository variables for OS and CM version
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-CM{{ cm_version.major }}_{{ cm_version.minor }}.yml"
+    - "{{ ansible_facts['distribution'] }}-CM{{ cm_version.major }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-CM{{ cm_version.major }}_{{ cm_version.minor }}.yml"
+    - "{{ ansible_facts['os_family'] }}-CM{{ cm_version.major }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+  vars:
+    cm_version: "{{ cloudera_manager_version | cloudera.exe.cm_version }}"
+
+- name: Configure Cloudera Manager package repository
+  ansible.builtin.include_tasks:
+    file: "{{ ansible_os_family }}.yml"
