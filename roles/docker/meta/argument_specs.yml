@@ -1,0 +1,52 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: "Install Docker"
+    description:
+      - Install Docker and add specified users to the docker group.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    version_added: "5.0.0"
+    options:
+      docker_repo:
+        description:
+          - For RedHat OS distributions, the URL for the Docker repository.
+          - For Ubuntu OS distributions, the deb package string the Docker repository.
+          - If not specified the value is taken from the role variables file
+        type: "str"
+        required: false
+      docker_repo_key:
+        description:
+          - URL for the GPG key of the Docker repository
+          - If not specified the value is taken from the role variables file
+        type: str
+        required: false
+      docker_packages:
+        description: List of Docker packages to install
+        type: list
+        elements: str
+        default:
+          - "docker-ce"
+          - "docker-ce-cli"
+          - "docker-ce-rootless-extras"
+          - "containerd.io"
+          - "docker-buildx-plugin"
+      docker_users:
+        description: List of usernames to be added to the Docker group
+        type: list
+        elements: str
+        default: []
