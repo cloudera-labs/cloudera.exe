@@ -1,0 +1,57 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Install PostgreSQL common repository
+  when: postgresql_repo_enabled
+  ansible.builtin.yum_repository:
+    name: pgdg-common
+    description: PostgreSQL common for RHEL/CentOS
+    baseurl: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-$releasever-$basearch"
+    gpgkey: >-
+      https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-
+      {{ (ansible_architecture in ['aarch64', 'arm64']) | ternary('AARCH64-', '') }}
+      RHEL
+  tags: molecule-idempotence-notest
+
+- name: Install PostgreSQL version repository
+  when: postgresql_repo_enabled
+  ansible.builtin.yum_repository:
+    name: pgdg
+    description: PostgreSQL {{ postgresql_version }} for RHEL/CentOS
+    baseurl: "https://download.postgresql.org/pub/repos/yum/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch"
+    gpgkey: >-
+      https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-
+      {{ (ansible_architecture in ['aarch64', 'arm64']) | ternary('AARCH64-', '') }}
+      RHEL
+  tags: molecule-idempotence-notest
+
+- name: Disable default Postgres module in RHEL 8 or greater
+  when: ansible_distribution_major_version | int >= 8
+  ansible.builtin.command: dnf module disable -qy postgresql
+  register: __postgres_module_result
+  changed_when:
+    - '"Disabling modules" in __postgres_module_result.stdout'
+  failed_when:
+    - __postgres_module_result.rc != 0 and __postgres_module_result.rc != 1
+
+- name: Set UTF-8 as default locale for database encoding
+  ansible.builtin.lineinfile:
+    path: /etc/locale.conf
+    line: 'LC_ALL="en_US.UTF-8"'
+    regexp: "^(#\\s+)LC_ALL="
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
