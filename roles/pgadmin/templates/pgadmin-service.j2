@@ -1,0 +1,15 @@
+[Unit]
+Description=pgAdmin Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutSec=infinity
+Restart=always
+RestartSec=3
+
+ExecStart={{ pgadmin_docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml --project-name pgadmin up
+ExecStop={{ pgadmin_docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml --project-name pgadmin stop
+
+[Install]
+WantedBy=multi-user.target
