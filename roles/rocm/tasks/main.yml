@@ -1,0 +1,69 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+- name: Check AMD ROCm and GPU versions
+  when: rocm_version != amdgpu_version
+  ansible.builtin.debug:
+    msg: WARNING! AMD ROCm and GPU versions differ. ({{ rocm_version }} != {{ amdgpu_version }})
+
+- name: Gather host distribution details
+  ansible.builtin.setup:
+    gather_subset: distribution
+
+- name: Load distribution variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+- name: Run distribution pre-tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-pre.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}-pre.yml"
+    - "{{ ansible_facts['distribution'] }}-pre.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}-pre.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}-pre.yml"
+    - "{{ ansible_facts['os_family'] }}-pre.yml"
+    - "default.yml"
+
+- name: Execute handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Provision ROCm and AMDGPU binaries
+  ansible.builtin.package:
+    name: rocm
+    state: present
+
+- name: Provision AMDGPU kernel modules (reboot to enable)
+  ansible.builtin.package:
+    name: amdgpu-dkms
+    state: present
+  notify: Reboot host
+
+- name: Run distribution post-tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-post.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}-post.yml"
+    - "{{ ansible_facts['distribution'] }}-post.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}-post.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}-post.yml"
+    - "{{ ansible_facts['os_family'] }}-post.yml"
+    - "default.yml"
