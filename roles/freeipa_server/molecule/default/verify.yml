@@ -1,0 +1,53 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Verify
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Install supporting FreeIPA packages
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - ipa-healthcheck
+
+    - name: Run ipa-healthcheck CLI
+      ansible.builtin.command: ipa-healthcheck
+      changed_when: false
+
+    - name: Gather details for forward DNS
+      ansible.builtin.command: host {{ inventory_hostname }}
+      register: __forward
+      failed_when: __forward.stdout | string is not regex(ansible_default_ipv4.address)
+      changed_when: false
+
+    - name: Gather details for reverse DNS
+      ansible.builtin.command: host {{ ansible_default_ipv4.address }}
+      register: __reverse
+      failed_when: __reverse.stdout | string is not regex(inventory_hostname)
+      changed_when: false
+
+    - name: Execute kinit for admin
+      ansible.builtin.shell: "set -o pipefail; echo '{{ ipaadmin_password }}' | kinit {{ ipaadmin_principal | default('admin') }}"
+      register: __kinit
+      failed_when: __kinit.stdout | string is not regex("Password for " + ipaadmin_principal | default('admin') + "@" + ipaserver_realm)
+      changed_when: false
+
+    - name: List Kerberos tickets
+      ansible.builtin.command: klist
+      register: __klist
+      failed_when: __klist.stdout | string is not regex("krbtgt/" + ipaserver_realm + "@" + ipaserver_realm)
+      changed_when: false
