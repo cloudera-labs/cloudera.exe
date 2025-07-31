@@ -1,4 +1,3 @@
----
 # Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,5 +11,40 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-- name: Include distribution specific tasks
-  ansible.builtin.include_tasks: "Grafana-{{ ansible_facts['distribution'] }}.yml"
+
+---
+
+- name: Load OS-specific Grafana variables
+  ansible.builtin.include_vars: "{{ ansible_facts['distribution'] }}.yml"
+
+- name: Execute OS-specific Grafana installation
+  ansible.builtin.include_tasks: "{{ ansible_facts['distribution'] }}.yml"
+
+- name: Connect Prometheus datasource
+  ansible.builtin.template:
+    src: prometheus_source.yml.j2
+    dest: "{{ grafana_datasource_directory }}"
+    mode: "0755"
+
+- name: Add configuration for reading dashboards
+  ansible.builtin.template:
+    src: providers.yml.j2
+    dest: "{{ grafana_providers_configuration }}"
+    mode: "0755"
+
+- name: Ensure that directory for dashboards exist
+  ansible.builtin.file:
+    path: "{{ grafana_dashboard_directory }}"
+    mode: "0755"
+    state: directory
+
+- name: Copy default node exporter dashboard
+  ansible.builtin.copy:
+    src: files/base_dashboard.json
+    dest: "{{ grafana_dashboard_directory }}/base_dashboard.json"
+    mode: "0755"
+
+- name: Start Grafana service
+  ansible.builtin.systemd:
+    name: "{{ grafana_service }}"
+    state: started
