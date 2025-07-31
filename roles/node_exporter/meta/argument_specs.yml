@@ -1,0 +1,54 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+
+argument_specs:
+  main:
+    short_description: Install Node Exporter
+    description:
+      - Download and install the Node Exporter (node_exporter) for Prometheus.
+    author: Cloudera Labs
+    version_added: 5.0.0
+    options:
+      node_exporter_directory:
+        description: Configuration directory
+        type: path
+        required: false
+        default: /etc/node_exporter
+      node_exporter_tarball_url:
+        description: URL to the installation package
+        type: str
+        required: false
+        default: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+      node_exporter_tarball_file:
+        description: The intermediate name of the installation package
+        type: str
+        required: false
+        default: node_exporter.tar.gz
+      node_exporter_service_directory:
+        description: systemd services directory
+        type: path
+        required: false
+        default: /etc/systemd/system/node_exporter.service
+      node_exporter_user:
+        description: Service username
+        type: str
+        required: false
+        default: node_exporter
+      node_exporter_group:
+        description: Service group
+        type: str
+        required: false
+        default: node_exporter

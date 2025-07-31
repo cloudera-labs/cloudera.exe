@@ -1,6 +1,6 @@
 ---
 
-# Copyright 2025 Cloudera, Inc. All Rights Reserved.
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,17 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-requires_ansible: ">=2.15.0"
+node_exporter_directory: /etc/node_exporter
+node_exporter_tarball_url: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+node_exporter_tarball_file: node_exporter.tar.gz
+node_exporter_service_directory: /etc/systemd/system/node_exporter.service
 
-plugin_routing:
-  role: # Not yet supported
-    rdbms.server:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: Use cloudera.exe.rdbms_server instead of this nested role.
-      redirect: cloudera.exe.rdbms_server
-    nodeexporter:
-      deprecation:
-        removal_version: 6.0.0
-        warning_text: Please update references to the renamed role, cloudera.exe.node_exporter
-      redirect: cloudera.exe.node_exporter
+node_exporter_user: nodeexporter
+node_exporter_group: nodeexporter
