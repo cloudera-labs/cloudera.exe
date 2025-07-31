@@ -1,4 +1,4 @@
-# Copyright 2025 Cloudera, Inc.
+# Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,24 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Restart host
-  ansible.builtin.reboot:
-
-- name: Restart SSSD
-  ansible.builtin.service:
-    name: "{{ sssd_service }}"
-    state: restarted
-
-# RHEL only
-- name: Restart DBUS
-  ansible.builtin.systemd:
-    name: dbus
-    enabled: true
-    masked: false
-    state: restarted
-
-# RHEL only
-- name: Restart logind
-  ansible.builtin.service:
-    name: systemd-logind
-    state: restarted
+sssd_service: sssd
+sssd_config_path: /etc/sssd/sssd.conf
