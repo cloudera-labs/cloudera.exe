@@ -1,0 +1,60 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+argument_specs:
+  main:
+    short_description: Create and mount a storage volume
+    description: |
+      Create, format, and mount an LVM partition for a specified storage volume.
+      Includes the installation of the LVM2 OS package.
+    author: Cloudera Labs
+    options:
+      mount_volumes:
+        description:
+          - Version of the AMD ROCm package.
+        type: list
+        elements: dict
+        required: true
+        options:
+          device:
+            description:
+              - The device identifier.
+            type: str
+            required: true
+          mount:
+            description:
+              - The mount path on the host.
+            type: path
+            required: true
+          fstype:
+            description:
+              - Format type for the partition.
+              - The default format type is defined by O(mount_fstype).
+            type: str
+            required: false
+      mount_fstype:
+        description:
+          - Format type for the partition(s).
+        type: str
+        required: false
+        default: xfs
+      mount_provider:
+        description:
+          - The infrastructure provider.
+          - For V(aws), EBS NVME volume attachments will be mapped and mounted.
+        type: str
+        required: false
+        choices:
+          - aws
+...
