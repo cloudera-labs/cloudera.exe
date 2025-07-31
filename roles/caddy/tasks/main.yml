@@ -1,0 +1,142 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+
+- name: Gather host distribution details
+  ansible.builtin.setup:
+    gather_subset: distribution
+
+- name: Load distribution variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+- name: Run distribution pre-tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-pre.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}-pre.yml"
+    - "{{ ansible_facts['distribution'] }}-pre.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}-pre.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}-pre.yml"
+    - "{{ ansible_facts['os_family'] }}-pre.yml"
+    - "default-pre.yml"
+
+- name: Install Caddy binaries
+  ansible.builtin.package:
+    name: "{{ caddy_package }}"
+  loop: "{{ caddy_packages }}"
+  loop_control:
+    loop_var: caddy_package
+
+- name: Set up Caddyfile imports directory
+  ansible.builtin.file:
+    path: "/etc/caddy/Caddyfile.d"
+    mode: "0755"
+    state: directory
+
+- name: Set up Caddy WWW root directory
+  ansible.builtin.file:
+    path: "{{ caddy_www_root }}"
+    mode: "0755"
+    state: directory
+
+- name: Set up default index page for Caddy WWW root
+  ansible.builtin.file:
+    path: "{{ [caddy_www_root, 'index.html'] | path_join }}"
+    mode: "0755"
+    state: touch
+
+- name: Provision external CA certificates
+  when: caddy_ca_pem is defined
+  block:
+    - name: Set up external PKI directory
+      ansible.builtin.file:
+        path: "{{ caddy_external_pki_dir }}"
+        state: directory
+        owner: caddy
+        group: caddy
+        mode: "0700"
+
+    - name: Install external CA certificates
+      ansible.builtin.copy:
+        src: "{{ __ca_file }}"
+        dest: "{{ [caddy_external_pki_dir, __ca_file | basename] | path_join }}"
+        owner: caddy
+        group: caddy
+        mode: "0600"
+      loop:
+        - "{{ caddy_ca_pem }}"
+        - "{{ caddy_ca_key }}"
+      loop_control:
+        loop_var: __ca_file
+
+# - name: Set up Caddyfile ACME issuers
+#   ansible.builtin.blockinfile:
+#     backup: no
+#     path: "/etc/caddy/Caddyfile"
+#     insertbefore: BOF
+#     # append_newline: yes <=2.16
+#     block: |
+#       {
+#         cert_issuer acme
+#         cert_issuer acme {
+#           dir https://acme.zerossl.com/v2/DV90
+#           email some@email.goes.here
+#         }
+#       }
+
+# - name: Set up Caddy CA
+#   when: caddy_self_signed
+#   ansible.builtin.blockinfile:
+#     backup: no
+#     path: "/etc/caddy/Caddyfile"
+#     insertbefore: BOF
+#     # append_newline: yes <=2.16
+#     block: "{{ lookup('template', 'internal_ca.json.j2') }}"
+
+# - name: Set up Caddyfile imports directive
+#   ansible.builtin.blockinfile:
+#     backup: no
+#     path: "/etc/caddy/Caddyfile"
+#     insertafter: EOF
+#     # prepend_newline: yes <=2.16
+#     block: |
+#       import Caddyfile.d/*.caddyfile
+
+- name: Provision Caddy configuration
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    mode: "0755"
+
+- name: Enable and run the Caddy service
+  ansible.builtin.service:
+    name: "{{ caddy_service }}"
+    enabled: true
+    state: started
+
+- name: Retrieve the Caddy self-signed CA certificate
+  when: caddy_self_signed and caddy_ca_pem is undefined
+  ansible.builtin.fetch:
+    src: /var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt
+    dest: "{{ [playbook_dir, name_prefix + '-caddy-root.crt'] | path_join }}"
+    flat: true

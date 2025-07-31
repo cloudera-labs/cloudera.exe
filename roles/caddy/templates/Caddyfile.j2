@@ -1,0 +1,26 @@
+# Managed by cloudera.exe.caddy
+
+{% if caddy_self_signed %}
+{
+    local_certs
+{% if caddy_ca_pem is defined %}
+    pki {
+        ca {
+            root {
+                cert {{ [caddy_external_pki_dir, caddy_ca_pem | basename] | path_join }}
+                key {{ [caddy_external_pki_dir, caddy_ca_key | basename] | path_join }}
+            }
+        }
+    }
+{% endif %}
+}
+{% endif %}
+
+# Caddy default WWW root
+{{ caddy_domain }} {
+    root * {{ caddy_www_root }}
+    file_server
+}
+
+# Caddy routes
+import Caddyfile.d/*.caddyfile
