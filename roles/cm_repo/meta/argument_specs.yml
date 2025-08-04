@@ -1,0 +1,48 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Manage the package repository for Cloudera Manager.
+    description:
+      - Manage the package repository for downloading and installing Cloudera Manager binaries.
+      - Handles trial, enterprise, and custom repositories.
+    author:
+      - "Webster Mudge <wmudge@cloudera.com>"
+    version_added: "5.0.0"
+    options:
+      cloudera_manager_version:
+        description:
+          - Version of Cloudera Manager.
+          - If not defined and C(cloudera_manager_repo_username) is not defined, will default to the C(7.4.4) trial version,
+            if compatiable with the OS distribution.
+        default: 7.11.3
+      cloudera_manager_repo_url:
+        description:
+          - Base URL for the package repository.
+          - If not defined and C(cloudera_manager_repo_username) is set, will default to the Cloudera enterprise archive.
+          - Defaults to the Cloudera trial archive.
+      cloudera_manager_repo_username:
+        description:
+          - Package repository username.
+          - For Cloudera enterprise licenses, this is the C(uuid) value.
+      cloudera_manager_repo_password:
+        description:
+          - Package repository password.
+          - For Cloudera enterprise licenses, this is the derived C(password) value.
+      cloudera_manager_repo_key:
+        description: Package repository validation key URL.
+      cloudera_manager_repo_gpgcheck:
+        description: Flag to manage validation checks of the repository contents.
+        type: bool
