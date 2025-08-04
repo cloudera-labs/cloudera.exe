@@ -1,0 +1,66 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up FreeIPA client
+    description:
+      - Set up FreeIPA client, registering the host with a FreeIPA server, configured for DNS updates.
+      - Set up DNS search domain and DNS forwarders for name resolution.
+      - Install either defined or default FreeIPA client packages.
+      - Optionally, configure SSSD to enumerate users and groups.
+    author: Cloudera Labs
+    version_added: "5.0.0"
+    options:
+      ipaclient_packages:
+        description:
+          - List of FreeIPA packages to install.
+          - If not defined, the role will default to the packages defined in the
+            L(freeipa.ansible_freeipa.ipaclient,https://github.com/freeipa/ansible-freeipa/tree/master/roles/ipaclient) role.
+        type: list
+        elements: str
+      ipaclient_domain:
+        description:
+          - Domain name for DNS search and FreeIPA registration.
+        required: true
+      ipaclient_realm:
+        description:
+          - Realm for the Kerberos service.
+        required: true
+      ipaclient_servers:
+        description:
+          - List of hostnames of the FreeIPA servers.
+        type: list
+        elements: str
+        required: true
+      ipaclient_dns_servers:
+        description:
+          - List of IP address of the DNS servers to use for resolution.
+          - Typically, the IP addresses of the FreeIPA DNS servers.
+        type: list
+        elements: str
+        required: true
+      ipaclient_sssd_enumeration:
+        description:
+          - Flag to enable the C(enumeration) setting in the SSSD configuration file.
+        type: bool
+        default: false
+      ipaadmin_principal:
+        description:
+          - Principal of the FreeIPA user with elevated priviledges allowing host registration.
+        default: admin
+      ipaadmin_password:
+        description:
+          - Password of the FreeIPA user with elevated priviledges allowing host registration.
+        required: true
