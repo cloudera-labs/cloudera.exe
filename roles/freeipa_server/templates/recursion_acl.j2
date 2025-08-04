@@ -1,0 +1,6 @@
+acl "internal_network" {
+    localhost;
+{% for acl_cidr in ipaserver_recursion_acl_cidr %}
+    {{ acl_cidr }};
+{% endfor %}
+};

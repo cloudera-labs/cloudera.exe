@@ -1,0 +1,70 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up FreeIPA server
+    description: |
+      Set up FreeIPA server with support for DNS, Kerberos, TLS, and LDAP.
+      Optionally, install the FreeIPA server packages.
+    author: Cloudera Labs
+    options:
+      ipaserver_packages:
+        description:
+          - List of FreeIPA packages to install.
+          - If not defined, the role will default to the packages defined in the P(freeipa.ansible_freeipa.ipaserver#role) role.
+        type: list
+        elements: str
+      ipaserver_domain:
+        description:
+          - Domain name to set as the root zone.
+        required: true
+      ipaserver_realm:
+        description:
+          - Realm to set for the Kerberos service.
+        required: true
+      ipaserver_cidr:
+        description:
+          - List of CIDR blocks to manage for the DNS service.
+        type: list
+        elements: str
+        required: true
+      ipaserver_forwarders:
+        description:
+          - List of upstream name servers for the DNS service.
+        type: list
+        elements: str
+        required: true
+      ipaserver_recursion_acl_cidr:
+        description:
+          - List of CIDR blocks to define the access ACL for DNS recursion.
+        type: list
+        elements: str
+        required: true
+      ipaserver_ca_subject:
+        description:
+          - Certificate Authority subject for the self-signed root CA.
+        default: "CN=CLDR-RootCA,O=ipaserver_domain"
+      ipaadmin_principal:
+        description:
+          - Kerberos principal for the FreeIPA administrator account.
+        default: admin
+      ipaadmin_password:
+        description:
+          - Password for the FreeIPA adminstrator Kerberos principal.
+        required: true
+      ipadm_password:
+        description:
+          - Password for the FreeIPA Directory Services administrator.
+        required: true
