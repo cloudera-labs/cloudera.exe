@@ -1,0 +1,38 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Set timezone
+  community.general.timezone:
+    hwclock: "{{ os_timezone }}"
+
+- name: Configure /tmp directory
+  ansible.builtin.file:
+    path: /tmp
+    state: directory
+    mode: "1777"
+
+# See https://askubuntu.com/questions/1250974/user-root-cant-write-to-file-in-tmp-owned-by-someone-else-in-20-04-but-can-in
+- name: Fix root permissions for non-root file (Ubuntu 20.04)
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_version == '20.04'
+  block:
+    - name: Set 'protected_regular' kernel parameter
+      ansible.posix.sysctl:
+        sysctl_file: /usr/lib/sysctl.d/protect-links.conf
+        name: fs.protected_regular
+        value: 0
+        state: present
+        reload: true
