@@ -1,0 +1,47 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: "Client configuration for PostgreSQL database"
+    description:
+      - Install of the Postgres Connector JDBC Driver.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    version_added: "5.0.0"
+    options:
+      postgresql_connector_url:
+        description: URL for PostgreSQL connector
+        type: "str"
+        default: "https://jdbc.postgresql.org/download/postgresql-42.7.2.jar"
+      postgresql_connector_checksum:
+        description: Checksum of downloaded PostgreSQL connector jar
+        type: "str"
+        default: "md5:bb897217989c97a463d8f571069d158a"
+      postgresql_connector_install_dir:
+        description: Directory to install PostgreSQL connector
+        type: "str"
+        default: "/usr/share/java"
+      download_connector_to_controller:
+        description:
+          - Flag to specify if the PostgreSQL connector should be downloaded via the Ansible controller host.
+          - If I(True) download will be performed on the Ansible controller and copied to each host.
+          - If I(False) download will be performed on each host.
+        type: bool
+        default: true
+      install_py3_psycopg2:
+        description: Flag to specify if the psycopg2 Python package should be installed
+        type: bool
+        default: false

@@ -1,0 +1,72 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+# ---- Install PosgreSQL Connector ---- #
+- name: Create /usr/share/java directory
+  ansible.builtin.file:
+    path: "{{ postgresql_connector_install_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Check if Connector is already installed
+  ansible.builtin.stat:
+    path: "{{ [postgresql_connector_install_dir, 'postgresql-connector-java.jar'] | path_join }}"
+  register: __pg_connector_jar
+
+- name: Install PostgreSQL Connector from controller
+  when:
+    - not __pg_connector_jar.stat.exists
+    - download_connector_to_controller
+  block:
+    - name: Create temporary build directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: postgres_connector
+      register: __connector_tempdir
+      become: false
+      run_once: true
+      delegate_to: localhost
+
+    - name: Download PostgreSQL Connector
+      ansible.builtin.get_url:
+        url: "{{ postgresql_connector_url }}"
+        dest: "{{ __connector_tempdir.path }}/postgresql-connector-java.jar"
+        checksum: "{{ postgresql_connector_checksum }}"
+        mode: "0644"
+      become: false
+      run_once: true
+      delegate_to: localhost
+
+    - name: Copy PostgreSQL Connector jar file to correct location
+      ansible.builtin.copy:
+        src: "{{ __connector_tempdir.path }}/postgresql-connector-java.jar"
+        dest: /usr/share/java/postgresql-connector-java.jar
+        mode: "0644"
+
+- name: Download and Install PostgreSQL Connector
+  when:
+    - not __pg_connector_jar.stat.exists
+    - not download_connector_to_controller
+  ansible.builtin.get_url:
+    url: "{{ postgresql_connector_url }}"
+    dest: "{{ [postgresql_connector_install_dir, 'postgresql-connector-java.jar'] | path_join }}"
+    checksum: "{{ postgresql_connector_checksum }}"
+    mode: "0644"
+
+# ---- Install psycopg2 package ---- #
+- name: Install psycopg2 package if required
+  when: install_py3_psycopg2
+  ansible.builtin.import_role:
+    name: cloudera.exe.prereq_psycopg2
