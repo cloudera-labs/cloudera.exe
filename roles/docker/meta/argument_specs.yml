@@ -20,7 +20,7 @@ argument_specs:
       - Install Docker and add specified users to the docker group.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       docker_repo:
         description:

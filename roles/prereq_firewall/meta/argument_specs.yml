@@ -22,7 +22,7 @@ argument_specs:
       - Backup file naming is C(iptables-rules-[ipv4|ipv6].TIMESTAMP), where TIMESTAMP is UTC.
     author:
       - Webster Mudge <wmudge@cloudera.com>
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       firewall_backup_enabled:
         description: Flag to enable timestamped backups of iptable rules.

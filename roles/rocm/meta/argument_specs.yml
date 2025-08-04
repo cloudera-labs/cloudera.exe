@@ -19,7 +19,7 @@ argument_specs:
     description: |
       Install and configure a host for AMD ROCm GPU packages and drivers.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       rocm_version:
         description:

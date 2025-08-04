@@ -21,7 +21,7 @@ argument_specs:
       - Also ensures that Pip is installed and updated.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       cloudera_manager_version:
         description: Version of Cloudera Manager

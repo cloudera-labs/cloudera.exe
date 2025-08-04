@@ -19,5 +19,5 @@ argument_specs:
     description:
       - Set up for Apache Hadoop usage, notably, create the local C(hadoop) user group.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options: {}

@@ -21,7 +21,7 @@ argument_specs:
       - Includes installing and configuring required services as well as disabling unnecessary services.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       prereq_services_unnecessary_services:
         description: "List of unwanted OS services that will be disabled."

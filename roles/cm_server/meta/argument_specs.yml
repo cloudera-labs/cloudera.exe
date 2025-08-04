@@ -24,7 +24,7 @@ argument_specs:
       - For external databases, the database server and the Java client libraries must be installed prior.
     author:
       - "Webster Mudge <wmudge@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       cloudera_manager_server_packages:
         description:

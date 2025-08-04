@@ -20,7 +20,7 @@ argument_specs:
       - Handles trial, enterprise, and custom repositories.
     author:
       - "Webster Mudge <wmudge@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       cloudera_manager_version:
         description:

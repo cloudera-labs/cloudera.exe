@@ -20,5 +20,5 @@ argument_specs:
       - This module installs the Chrony NTP package if neither Chrony nor NTP is currently installed or running on the system.
       - If both services are present and running, it will stop the NTP service to prioritize Chrony.
     author: "Ronald Suplina <rsuplina@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options: {}

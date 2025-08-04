@@ -19,7 +19,7 @@ argument_specs:
       - Downloads and installs a specified list of Cloudera Custom Services Descriptor (CSD) files.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       cloudera_manager_csd_directory:
         description: Location where CSDs are downloaded

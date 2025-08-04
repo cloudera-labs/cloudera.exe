@@ -21,7 +21,7 @@ argument_specs:
       - pgAdmin is run as a container with systemd service file is used to control container stop and start.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       database_admin_user:
         description:

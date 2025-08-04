@@ -21,7 +21,7 @@ argument_specs:
       - Set up TLS ACLs, if needed.
       - Install LDAP packages for Kerberos, if needed.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       kerberos_config_path:
         description:

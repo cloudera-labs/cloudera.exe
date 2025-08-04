@@ -21,7 +21,7 @@ argument_specs:
       - Additionally, the I(support_matrix) variable defined in this role can be imported and used in other roles.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       cloudera_manager_version:
         description: Version of Cloudera Manager

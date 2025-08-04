@@ -20,7 +20,7 @@ argument_specs:
       - Creates the database and user for Cloudera Manager
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       cloudera_manager_database_user:
         description: Cloudera Manager database username

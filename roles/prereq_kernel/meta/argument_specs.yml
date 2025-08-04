@@ -22,7 +22,7 @@ argument_specs:
         and configuring IPv6 settings to disable IPv6 functionality.
     author:
       - "Ronald Suplina <rsuplina@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       prereq_kernel__kernel_flags:
         description: Dictionary of kernel parameters to configure with C(sysctl).

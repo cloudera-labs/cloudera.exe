@@ -21,7 +21,7 @@ argument_specs:
       - Requires a valid JDK; see P(cloudera.exe.prereq_jdk#role) for options.
       - Requires a valid Cloudera Manager package repository; see P(cloudera.exe.cm_repo#role) for options.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       cloudera_manager_host:
         description: Cloudera Manager hostname
