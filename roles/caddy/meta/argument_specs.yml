@@ -1,0 +1,54 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Install Caddy proxy packages.
+    description:
+      - Install Caddy proxy service using self-signed TLS.
+      - Configure an initial global configuration with an import directory.
+      - Configure a WWW root directory.
+      - Optionally, provision the Caddy with external CA certificates.
+      - If Caddy self-signing is enabled and an external CA certificate is not defined, retrieve the Caddy self-signed CA certificate to the target host.
+    author: Cloudera Labs
+    version_added: "5.0.0"
+    options:
+      caddy_domain:
+        description: Domain name for the Caddy reverse proxy.
+        type: str
+        required: true
+      caddy_www_root:
+        description: Directory of the static WWW service.
+        type: path
+        required: false
+        default: /var/www_root
+      caddy_self_signed:
+        description:
+          - Flag enabling Caddy to issue self-signed TLS certificates.
+          - If not defined, Caddy will default to the Let's Encrypt ACME service.
+          - If defined and O(caddy_ca_pem) is not defined, Caddy will generate a root CA certificate for self-signed TLS.
+        type: bool
+        required: false
+        default: true
+      caddy_ca_pem:
+        description:
+          - External CA for the Caddy TLS service.
+        type: path
+        required: false
+      caddy_ca_key:
+        description:
+          - External CA key for the Caddy TLS service.
+          - Required if O(caddy_ca_pem) is defined.
+        type: path
+        required: false
