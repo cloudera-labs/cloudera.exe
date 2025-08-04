@@ -1,0 +1,42 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Gather networking details
+  ansible.builtin.setup:
+    gather_subset: network
+
+- name: Set netplan configuration fragment for DNS
+  ansible.builtin.template:
+    dest: "{{ [network_netplan_dir, '99-cldr-internal.yaml'] | path_join }}"
+    src: netplan.yaml.j2
+    mode: "0644"
+    owner: root
+    group: root
+  vars:
+    internal_interface: >-
+      {{
+        ['ansible_'] |
+        product(ansible_interfaces) |
+        map('join') |
+        map('extract', hostvars[inventory_hostname]) |
+        selectattr('type', 'eq', 'ether') |
+        selectattr('ipv4.address', 'eq', network_ip_address) |
+        map(attribute='device') |
+        first
+      }}
+  register: __netplan_template
+  notify:
+    - Apply netplan configuration
+    - Restart systemd-resolved

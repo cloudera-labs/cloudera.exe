@@ -1,0 +1,87 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+- name: Check for cloud-init
+  ansible.builtin.stat:
+    path: "{{ network_cloud_init_path }}"
+  register: __cloud_init
+
+- name: Set cloud-init to preserve hostname
+  when: __cloud_init.stat.exists
+  ansible.builtin.lineinfile:
+    path: "{{ network_cloud_init_path }}"
+    regex: "^(#)?preserve_hostname"
+    line: "preserve_hostname: true"
+    state: present
+
+- name: Set hostname to Ansible FQDN inventory hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Set Ansible FQDN inventory hostname and IP address in /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ network_ip_address }} {{ inventory_hostname }} {{ inventory_hostname_short }}"
+    regexp: "[\\d\\.]+\\s+{{ inventory_hostname }} {{ inventory_hostname_short }}"
+    state: present
+    backup: true
+
+- name: Gather service details
+  ansible.builtin.service_facts:
+
+- name: Configure NetworkManager
+  when: "'NetworkManager.service' in ansible_facts.services and ansible_facts.services['NetworkManager.service']['state'] == 'running'"
+  ansible.builtin.include_tasks: network-manager.yml
+  register: __network_manager
+
+# Netplan can also use NetworkManager, so the logic will need to change
+- name: Configure systemd-resolved via netplan
+  when: "'systemd-resolved.service' in ansible_facts.services and ansible_facts.services['systemd-resolved.service']['state'] == 'running'"
+  ansible.builtin.include_tasks: netplan.yml
+  register: __netplan
+
+- name: Handle DHCP
+  when: __network_manager is skipped and __netplan is skipped
+  block:
+    - name: Check for existence of DHCP client
+      ansible.builtin.stat:
+        path: "{{ network_dhclient_path }}"
+      register: __dhclient_conf
+
+    - name: Configure DHCP client
+      when: __dhclient_conf.stat.exists
+      ansible.builtin.include_tasks: dhcp.yml
+      register: __dhcp
+
+- name: Configure /etc/resolv.conf directly
+  when: __network_manager is skipped and __netplan is skipped and __dhcp is skipped
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    mode: "0644"
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
