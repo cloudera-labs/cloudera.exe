@@ -1,14 +1,14 @@
-# prereq_hbase
+# prereq_hdfs
 
-Set up for Hbase
+Set up for Hdfs
 
-This role prepares a host for Apache HBase usage by creating a dedicated system user and group named `hbase`. This user is essential for running HBase processes with appropriate permissions and isolation. The role can also optionally set up Access Control Lists (ACLs) on TLS entities if required for secure HBase communication.
+This role prepares a host for HDFS (Hadoop Distributed File System) usage by creating a dedicated system user and group named `hdfs`. This user is essential for running HDFS processes with appropriate permissions and isolation. The role can also optionally set up Access Control Lists (ACLs) on TLS entities if required for secure HDFS communication.
 
 The role will:
-- Create the `hbase` system user and group.
-- Configure home directories and other necessary local paths for the `hbase` user, if required.
-- Ensure appropriate permissions are set for files and directories related to HBase.
-- Configure TLS ACLs to secure HBase communication, if needed.
+- Create the `hdfs` system user and group.
+- Configure home directories and other necessary local paths for the `hdfs` user, if required.
+- Ensure appropriate permissions are set for files and directories related to HDFS.
+- Configure TLS ACLs to secure HDFS communication, if needed.
 
 # Requirements
 
@@ -27,11 +27,11 @@ None.
 # Example Playbook
 
 ```yaml
-- hosts: hbase_nodes
+- hosts: hdfs_nodes
   tasks:
-    - name: Set up the hbase user and environment
+    - name: Set up the hdfs user and environment
       ansible.builtin.import_role:
-        name: cloudera.exe.prereq_hbase
+        name: cloudera.exe.prereq_hdfs
 ```
 
 # License
