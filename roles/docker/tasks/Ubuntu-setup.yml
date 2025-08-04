@@ -1,0 +1,39 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Ensure directory exists for /etc/apt/keyrings
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add Docker APT key
+  ansible.builtin.get_url:
+    url: "{{ docker_repo_key | default(docker_apt_gpg_key) }}"
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "{{ docker_repo | default(docker_apt_repository) }}"
+    state: present
+    filename: "docker"
+    update_cache: true
+
+- name: Install Docker packages
+  ansible.builtin.package:
+    name: "{{ docker_packages }}"
+    state: "present"
+  notify: Restart Docker

@@ -1,0 +1,40 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    # Check 1 - confirm docker container can run
+    # - name: Check that container can be launched
+    #   ansible.builtin.command: docker run hello-world
+    #   register: __container
+    #   failed_when: __container.rc != 0
+    #   changed_when: false
+
+    # - name: Check that container can be launched
+    #   community.docker.docker_container:
+    #     name: test_container
+    #     image: hello-world
+    #   register: __container
+    #   failed_when: __container.container['State']['ExitCode'] != 0
+    #   changed_when: false
+
+    # Check 2 - confirm test user is in docker group
+    - name: Check for test user group membership
+      ansible.builtin.command: groups test
+      register: __groups
+      failed_when: __groups.rc != 0 and __groups.stdout is not search("docker")
+      changed_when: false
