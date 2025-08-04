@@ -1,4 +1,3 @@
----
 # Copyright 2025 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,13 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-- name: Provision databases and user accounts
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_database
-  vars:
-    database_accounts: "{{ dataviz_details }}"
-    dataviz_details:
-      - user: "{{ dataviz_username }}"
-        password: "{{ dataviz_password }}"
-        db: "{{ dataviz_database }}"
-  no_log: true

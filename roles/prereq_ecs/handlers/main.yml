@@ -12,13 +12,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-- name: Provision databases and user accounts
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_database
-  vars:
-    database_accounts: "{{ dataviz_details }}"
-    dataviz_details:
-      - user: "{{ dataviz_username }}"
-        password: "{{ dataviz_password }}"
-        db: "{{ dataviz_database }}"
-  no_log: true
+
+# - name: Flush iptables
+#   ansible.builtin.iptables:
+#     flush: yes
+#     table: "{{ __iptables_flush_item }}"
+#   loop:
+#     - filter
+#     - nat
+#     - mangle
+#     - raw
+#     - security
+#   loop_control:
+#     loop_var: __iptables_flush_item
+
+- name: Restart network
+  ansible.builtin.service:
+    name: "{{ network_service }}"
+    state: restarted
+    daemon_reload: true

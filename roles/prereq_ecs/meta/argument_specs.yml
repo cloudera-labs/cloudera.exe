@@ -12,13 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-- name: Provision databases and user accounts
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_database
-  vars:
-    database_accounts: "{{ dataviz_details }}"
-    dataviz_details:
-      - user: "{{ dataviz_username }}"
-        password: "{{ dataviz_password }}"
-        db: "{{ dataviz_database }}"
-  no_log: true
+
+argument_specs:
+  main:
+    short_description: Set up for ECS
+    description:
+      - Set up for ECS usage including creation of required local users and configuration of firewall and networking configuration.
+      - The list of local users are taken from the M(cloudera.exe.prereq_cloudera_manager) role.
+    author: Cloudera Labs
+    options: {}

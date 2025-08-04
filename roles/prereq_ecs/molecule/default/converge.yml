@@ -12,13 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-- name: Provision databases and user accounts
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_database
-  vars:
-    database_accounts: "{{ dataviz_details }}"
-    dataviz_details:
-      - user: "{{ dataviz_username }}"
-        password: "{{ dataviz_password }}"
-        db: "{{ dataviz_database }}"
-  no_log: true
+
+- name: Converge
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Set up for ECS
+      ansible.builtin.import_role:
+        name: prereq_ecs

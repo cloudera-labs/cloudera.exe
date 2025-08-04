@@ -1,0 +1,50 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Install iptables, using rpm option tsflags=noscripts
+  when: ansible_facts.packages[iptables_package] is not defined
+  ansible.builtin.command: "dnf install -y {{ iptables_package }} --setopt=tsflags=noscripts"
+  changed_when: false # TODO Revisit
+
+- name: Flush iptables
+  ansible.builtin.command: "iptables-nft --flush -t {{ __iptables_flush_item }}"
+  loop:
+    - filter
+    - nat
+    - mangle
+    - raw
+    - security
+  loop_control:
+    loop_var: __iptables_flush_item
+  changed_when: false
+  tags: molecule-idempotence-notest
+
+- name: Gather services facts
+  ansible.builtin.service_facts:
+
+# Required as per https://docs.rke2.io/known_issues
+- name: Set NetworkManager to ignore any ECS calico & flannel interfaces
+  ansible.builtin.copy:
+    src: networkmanager.conf
+    dest: /etc/NetworkManager/conf.d/rke2-canal.config
+    owner: root
+    group: root
+    mode: "0644"
+  when: "'NetworkManager.service' in ansible_facts.services"
+  notify: Restart network
