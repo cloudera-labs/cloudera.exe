@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data__aws_policy_urls_default_root:   "{{ common__aws_policy_urls_default_root }}"
+data__aws_policy_urls_default_root: "{{ common__aws_policy_urls_default_root }}"
 data__aws_policy_urls_default:
-  read_only:                          "{{ data__aws_policy_urls_default_root }}/aws-cdp-bucket-access-policy.json"
-  read_write:                         "{{ data__aws_policy_urls_default_root }}/aws-cdp-datalake-admin-s3-policy.json"
+  read_only: "{{ data__aws_policy_urls_default_root }}/aws-cdp-bucket-access-policy.json"
+  read_write: "{{ data__aws_policy_urls_default_root }}/aws-cdp-datalake-admin-s3-policy.json"

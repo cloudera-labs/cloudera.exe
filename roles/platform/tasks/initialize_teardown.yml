@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +29,7 @@
       - plat__env_info.environments[0].descendants.opdb | length == 0
       - plat__env_info.environments[0].descendants.de | length == 0
     fail_msg: "Environment {{ plat__env_name }} has one or more child services registered, please check and try again"
-    quiet: yes
+    quiet: true
 
 - name: Include provider-specific initialization base
   ansible.builtin.include_tasks: "initialize_{{ plat__infra_type | lower }}.yml"

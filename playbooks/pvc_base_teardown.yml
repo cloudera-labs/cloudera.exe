@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +17,8 @@
 # Teardown CA
 - name: Teardown CA server
   hosts: "{{ target | default('ca_server') }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - ansible.builtin.include_role:
         name: cloudera.cluster.infrastructure.ca_certs
@@ -29,8 +28,8 @@
 
 - name: Teardown security artifact directories
   hosts: "{{ target | default('tls') }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - role: cloudera.cluster.security.tls_clean
       when: "'tls' in groups"
@@ -40,8 +39,8 @@
 # Teardown Cluster
 - name: Teardown ECS
   hosts: "{{ target | default('ecs_nodes') }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - ansible.builtin.include_role:
         name: cloudera.cluster.teardown
@@ -53,8 +52,8 @@
 
 - name: Cluster Teardown Process
   hosts: "{{ target | default('all') }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   any_errors_fatal: true
   roles:
     - cloudera.cluster.teardown

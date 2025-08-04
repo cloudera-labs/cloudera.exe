@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 # STARTBLOCK # Install Cloudera Manager
 - name: Install Cloudera Manager daemons
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  become: yes
+  become: true
   any_errors_fatal: true
   roles:
     - role: cloudera.cluster.cloudera_manager.daemons
@@ -28,7 +27,7 @@
 
 - name: Install Cloudera Manager server
   hosts: "{{ target | default('cloudera_manager') }}"
-  become: yes
+  become: true
   roles:
     - role: cloudera.cluster.cloudera_manager.server
   tags:
@@ -38,7 +37,7 @@
 
 - name: Install Cloudera Manager License
   hosts: "{{ target | default('cloudera_manager') }}"
-  become: yes
+  become: true
   roles:
     - role: cloudera.cluster.cloudera_manager.license
   tags:
@@ -49,7 +48,7 @@
 
 - name: Install Cloudera Manager agents
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  become: yes
+  become: true
   any_errors_fatal: true
   roles:
     - role: cloudera.cluster.cloudera_manager.agent
@@ -60,8 +59,8 @@
 
 - name: Configure Cloudera Manager server for TLS
   hosts: "{{ target | default('cloudera_manager') }}"
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   roles:
     - role: cloudera.cluster.cloudera_manager.server_tls
       when: tls | default(False) or manual_tls_cert_distribution | default(False)
@@ -72,7 +71,7 @@
 
 - name: Configure Cloudera Manager agents
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  become: yes
+  become: true
   any_errors_fatal: true
   roles:
     - cloudera.cluster.cloudera_manager.agent_config
@@ -83,7 +82,7 @@
 
 - name: Configure Cloudera Manager server
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - cloudera.cluster.cloudera_manager.config
   tags:
@@ -93,7 +92,7 @@
 
 - name: Configure Cloudera Manager auth and accounts
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - role: cloudera.cluster.cloudera_manager.external_auth
     - role: cloudera.cluster.cloudera_manager.external_account
@@ -105,7 +104,7 @@
 # STARTBLOCK # Cloudera Manager Password
 - name: Configure Cloudera Manager Password
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - role: cloudera.cluster.cloudera_manager.admin_password.set
   tags:
@@ -115,7 +114,7 @@
 
 - name: Check Cloudera Manager admin password
   hosts: "{{ target | default('cloudera_manager, cluster') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - cloudera.cluster.cloudera_manager.api_client
   tags:
@@ -127,7 +126,7 @@
 # STARTBLOCK # Prepare Security
 - name: Enable Auto-TLS
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - role: cloudera.cluster.cloudera_manager.autotls
       when: autotls is defined and autotls == True
@@ -137,7 +136,7 @@
 
 - name: Install prerequisite packages for Kerberos
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  become: yes
+  become: true
   roles:
     - role: cloudera.cluster.prereqs.kerberos
       when:
@@ -150,7 +149,7 @@
 
 - name: Configure Cloudera Manager server for Kerberos
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - role: cloudera.cluster.cloudera_manager.kerberos
       when: krb5_kdc_host is defined or 'krb5_server' in groups
@@ -162,11 +161,11 @@
 # STARTBLOCK # Configure CM
 - name: Restart Cloudera Manager Agents
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
     - name: Restart Cloudera Manager Agents
-      meta: noop
+      ansible.builtin.meta: noop
       notify:
         - restart cloudera-scm-agent
   tags:
@@ -175,8 +174,8 @@
 
 - name: Ensure that the agents are heartbeating
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  gather_facts: yes
-  any_errors_fatal: yes
+  gather_facts: true
+  any_errors_fatal: true
   roles:
     - role: cloudera.cluster.cloudera_manager.wait_for_heartbeat
       when: cloudera_manager_agent_wait_for_heartbeat | default(True)
@@ -187,7 +186,7 @@
 
 - name: Deploy Cloudera Management Service
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - cloudera.cluster.deployment.services.mgmt
   tags:
@@ -197,8 +196,8 @@
 
 - name: Preload parcels from custom repo to Cloudera Manager
   hosts: "{{ target | default('cloudera_manager') }}"
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   roles:
     - role: cloudera.cluster.cloudera_manager.preload_parcels
       when: "'custom_repo' in groups"

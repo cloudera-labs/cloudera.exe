@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +39,7 @@
       Version: "2012-10-17"
       Statement:
         - Effect: "Allow"
-          Sid: "{{ infra__utlity_bucket_name | replace('-','') }}"
+          Sid: "{{ infra__utlity_bucket_name | replace('-', '') }}"
           Action:
             - "s3:ListBucket"
             - "s3:PutObject"
@@ -65,7 +64,7 @@
 - name: Create Role to access Storage Utility Service Bucket
   register: infra__auto_repo_mirror_role
   community.aws.iam_role:
-    create_instance_profile: yes
+    create_instance_profile: true
     name: "{{ infra__utlity_bucket_name }}"
     state: present
     managed_policies:

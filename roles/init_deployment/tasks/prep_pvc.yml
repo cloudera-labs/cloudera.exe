@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
 
 - name: Set specific Facts for later use in Cluster Deployment
   ansible.builtin.set_fact:
-    _pre_template_cluster: "{{ lookup('file', init__cluster_definition_file ) | from_yaml }}"
+    _pre_template_cluster: "{{ lookup('file', init__cluster_definition_file) | from_yaml }}"
     preload_parcels: "{{ auto_repo_mirror_file_list | default([]) }}"
     custom_repo_rehost_files: "{{ auto_repo_mirror_file_list | default([]) }}"
   delegate_to: "{{ __play_host }}"
@@ -46,7 +45,7 @@
   loop: "{{ groups.all }}"
   loop_control:
     loop_var: __play_host
-    label : __play_host
+    label: __play_host
 
 - name: Include Cluster Definition override
   ansible.builtin.include_vars:
@@ -56,10 +55,10 @@
   loop: "{{ groups.all }}"
   loop_control:
     loop_var: __play_host
-    label : __play_host
+    label: __play_host
 
 - name: Create local temp directories
-  file: "{{ __dir }}"
+  ansible.builtin.file: "{{ __dir }}"
   loop:
     - path: "{{ local_temp_dir }}/csrs"
       state: directory

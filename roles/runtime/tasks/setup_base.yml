@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,17 +23,19 @@
     state: present
     image: "{{ run__datahub_image_catalog_entry.uuid }}"
     catalog: "{{ run__datahub_image_catalog_name }}"
-    template: "{{ ('template' in __datahub_config_item) | ternary(run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template | default(omit)) | list | first, omit, omit) }}"
-    definition: "{{ ('definition' in __datahub_config_item) |  ternary(run__datahub_available_definitions | select('ansible.builtin.search', __datahub_config_item.definition | default(omit)) | list | first, omit, omit) }}"
+    template: "{{ ('template' in __datahub_config_item) | ternary(run__datahub_available_templates | select('ansible.builtin.search', __datahub_config_item.template
+      | default(omit)) | list | first, omit, omit) }}"
+    definition: "{{ ('definition' in __datahub_config_item) | ternary(run__datahub_available_definitions | select('ansible.builtin.search', __datahub_config_item.definition
+      | default(omit)) | list | first, omit, omit) }}"
     groups: "{{ __datahub_config_item.instance_groups | default(omit) }}"
     extension: "{{ __datahub_config_item.extension | default(omit) }}"
     subnets_filter: "{{ __datahub_config_item.subnets_filter | default(omit) }}"
     multi_az: "{{ __datahub_config_item.multi_az | default(omit) }}"
     tags: "{{ __datahub_config_item.tags }}"
-    wait: yes
+    wait: true
   loop_control:
     loop_var: __datahub_config_item
-    label: "{{ __datahub_config_item.name | default ('None') }}"
+    label: "{{ __datahub_config_item.name | default('None') }}"
   loop: "{{ run__datahub_configs }}"
   async: 3600 # 1 hour timeout
   poll: 0
@@ -59,7 +60,7 @@
     storage: "{{ __ml_config_item.raw.storage | default(omit) }}"
   loop_control:
     loop_var: __ml_config_item
-    label: "{{ __ml_config_item.name | default ('None') }}"
+    label: "{{ __ml_config_item.name | default('None') }}"
   loop: "{{ run__ml_configs }}"
   async: 3600 # 1 hour timeout
   poll: 0
@@ -89,7 +90,7 @@
     whitelist_ips: "{{ __de_config_item.raw.whitelist_ips | default(omit) }}"
   loop_control:
     loop_var: __de_config_item
-    label: "{{ __de_config_item.name | default ('None') }}"
+    label: "{{ __de_config_item.name | default('None') }}"
   loop: "{{ run__de_configs }}"
   async: 7200 # 2 hour timeout
   poll: 0
@@ -102,10 +103,10 @@
     name: "{{ __opdb_config_item.name }}"
     env: "{{ run__env_name }}"
     state: present
-    wait: yes
+    wait: true
   loop_control:
     loop_var: __opdb_config_item
-    label: "{{ __opdb_config_item.name | default ('None') }}"
+    label: "{{ __opdb_config_item.name | default('None') }}"
   loop: "{{ run__opdb_configs }}"
   async: 3600 # 1 hour timeout
   poll: 0
@@ -127,7 +128,7 @@
     loadbalancer_subnets_filter: "{{ run__df_lb_subnets_filter }}"
     tags: "{{ run__df_tags }}"
     state: present
-    wait: no
+    wait: false
 
 # Wait for Service Deployments
 - name: Wait for CDP Datahub deployments to complete
@@ -137,7 +138,7 @@
     jid: "{{ __datahub_build_item.ansible_job_id }}"
   loop_control:
     loop_var: __datahub_build_item
-    label: "{{ __datahub_build_item.__datahub_config_item.name | default ('None') }}"
+    label: "{{ __datahub_build_item.__datahub_config_item.name | default('None') }}"
   loop: "{{ __datahub_builds.results }}"
   register: __datahub_builds_async
   until: __datahub_builds_async.finished
@@ -151,7 +152,7 @@
     jid: "{{ __ml_build.ansible_job_id }}"
   loop_control:
     loop_var: __ml_build
-    label: "{{ __ml_build.__ml_config_item.name | default ('None') }}"
+    label: "{{ __ml_build.__ml_config_item.name | default('None') }}"
   loop: "{{ __ml_builds.results }}"
   register: __ml_builds_async
   until: __ml_builds_async.finished
@@ -165,7 +166,7 @@
     jid: "{{ __de_build.ansible_job_id }}"
   loop_control:
     loop_var: __de_build
-    label: "{{ __de_build.__de_config_item.name | default ('None') }}"
+    label: "{{ __de_build.__de_config_item.name | default('None') }}"
   loop: "{{ __de_builds.results }}"
   register: __de_builds_async
   until: __de_builds_async.finished
@@ -179,7 +180,7 @@
     jid: "{{ __opdb_build.ansible_job_id }}"
   loop_control:
     loop_var: __opdb_build
-    label: "{{ __opdb_build.__opdb_config_item.name | default ('None') }}"
+    label: "{{ __opdb_build.__opdb_config_item.name | default('None') }}"
   loop: "{{ __opdb_builds.results }}"
   register: __opdb_builds_async
   until: __opdb_builds_async.finished
@@ -191,7 +192,7 @@
   tags: df
   cloudera.cloud.df_service:
     name: "{{ run__cdp_env_crn }}"
-    wait: yes
+    wait: true
 
 # Request Service child deployments
 - name: Create CDP DE Virtual clusters
@@ -207,7 +208,7 @@
     runtime_spot_component: "{{ __de_vc_config_item.1.runtime_spot_component | default(omit) }}"
     spark_version: "{{ __de_vc_config_item.1.spark_version | default(omit) }}"
     acl_users: "{{ __de_vc_config_item.1.acl_users | default(omit) }}"
-    wait: yes
+    wait: true
   async: 1800 # 30 minute timeout
   poll: 0
   register: __de_vc_builds

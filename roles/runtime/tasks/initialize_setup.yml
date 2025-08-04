@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +40,7 @@
         that:
           - run__public_subnet_ids | length == 3
         fail_msg: "Must have exactly 3 public subnets when deploying CDP Data Warehouse with a public load balancer"
-        quiet: yes
+        quiet: true
       tags:
         - ml
         - dw

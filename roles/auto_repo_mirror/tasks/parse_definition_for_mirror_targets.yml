@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 # Read in cluster definition without jinja parsing=
 - name: Fetch repositories from cluster definition
   ansible.builtin.set_fact:
-    init__preparse_repo_listing: "{{ lookup('file', init__cluster_definition_file ) | from_yaml | json_query('clusters[*].repositories') | flatten }}"
+    init__preparse_repo_listing: "{{ lookup('file', init__cluster_definition_file) | from_yaml | json_query('clusters[*].repositories') | flatten }}"
 
 - name: Check that a Cloudera License is presented if mirroring from files behind Cloudera Subscription
   when: init__preparse_repo_listing | select('search', 'archive.cloudera.com/p') | length > 0
@@ -36,7 +35,7 @@
 - name: Get Parcel Manifests
   ansible.builtin.include_role:
     name: cloudera.cluster.deployment.repometa
-    public: yes
+    public: true
   vars:
     repositories: "{{ __init_parcel_repos }}"
     cluster_os_distribution: "{{ init__parcel_distro }}"
@@ -48,7 +47,7 @@
 
 - name: Filter Parcels by distro
   ansible.builtin.set_fact:
-    __filtered_parcel_urls: "{{ __parcel_urls | select('search', __parcel_distro_search_term ) | list }}"
+    __filtered_parcel_urls: "{{ __parcel_urls | select('search', __parcel_distro_search_term) | list }}"
 
 - name: Prepare target Download Mirror listing with parcels and attendant files
   when: __filtered_parcel_urls | length > 0
@@ -56,7 +55,8 @@
   loop_control:
     loop_var: __filtered_parcel_item
   ansible.builtin.set_fact:
-    init__file_mirror_targets: "{{ init__file_mirror_targets | default(__init_tarball_links) + [__filtered_parcel_item, __filtered_parcel_item + '.sha1', __filtered_parcel_item + '.sha', __filtered_parcel_item + '.sha256', __filtered_parcel_item.replace(__filtered_parcel_item | basename, 'manifest.json') ] }}"
+    init__file_mirror_targets: "{{ init__file_mirror_targets | default(__init_tarball_links) + [__filtered_parcel_item, __filtered_parcel_item + '.sha1', __filtered_parcel_item
+      + '.sha', __filtered_parcel_item + '.sha256', __filtered_parcel_item.replace(__filtered_parcel_item | basename, 'manifest.json')] }}"
 
 # Explicitly set version from parcel distro as Ansible controller could be different OS from target cluster
 - name: Determine Cloudera-Manager Distro and Version
@@ -69,14 +69,15 @@
   ansible.builtin.include_role:
     role: cloudera.cluster.cloudera_manager.repo
   vars:
-    install_repo_on_host: no
+    install_repo_on_host: false
     clusters: []
     cloudera_manager_distro_name: "{{ init__cloudera_manager_distro_name }}"
     cloudera_manager_distro_version: "{{ init__cloudera_manager_distro_version }}"
 
 - name: Add Cloudera Manager Repo to File Mirror list
   ansible.builtin.set_fact:
-    init__file_mirror_targets: "{{ init__file_mirror_targets + [cloudera_manager_repo_url | regex_replace('^(.+\\/(\\d\\.\\d\\.\\d)\\/)(\\w+)\\/.+$', '\\1' + 'repo-as-tarball/cm' + '\\2' + '-' + '\\3' + '.tar.gz')] }}"
+    init__file_mirror_targets: "{{ init__file_mirror_targets + [cloudera_manager_repo_url | regex_replace('^(.+\\/(\\d\\.\\d\\.\\d)\\/)(\\w+)\\/.+$', '\\1' + 'repo-as-tarball/cm'
+      + '\\2' + '-' + '\\3' + '.tar.gz')] }}"
 
 - name: Include CSDs if set
   when:
@@ -94,7 +95,8 @@
 
     - name: Prepare Localised Download Mirror utility bucket name
       ansible.builtin.set_fact:
-        init__auto_repo_mirror_bucket_name: "{{ utility_bucket_name | default([ auto_repo_mirror_prefix | default(default_auto_repo_mirror_prefix), __aws_caller_info.account, globals.region ] | join('-') ) }}"
+        init__auto_repo_mirror_bucket_name: "{{ utility_bucket_name | default([auto_repo_mirror_prefix | default(default_auto_repo_mirror_prefix), __aws_caller_info.account,
+          globals.region] | join('-')) }}"
 
     - name: List current target cache contents if any exist
       register: __auto_repo_mirror_lookup_initial
@@ -115,7 +117,7 @@
 
 - name: Set Download Mirror details in Globals
   ansible.builtin.set_fact:
-    globals: "{{ globals | default({}) | combine( __auto_repo_mirror_spec, recursive=True ) }}"
+    globals: "{{ globals | default({}) | combine(__auto_repo_mirror_spec, recursive=True) }}"
   vars:
     __auto_repo_mirror_spec:
       auto_repo_mirror_targets: "{{ init__file_mirror_targets }}"

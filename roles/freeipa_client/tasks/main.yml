@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +25,8 @@
       when: ansible_facts['os_family'] == 'RedHat'
       block:
         - name: Check for existence of /etc/cloud/cloud.cfg
-          ansible.builtin.stat: path=/etc/cloud/cloud.cfg
+          ansible.builtin.stat:
+            path: /etc/cloud/cloud.cfg
           register: cloud_cfg
 
         - name: Set cloud-init to preserve hostname (RHEL)
@@ -65,7 +65,7 @@
           notify: restart network
 
         - name: Disable nm-cloud-setup if present
-          ignore_errors: yes
+          ignore_errors: true
           ansible.builtin.command: "{{ __nm_cloud_setup_disable_item }}"
           loop_control:
             loop_var: __nm_cloud_setup_disable_item
@@ -89,7 +89,8 @@
       notify: restart network
 
     - name: Check for existence of /etc/dhcp/dhclient.conf
-      ansible.builtin.stat: path=/etc/dhcp/dhclient.conf
+      ansible.builtin.stat:
+        path: /etc/dhcp/dhclient.conf
       register: dhclient_conf
 
     - name: Set /etc/dhcp/dhclient.conf for domain search and name servers
@@ -121,4 +122,4 @@
     ipaclient_servers: "{{ ipa_hosts }}"
     ipaserver_setup_dns: "{{ enable_dns }}"
     ipasssd_enable_dns_updates: "{{ enable_dns }}"
-    ipaclient_mkhomedir: yes
+    ipaclient_mkhomedir: true

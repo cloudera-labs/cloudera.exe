@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 - name: Get public IP from Ipify
   community.general.ipify_facts:
     timeout: 20
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Alternate Ipify
   when: ipify_public_ip is not defined
@@ -25,7 +24,7 @@
     - name: Fetch Public IP From Icanhazip
       ansible.builtin.uri:
         url: https://ipv4.icanhazip.com
-        return_content: yes
+        return_content: true
       register: __public_ip_info
 
     - name: Set Alternate Ipify fact
@@ -48,11 +47,11 @@
   loop: "{{ infra__vpc_public_subnet_cidrs }}"
   vars:
     entry:
-      name: "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+      name: "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx | string] | join('-') }}"
       cidr: "{{ __public_subnet_item }}"
       tags:
         "kubernetes.io/role/elb": "1"
-        "Name": "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+        "Name": "{{ [infra__namespace, infra__vpc_public_subnets_suffix, __public_subnet_idx | string] | join('-') }}"
 
 - name: Generate Private Subnet Details for creation
   when: not infra__aws_private_subnet_ids
@@ -64,8 +63,8 @@
   loop: "{{ infra__vpc_private_subnet_cidrs }}"
   vars:
     entry:
-      name: "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+      name: "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx | string] | join('-') }}"
       cidr: "{{ __private_subnet_item }}"
       tags:
         "kubernetes.io/role/internal-elb": "1"
-        "Name": "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+        "Name": "{{ [infra__namespace, infra__vpc_private_subnets_suffix, __private_subnet_idx | string] | join('-') }}"

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +26,7 @@
     state: present
 
 - name: Retrieve AWS EC2 Instance details for CDP Datalake
-  community.aws.ec2_instance_info:
+  amazon.aws.ec2_instance_info:
     region: "{{ plat__region }}"
     filters:
       "tag:Name": "{{ plat__namespace }}*"

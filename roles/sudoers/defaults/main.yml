@@ -19,15 +19,15 @@
 # Role prefix is 'sudoers__'
 
 # Variables used as inputs in main.yml
-sudoers__env_admin_password:                     "{{ common__env_admin_password }}"
+sudoers__env_admin_password: "{{ common__env_admin_password }}"
 
 # sudoers__sudo_group_name:                        sudoers
-sudoers__sudo_users:                       []
-sudoers__sudo_groups:                      [] # the groups that are members of the sudo_rule
+sudoers__sudo_users: []
+sudoers__sudo_groups: [] # the groups that are members of the sudo_rule
 
 # Flag to determine if we want to remove (=True) or retain (=False) existing users in sudo rule
-sudoers__purge_users:                   False
+sudoers__purge_users: false
 # Flag to determine if we want to remove (=True) or retain (=False) existing group members in sudo rule
-sudoers__purge_groups:                  False
+sudoers__purge_groups: false
 
-sudoers__sudorule_name:                          admin_all_rule
+sudoers__sudorule_name: admin_all_rule

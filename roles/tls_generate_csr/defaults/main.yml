@@ -27,7 +27,6 @@ ca_server_attrs_general:
   ST: CA
   C: US
 
-
 tls_key_password: changeme
 
 tls_key_path: "{{ base_dir_security_pki }}/{{ inventory_hostname }}.key"

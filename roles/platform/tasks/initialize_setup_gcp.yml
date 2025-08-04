@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,28 +31,30 @@
       ansible.builtin.assert:
         that:
           - plat__gcp_availability_zones is subset(plat__gcp_availability_zones_discovered)
-        fail_msg: "The following zone(s) are not available in region '{{ plat__region }}': {{ plat__gcp_availability_zones | difference(plat__gcp_availability_zones_discovered) | join(', ') }}"
-        quiet: yes
+        fail_msg: "The following zone(s) are not available in region '{{ plat__region }}': {{ plat__gcp_availability_zones | difference(plat__gcp_availability_zones_discovered)
+          | join(', ') }}"
+        quiet: true
 
 # https://docs.cloudera.com/management-console/cloud/requirements-gcp/topics/mc-gcp_apis.html
 - name: Ensure Google Services Enabled
   when: plat__gcp_enable_services | bool
   block:
     - name: Fetch list of enabled GCP Services
-      command: >
+      ansible.builtin.command: >
         gcloud services list --enabled --project {{ plat__gcp_project }}
       register: __gcp_services_info
 
     - name: Determine list of missing Services
-      set_fact:
-        __plat_gcp_services_to_enable: "{{ __plat_gcp_services_to_enable | default([]) + ([__gcp_service_item] if __gcp_service_item not in __gcp_services_info.stdout else []) | unique }}"
+      ansible.builtin.set_fact:
+        __plat_gcp_services_to_enable: "{{ __plat_gcp_services_to_enable | default([]) + ([__gcp_service_item] if __gcp_service_item not in __gcp_services_info.stdout
+          else []) | unique }}"
       loop: "{{ plat__gcp_required_services }}"
       loop_control:
         loop_var: __gcp_service_item
 
     - name: Enable missing GCP Service APIs
       when: __plat_gcp_services_to_enable | length > 0
-      command: >
+      ansible.builtin.command: >
         gcloud services enable --quiet {{ __gcp_enable_item }}
       loop: "{{ __plat_gcp_services_to_enable }}"
       loop_control:

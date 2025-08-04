@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +43,7 @@
               - "{{ __artifacts_directory.stat.isdir }}"
               - "{{ __artifacts_directory.stat.writeable }}"
             fail_msg: "Artifacts directory is either not a directory or is not writeable"
-            quiet: yes
+            quiet: true
 
         - name: Set fact for the artifacts directory path
           ansible.builtin.set_fact:
@@ -77,12 +76,12 @@
 
 - name: Query CDP Operational DBs
   cloudera.cloud.opdb_info:
-    env:  "{{ info__env_name }}"
+    env: "{{ info__env_name }}"
   register: __opdb_info
 
 - name: Query CDP DFX
   cloudera.cloud.df_service_info:
-    name:  "{{ info__env_name }}"
+    name: "{{ info__env_name }}"
   register: __df_info
 
 - name: Set facts for the CDP deployment details

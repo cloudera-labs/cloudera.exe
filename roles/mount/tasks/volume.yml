@@ -9,24 +9,24 @@
 - name: Create logical volume
   community.general.lvol:
     vg: "{{ volume.vg_name }}"
-    lv:  "{{ volume.lv_name }}"
+    lv: "{{ volume.lv_name }}"
     size: +100%FREE
-    force: yes
+    force: true
 
 - name: Format partition as XFS
   community.general.filesystem:
-    dev: "{{ '/'.join(['/dev',volume.vg_name, volume.lv_name]) }}"
+    dev: "{{ '/'.join(['/dev', volume.vg_name, volume.lv_name]) }}"
     fstype: xfs
 
 - name: Create the mount directory
   ansible.builtin.file:
     path: "{{ volume.mount }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Mount the logical volume
-  mount:
+  ansible.posix.mount:
     path: "{{ volume.mount }}"
-    src: "{{ '/'.join(['/dev',volume.vg_name, volume.lv_name]) }}"
+    src: "{{ '/'.join(['/dev', volume.vg_name, volume.lv_name]) }}"
     fstype: xfs
     state: mounted

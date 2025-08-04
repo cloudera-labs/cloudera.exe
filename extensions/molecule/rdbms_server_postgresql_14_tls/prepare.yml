@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,7 @@
     - name: Create CA private key
       community.crypto.openssl_privatekey:
         path: ./ca-certificate.key
-        mode: 0600
+        mode: "0600"
 
     - name: Create CSR for CA certificate
       community.crypto.openssl_csr_pipe:
@@ -27,7 +28,7 @@
         common_name: Molecule CA
         use_common_name_for_san: false
         basic_constraints:
-          - 'CA:TRUE'
+          - "CA:TRUE"
         basic_constraints_critical: true
         key_usage:
           - keyCertSign
@@ -40,11 +41,11 @@
         csr_content: "{{ __ca_csr.csr }}"
         privatekey_path: ca-certificate.key
         provider: selfsigned
-        mode: 0644
+        mode: "0644"
 
 - name: Set up TLS certificates
   hosts: all
-  gather_facts: yes
+  gather_facts: true
   tasks:
     - name: Update pip
       ansible.builtin.pip:
@@ -77,20 +78,20 @@
       ansible.builtin.file:
         path: /opt/security/pki
         state: directory
-        mode: 0755
+        mode: "0755"
 
     - name: Copy CA certificate from controller
       ansible.builtin.copy:
         src: ca-certificate.pem
         dest: /opt/security/pki/ca-certificate.pem
-        mode: 0644
+        mode: "0644"
 
     - name: Create host private key
       community.crypto.openssl_privatekey:
         path: /opt/security/pki/host.key
-        return_content: yes
+        return_content: true
         group: postgres
-        mode: 0640
+        mode: "0640"
       register: __key
 
     - name: Write unencrypted host private key
@@ -98,7 +99,7 @@
         dest: /opt/security/pki/host.key.unenc
         content: "{{ __key.privatekey }}"
         group: postgres
-        mode: 0640
+        mode: "0640"
 
     - name: Create CSR for host certificate
       community.crypto.openssl_csr_pipe:
@@ -121,5 +122,5 @@
       ansible.builtin.copy:
         dest: /opt/security/pki/host.pem
         content: "{{ __cert.certificate }}"
-        mode: 0640
+        mode: "0640"
         group: postgres

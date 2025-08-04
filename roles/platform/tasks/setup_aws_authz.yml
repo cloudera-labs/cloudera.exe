@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -174,8 +173,8 @@
     region: "{{ plat__region }}"
     name: "{{ __aws_service_role_details_item.name }}"
     description: "{{ __aws_service_role_details_item.description }} role for {{ plat__namespace }}"
-    create_instance_profile: yes
-    purge_policies: yes
+    create_instance_profile: true
+    purge_policies: true
     assume_role_policy_document:
       Version: "2012-10-17"
       Statement:
@@ -224,8 +223,8 @@
     region: "{{ plat__region }}"
     name: "{{ __aws_data_access_role_details_item.name }}"
     description: "{{ __aws_data_access_role_details_item.description }} role for {{ plat__namespace }}"
-    create_instance_profile: yes
-    purge_policies: yes
+    create_instance_profile: true
+    purge_policies: true
     assume_role_policy_document:
       Version: "2012-10-17"
       Statement:
@@ -268,7 +267,7 @@
   failed_when: __aws_data_access_role_tags_item.failed
 
 - name: Ensure AWS Instance Profiles are attached to CDP Roles
-  command: >
+  ansible.builtin.command: >
     aws iam add-role-to-instance-profile
     --instance-profile-name {{ __aws_role_item }}
     --role-name {{ __aws_role_item }}

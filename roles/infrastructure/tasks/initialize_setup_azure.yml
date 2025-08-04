@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 - name: Prepare Azure Security Group Rules
   ansible.builtin.set_fact:
     infra__azure_security_group_rules:
-      - name: 'AllowCallerAccess'
+      - name: "AllowCallerAccess"
         protocol: Tcp
         # TODO Add back in infra__vpc_user_cidr as an union of source addresses
         source_address_prefix:
@@ -32,7 +31,7 @@
     infra__azure_security_group_rules: "{{ infra__azure_security_group_rules | union(rule) }}"
   vars:
     rule:
-      - name: 'AllowCDPControlPlane'
+      - name: "AllowCDPControlPlane"
         protocol: Tcp
         source_address_prefix: "{{ infra__cdp_control_plane_cidr }}"
         destination_port_range: "{{ infra__cdp_control_plane_ports }}"
@@ -46,7 +45,7 @@
     infra__azure_security_group_rules: "{{ infra__azure_security_group_rules | union(rule) }}"
   vars:
     rule:
-      - name: 'AllowExtraAccess'
+      - name: "AllowExtraAccess"
         protocol: Tcp
         source_address_prefix: "{{ infra__vpc_extra_cidr }}"
         destination_port_range: "{{ infra__vpc_extra_ports }}"

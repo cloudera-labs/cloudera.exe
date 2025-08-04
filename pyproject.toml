@@ -1,35 +1,78 @@
 [project]
 name = "exe"
+dynamic = ["version"]
 description = "cloudera.exe Ansible collection"
 readme = "README.md"
-dependencies = [
-  "ansible-core~=2.12.0"
-]
-requires-python = "~=3.8.0"
-dynamic = ["version"]
+requires-python = ">=3.8"
+license = "Apache-2.0"
+keywords = []
+
+authors = [{ name = "Webster Mudge", email = "wmudge@cloudera.com" }]
+classifiers = []
+dependencies = []
+
+[tool.hatch.build.targets.wheel]
+bypass-selection = true
 
 [tool.hatch.version]
 path = "galaxy.yml"
 pattern = "version:\\s+(?P<version>[\\d\\.]+)"
+scheme = "semver"
+validate-bump = true
 
 [tool.hatch.envs.default]
+python = "3.12"
+detached = true
 dependencies = [
   "pre-commit",
   "coverage[toml]",
   "pytest",
-  "pytest-cov",
+  "molecule",
+  "molecule-plugins",
+  "molecule-plugins[ec2]",
+  "ansible-core<2.17",     # For RHEL 8 support
+  "ansible-lint",
+  "antsibull-docs >= 2.0.0, < 3.0.0",
 ]
-installer = "uv"
+
+[tool.hatch.envs.default.scripts]
+lint = [
+  "pre-commit run -a",
+  "antsibull-docs lint-collection-docs --plugin-docs --validate-collection-refs=all --skip-rstcheck .",
+]
+
+[tool.hatch.envs.docs]
+python = "3.12"
+detached = true
+extra-dependencies = [
+  "ansible-core<2.17",     # For RHEL 8 support
+  "antsibull-docs @ git+https://github.com/cloudera-labs/antsibull-docs@cldr-docsite#egg=antsibull-docs",
+  "ansible-pygments",
+  "sphinx",
+  "sphinx-ansible-theme >= 0.9.0",
+  "antsichaut",
+]
+
+[tool.hatch.envs.docs.scripts]
+build = "docsbuild/build.sh"
+changelog = [
+  # Read the version in galaxy.yml via hatch itself (normalizes release candidates, etc.)
+  # Use 'hatch version' to manage the version, i.e. 'hatch version major,rc'
+  "antsibull-changelog release --version $(hatch version)",
+  "antsichaut --since_version=latest",
+  "antsibull-changelog generate",
+]
 
 [tool.pytest.ini_options]
-testpaths = [
-  "tests",
-]
+testpaths = ["tests"]
 filterwarnings = [
   "ignore:AnsibleCollectionFinder has already been configured",
   "ignore:'crypt' is deprecated and slated for removal in Python 3.13:DeprecationWarning",
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = [
+  "hatchling",
+  "hatch-semver",
+]
 build-backend = "hatchling.build"

@@ -81,7 +81,7 @@ df:
           parameters:
             - name:
               value:
-              assetReferences: [str, ...]
+              assetReferences: [str, "..."]
       kpis:
         - metricId:
           componentId:
@@ -505,5 +505,5 @@ data:
     aws:
       suffix:
   teardown:
-      delete_policies:
-      delete_roles:
+    delete_policies:
+    delete_roles:

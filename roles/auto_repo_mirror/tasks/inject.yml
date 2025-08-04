@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +45,7 @@
   when:
     - init__auto_repo_mirror_ini_key is defined
     - use_auto_repo_mirror | default(default_enable_auto_repo_mirror) | bool
-  ignore_errors: yes
+  ignore_errors: true
   ansible.builtin.set_fact:
     __auto_repo_mirror_ini_entry: "{{ lookup('ini', __ini_lookup) }}"
   vars:
@@ -68,8 +67,8 @@
     - name: Inject Parcel cache entries to Repository URLs
       ansible.builtin.replace:
         name: "{{ __tmp_cluster_file }}"
-        regexp: '^(\s+\-\s)https://archive\.cloudera\.com(\/.+)$'
-        replace: '\1http://{{ groups.custom_repo | first }}\2'
+        regexp: "^(\\s+\\-\\s)https://archive\\.cloudera\\.com(\\/.+)$"
+        replace: "\\1http://{{ groups.custom_repo | first }}\\2"
 
     - name: Set Cluster Definition file to Temp file with parcel cache entries
       ansible.builtin.set_fact:
@@ -91,31 +90,21 @@
       loop_control:
         loop_var: __cluster_repo_path_item
       ansible.builtin.set_fact:
-        init__urls_to_sign: "{{ init__urls_to_sign
-          | default([]) + __auto_repo_mirror_ini_entry
-          | select('search', __cluster_repo_path_item)
-          | select('search', init__parcel_distro)
+        init__urls_to_sign: "{{ init__urls_to_sign | default([]) + __auto_repo_mirror_ini_entry | select('search', __cluster_repo_path_item) | select('search', init__parcel_distro)
           | list }}"
 
     - name: Include Cloudera Manager Tarball
       ansible.builtin.set_fact:
-        init__urls_to_sign: "{{ init__urls_to_sign
-            | default([]) + __auto_repo_mirror_ini_entry
-            | select('search', 'repo-as-tarball')
-            | select('search', cloudera_manager_version)
-            | select('search', cm_distro_select[init__parcel_distro]['version'] | string + '.tar')
-            | list }}"
+        init__urls_to_sign: "{{ init__urls_to_sign | default([]) + __auto_repo_mirror_ini_entry | select('search', 'repo-as-tarball') | select('search', cloudera_manager_version)
+          | select('search', cm_distro_select[init__parcel_distro]['version'] | string + '.tar') | list }}"
 
-# TODO: Filter to relevent version manifests, not all manifests, just to be tidy
+    # TODO: Filter to relevent version manifests, not all manifests, just to be tidy
     - name: Ensure manifest is included in Download Mirror URLs if present
       loop: "{{ init__cluster_repo_entries }}"
       loop_control:
         loop_var: __cluster_repo_path_item
       ansible.builtin.set_fact:
-        init__urls_to_sign: "{{ init__urls_to_sign
-            | default([]) + __auto_repo_mirror_ini_entry
-            | select('search', 'manifest.json')
-            | list }}"
+        init__urls_to_sign: "{{ init__urls_to_sign | default([]) + __auto_repo_mirror_ini_entry | select('search', 'manifest.json') | list }}"
 
 - name: Get AWS Specific download URIs
   when:
@@ -130,7 +119,7 @@
       amazon.aws.aws_s3:
         bucket: "{{ __s3_bucket_uri | regex_replace('^.+//(.+)\\.s3.+$', '\\1') }}"
         object: "{{ __s3_bucket_uri | regex_replace('^.+amazonaws\\.com(.+)$', '\\1') }}"
-        ignore_nonexistent_bucket: yes
+        ignore_nonexistent_bucket: true
         expiry: "{{ download_link_expiry | default(default_download_link_expiry) }}"
         mode: geturl
 

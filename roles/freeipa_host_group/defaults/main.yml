@@ -19,9 +19,9 @@
 # Role prefix is 'freeipa_host_group__'
 
 # Variables used as inputs in main.yml
-freeipa_host_group__env_name:  "{{ common__env_name }}"
-freeipa_host_group__infra_type:  "{{ common__infra_type }}"
-freeipa_host_group__region:    "{{ common__region }}"
+freeipa_host_group__env_name: "{{ common__env_name }}"
+freeipa_host_group__infra_type: "{{ common__infra_type }}"
+freeipa_host_group__region: "{{ common__region }}"
 
 freeipa_host_group__gcp_project: "{{ common__gcp_project }}"
 

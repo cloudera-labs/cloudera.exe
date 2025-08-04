@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 # TODO: Check index.txt.attr and see if unique_subject = no for intermediate ca
 
 - name: Set fact for all CSRs to sign
@@ -31,7 +30,7 @@
   ansible.builtin.copy:
     src: "{{ item.local_file }}"
     dest: "{{ ca_server_intermediate_path_csr }}/{{ item.csr_filename }}"
-    mode: 0644
+    mode: "0644"
   loop: "{{ __csrs_to_sign }}"
 
 - name: Sign CSRs
@@ -51,5 +50,5 @@
   ansible.builtin.fetch:
     src: "{{ ca_server_intermediate_path_certs }}/{{ item.file_suffix }}.pem"
     dest: "{{ local_certs_dir }}/{{ item.file_suffix }}.pem"
-    flat: yes
+    flat: true
   loop: "{{ __csrs_to_sign }}"

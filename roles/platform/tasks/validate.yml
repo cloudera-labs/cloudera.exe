@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@
       - "{{ __auth_fact_item }} is string"
       - "{{ __auth_fact_item }} | trim | length > 0"
     fail_msg: "Authentication parameter, '{{ __auth_fact_item }}', is invalid."
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __auth_fact_item
   loop:
@@ -34,7 +33,7 @@
     fail_msg: >-
       Namespace exceeds 18 chars. Resulting hostnames may exceed 64 chars and cause errors in
       some systems like Hue. Please use a shorter namespace.
-    quiet: yes
+    quiet: true
 
 - name: Confirm mutually-inclusive CDP Cross Account details
   when: (plat__cdp_xaccount_external_id is string) != (plat__cdp_xaccount_account_id is string)
@@ -46,7 +45,7 @@
   ansible.builtin.assert:
     that: "{{ __xaccount_item }} | length > 0"
     fail_msg: "CDP Cross Account parameter, '{{ __xaccount_item }}'', is invalid."
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __xaccount_item
   loop:
@@ -62,7 +61,7 @@
     fail_msg: >-
       Error: '{{ lookup('vars', __group_fact_item) }}'. CDP Group name must be less than 32 characters, must begin with either a letter or
       underscore, and contain only alphanumeric characters, dashes, and underscores.
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __group_fact_item
   loop:

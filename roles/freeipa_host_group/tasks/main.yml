@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +29,7 @@
   when: freeipa_host_group__infra_type == "aws"
   block:
     - name: Gather EC2 instance information using ID
-      community.aws.ec2_instance_info:
+      amazon.aws.ec2_instance_info:
         region: "{{ freeipa_host_group__region }}"
         instance_ids:
           - "{{ __freeipa_server_instance_id }}"
@@ -56,7 +55,7 @@
         project: "{{ freeipa_host_group__gcp_project }}"
         # Filter on the freeipa instance name with the timestamp stripped
         filters:
-        - "name : {{ __freeipa_server_instance_id | regex_replace('[^-]+$', '') }}*"
+          - "name : {{ __freeipa_server_instance_id | regex_replace('[^-]+$', '') }}*"
       register: __gcp_freeipa_address_info
 
     - name: Set facts for the FreeIPA server IP

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@
       ansible.builtin.set_fact:
         __aws_vpc_tags: "{{ __aws_vpc_tags | default([]) | union([tag_entry]) }}"
       vars:
-        tag_entry: "Key={{ __tag.key }},Value={{ __tag.value |quote}}"
+        tag_entry: "Key={{ __tag.key }},Value={{ __tag.value | quote }}"
       loop: "{{ infra__tags | dict2items }}"
       loop_control:
         loop_var: __tag
@@ -56,7 +55,7 @@
     map_public: "{{ __aws_public_subnet_item.map_public }}"
     assign_instances_ipv6: "{{ __aws_public_subnet_item.assign_instances_ipv6 }}"
     state: present
-    purge_tags: no
+    purge_tags: false
     tags: "{{ infra__tags | combine(__aws_public_subnet_item.tags, recursive=True) }}"
   loop_control:
     loop_var: __aws_public_subnet_item
@@ -70,7 +69,7 @@
     vpc_id: "{{ infra__aws_vpc_id }}"
     cidr: "{{ __aws_private_subnet_item.cidr }}"
     state: present
-    purge_tags: no
+    purge_tags: false
     tags: "{{ infra__tags | combine(__aws_private_subnet_item.tags, recursive=True) }}"
   loop_control:
     loop_var: __aws_private_subnet_item
@@ -78,15 +77,15 @@
   loop: "{{ infra__vpc_private_subnets_info }}"
 
 - name: Set up AWS Public Network infrastructure
-  when: infra__aws_subnet_ids is undefined  # L0 (fully public), L1 (semi-private), or L2 (fully-private), but not for existing network or L3 (outbound restricted)
+  when: infra__aws_subnet_ids is undefined # L0 (fully public), L1 (semi-private), or L2 (fully-private), but not for existing network or L3 (outbound restricted)
   # when: not (infra__tunnel and not infra__public_endpoint_access) and infra__aws_subnet_ids is undefined # L0 (all public) or L1 (public/private)
   block:
     - name: Create AWS Internet Gateway (IGW)
-      community.aws.ec2_vpc_igw:
+      amazon.aws.ec2_vpc_igw:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
         state: present
-        tags: "{{ infra__tags | combine({ 'Name': infra__aws_igw_name }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': infra__aws_igw_name}, recursive=True) }}"
       register: __aws_igw
 
     - name: Set fact for AWS IGW ID
@@ -101,7 +100,7 @@
         cidr: "{{ __aws_public_subnet_item.cidr }}"
         state: present
         tags: "{{ infra__tags | combine(__aws_public_subnet_item.tags, recursive=True) }}"
-        map_public: yes
+        map_public: true
         az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
       loop_control:
         loop_var: __aws_public_subnet_item
@@ -130,7 +129,7 @@
         route_table_id: "{{ __aws_route_table_id }}"
         lookup: id
         state: present
-        tags: "{{ infra__tags | combine({ 'Name': infra__aws_public_route_table_name }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': infra__aws_public_route_table_name}, recursive=True) }}"
         routes:
           - dest: "0.0.0.0/0"
             gateway_id: "{{ infra__aws_igw_id }}"
@@ -153,8 +152,8 @@
         vpc_id: "{{ infra__aws_vpc_id }}"
         cidr: "{{ __aws_private_subnet_item.cidr }}"
         state: present
-        tags: "{{ infra__tags | combine(__aws_private_subnet_item.tags, recursive = true) }}"
-        map_public: no
+        tags: "{{ infra__tags | combine(__aws_private_subnet_item.tags, recursive=true) }}"
+        map_public: false
         az: "{{ __aws_az_info.availability_zones[__aws_subnet_index % infra__aws_vpc_az_count | int].zone_name }}"
       loop_control:
         loop_var: __aws_private_subnet_item
@@ -171,25 +170,25 @@
       loop: "{{ __aws_private_subnets.results }}"
 
     - name: Configure Private Route Table for the AWS VPC
-      when: no
+      when: false
       #when: not infra__public_endpoint_access
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
-        tags: "{{ infra__tags | combine({ 'Name': infra__aws_private_route_table_name }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': infra__aws_private_route_table_name}, recursive=True) }}"
         subnets: "{{ infra__aws_private_subnet_ids }}"
         routes: []
 
     - name: Create Network Gateways (NAT) # and allocate Elastic IP Addresses (EIP) for Public Endpoint Access
       #when: infra__public_endpoint_access
       # Might want a net new flag -- disconnected -- that will not set up any routes to outside, i.e. Level3
-      community.aws.ec2_vpc_nat_gateway:
+      amazon.aws.ec2_vpc_nat_gateway:
         state: present
         subnet_id: "{{ __aws_public_subnet_id }}"
         wait: true
         if_exist_do_not_create: true
         region: "{{ infra__region }}"
-        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_nat_gateway_name, __aws_public_subnet_index | string]) }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': '-'.join([infra__aws_nat_gateway_name, __aws_public_subnet_index | string])}, recursive=True) }}"
       loop_control:
         loop_var: __aws_public_subnet_id
         index_var: __aws_public_subnet_index
@@ -202,11 +201,11 @@
       community.aws.ec2_vpc_route_table:
         vpc_id: "{{ infra__aws_vpc_id }}"
         region: "{{ infra__region }}"
-        tags: "{{ infra__tags | combine({ 'Name': '-'.join([infra__aws_private_route_table_name, __aws_private_subnet_id_index | string]) }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': '-'.join([infra__aws_private_route_table_name, __aws_private_subnet_id_index | string])}, recursive=True) }}"
         subnets: "{{ __aws_private_subnet_id_item }}"
         routes:
-        - dest: "0.0.0.0/0"
-          nat_gateway_id:  "{{ __aws_ngws.results[ __aws_private_subnet_id_index % __aws_ngws.results | length ].nat_gateway_id }}"
+          - dest: "0.0.0.0/0"
+            nat_gateway_id: "{{ __aws_ngws.results[__aws_private_subnet_id_index % __aws_ngws.results | length].nat_gateway_id }}"
       loop_control:
         loop_var: __aws_private_subnet_id_item
         index_var: __aws_private_subnet_id_index
@@ -236,8 +235,8 @@
     vpc_id: "{{ infra__aws_vpc_id }}"
     name: "{{ __security_group_name_item }}"
     description: "{{ __security_group_name_item }}"
-    tags: "{{ infra__tags | combine({ 'Name': __security_group_name_item }, recursive=True) }}"
-    rules:  "{{ infra__aws_security_group_rules | union([rule])}}"
+    tags: "{{ infra__tags | combine({'Name': __security_group_name_item}, recursive=True) }}"
+    rules: "{{ infra__aws_security_group_rules | union([rule]) }}"
   vars:
     rule:
       proto: all
@@ -265,7 +264,7 @@
         state: present
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
-        tags: "{{ infra__tags | combine({ 'Name': infra__security_group_vpce_name }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': infra__security_group_vpce_name}, recursive=True) }}"
         name: "{{ infra__security_group_vpce_name }}"
         description: "{{ infra__security_group_vpce_name }}"
         rules:
@@ -291,13 +290,13 @@
         loop_var: __aws_route_tables
 
     - name: Create Gateway VPC Endpoints (Skip if infra__aws_private_endpoints is false)
-      community.aws.ec2_vpc_endpoint:
+      amazon.aws.ec2_vpc_endpoint:
         state: present
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
         service: "{{ __infra_gateway_vpc_endpoint }}"
         route_table_ids: "{{ infra__route_table_ids }}"
-        tags: "{{ infra__tags | combine({ 'Name': infra__namespace + __infra_gateway_vpc_endpoint.split(infra__region)[1] }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': infra__namespace + __infra_gateway_vpc_endpoint.split(infra__region)[1]}, recursive=True) }}"
       vars:
         route_table_id: "{{ route_tables.associations[0].route_table_id }}"
       loop: "{{ infra__aws_gateway_vpc_private_endpoints }}"
@@ -306,14 +305,14 @@
       register: __aws_gateway_vpc_endpoints
 
     - name: Create Interface VPC Endpoints (Skip if infra__aws_private_endpoints is false)
-      community.aws.ec2_vpc_endpoint:
+      amazon.aws.ec2_vpc_endpoint:
         state: present
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
         service: "{{ __infra_interface_vpc_endpoint }}"
         vpc_endpoint_type: Interface
         wait: true
-        tags: "{{ infra__tags | combine({ 'Name': infra__namespace + __infra_interface_vpc_endpoint.split(infra__region)[1] }, recursive=True) }}"
+        tags: "{{ infra__tags | combine({'Name': infra__namespace + __infra_interface_vpc_endpoint.split(infra__region)[1]}, recursive=True) }}"
       loop: "{{ infra__aws_interface_vpc_private_endpoints }}"
       loop_control:
         loop_var: __infra_interface_vpc_endpoint
@@ -331,7 +330,7 @@
       when:
         - __aws_interface_vpc_endpoints is defined
         - __aws_interface_vpc_endpoints.results is defined
-      command: >
+      ansible.builtin.command: >
         aws ec2 modify-vpc-endpoint
         --region {{ infra__region }}
         --vpc-endpoint-id {{ __infra_vpce_loop_var.result.vpc_endpoint_id }}
@@ -340,6 +339,6 @@
         --remove-security-group-ids {{ __aws_vpc_default_sg.security_groups[0].group_id }}
         --private-dns-enabled
       loop_control:
-        label: "{{ __infra_vpce_loop_var.result.vpc_endpoint_id | default('') }}"  # Default empty string to avoid ansible label undef error
+        label: "{{ __infra_vpce_loop_var.result.vpc_endpoint_id | default('') }}" # Default empty string to avoid ansible label undef error
         loop_var: __infra_vpce_loop_var
       loop: "{{ __aws_interface_vpc_endpoints.results }}"

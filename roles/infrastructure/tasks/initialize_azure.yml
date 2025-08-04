@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,25 +23,25 @@
     --tenant "{{ lookup('env','AZURE_TENANT') }}"
   async: 30
   poll: 5
-  no_log: yes
+  no_log: true
 
 - name: Check Azure CLI Account to ensure functionality and user access
   register: __azure_account_info
-  ansible.builtin.command: "az account show"  # Calling the CLI version doesn't test much of the install
+  ansible.builtin.command: "az account show" # Calling the CLI version doesn't test much of the install
 
 - name: Confirm Azure CLI
   ansible.builtin.assert:
     that:
       - "__azure_account_info.rc == 0"
     fail_msg: "Azure CLI failed to execute: {{ __azure_account_info.stdout }} ({{ __azure_account_info.stderr }})"
-    quiet: yes
+    quiet: true
 
 - name: Fetch Netapp subnet URI if it exists
   azure.azcollection.azure_rm_subnet_info:
     name: "{{ infra__vpc_svcnet_name }}"
     resource_group: "{{ infra__azure_metagroup_name }}"
     virtual_network_name: "{{ infra__vpc_name }}"
-  ignore_errors: yes  # Microsoft throws errors instead of reporting a simple 'not found'.
+  ignore_errors: true # Microsoft throws errors instead of reporting a simple 'not found'.
   register: __azure_netapp_subnet_info
 
 - name: Set fact NetApp Subnet URI if exists

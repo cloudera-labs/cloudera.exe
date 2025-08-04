@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,14 +29,14 @@
   ansible.builtin.import_role:
     name: exec_cdp
   vars:
-    install: yes
+    install: true
   tags: setup
 
 - name: Set up the CDP Public Cloud environment again (idempotent)
   ansible.builtin.import_role:
     name: exec_cdp
   vars:
-    install: yes
+    install: true
   tags: setup
 
 - name: Run test tasks
@@ -49,12 +48,12 @@
   ansible.builtin.import_role:
     name: exec_cdp
   vars:
-    install: no
+    install: false
   tags: teardown
 
 - name: Tear down the CDP Public Cloud environment (idempotent)
   ansible.builtin.import_role:
     name: exec_cdp
   vars:
-    install: no
+    install: false
   tags: teardown

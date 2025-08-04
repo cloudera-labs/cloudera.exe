@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +44,7 @@
     extra_opts: --strip-components=1
     owner: "{{ node_exporter_user }}"
     group: "{{ node_exporter_group }}"
-    remote_src: yes
+    remote_src: true
 
 - name: Remove the temporary  directory
   when: __exporter_tmp is defined
@@ -62,13 +61,12 @@
 - name: Start and enable node_exporter service
   when: __exporter_service.changed
   block:
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
 
-  - name: Reload systemd daemon
-    ansible.builtin.systemd:
-      daemon_reload: yes
-
-  - name: Enable and start node_exporter service
-    ansible.builtin.systemd:
-      name: node_exporter
-      state: started
-      enabled: yes
+    - name: Enable and start node_exporter service
+      ansible.builtin.systemd:
+        name: node_exporter
+        state: started
+        enabled: true

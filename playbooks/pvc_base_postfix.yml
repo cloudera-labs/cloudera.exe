@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 # STARTBLOCK # Fix Auto-TLS
 - name: Auto-TLS Services Setup
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - role: cloudera.cluster.cloudera_manager.cms_tls
       when: autotls is defined and autotls == True
@@ -29,12 +28,12 @@
 # STARTBLOCK # Setup HDFS Encryption
 - name: Setup KTS HA
   hosts: "{{ target | default('localhost') }}"
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
     - ansible.builtin.include_role:
         name: cloudera.cluster.deployment.services.kts_high_availability
-        public: yes
+        public: true
         apply:
           tags:
             - kts
@@ -48,8 +47,8 @@
 
 - name: Handle KMS services
   hosts: "{{ target | default('localhost') }}"
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - role: cloudera.cluster.deployment.services.kms
       when: "'kms_servers' in groups"
@@ -61,8 +60,8 @@
 
 - name: Handle KMS services
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   roles:
     - role: cloudera.cluster.operations.refresh_ranger_kms_repo
       when: "'kms_servers' in groups"
@@ -72,7 +71,7 @@
 
 - name: Restart and re-deploy stale client configs
   hosts: "{{ target | default('localhost') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - role: cloudera.cluster.operations.restart_stale
       when: "'kms_servers' in groups"
@@ -82,12 +81,12 @@
     - kms
     - restart_stale
     - full_cluster
- # ENDBLOCK # Setup HDFS Encryption
+# ENDBLOCK # Setup HDFS Encryption
 
- # STARTBLOCK # WXM Setup
+# STARTBLOCK # WXM Setup
 - name: Handle WXM Setup
   hosts: "{{ target | default('cluster_master_nodes[0]') }}"
-  gather_facts: yes
+  gather_facts: true
   tags:
     - wxm
     - full_cluster
@@ -97,43 +96,43 @@
         - use_wxm | default(False)
         - altus_key_id | length > 0
         - altus_private_key | length > 0
-      import_role:
+      ansible.builtin.import_role:
         name: cloudera.cluster.deployment.services.wxm
 # ENDBLOCK # WXM Setup
 
 - name: Post-Install for PvC on all cluster hosts
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  gather_facts: yes
+  gather_facts: true
   tags:
     - pvc
   tasks:
     - name: Add missing ExtJS for Oozie UI
-      include_role:
+      ansible.builtin.include_role:
         name: cloudera.cluster.config.services.oozie_ui
       when: oozie_service_exists | default(false)
 
 - name: Post-Install Cloudera Manager and Cluster
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: yes
+  gather_facts: true
   tags:
     - pvc
   tasks:
     - name: Refresh CM Services Info
-      include_role:
+      ansible.builtin.include_role:
         name: cloudera.cluster.cloudera_manager.services_info
-        public: yes
+        public: true
       vars:
         cluster_name: "{{ cluster_name_base }}"
 
     - name: Fix Hue ticket lifetime for Free IPA
-      include_role:
+      ansible.builtin.include_role:
         name: cloudera.cluster.config.services.hue_ticket_lifetime
       when:
         - hue_service_exists | default(false)
         - krb5_kdc_type == 'Red Hat IPA'
 
     - name: Set Cloudera Manager session timeout to 30d
-      include_role:
+      ansible.builtin.include_role:
         name: cloudera.cluster.cloudera_manager.session_timeout
 
 ## TODO Believe this is version specific, in 7.1.7Spx solr plugin is NOT missing, needs work
@@ -145,7 +144,7 @@
 #        - solr_service_exists | default(false)
 
     - name: Add Solr urls to Knox
-      include_role:
+      ansible.builtin.include_role:
         name: cloudera.cluster.config.services.solr_knox
       when: knox_service_exists | default(false) and solr_service_exists | default(false)
 
@@ -153,7 +152,7 @@
       when:
         - kms_service_exists | default(False)
         - (autotls | default(False))
-      include_role:
+      ansible.builtin.include_role:
         name: cloudera.cluster.config.services.kms_tls
 
 ## TODO Believe this is version specific, in 7.1.7SPx Ranger policies are duplicated, needs work

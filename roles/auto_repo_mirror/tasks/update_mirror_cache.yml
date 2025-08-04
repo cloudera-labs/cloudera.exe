@@ -1,5 +1,4 @@
 ---
-
 - name: Refresh Listing of target cache contents
   when:
     - init__auto_repo_mirror_bucket_name is defined
@@ -18,7 +17,8 @@
   loop_control:
     loop_var: __auto_repo_mirror_s3_urls_item
   ansible.builtin.set_fact:
-    __auto_repo_mirror_url_listing: "{{ __auto_repo_mirror_url_listing | default([]) + [['https:/', init__auto_repo_mirror_bucket_name + '.s3.amazonaws.com', __auto_repo_mirror_s3_urls_item ] | join('/') ] }}"
+    __auto_repo_mirror_url_listing: "{{ __auto_repo_mirror_url_listing | default([]) + [['https:/', init__auto_repo_mirror_bucket_name + '.s3.amazonaws.com', __auto_repo_mirror_s3_urls_item]
+      | join('/')] }}"
 
 - name: Persist Download Mirror to Definition path
   when:

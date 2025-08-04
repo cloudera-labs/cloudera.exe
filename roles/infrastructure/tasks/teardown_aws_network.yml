@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,14 +48,14 @@
       when: infra__force_teardown | bool
       block:
         - name: List VPC Endpoints
-          community.aws.ec2_vpc_endpoint_info:
+          amazon.aws.ec2_vpc_endpoint_info:
             region: "{{ infra__region }}"
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
           register: existing_endpoints
 
         - name: Delete VPC Endpoints
-          community.aws.ec2_vpc_endpoint:
+          amazon.aws.ec2_vpc_endpoint:
             state: absent
             vpc_endpoint_id: "{{ endpoint.vpc_endpoint_id }}"
             region: "{{ infra__region }}"
@@ -66,7 +65,7 @@
             label: "{{ endpoint.vpc_endpoint_id }}"
 
         - name: Wait for VPC Endpoint Deletion
-          community.aws.ec2_vpc_endpoint_info:
+          amazon.aws.ec2_vpc_endpoint_info:
             region: "{{ infra__region }}"
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
@@ -87,7 +86,7 @@
               amazon.aws.elb_classic_lb:
                 name: "{{ __infra_elb_remove_item }}"
                 state: absent
-                wait: yes
+                wait: true
               async: 3600 # 1 hour timeout
               poll: 0
               register: __elb_teardowns_info
@@ -112,7 +111,7 @@
             - __infra_aws_nat_gateways is defined
             - __infra_aws_nat_gateways.result is defined
             - __infra_aws_nat_gateways.result | length > 0
-          community.aws.ec2_vpc_nat_gateway:
+          amazon.aws.ec2_vpc_nat_gateway:
             state: absent
             region: "{{ infra__region }}"
             wait: true
@@ -188,7 +187,7 @@
 
         - name: Remove AWS Internet Gateway (IGW)
           when: (infra__tunnel and infra__public_endpoint_access) or infra__force_teardown | bool
-          community.aws.ec2_vpc_igw:
+          amazon.aws.ec2_vpc_igw:
             region: "{{ infra__region }}"
             vpc_id: "{{ infra__aws_vpc_id }}"
             state: absent
@@ -216,7 +215,7 @@
       when: infra__aws_private_endpoints | bool
       block:
         - name: Delete VPC Endpoints
-          community.aws.ec2_vpc_endpoint:
+          amazon.aws.ec2_vpc_endpoint:
             state: absent
             vpc_endpoint_id: "{{ __infra_vpc_endpoint.vpc_endpoint_id }}"
             region: "{{ infra__region }}"
@@ -226,7 +225,7 @@
             label: "{{ __infra_vpc_endpoint.vpc_endpoint_id }}"
 
         - name: Wait for VPC Endpoint Deletion
-          community.aws.ec2_vpc_endpoint_info:
+          amazon.aws.ec2_vpc_endpoint_info:
             region: "{{ infra__region }}"
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
@@ -249,12 +248,12 @@
       block:
         - name: Delete the AWS Private Route Table
           #when: not infra__public_endpoint_access
-          when: no
+          when: false
           community.aws.ec2_vpc_route_table:
             vpc_id: "{{ infra__aws_vpc_id }}"
             region: "{{ infra__region }}"
             lookup: tag
-            tags: "{{ { 'Name': infra__aws_private_route_table_name } }}"
+            tags: "{{ {'Name': infra__aws_private_route_table_name} }}"
             state: absent
 
         - name: Delete the AWS Private Route Tables # for Public Endpoint Access
@@ -263,7 +262,7 @@
             vpc_id: "{{ infra__aws_vpc_id }}"
             region: "{{ infra__region }}"
             lookup: tag
-            tags: "{{ { 'Name': '-'.join([infra__aws_private_route_table_name, __aws_private_subnet_id_index | string])} }}"
+            tags: "{{ {'Name': '-'.join([infra__aws_private_route_table_name, __aws_private_subnet_id_index | string])} }}"
             state: absent
           loop_control:
             index_var: __aws_private_subnet_id_index
@@ -271,7 +270,7 @@
 
         - name: List all managed AWS NAT Gateways # for Public Endpoint Access
           # when: infra__public_endpoint_access
-          community.aws.ec2_vpc_nat_gateway_info:
+          amazon.aws.ec2_vpc_nat_gateway_info:
             region: "{{ infra__region }}"
             filters:
               vpc-id: "{{ infra__aws_vpc_id }}"
@@ -279,7 +278,7 @@
 
         - name: Delete associated AWS NAT Gateways
           # when: infra__public_endpoint_access
-          community.aws.ec2_vpc_nat_gateway:
+          amazon.aws.ec2_vpc_nat_gateway:
             state: absent
             region: "{{ infra__region }}"
             wait: true
@@ -296,7 +295,8 @@
           when: __aws_ngw_teardown is defined and __aws_ngw_teardown.results is defined and __aws_ngw_teardown.results | count > 0
           ansible.builtin.fail:
             msg: "Failed to delete a NAT gateway"
-          failed_when: __aws_ngw_teardown_item.rc is defined and __aws_ngw_teardown_item.rc != 1 and ('InvalidAllocationID.NotFound' in __aws_ngw_teardown_item.module_stderr)
+          failed_when: __aws_ngw_teardown_item.rc is defined and __aws_ngw_teardown_item.rc != 1 and ('InvalidAllocationID.NotFound' in
+            __aws_ngw_teardown_item.module_stderr)
           loop_control:
             loop_var: __aws_ngw_teardown_item
           loop: "{{ __aws_ngw_teardown.results }}"
@@ -316,7 +316,7 @@
           loop: "{{ infra__vpc_public_subnet_cidrs | union(infra__vpc_private_subnet_cidrs) }}"
 
         - name: Remove AWS Internet Gateway (IGW)
-          community.aws.ec2_vpc_igw:
+          amazon.aws.ec2_vpc_igw:
             region: "{{ infra__region }}"
             vpc_id: "{{ infra__aws_vpc_id }}"
             state: absent

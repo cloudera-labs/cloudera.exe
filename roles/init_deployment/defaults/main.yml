@@ -18,9 +18,9 @@
 definition_path: "./"
 
 # Default Paths
-default_local_temp_dir: '/tmp'
-default_sshkey_path: '~/.ssh'
-default_config_path: '~/.config/cloudera-deploy'
+default_local_temp_dir: "/tmp"
+default_sshkey_path: "~/.ssh"
+default_config_path: "~/.config/cloudera-deploy"
 
 # Default names
 default_name_prefix: cldr
@@ -33,14 +33,14 @@ default_cluster_definition_file: "vars/basic_cluster.yml"
 default_definition_file: "definition.yml"
 default_cluster_file: "cluster.yml"
 
-include_inventory_file: ''
+include_inventory_file: ""
 auto_repo_mirror_file: "{{ [default_config_path, 'auto_repo_mirror.ini'] | path_join }}"
 
 # Default Deployment Controls
 default_infra_deployment_engine: ansible
-default_infra_type: aws  # azure, gcp
-default_infra_region: us-east-1  # westeurope, gcp?
-default_parcel_distro: el7  # el8, bionic, focal
+default_infra_type: aws # azure, gcp
+default_infra_region: us-east-1 # westeurope, gcp?
+default_parcel_distro: el7 # el8, bionic, focal
 
 # Terraform defaults
 default_terraform_base_dir: "{{ [default_config_path, 'terraform'] | path_join }}"

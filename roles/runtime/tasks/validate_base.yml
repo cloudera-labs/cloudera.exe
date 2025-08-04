@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +22,10 @@
     that:
       - "__opdb_definition.name | length < 16"
     fail_msg: "OpDB name exceeds 15 characters"
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __opdb_definition
-    label: "{{ __opdb_definition.name | default ('None') }}"
+    label: "{{ __opdb_definition.name | default('None') }}"
   loop: "{{ run__opdb_definitions }}"
 
 - name: Check Datahub names
@@ -38,8 +37,8 @@
     that:
       - "__datahub_definition.name | length < 21"
     fail_msg: "Datahub name exceeds 20 characters"
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __datahub_definition
-    label: "{{ __datahub_definition.name | default ('None') }}"
+    label: "{{ __datahub_definition.name | default('None') }}"
   loop: "{{ run__datahub_definitions }}"

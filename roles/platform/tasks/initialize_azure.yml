@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
 
 - name: Check Azure CLI Account to ensure functionality and user access
   register: __azure_account_info
-  ansible.builtin.command: "az account show"  # Calling the CLI version doesn't test much of the install
+  ansible.builtin.command: "az account show" # Calling the CLI version doesn't test much of the install
 
 - name: Set Azure Caller Information
   ansible.builtin.set_fact:
@@ -66,18 +65,20 @@
 
     - name: Check that we found a valid Service Principal for the Azure App
       ansible.builtin.assert:
-        quiet: yes
+        quiet: true
         that: __azure_application_service_principals_list.stdout | from_json | length == 1
-        fail_msg: "Expected exactly one result from Azure Service Principal query for UUID {{ plat__azure_xaccount_app_uuid}}, got {{ __azure_application_service_principals_list.stdout | from_json | length }} instead"
+        fail_msg: "Expected exactly one result from Azure Service Principal query for UUID {{ plat__azure_xaccount_app_uuid }}, got {{ __azure_application_service_principals_list.stdout
+          | from_json | length }} instead"
         success_msg: "Found New Azure Cross Account App in directory matching UUID {{ plat__azure_xaccount_app_uuid }}, using for Cross Account Credential Creation"
 
     - name: Set Service Principal Object UUID for Azure App
       ansible.builtin.set_fact:
-        plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | community.general.json_query('[0].id') }}"
+        plat__azure_application_service_principal_objuuid: "{{ __azure_application_service_principals_list.stdout | from_json | community.general.json_query('[0].id')
+          }}"
 
     - name: Check that Azure Service Principal ID is now set
       ansible.builtin.assert:
-        quiet: yes
+        quiet: true
         that: plat__azure_application_service_principal_objuuid | length > 0
         fail_msg: "Azure Service Principal Object ID appears to be length 0, please check and try again"
 
@@ -93,11 +94,10 @@
 
 - name: Fetch Azure Security Group Info
   register: __azure_sg_info
-  command: "az network nsg list"
-
+  ansible.builtin.command: "az network nsg list"
 - name: Extract URIs for Azure Security Groups
   when: __azure_sg_info | length > 0
-  ignore_errors: True  # We do not want to fail if collecting facts and nsg are not already present
+  ignore_errors: true # We do not want to fail if collecting facts and nsg are not already present
   ansible.builtin.set_fact:
     __azure_sec_group_knox_uri: "{{ __azure_sg_info.stdout | from_json | community.general.json_query(__azure_jq_knox) | first }}"
     __azure_sec_group_default_uri: "{{ __azure_sg_info.stdout | from_json | community.general.json_query(__azure_jq_default) | first }}"
@@ -114,7 +114,7 @@
   loop: "{{ plat__vpc_public_subnet_cidrs }}"
   vars:
     entry:
-      name: "{{ [plat__namespace, plat__vpc_public_subnets_suffix, __public_subnet_idx|string] | join('-') }}"
+      name: "{{ [plat__namespace, plat__vpc_public_subnets_suffix, __public_subnet_idx | string] | join('-') }}"
       cidr: "{{ __public_subnet_item }}"
       tags:
         "kubernetes.io/role/elb": "1"
@@ -128,7 +128,7 @@
   loop: "{{ plat__vpc_private_subnet_cidrs }}"
   vars:
     entry:
-      name: "{{ [plat__namespace, plat__vpc_private_subnets_suffix, __private_subnet_idx|string] | join('-') }}"
+      name: "{{ [plat__namespace, plat__vpc_private_subnets_suffix, __private_subnet_idx | string] | join('-') }}"
       cidr: "{{ __private_subnet_item }}"
       tags:
         "kubernetes.io/role/internal-elb": "1"
@@ -143,8 +143,10 @@
 - name: Set fact for Azure Storage URIs
   ansible.builtin.set_fact:
     plat__azure_storage_account_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}"
-    plat__azure_logpath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{ plat__azure_log_suffix }}"
-    plat__azure_datapath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{ plat__azure_data_suffix }}"
+    plat__azure_logpath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{
+      plat__azure_log_suffix }}"
+    plat__azure_datapath_uri: "{{ plat__azure_metagroup_uri }}/providers/Microsoft.Storage/storageAccounts/{{ plat__azure_storage_name }}/blobServices/default/containers/{{
+      plat__azure_data_suffix }}"
 
 - name: Set fact for default Azure MSIs
   ansible.builtin.set_fact:

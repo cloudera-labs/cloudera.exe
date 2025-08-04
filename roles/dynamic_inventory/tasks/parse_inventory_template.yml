@@ -1,3 +1,4 @@
+---
 # Read in Dynamic Inventory
 - name: Seek Inventory Template in Definition Path
   register: __di_template_stat
@@ -12,18 +13,18 @@
     - __di_template_stat.stat.exists
   block:
     - name: Load in Dynamic Inventory Template
-      include_tasks: refresh_inventory.yml
+      ansible.builtin.include_tasks: refresh_inventory.yml
       vars:
         include_inventory_file: "{{ __di_template_stat.stat.path }}"
 
     - name: Print Dynamic Inventory groups to debug at Verbosity 3
-      debug:
+      ansible.builtin.debug:
         msg: "{{ groups }}"
         verbosity: 3
 
     - name: Check expected minimum host groups appear in Inventory
       ansible.builtin.assert:
-        quiet: yes
+        quiet: true
         that:
           - groups.cluster is defined
           - groups.cloudera_manager is defined
@@ -37,7 +38,7 @@
     - name: Set Dynamic Inventory host count in Globals
       when: __dynamic_inventory_host_list | length > 0
       ansible.builtin.set_fact:
-        globals: "{{ globals | default({}) | combine( __di_entry | default(omit), recursive=True ) }}"
+        globals: "{{ globals | default({}) | combine(__di_entry | default(omit), recursive=True) }}"
       loop_control:
         loop_var: __di_entry
       loop:
@@ -47,4 +48,4 @@
               os: "{{ init__parcel_distro }}"
   always:
     - name: Remove Dynamic Inventory Template from current inventory
-      include_tasks: refresh_inventory.yml
+      ansible.builtin.include_tasks: refresh_inventory.yml

@@ -1,5 +1,4 @@
 ---
-
 - name: Generate map of EBS volume attachments
   when: mount_provider == 'aws'
   block:
@@ -13,7 +12,7 @@
         - device.key is match("nvme")
         - volume != "UNKNOWN"
       ansible.builtin.set_fact:
-        ebs_device_map: "{{ ebs_device_map | default({}) | combine({ volume : '/dev/' + device.key }) }}"
+        ebs_device_map: "{{ ebs_device_map | default({}) | combine({volume: '/dev/' + device.key}) }}"
       loop: "{{ ansible_devices | dict2items }}"
       loop_control:
         loop_var: device
@@ -24,7 +23,7 @@
 
 - name: Set required facts for volumes
   ansible.builtin.set_fact:
-      __storage_volumes_facts: "{{ __storage_volumes_facts | default([]) | union([storage_volume_detail]) }}"
+    __storage_volumes_facts: "{{ __storage_volumes_facts | default([]) | union([storage_volume_detail]) }}"
   vars:
     __device: "{{ ebs_device_map[volume.vol_id] | default(volume.device) }}"
     __speared_device: "{{ __device | replace('/', '-') }}"
@@ -48,7 +47,7 @@
   community.general.parted:
     device: "{{ volume.device }}"
     number: 1
-    flags: [ lvm ]
+    flags: [lvm]
     state: present
     part_start: "0%"
     part_end: "100%"

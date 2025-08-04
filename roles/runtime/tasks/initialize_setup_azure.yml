@@ -1,3 +1,4 @@
+---
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,8 +57,10 @@
 
         - name: Validate Azure NetApp Volume NFS protocol version
           ansible.builtin.assert:
-            that: ("NFSv" + run__azure_netapp_nfs_version) in __azure_netapp_nfs_info.response | first | community.general.json_query('properties.protocolTypes')
-            fail_msg: "Invalid NFS protocol version. 'NFSv{{ run__azure_netapp_nfs_version }}' not supported by Azure NetApp volume, '{{ __azure_netapp_nfs_info.response | map('attribute', 'id') | list | first }}'."
-            quiet: yes
+            that: ("NFSv" + run__azure_netapp_nfs_version) in __azure_netapp_nfs_info.response | first |
+              community.general.json_query('properties.protocolTypes')
+            fail_msg: "Invalid NFS protocol version. 'NFSv{{ run__azure_netapp_nfs_version }}' not supported by Azure NetApp volume, '{{ __azure_netapp_nfs_info.response
+              | map('attribute', 'id') | list | first }}'."
+            quiet: true
 
 # ansible -m azure.azcollection.azure_rm_resource_info localhost -a "resource_group=go03-rmgp provider=NetApp resource_type='netAppAccounts' resource_name='go03-netapp-account' subresource={{ subs }}" -e '{ "subs": [{ "type": "capacityPools" }] }'

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,4 +24,5 @@
 - name: Determine if Specific Roles should be called
   ansible.builtin.set_fact:
     # init__call_cdp_pvc: "{{ mgmt is defined or cluster is defined }}"
-    init__call_cdp_pbc: "{{ env is defined or ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined or df is defined | default(False) }}"
+    init__call_cdp_pbc: "{{ env is defined or ml is defined or de is defined or datahub is defined or opdb is defined or dw is defined or df is defined | default(False)
+      }}"

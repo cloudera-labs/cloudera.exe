@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +18,8 @@
   community.aws.iam_role:
     region: "{{ infra__region }}"
     name: "{{ infra__utlity_bucket_name }}"
-    purge_policies: yes
-    delete_instance_profile: yes
+    purge_policies: true
+    delete_instance_profile: true
     state: absent
 
 - name: Remove CDP Data Access Policies

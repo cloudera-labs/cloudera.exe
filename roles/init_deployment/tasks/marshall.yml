@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 # Check path
 - name: Check a Definition path has been supplied
   ansible.builtin.assert:
-    quiet: yes
+    quiet: true
     that:
       - definition_path is defined
       - definition_path | length > 0
@@ -31,7 +28,7 @@
 
 - name: Assert Definition Path is a directory
   ansible.builtin.assert:
-    quiet: yes
+    quiet: true
     fail_msg: "'definition_path' does not appear to point to an existing and reachable directory'"
     that:
       - __definition_path_stat.stat.isdir is defined
@@ -40,8 +37,8 @@
 # Set File Paths
 - name: Set Expected File Paths
   ansible.builtin.set_fact:
-    init__definition_file: "{{ abs_definition | default( [definition_path, definition_file | default(default_definition_file)] | path_join ) }}"
-    init__cluster_file: "{{ abs_cluster | default( [definition_path, cluster_file | default(default_cluster_file)] | path_join ) }}"
+    init__definition_file: "{{ abs_definition | default([definition_path, definition_file | default(default_definition_file)] | path_join) }}"
+    init__cluster_file: "{{ abs_cluster | default([definition_path, cluster_file | default(default_cluster_file)] | path_join) }}"
     init__auto_repo_mirror_artefact: "{{ auto_repo_mirror_file | default(auto_repo_mirror_file) }}"
 
 # Handle Definition File
@@ -52,7 +49,7 @@
 
 - name: Assert that a Definition File has been provided
   ansible.builtin.assert:
-    quiet: yes
+    quiet: true
     that: __def_file_stat.stat.exists
     fail_msg: "Expected to find a definition file '{{ init__definition_file }}' in Definition Path '{{ definition_path }}'"
 
@@ -106,7 +103,7 @@
 # Merge User Profile to Globals
 - name: Marshal User Config into Globals
   ansible.builtin.set_fact:
-    globals: "{{ globals | default({}) | combine(user_config , recursive=True) }}"
+    globals: "{{ globals | default({}) | combine(user_config, recursive=True) }}"
   vars:
     user_config:
       name_prefix: "{{ name_prefix | default(default_name_prefix) }}"
@@ -137,7 +134,7 @@
 - name: Set GCloud Environment Variables if needed
   when: globals.gcloud_credential_file is defined
   ansible.builtin.set_fact:
-    globals: "{{ globals | default({}) | combine( env_gcp_entries, recursive=True ) }}"
+    globals: "{{ globals | default({}) | combine(env_gcp_entries, recursive=True) }}"
   vars:
     env_gcp_entries:
       env_vars:
@@ -165,7 +162,7 @@
 
 - name: Set Profile Env Vars if required
   ansible.builtin.set_fact:
-    globals: "{{ globals | default({}) | combine( env_var_entries, recursive=True ) }}"
+    globals: "{{ globals | default({}) | combine(env_var_entries, recursive=True) }}"
   vars:
     env_var_entries:
       env_vars:

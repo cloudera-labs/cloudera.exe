@@ -13,12 +13,11 @@
 # limitations under the License.
 
 ---
-
 - name: Bring ca root and intermediate cert back to controller
   ansible.builtin.fetch:
     src: "{{ item.cert_path }}/{{ item.cert_filename }}"
     dest: "{{ local_ca_certs_dir }}/{{ item.cert_filename }}"
-    flat: yes
+    flat: true
   loop:
     - cert_path: "{{ ca_server_intermediate_path }}"
       cert_filename: "{{ ca_server_intermediate_cert_name }}"

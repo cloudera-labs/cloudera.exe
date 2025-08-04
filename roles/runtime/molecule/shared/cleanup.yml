@@ -1,5 +1,4 @@
 ---
-
 - name: Cleanup CDP deployment and SSH key
   hosts: localhost
   tasks:
@@ -52,7 +51,7 @@
       community.general.terraform:
         project_path: "{{ molecule_scenario_directory }}/deployment/"
         state: absent
-        force_init: yes
+        force_init: true
 
     - name: Delete the SSH key asset
       amazon.aws.ec2_key:

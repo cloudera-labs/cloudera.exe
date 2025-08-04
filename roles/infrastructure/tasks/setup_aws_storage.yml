@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +14,7 @@
 # limitations under the License.
 
 - name: Warn user about HeadBucket Forbidden errors
-  debug:
+  ansible.builtin.debug:
     msg:
       - "If the 'Create AWS Buckets' task below fails. "
       - "If you see HeadBucket Forbidden errors. "
@@ -47,7 +46,7 @@
     region: "{{ infra__region }}"
     bucket: "{{ __aws_storage_object_item.bucket }}"
     object: "{{ __aws_storage_object_item.path }}"
-    mode: create  # Put will not work here due to the way the s3 module is written
+    mode: create # Put will not work here due to the way the s3 module is written
     permission: "{{ infra__aws_bucket_acl_permissions }}"
   loop_control:
     loop_var: __aws_storage_object_item

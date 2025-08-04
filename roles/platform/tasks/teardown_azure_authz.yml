@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +20,7 @@
   loop_control:
     loop_var: __plat_azure_role_item
     label: __plat_azure_role_item.name
-  loop:
-    "{{ __plat_azure_role_assignment_list }}"
+  loop: "{{ __plat_azure_role_assignment_list }}"
 
 - name: Request deletion of Azure Managed Identities
   when:
@@ -36,11 +34,10 @@
     provider: ManagedIdentity
     resource_type: userAssignedIdentities
     resource_name: "{{ __azure_msi_item }}"
-    api_version: '2018-11-30'
-    idempotency: yes
+    api_version: "2018-11-30"
+    idempotency: true
     state: absent
   loop: "{{ plat__azure_msis }}"
-
 
 - name: Wait for MSIs to be delisted - Non RAZ
   when:
@@ -50,7 +47,7 @@
     resource_group: "{{ plat__azure_metagroup_name }}"
     provider: ManagedIdentity
     resource_type: userAssignedIdentities
-    api_version: '2018-11-30'
+    api_version: "2018-11-30"
   register: __azure_identity_list
   delay: 5
   retries: 10
@@ -62,7 +59,6 @@
   vars:
     discovered_msi_list: "{{ __azure_identity_list.response | map(attribute='name') | list }}"
 
-
 - name: Wait for MSIs to be delisted - RAZ
   when:
     - plat__azure_metagroup_uri is defined
@@ -72,7 +68,7 @@
     resource_group: "{{ plat__azure_metagroup_name }}"
     provider: ManagedIdentity
     resource_type: userAssignedIdentities
-    api_version: '2018-11-30'
+    api_version: "2018-11-30"
   register: __azure_identity_list
   delay: 5
   retries: 10
@@ -80,7 +76,6 @@
     - plat__azure_raz_identity_name not in discovered_msi_list
   vars:
     discovered_msi_list: "{{ __azure_identity_list.response | map(attribute='name') | list }}"
-
 
 - name: Remove CDP Cross Account Credential for Azure
   when: plat__teardown_deletes_credential
@@ -90,10 +85,9 @@
 
 - name: Tear down Azure AD App Registration
   when: plat__teardown_deletes_xaccount and ( plat__azure_xaccount_app_uuid is defined ) and ( plat__azure_xaccount_app_uuid | length > 0 )
-  command: >
-      az ad app delete
-      --id {{ plat__azure_xaccount_app_uuid }}
-
+  ansible.builtin.command: >
+    az ad app delete
+    --id {{ plat__azure_xaccount_app_uuid }}
 - name: Tear down Custom Role
   when: plat__teardown_deletes_roles
   azure.azcollection.azure_rm_roledefinition:

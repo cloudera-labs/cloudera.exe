@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: restart network
+- name: Restart network
   ansible.builtin.service:
     name: NetworkManager
     state: restarted
 
-- name: restart dns
+- name: Restart dns
   ansible.builtin.service:
     name: named-pkcs11
     state: restarted

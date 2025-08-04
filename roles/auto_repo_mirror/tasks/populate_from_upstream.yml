@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +33,7 @@
     url: "{{ __mirror_fetch_item }}"
     dest: "/tmp/{{ globals.utility_bucket_name }}{{ __mirror_fetch_item | urlsplit('path') }}"
     url_username: "{{ cloudera_manager_repo_username | default(omit) }}"
-    url_password: "{{ cloudera_manager_repo_password | default(omit)  }}"
+    url_password: "{{ cloudera_manager_repo_password | default(omit) }}"
 
 - name: Track async downloads to completion  [ This may take up to an hour the first time for multi-gb Parcels ]
   loop: "{{ __auto_repo_mirror_rehost_results.results }}"
@@ -44,7 +43,7 @@
   until: __async_download_results.finished is defined and __async_download_results.finished
   delay: 30
   retries: 240
-  async_status:
+  ansible.builtin.async_status:
     jid: "{{ __download_async_item.ansible_job_id }}"
   failed_when:
     - __download_async_item.failed == True
@@ -57,26 +56,26 @@
   loop_control:
     loop_var: __parcel_unpack_item
   ansible.builtin.unarchive:
-    extra_opts: [ --strip-components=1 ]
-    remote_src: yes
+    extra_opts: [--strip-components=1]
+    remote_src: true
     src: "/var/www/html{{ __parcel_unpack_item | urlsplit('path') }}"
     dest: "/var/www/html{{ __parcel_unpack_item | urlsplit('path') | dirname }}"
-    keep_newer: yes
+    keep_newer: true
 
 - name: Upload Download Mirror for AWS to S3
   when: globals.infra_type == 'aws'
   block:
     # Prepare to sync cache dir to S3
     - name: Setup System Rhel8
-      ignore_errors: true  # newer versions of rhel8 do not need or have epel-release
+      ignore_errors: true # newer versions of rhel8 do not need or have epel-release
       when:
         - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version | int >= 8
-      become: yes
+      become: true
       ansible.builtin.package:
         lock_timeout: 180
         name: "{{ __package_item }}"
-        update_cache: yes
+        update_cache: true
         state: present
       loop_control:
         loop_var: __package_item
@@ -88,7 +87,7 @@
       when:
         - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version | int < 8
-      become: yes
+      become: true
       ansible.builtin.package:
         name: "{{ __package_item }}"
         state: present
@@ -102,9 +101,9 @@
     - name: Setup system Debian
       when: ansible_os_family == "Debian"
       block:
-        - name: enable Debian Repos
-          become: yes
-          apt_repository:
+        - name: Enable Debian Repos
+          become: true
+          ansible.builtin.apt_repository:
             repo: "{{ __repo_item }}"
           loop_control:
             loop_var: __repo_item
@@ -114,14 +113,14 @@
             - "deb http://security.ubuntu.com/ubuntu/ {{ globals.dynamic_inventory.vm.os }}-security universe"
 
         - name: Install Pip on Debian
-          become: yes
+          become: true
           ansible.builtin.apt:
-            update_cache: yes
+            update_cache: true
             name: python3-pip
             state: present
 
     - name: Prepare host for s3 actions
-      become: yes
+      become: true
       ansible.builtin.pip:
         name: "{{ __pip_item }}"
       loop_control:
@@ -131,7 +130,7 @@
         - "{{ (ansible_python_version[0] == '2') | ternary('boto3 >= 1.4.4,<1.18', 'boto3 >= 1.20.0') }}"
 
     - name: Sync downloaded Files paths to S3 cache bucket
-      become: yes
+      become: true
       community.aws.s3_sync:
         bucket: "{{ globals.utility_bucket_name }}"
         file_root: "/tmp/{{ globals.utility_bucket_name }}"

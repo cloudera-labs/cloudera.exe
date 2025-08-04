@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +42,7 @@
     - name: Retrieve default CDP Datalake Runtime version if required
       when: run__cdp_datalake_version | length < 1
       cloudera.cloud.datalake_runtime_info:
-        default: yes
+        default: true
       register: __cdp_datalake_version_info
       failed_when: __cdp_datalake_version_info.versions is not defined
 
@@ -65,12 +64,13 @@
     - name: Retrieve Image Catalog File
       ansible.builtin.uri:
         url: "{{ run__datahub_image_catalog_url }}"
-      no_log: yes
+      no_log: true
       register: __datahub_image_catalog
 
     - name: Set fact for latest CDP Image in Catalog
       ansible.builtin.set_fact:
-        run__datahub_image_catalog_entry: "{{ __datahub_image_catalog.json.images['cdh-images'] | community.general.json_query(builds) | sort(attribute='created', reverse=True) | first }}"
+        run__datahub_image_catalog_entry: "{{ __datahub_image_catalog.json.images['cdh-images'] | community.general.json_query(builds) | sort(attribute='created',
+          reverse=True) | first }}"
       vars:
         builds: "[? version=='{{ run__cdp_datalake_version }}' && contains(keys(images), '{{ run__infra_type }}')]"
 
@@ -80,7 +80,8 @@
 
     - name: Set fact for available CDP Datahub templates by Datalake version
       ansible.builtin.set_fact:
-        run__datahub_available_templates: "{{ __datahub_template_info.templates | selectattr('productVersion', 'search', run__cdp_datalake_version) | map(attribute='clusterTemplateName') | list }}"
+        run__datahub_available_templates: "{{ __datahub_template_info.templates | selectattr('productVersion', 'search', run__cdp_datalake_version) | map(attribute='clusterTemplateName')
+          | list }}"
 
     - name: Retrieve available CDP Datahub definitions
       cloudera.cloud.datahub_definition_info:
@@ -88,19 +89,21 @@
 
     - name: Set fact for available CDP Datahub definitions by Datalake version and Cloud Platform
       ansible.builtin.set_fact:
-        run__datahub_available_definitions: "{{ __datahub_definition_info.definitions | selectattr('productVersion', 'search', run__cdp_datalake_version) | selectattr('cloudPlatform', 'search', run__infra_type.upper()) | map(attribute='clusterDefinitionName') | list }}"
+        run__datahub_available_definitions: "{{ __datahub_definition_info.definitions | selectattr('productVersion', 'search', run__cdp_datalake_version) | selectattr('cloudPlatform',
+          'search', run__infra_type.upper()) | map(attribute='clusterDefinitionName') | list }}"
 
     - name: Construct CDP Datahub configurations
       ansible.builtin.set_fact:
         run__datahub_configs: "{{ run__datahub_configs | default([]) | union([config]) }}"
       vars:
         include: "{{ lookup('template', __datahub_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
-        overlay: "{{ __datahub_config.instance_groups | default(include.instance_groups | default([]) ) }}"
+        overlay: "{{ __datahub_config.instance_groups | default(include.instance_groups | default([])) }}"
         base: "{{ run__datahub_instance_group_base }}"
         config:
-          name: "{{ __datahub_config.name | default([run__namespace_cdp, __datahub_config.suffix | default(include.suffix) | default(run__datahub_suffix)] | join('-')) }}"
-          template: "{{ __datahub_config.template | default(include.template | default(omit) ) }}"
-          definition: "{{ __datahub_config.definition | default(include.definition | default(omit) ) }}"
+          name: "{{ __datahub_config.name | default([run__namespace_cdp, __datahub_config.suffix | default(include.suffix) | default(run__datahub_suffix)] | join('-'))
+            }}"
+          template: "{{ __datahub_config.template | default(include.template | default(omit)) }}"
+          definition: "{{ __datahub_config.definition | default(include.definition | default(omit)) }}"
           instance_groups: "{{ (overlay | length > 0) | ternary(overlay | map('cloudera.exe.combine_onto', base, recursive=True) | list, omit) }}"
           extension: "{{ __datahub_config.extension | default(omit) }}"
           subnets_filter: "{{ __datahub_config.subnets_filter | default(omit) }}"
@@ -120,7 +123,7 @@
           - "not ('{{ __datahub_config.name }}' | regex_search('[^-a-z0-9]+'))"
         fail_msg: >-
           CDP Datahub name must contain only lowercase letters, numbers, and hypens.
-        quiet: yes
+        quiet: true
       loop_control:
         loop_var: __datahub_config
       loop: "{{ run__datahub_configs }}"
@@ -157,7 +160,8 @@
         config:
           name: "{{ __ml_config.name | default([run__namespace_cdp, __ml_config.suffix | default(include.suffix) | default(run__ml_suffix)] | join('-')) }}"
           nfs: "{{ __ml_config.nfs | default(run__azure_netapp_nfs_mount | default(omit)) }}"
-          nfs_version: "{{ __ml_config.nfs_version | default((__ml_config.nfs is defined or run__azure_netapp_nfs_mount is defined) | ternary(run__azure_netapp_nfs_version, omit)) }}"
+          nfs_version: "{{ __ml_config.nfs_version | default((__ml_config.nfs is defined or run__azure_netapp_nfs_mount is defined) | ternary(run__azure_netapp_nfs_version,
+            omit)) }}"
           k8s_request:
             environmentName: "{{ run__env_name }}"
             instanceGroups: "{{ overlay_instance_groups | map('cloudera.exe.combine_onto', base_instance_group, recursive=True) | list }}"
@@ -187,7 +191,6 @@
       loop_control:
         loop_var: __de_config
         label: "{{ config.name }}"
-
 
 - name: Prepare for CDP DW experiences
   when: run__include_dw
@@ -237,9 +240,9 @@
           - __dw_vw_config.tags | dict2items | rejectattr('value', 'regex', '[^-_a-zA-Z0-9.=:+@]+') | list
         fail_msg:
           - "A tag in Data Warehouse, '{{ __dw_vw_config.name }}', does not meet requirements;"
-          - "current tags: {{ __dw_vw_config.tags}}."
+          - "current tags: {{ __dw_vw_config.tags }}."
           - "Allowed characters in tags are letters, numbers and the following characters: _.:/=+-@"
-        quiet: yes
+        quiet: true
       loop_control:
         loop_var: __dw_vw_config
         label: "{{ __dw_vw_config.name }}"
@@ -257,7 +260,7 @@
       vars:
         include: "{{ lookup('template', __df_config.include | default('experiences_config_placeholder.j2')) | from_yaml }}"
         config:
-          name: "{{ __df_config.name | default([run__namespace_cdp, __df_config.flow_name[::2] | replace(' ','') ] | join('-')) }}"
+          name: "{{ __df_config.name | default([run__namespace_cdp, __df_config.flow_name[::2] | replace(' ', '')] | join('-')) }}"
           raw: "{{ __df_config }}"
       loop: "{{ run__df_deployments }}"
       loop_control:

@@ -18,27 +18,27 @@
 
 # Role prefix is 'data__'
 
-data__infra_type:                             "{{ common__infra_type }}"
-data__region:                                 "{{ common__region }}"
-data__namespace:                              "{{ common__namespace }}"
+data__infra_type: "{{ common__infra_type }}"
+data__region: "{{ common__region }}"
+data__namespace: "{{ common__namespace }}"
 
-data__storage:                                "{{ data.storage | default([]) }}"
-data__external_data_suffix:                   "{{ common__external_data_suffix }}"
-data__policy_suffix:                          "{{ data.policy.suffix | default(common__policy_suffix) }}"
-data__role_suffix:                            "{{ data.role.suffix | default(common__role_suffix) }}"
+data__storage: "{{ data.storage | default([]) }}"
+data__external_data_suffix: "{{ common__external_data_suffix }}"
+data__policy_suffix: "{{ data.policy.suffix | default(common__policy_suffix) }}"
+data__role_suffix: "{{ data.role.suffix | default(common__role_suffix) }}"
 
-data__teardown_deletes_policies:              "{{ data.teardown.delete_policies | default(False) }}"
-data__teardown_deletes_roles:                 "{{ data.teardown.delete_roles | default(False) }}"
+data__teardown_deletes_policies: "{{ data.teardown.delete_policies | default(False) }}"
+data__teardown_deletes_roles: "{{ data.teardown.delete_roles | default(False) }}"
 
 # AWS
-data__aws_policy_suffix:                      "{{ data.policy.aws.suffix | default(data__policy_suffix) }}"
-data__aws_read_only_policy_suffix:            "{{ data.policy.aws.read_only.suffix | default('read-only') }}"
-data__aws_read_write_policy_suffix:           "{{ data.policy.aws.read_write.suffix | default('read-write') }}"
+data__aws_policy_suffix: "{{ data.policy.aws.suffix | default(data__policy_suffix) }}"
+data__aws_read_only_policy_suffix: "{{ data.policy.aws.read_only.suffix | default('read-only') }}"
+data__aws_read_write_policy_suffix: "{{ data.policy.aws.read_write.suffix | default('read-write') }}"
 
-data__aws_role_suffix:                        "{{ data.role.aws.suffix | default(data__role_suffix) }}"
+data__aws_role_suffix: "{{ data.role.aws.suffix | default(data__role_suffix) }}"
 
-data__aws_read_only_policy_url:               "{{ data.policy.aws.read_only.url | default(data__aws_policy_urls_default['read_only']) }}"
-data__aws_read_write_policy_url:              "{{ data.policy.aws.read_write.url | default(data__aws_policy_urls_default['read_write']) }}"
+data__aws_read_only_policy_url: "{{ data.policy.aws.read_only.url | default(data__aws_policy_urls_default['read_only']) }}"
+data__aws_read_write_policy_url: "{{ data.policy.aws.read_write.url | default(data__aws_policy_urls_default['read_write']) }}"
 
-data__aws_idbroker_role_name:                 "{{ common__aws_idbroker_role_name }}"
-data__aws_datalake_admin_role_name:           "{{ common__aws_datalake_admin_role_name }}"
+data__aws_idbroker_role_name: "{{ common__aws_idbroker_role_name }}"
+data__aws_datalake_admin_role_name: "{{ common__aws_datalake_admin_role_name }}"

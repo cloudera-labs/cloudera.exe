@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,23 +16,23 @@
 - name: Teardown for Ansible deployment engine
   when: infra__deployment_engine == 'ansible'
   block:
-  - name: Teardown provider-specific Infrastructure compute
-    ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_compute.yml"
+    - name: Teardown provider-specific Infrastructure compute
+      ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_compute.yml"
 
-  - name: Teardown provider-specific Infrastructure storage
-    ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_storage.yml"
+    - name: Teardown provider-specific Infrastructure storage
+      ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_storage.yml"
 
-  - name: Teardown provider-specific Infrastructure network
-    ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_network.yml"
+    - name: Teardown provider-specific Infrastructure network
+      ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_network.yml"
 
-  - name: Teardown provider-specific Utility Services
-    ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_utility_service.yml"
+    - name: Teardown provider-specific Utility Services
+      ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}_utility_service.yml"
 
-  - name: Teardown provider-specific Infrastructure artifacts
-    ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}.yml"
+    - name: Teardown provider-specific Infrastructure artifacts
+      ansible.builtin.include_tasks: "teardown_{{ infra__type | lower }}.yml"
 
 - name: Teardown for Terraform deployment engine
   when: infra__deployment_engine == 'terraform'
   block:
-  - name: Teardown Terraform Infrastructure artifacts
-    ansible.builtin.include_tasks: "teardown_{{ infra__deployment_engine }}.yml"
+    - name: Teardown Terraform Infrastructure artifacts
+      ansible.builtin.include_tasks: "teardown_{{ infra__deployment_engine }}.yml"

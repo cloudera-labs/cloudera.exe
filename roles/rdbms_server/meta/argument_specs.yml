@@ -58,7 +58,8 @@ argument_specs:
         required: false
         default: "/opt/cloudera/security/pki"
       tls_chain_path:
-        description: File on the target host consisting of an ordered list of certificates, including TLS certificates and Certificate Authority (CA) certificates.
+        description: File on the target host consisting of an ordered list of certificates, including TLS certificates and Certificate Authority (CA)
+          certificates.
         type: path
         required: false
         default: "C(base_dir_security_pki)/chain.pem"

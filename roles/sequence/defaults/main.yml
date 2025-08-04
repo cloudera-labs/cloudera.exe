@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-sequence__setup_runtime:  "{{ common__setup_runtime }}"
+sequence__setup_runtime: "{{ common__setup_runtime }}"
 
-sequence__setup_plat:     "{{ common__setup_plat }}"
+sequence__setup_plat: "{{ common__setup_plat }}"
 
-sequence__setup_infra:    "{{ common__setup_infra }}"
+sequence__setup_infra: "{{ common__setup_infra }}"
 
-sequence_init:            "{{ sequence__setup_infra }}"
+sequence_init: "{{ sequence__setup_infra }}"

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +22,7 @@
     that:
       - "__gcloud_cli.rc == 0"
     fail_msg: "GCP CLI failed to execute: {{ __gcloud_cli.stdout }} ({{ __gcloud_cli.stderr }})"
-    quiet: yes
+    quiet: true
 
 - name: Get Google VPC Info if exists
   google.cloud.gcp_compute_network_info:
@@ -36,7 +35,7 @@
   ansible.builtin.assert:
     that: "__gcp_vpc_info.resources is defined"
     fail_msg: "Gcloud Collection failed to retrieve resources, you may need to run 'gcloud auth login' or 'gcloud init': {{ __gcp_vpc_info }}"
-    quiet: yes
+    quiet: true
 
 - name: Set fact for Log, Backups and Data locations
   ansible.builtin.set_fact:

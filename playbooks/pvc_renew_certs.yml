@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2024 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +27,7 @@
       ansible.builtin.file:
         path: "{{ [__pvc_tls_tempdir.path, item] | path_join }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
       loop:
         - csrs
         - certs
@@ -36,15 +35,14 @@
 
 - name: Play 1 - Generate CSR on each host
   hosts: "{{ target | default('cluster') }}"
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-
-  - name: Call tls_generate_csr role
-    ansible.builtin.import_role:
-      name: cloudera.exe.tls_generate_csr
-    vars:
-      local_csrs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'csrs') | path_join }}"
+    - name: Call tls_generate_csr role
+      ansible.builtin.import_role:
+        name: cloudera.exe.tls_generate_csr
+      vars:
+        local_csrs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'csrs') | path_join }}"
 
 - name: Get the list of CSRs to sign
   hosts: localhost
@@ -64,10 +62,9 @@
 
 - name: Play 2 - Sign the CSR
   hosts: ca_server
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-
     - name: Call tls_signing role
       ansible.builtin.import_role:
         name: cloudera.exe.tls_signing
@@ -78,51 +75,47 @@
 
 - name: Play 3 - Install the sign certs on each host
   hosts: "{{ target | default('cluster') }}"
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-
-  - name: Call tls_install_certs role
-    ansible.builtin.import_role:
-      name: cloudera.exe.tls_install_certs
-    vars:
-      local_tls_signed_certs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'certs') | path_join }}"
+    - name: Call tls_install_certs role
+      ansible.builtin.import_role:
+        name: cloudera.exe.tls_install_certs
+      vars:
+        local_tls_signed_certs_dir: "{{ (hostvars['localhost']['__pvc_tls_tempdir']['path'], 'certs') | path_join }}"
 
 - name: Post 1 - Restart CM Server service
   hosts: cloudera_manager
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-
-  - name: Restart CM Server service
-    when:
-      - restart_services | default(False)
-    ansible.builtin.service:
-      name: cloudera-scm-server
-      state: restarted
+    - name: Restart CM Server service
+      when:
+        - restart_services | default(False)
+      ansible.builtin.service:
+        name: cloudera-scm-server
+        state: restarted
 
 - name: Post 2 - Restart DB Server service
   hosts: db_server
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-
-  - name: Restart DB Server service
-    when:
-      - restart_services | default(False)
-    ansible.builtin.service:
-      name: "{{ db_service_name }}"
-      state: reloaded
+    - name: Restart DB Server service
+      when:
+        - restart_services | default(False)
+      ansible.builtin.service:
+        name: "{{ db_service_name }}"
+        state: reloaded
 
 - name: Post 3 - Restart CM Agent service
   hosts: cluster
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-
-  - name: Restart CM Agent service
-    when:
-      - restart_services | default(False)
-    ansible.builtin.service:
-      name: cloudera-scm-agent
-      state: restarted
+    - name: Restart CM Agent service
+      when:
+        - restart_services | default(False)
+      ansible.builtin.service:
+        name: cloudera-scm-agent
+        state: restarted

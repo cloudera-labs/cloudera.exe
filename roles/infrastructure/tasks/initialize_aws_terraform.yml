@@ -1,3 +1,4 @@
+---
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,13 +26,13 @@
 # Copy Terraform provider file
 - name: Copy Terraform Provider file
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/provider.tf'
+    src: "files/{{ infra__type }}/provider.tf"
     dest: "{{ infra__terraform_template_dir }}/infra/provider.tf"
 
 # Copy Terraform variables file
 - name: Copy Terraform Variables declaration file
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/terraform_variables.tf'
+    src: "files/{{ infra__type }}/terraform_variables.tf"
     dest: "{{ infra__terraform_template_dir }}/infra/variables.tf"
   no_log: false
 
@@ -39,33 +40,33 @@
 # ...network resources
 - name: Copy Terraform resource file for network resources
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/infra_{{ infra__type }}_network.tf'
+    src: "files/{{ infra__type }}/infra_{{ infra__type }}_network.tf"
     dest: "{{ infra__terraform_template_dir }}/infra/infra_network.tf"
   no_log: false
 
 # ...storage resources
 - name: Copy Terraform resource file for storage resources
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/infra_{{ infra__type }}_storage.tf'
+    src: "files/{{ infra__type }}/infra_{{ infra__type }}_storage.tf"
     dest: "{{ infra__terraform_template_dir }}/infra/infra_storage.tf"
   no_log: false
 
 # ...compute resources
 - name: Generating Terraform infra file for compute resources
   ansible.builtin.copy:
-    src: 'files/{{ infra__type }}/infra_{{ infra__type }}_compute.tf'
+    src: "files/{{ infra__type }}/infra_{{ infra__type }}_compute.tf"
     dest: "{{ infra__terraform_template_dir }}/infra/infra_compute.tf"
   no_log: false
 
 # Apply template for Terraform backend state
 - name: Generate Terraform Backend State
   ansible.builtin.template:
-    src: 'templates/{{ infra__type }}/backend_state.tf.j2'
+    src: "templates/{{ infra__type }}/backend_state.tf.j2"
     dest: "{{ infra__terraform_template_dir }}/infra/backend_state.tf"
 
 # Create Terraform variable definitions from template
 - name: Generate Terraform Variables definition
   ansible.builtin.template:
-    src: 'templates/{{ infra__type }}/terraform.tfvars.j2'
+    src: "templates/{{ infra__type }}/terraform.tfvars.j2"
     dest: "{{ infra__terraform_template_dir }}/infra/terraform.tfvars"
   no_log: false

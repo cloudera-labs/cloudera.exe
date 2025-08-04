@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 # STARTBLOCK # Verify Inventory and Definition
 - name: Verify inventory [verify_inventory]
   hosts: "{{ target | default('localhost') }}"
-  gather_facts: no
+  gather_facts: false
   roles:
     - cloudera.cluster.verify.inventory
   tags:
@@ -28,7 +27,7 @@
 
 - name: Verify definition [verify_definition]
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: yes
+  gather_facts: true
   roles:
     - cloudera.cluster.verify.definition
   tags:
@@ -40,7 +39,7 @@
 # Moved before parcel verification to allow rehosting
 - name: Install custom parcel repository
   hosts: "{{ target | default('custom_repo') }}"
-  become: yes
+  become: true
   roles:
     - cloudera.cluster.infrastructure.custom_repo
   tags:
@@ -51,7 +50,7 @@
 # Moved from verify_parcels to reduce duplication
 - name: Verify definition [verify_parcels_and_roles]
   hosts: "{{ target | default('cloudera_manager') }}"
-  gather_facts: yes
+  gather_facts: true
   roles:
     - cloudera.cluster.verify.parcels_and_roles
   tags:
@@ -64,7 +63,7 @@
 # STARTBLOCK # Prepare Nodes
 - name: Apply OS pre-requisite configurations
   hosts: "{{ target | default('cloudera_manager, cluster, ca_server, ecs_nodes') }}"
-  become: yes
+  become: true
   roles:
     - cloudera.cluster.prereqs.os
   tags:
@@ -74,8 +73,8 @@
 
 - name: Apply OS Prereqs to ECS Nodes
   hosts: "{{ target | default('ecs_nodes') }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tags:
     - pvc
     - os
@@ -88,8 +87,8 @@
 
 - name: Create local user accounts
   hosts: "{{ target | default('cloudera_manager, cluster') }}"
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   roles:
     - cloudera.cluster.prereqs.user_accounts
   tags:
@@ -99,8 +98,8 @@
 
 - name: Create local users on ECS Nodes
   hosts: "{{ target | default('ecs_nodes') }}"
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tags:
     - pvc
     - users
@@ -113,7 +112,7 @@
 
 - name: Install JDK
   hosts: "{{ target | default('cloudera_manager, cluster, tls, krb5_server, ecs_nodes') }}"
-  become: yes
+  become: true
   roles:
     - cloudera.cluster.prereqs.jdk
   tags:
@@ -128,8 +127,8 @@
 # DB Connectors
 - name: Install MySQL Connector
   hosts: "{{ target | default('cloudera_manager, cluster') }}"
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - role: cloudera.exe.rdbms.client.mysql_connector
       when: database_type == 'mysql' or database_type == 'mariadb'
@@ -139,8 +138,8 @@
 
 - name: Install Oracle Connector
   hosts: "{{ target | default('cloudera_manager, cluster') }}"
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - role: cloudera.exe.rdbms.client.oracle_connector
       when: database_type == 'oracle'
@@ -150,8 +149,8 @@
 
 - name: Install PostgreSQL Connector
   hosts: cloudera_manager, cluster
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - role: cloudera.exe.rdbms.client.postgresql_connector
       when: database_type == 'postgresql'
@@ -163,8 +162,8 @@
 # STARTBLOCK # Create Cluster Service Infrastructure
 - name: Install Kerberos Server
   hosts: "{{ target | default('krb5_server') }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - role: cloudera.cluster.infrastructure.krb5_server
   tags:
@@ -176,8 +175,8 @@
 
 - name: Setup KRB5 clients
   hosts: "{{ target | default('cloudera_manager, cluster, ecs_nodes') }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - role: cloudera.cluster.infrastructure.krb5_client
       when:
@@ -192,7 +191,7 @@
 
 - name: Install CA server
   hosts: "{{ target | default('ca_server') }}"
-  become: yes
+  become: true
   roles:
     - cloudera.cluster.infrastructure.ca_server
   tags:
@@ -202,7 +201,7 @@
 
 - name: Install HAProxy
   hosts: "{{ target | default('haproxy') }}"
-  become: yes
+  become: true
   roles:
     - cloudera.cluster.infrastructure.haproxy
   tags:
@@ -214,8 +213,8 @@
 
 - name: Build TLS keystores and truststores
   hosts: "{{ target | default('tls') }}"
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   roles:
     - cloudera.cluster.security.tls_generate_csr
     - cloudera.cluster.security.tls_signing
@@ -229,10 +228,10 @@
 
 - name: Delete temp directories
   hosts: "{{ target | default('localhost') }}"
-  become: no
-  gather_facts: no
+  become: false
+  gather_facts: false
   tasks:
-    - file:
+    - ansible.builtin.file:
         path: "{{ [local_temp_dir, dir] | path_join }}"
         state: absent
       loop:
@@ -247,8 +246,8 @@
 # STARTBLOCK # NiFi TLS
 - name: Setup symlinks for NiFi TLS keystore and truststore
   hosts: "{{ target | default('cluster') }}"
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   roles:
     - role: cloudera.cluster.security.tls_nifi
       when: >
@@ -260,7 +259,7 @@
 # STARTBLOCK # Install Cluster Service Infrastructure II
 - name: Install RDBMS
   hosts: "{{ target | default('db_server') }}"
-  become: yes
+  become: true
   roles:
     - cloudera.exe.rdbms.server
   tags:

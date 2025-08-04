@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +15,14 @@
 
 - name: Remove Main Azure Storage Account during Teardown
   when:
-  - infra__teardown_deletes_data
-  - infra__azure_metagroup_uri | length > 0
+    - infra__teardown_deletes_data
+    - infra__azure_metagroup_uri | length > 0
   azure.azcollection.azure_rm_storageaccount:
     resource_group: "{{ infra__azure_metagroup_name }}"
     location: "{{ infra__region }}"
     force_delete_nonempty: "{{ infra__teardown_deletes_data }}"
     state: absent
-    name: "{{ infra__storage_name }}"  # HNS Property currently NA in Stock Ansible
+    name: "{{ infra__storage_name }}" # HNS Property currently NA in Stock Ansible
 
 - name: Remove Azure Netapp Storage during Teardown
   when:

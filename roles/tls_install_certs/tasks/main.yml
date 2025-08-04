@@ -13,11 +13,10 @@
 # limitations under the License.
 
 ---
-
 - name: Check if signed cert is available
-  become: no
+  become: false
   delegate_to: localhost
-  stat:
+  ansible.builtin.stat:
     path: "{{ local_tls_signed_certs_dir }}/{{ inventory_hostname }}.pem"
   register: signed_cert
 
@@ -33,7 +32,7 @@
   ansible.builtin.copy:
     src: "{{ local_tls_signed_certs_dir }}/{{ inventory_hostname }}.pem"
     dest: "{{ tls_cert_path }}"
-    mode: 0644
+    mode: "0644"
 
 - name: Create host agnostic link for signed certificate
   ansible.builtin.file:
@@ -41,7 +40,7 @@
     dest: "{{ tls_cert_path_generic }}"
     state: hard
     force: true
-    mode: 0644
+    mode: "0644"
     owner: root
     group: root
 

@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@
       - "__auth_item is string"
       - "__auth_item | trim | length > 0"
     fail_msg: "AWS authentication parameter, '{{ __auth_item }}', is invalid."
-    quiet: yes
+    quiet: true
   loop_control:
     loop_var: __auth_item
   loop:
@@ -32,45 +31,44 @@
 
 - name: Confirm that required Terraform variables are defined
   block:
-  - name: Check infra__terraform_template_dir
-    ansible.builtin.assert:
-      that:
-        - "infra__terraform_template_dir is defined"
-        - "infra__terraform_template_dir | length > 0"
-      fail_msg: "Required infra__terraform_template_dir variable for Terraform is not valid."
-      quiet: yes
+    - name: Check infra__terraform_template_dir
+      ansible.builtin.assert:
+        that:
+          - "infra__terraform_template_dir is defined"
+          - "infra__terraform_template_dir | length > 0"
+        fail_msg: "Required infra__terraform_template_dir variable for Terraform is not valid."
+        quiet: true
 
-  - name: Check infra__terraform_workspace_dir
-    ansible.builtin.assert:
-      that:
-        - "infra__terraform_workspace_dir is defined"
-        - "infra__terraform_workspace_dir | length > 0"
-      fail_msg: "Required infra__terraform_workspace_dir variable for Terraform is not valid."
-      quiet: yes
+    - name: Check infra__terraform_workspace_dir
+      ansible.builtin.assert:
+        that:
+          - "infra__terraform_workspace_dir is defined"
+          - "infra__terraform_workspace_dir | length > 0"
+        fail_msg: "Required infra__terraform_workspace_dir variable for Terraform is not valid."
+        quiet: true
 
-  - name: Check infra__terraform_artefact_dir
-    ansible.builtin.assert:
-      that:
-        - "infra__terraform_artefact_dir is defined"
-        - "infra__terraform_artefact_dir | length > 0"
-      fail_msg: "Required infra__terraform_artefact_dir variable for Terraform is not valid."
-      quiet: yes
+    - name: Check infra__terraform_artefact_dir
+      ansible.builtin.assert:
+        that:
+          - "infra__terraform_artefact_dir is defined"
+          - "infra__terraform_artefact_dir | length > 0"
+        fail_msg: "Required infra__terraform_artefact_dir variable for Terraform is not valid."
+        quiet: true
 
-  - name: Check infra__terraform_state_storage
-    ansible.builtin.assert:
-      that:
-        - "infra__terraform_state_storage is defined"
-        - "infra__terraform_state_storage in infra__terraform_allowed_state_storage"
-      fail_msg: "Required infra__terraform_state_storage variable for Terraform needs to be \
-      one of {{ infra__terraform_allowed_state_storage | join(', ') }}"
-      quiet: yes
+    - name: Check infra__terraform_state_storage
+      ansible.builtin.assert:
+        that:
+          - "infra__terraform_state_storage is defined"
+          - "infra__terraform_state_storage in infra__terraform_allowed_state_storage"
+        fail_msg: "Required infra__terraform_state_storage variable for Terraform needs to be one of {{ infra__terraform_allowed_state_storage | join(', ') }}"
+        quiet: true
 
-  - name: Check remote state variables are defined for remote_s3
-    ansible.builtin.assert:
-      that:
-        - "infra__terraform_remote_state_bucket | length > 0"
-        - "infra__terraform_remote_state_lock_table | length > 0"
-      fail_msg: "Required infra__terraform_remote_state_bucket and infra__terraform_remote_state_lock_table variables \
-      need to be defined for '{{ infra__terraform_state_storage }}' Terraform remote state"
-      quiet: yes
-    when: infra__terraform_state_storage == "remote_s3"
+    - name: Check remote state variables are defined for remote_s3
+      ansible.builtin.assert:
+        that:
+          - "infra__terraform_remote_state_bucket | length > 0"
+          - "infra__terraform_remote_state_lock_table | length > 0"
+        fail_msg: "Required infra__terraform_remote_state_bucket and infra__terraform_remote_state_lock_table variables need to be defined for '{{ infra__terraform_state_storage
+          }}' Terraform remote state"
+        quiet: true
+      when: infra__terraform_state_storage == "remote_s3"

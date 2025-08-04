@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,14 +35,13 @@
       loop_control:
         loop_var: __gcp_sa_binding_item
       loop: "{{ plat__gcp_xaccount_policy_bindings }}"
-      command: >
+      ansible.builtin.command: >
         gcloud projects
         add-iam-policy-binding {{ plat__gcp_project }}
         --member="serviceAccount:{{ plat__gcp_xaccount_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
         --role={{ __gcp_sa_binding_item |quote }}
         --no-user-output-enabled
         --condition=None
-
     - name: Generate Key for Google Cross Account Service Account
       google.cloud.gcp_iam_service_account_key:
         service_account: "{{ __gcp_xaccount_sa_info }}"
@@ -98,7 +96,7 @@
         that:
           - "'includedPermissions:' in __gcp_custom_log_role_info.stdout"
           - "'NOT_FOUND' not in __gcp_custom_log_role_info.stderr"
-        quiet: yes
+        quiet: true
         fail_msg: |
           Custom Log Role {{ plat__gcp_log_role_name }} could not be created or undeleted.
           It is likely that the unique role_id was marked for deletion recently and you are in the GCloud no-reuse window.
@@ -136,14 +134,16 @@
           condition: "expression=resource.name == '{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_datalakeadmin_identity_name }}'"
         - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
           role: "{{ plat__gcp_roles.storage_admin }}"
-          condition: "expression=resource.name == '//storage.googleapis.com/projects/_/buckets/{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_datalakeadmin_identity_name }}-fulladmin'"
+          condition: "expression=resource.name == '//storage.googleapis.com/projects/_/buckets/{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_datalakeadmin_identity_name
+            }}-fulladmin'"
         - member: "serviceAccount:{{ plat__gcp_datalakeadmin_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
           role: "{{ plat__gcp_roles.storage_object_admin }}"
           condition: "expression=resource.name == '{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_ranger_audit_identity_name }}'"
         # Ranger Audit
         - member: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
           role: "{{ plat__gcp_roles.storage_object_admin }}"
-          condition: "expression=resource.name == '//storage.googleapis.com/projects/_/buckets/{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_ranger_audit_identity_name }}-fulladmin'"
+          condition: "expression=resource.name == '//storage.googleapis.com/projects/_/buckets/{{ plat__gcp_storage_location_data }}',title='{{ plat__gcp_ranger_audit_identity_name
+            }}-fulladmin'"
         # ID Broker  / Assumer Role
         - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
           role: "{{ plat__gcp_roles.iam_workload_identity_user }}"
@@ -154,13 +154,12 @@
         - member: "serviceAccount:{{ plat__gcp_idbroker_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com"
           role: "{{ plat__gcp_roles.iam_service_account_token_creator }}"
           condition: "None"
-      command: >
+      ansible.builtin.command: >
         gcloud projects
         add-iam-policy-binding {{ plat__gcp_project }}
         --member={{ __gcp_binding_item.member |quote }}
         --role={{ __gcp_binding_item.role |quote }}
         --condition={{ __gcp_binding_item.condition |quote }}
-
     - name: Add Service Accounts to Storage Policies for Buckets
       loop_control:
         loop_var: __gcp_pol_item
@@ -173,7 +172,7 @@
           bucket: "{{ plat__gcp_storage_location_data }}"
         - account: "serviceAccount:{{ plat__gcp_ranger_audit_identity_name }}@{{ plat__gcp_project }}.iam.gserviceaccount.com:admin"
           bucket: "{{ plat__gcp_storage_location_data }}"
-      command: >
+      ansible.builtin.command: >
         gsutil iam
         ch {{ __gcp_pol_item.account |quote }}
         gs://{{ __gcp_pol_item.bucket |quote }}

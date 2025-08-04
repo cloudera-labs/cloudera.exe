@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +22,11 @@
     that:
       - "__cdp_cli.rc == 0"
     fail_msg: "CDP CLI failed to execute: {{ __cdp_cli.stdout }} ({{ __cdp_cli.stderr }})"
-    quiet: yes
+    quiet: true
 
 - name: Query CDP Caller to confirm access to Endpoints
   cloudera.cloud.iam_user_info:
-    current_user: yes
+    current_user: true
   register: __cdp_iam_current_user_info
 
 - name: Set facts for CDP Caller Workload Username and CRN

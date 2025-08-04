@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +33,7 @@
         type: rsa
         size: 4096
         regenerate: never
-        force: no
+        force: false
       vars:
         __generated_keypair_name: "{{ globals.name_prefix + default_ssh_key_suffix }}"
 
@@ -45,16 +44,16 @@
         __generated_keypair:
           ssh:
             private_key_file: "{{ __generated_ssh_keys.filename }}"
-            public_key_file: "{{ [ __generated_ssh_keys.filename, 'pub' ] | join('.') }}"
+            public_key_file: "{{ [__generated_ssh_keys.filename, 'pub'] | join('.') }}"
 
 - name: Load SSH public key file to text
   when: globals.ssh.public_key_file is defined
   ansible.builtin.set_fact:
-    globals: "{{ globals | default({}) | combine(__public_key_globals , recursive=True) }}"
+    globals: "{{ globals | default({}) | combine(__public_key_globals, recursive=True) }}"
   vars:
     __public_key_globals:
       ssh:
-        public_key_text: "{{ lookup('file', globals.ssh.public_key_file ) | default(omit) }}"
+        public_key_text: "{{ lookup('file', globals.ssh.public_key_file) | default(omit) }}"
 
 - name: Validate SSH Private Key File has acceptable permissions
   when: globals.ssh.private_key_file is defined
@@ -72,4 +71,4 @@
           - "SSH Private Key at {{ __private_key_file_stat.stat.path }} has invalid permissions"
           - "Permissions are {{ __private_key_file_stat.stat.mode }}"
           - "Permissions should be 0400 or 0600"
-        quiet: yes
+        quiet: true

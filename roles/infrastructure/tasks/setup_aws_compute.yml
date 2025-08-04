@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,21 +25,21 @@
     key_name: "{{ infra__public_key_id }}"
     instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type][infra__dynamic_inventory_vm_type] }}"
     image_id: "{{ __infra_aws_ami_info.image_id }}"
-    ebs_optimized: yes
+    ebs_optimized: true
     volumes:
       - device_name: /dev/sda1
         ebs:
           volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type][infra__dynamic_inventory_storage_type] }}"
           volume_size: "{{ infra__dynamic_inventory_storage_size }}"
           delete_on_termination: "{{ infra__dynamic_inventory_delete_storage | bool }}"
-    wait: yes
+    wait: true
     state: running
     tags: "{{ infra__dynamic_inventory_tags }}"
     name: "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2], '%02d' | format(__infra_compute_instance_item)]) }}"
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
     network:
-      assign_public_ip: yes
-      delete_on_termination: yes
+      assign_public_ip: true
+      delete_on_termination: true
 
 - name: Ensure all {{ infra__dynamic_inventory_count }} instances have Public IPs assigned
   register: __infra_dynamic_inventory_instances
@@ -48,7 +47,7 @@
     region: "{{ infra__region }}"
     filters:
       "tag:Name": "{{ '-'.join([infra__namespace, infra__dynamic_inventory_vm_suffix, infra__dynamic_inventory_os[::2]]) }}-*"
-      instance-state-name: [ "running" ]
+      instance-state-name: ["running"]
   until: __infra_dynamic_inventory_instances.instances | selectattr('public_ip_address', 'defined') | list | count | int == infra__dynamic_inventory_count | int
   retries: 5
   delay: 5
@@ -71,7 +70,7 @@
     key_name: "{{ infra__public_key_id }}"
     instance_type: "{{ infra__dynamic_inventory_vm_type_default[infra__type]['sml'] }}"
     image_id: "{{ __infra_aws_ami_info.image_id }}"
-    ebs_optimized: yes
+    ebs_optimized: true
     instance_role: "{{ infra__auto_repo_mirror_role.iam_role.role_name }}"
     volumes:
       - device_name: /dev/sda1
@@ -79,13 +78,13 @@
           volume_type: "{{ infra__dynamic_inventory_storage_type_default[infra__type]['std'] }}"
           volume_size: 100
           delete_on_termination: true
-    wait: yes
+    wait: true
     state: running
     tags: "{{ infra__dynamic_inventory_tags }}"
-    name: "{{ '-'.join([infra__namespace, infra__region, 'utility_vm' ]) }}"
+    name: "{{ '-'.join([infra__namespace, infra__region, 'utility_vm']) }}"
     vpc_subnet_id: "{{ infra__aws_subnet_ids | first }}"
     network:
-      assign_public_ip: yes
+      assign_public_ip: true
 
 - name: Add Utility Instance to host group
   when: infra__create_utility_service

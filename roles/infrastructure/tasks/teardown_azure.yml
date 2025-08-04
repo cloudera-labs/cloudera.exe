@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,5 +26,5 @@
   delay: 5
   azure.azcollection.azure_rm_resourcegroup_info:
     name: "{{ infra__azure_metagroup_name }}"
-    list_resources: yes
+    list_resources: true
   register: __azure_resource_group_teardown

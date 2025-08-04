@@ -18,7 +18,7 @@
 
 # Role prefix is 'info__'
 
-info__env_name:                               "{{ common__env_name }}"
+info__env_name: "{{ common__env_name }}"
 
-info__create_deployment_details:              "{{ globals.artifacts.create_deployment_details | default(True) }}"
-info__artifacts_directory:                    "{{ globals.artifacts.directory | default('') }}"
+info__create_deployment_details: "{{ globals.artifacts.create_deployment_details | default(True) }}"
+info__artifacts_directory: "{{ globals.artifacts.directory | default('') }}"

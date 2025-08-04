@@ -1,5 +1,4 @@
 ---
-
 # Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +24,7 @@
     that:
       - __data_idbroker_role_info.iam_roles | length > 0
     fail_msg: "Unable to find AWS ID Broker role '{{ data__aws_idbroker_role_name }}'"
-    quiet: yes
+    quiet: true
 
 - name: Set fact for the AWS ID Broker role ARN
   ansible.builtin.set_fact:
