@@ -1,0 +1,43 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    # Check 1 - confirm that the service present and running
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Set fact for rngd services
+      ansible.builtin.set_fact:
+        __rngd_services: "{{ ansible_facts.services | dict2items | selectattr('key', 'search', 'rng') | list }}"
+
+    - name: Confirm that service is present and running
+      ansible.builtin.assert:
+        that:
+          - __rngd_services | length > 0
+          - __rngd_services | map(attribute='value') | map(attribute='state') | difference(['running']) | length == 0
+
+    # Check 2 - confirm that the process is using /dev/urandom
+    - name: Gather running process details
+      ansible.builtin.command: ps aux
+      changed_when: false
+      register: __rngd_process
+
+    - name: Confirm that rngd process is using /dev/urandom
+      ansible.builtin.assert:
+        that:
+          - __rngd_process.stdout_lines | select('search', 'rngd') | select('contains', '/dev/urandom') | length > 0
