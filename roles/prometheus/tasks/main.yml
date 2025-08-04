@@ -1,5 +1,4 @@
----
-# Copyright 2024 Cloudera, Inc. All Rights Reserved.
+# Copyright 2025 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+---
+
 - name: Create Prometheus directory
   ansible.builtin.file:
     path: "{{ prometheus_directory }}"
+    mode: "0755"
     state: directory
 
 - name: Create a temporary directory
@@ -27,15 +29,16 @@
   ansible.builtin.get_url:
     url: "{{ prometheus_tarball_url }}"
     dest: "{{ __prometheus_tmp.path }}/{{ prometheus_tarball_file }}"
+    mode: "0755"
 
-- name: Extract tarball
+- name: Extract Prometheus tarball
   ansible.builtin.unarchive:
     src: "{{ __prometheus_tmp.path }}/{{ prometheus_tarball_file }}"
     dest: "{{ prometheus_directory }}"
     extra_opts: --strip-components=1
     remote_src: true
 
-- name: Remove the temporary  directory
+- name: Remove the temporary directory
   when: __prometheus_tmp is defined
   ansible.builtin.file:
     path: "{{ __prometheus_tmp.path }}"
@@ -54,34 +57,24 @@
     state: directory
     recurse: true
 
-- name: Set ownership of all files inside  /etc/prometheus
+- name: Set ownership of Prometheus files
   ansible.builtin.file:
     path: "{{ prometheus_directory }}"
     owner: "{{ prometheus_user }}"
     group: "{{ prometheus_group }}"
+    mode: "0755"
     recurse: true
 
 - name: Create Prometheus service template
   ansible.builtin.template:
     src: prometheus.service.j2
     dest: "{{ prometheus_service_directory }}"
-  register: __prometheus_service
-
-- name: Start and enable prometheus service
-  when: __prometheus_service.changed
-  block:
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: true
-
-    - name: Enable and start prometheus service
-      ansible.builtin.systemd:
-        name: prometheus
-        state: started
-        enabled: true
+    mode: "0755"
+  notify: Enable Prometheus
 
 - name: Update Prometheus configuration
   ansible.builtin.template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
-  notify: restart prometheus
+    mode: "0755"
+  notify: Restart Prometheus
