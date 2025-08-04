@@ -20,7 +20,8 @@
   gather_facts: true
   become: true
   tasks:
-    - ansible.builtin.include_role:
+    - name: Teardown CA server
+      ansible.builtin.include_role:
         name: cloudera.cluster.infrastructure.ca_certs
         tasks_from: clean.yml
   tags:
@@ -42,7 +43,8 @@
   gather_facts: true
   become: true
   tasks:
-    - ansible.builtin.include_role:
+    - name: Teardown ECS
+      ansible.builtin.include_role:
         name: cloudera.cluster.teardown
         tasks_from: teardown_ecs.yml
       vars:

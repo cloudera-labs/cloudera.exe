@@ -31,7 +31,8 @@
   become: true
   gather_facts: false
   tasks:
-    - ansible.builtin.include_role:
+    - name: Include KTS High Availability
+      ansible.builtin.include_role:
         name: cloudera.cluster.deployment.services.kts_high_availability
         public: true
         apply:
