@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Update kernel parameters
+    short_description: Update OS kernel parameters for deployments
     description: |
       Updates and applies kernel parameters using C(sysctl).
       This includes controlling memory management (swappiness and memory overcommit)

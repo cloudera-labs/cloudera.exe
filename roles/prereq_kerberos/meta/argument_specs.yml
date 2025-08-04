@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Kerberos
+    short_description: Set up Kerberos for deployments
     description:
       - Set up for Kerberos usage, including OS-specific Kerberos client libraries.
       - Configure Kerberos credential cache.

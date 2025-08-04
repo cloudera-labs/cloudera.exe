@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: "Manage operating system services"
+    short_description: Manage operating system services for deployments
     description:
       - Manage operating system services for Cloudera on premises deployment.
       - Includes installing and configuring required services as well as disabling unnecessary services.

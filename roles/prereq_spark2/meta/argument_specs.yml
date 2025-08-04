@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Spark2
+    short_description: Set up user accounts for Spark2
     description: |
       Set up for Apache Spark2 usage, notably, create the local C(spark2) user.
       Optionally, set up ACLs on TLS entities.

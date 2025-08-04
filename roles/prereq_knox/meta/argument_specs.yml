@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Knox
+    short_description: Set up user accounts for Knox
     description: |
       Set up for Apache Knox usage, notably, create the local C(knox) user.
     author: Cloudera Labs

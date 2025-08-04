@@ -2,7 +2,7 @@
 
 Set up database and user accounts for Hive
 
-This role automates the setup of a database and its associated user accounts specifically for Hive services. It supports various database types, including PostgreSQL, MySQL, and Oracle. The role creates the database and a dedicated user with ownership privileges, using sensible defaults that can be easily overridden.
+This role automates the setup of a database and its associated user accounts specifically for Apache Hive services. It supports various database types, including PostgreSQL, MySQL, and Oracle. The role creates the database and a dedicated user with ownership privileges, using sensible defaults that can be easily overridden.
 
 The role will:
 - Connect to the specified database server using administrative credentials.

@@ -18,8 +18,8 @@ argument_specs:
     short_description: Set up database and user accounts for Activity Monitor
     description:
       - Set up the Activity Monitor database and its associated user accounts, ensuring proper configuration for Activity Monitor operations.
-      - Default values are used for the username, password, and database name, but these can be overwritten by setting the `activity_monitor_username`,
-        `activity_monitor_password`, and `activity_monitor_database` variables.
+      - Default values are used for the username, password, and database name, but these can be overwritten by setting the O(activity_monitor_username),
+        O(activity_monitor_password), and O(activity_monitor_database) variables.
     author: Cloudera Labs
     options:
       database_type:

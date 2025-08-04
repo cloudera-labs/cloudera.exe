@@ -1,6 +1,6 @@
 # prereq_hbase
 
-Set up for Hbase
+Set up for HBase
 
 This role prepares a host for Apache HBase usage by creating a dedicated system user and group named `hbase`. This user is essential for running HBase processes with appropriate permissions and isolation. The role can also optionally set up Access Control Lists (ACLs) on TLS entities if required for secure HBase communication.
 

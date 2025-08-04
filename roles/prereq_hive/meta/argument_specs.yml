@@ -15,9 +15,9 @@
 
 argument_specs:
   main:
-    short_description: Set up for Hive
+    short_description: Set up user accounts for Hive
     description: |
-      Set up for Hive usage, notably, create the local C(hive) user.
+      Set up for Apache Hive usage, notably, create the local C(hive) user.
       Optionally, set up ACLs on TLS entities.
     author: Cloudera Labs
     options: {}

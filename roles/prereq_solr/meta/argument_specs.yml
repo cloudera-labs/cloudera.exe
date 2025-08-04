@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Solr
+    short_description: Set up user accounts for Solr
     description: |
       Set up for Apache Solr usage, notably, create the local C(solr) user.
       Optionally, set up ACLs on TLS entities.

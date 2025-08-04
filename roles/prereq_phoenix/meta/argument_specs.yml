@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Phoenix
+    short_description: Set up user accounts for Phoenix
     description: |
       Set up for Apache Phoenix usage, notably, create local C(phoenix) user.
     author: Cloudera Labs

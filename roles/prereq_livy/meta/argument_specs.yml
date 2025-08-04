@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Livy
+    short_description: Set up user accounts for Livy
     description: |
       Set up for Apache Livy usage, notably, create the local C(livy) user.
     author: Cloudera Labs

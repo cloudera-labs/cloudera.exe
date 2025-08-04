@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: "Verify configuration against support matrix"
+    short_description: Verify configuration against support matrix
     description:
       - Verification of various system and configuration settings against the Cloudera on premise support matrix available at supportmatrix.cloudera.com.
       - Additionally, the I(support_matrix) variable defined in this role can be imported and used in other roles.

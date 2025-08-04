@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Sqoop
+    short_description: Set up user accounts for Sqoop
     description: |
       Set up for Apache Sqoop usage, notably, create the local C(sqoop,sqoop2) users and local C(sqoop) group.
       Optionally, set up ACLs on TLS entities.

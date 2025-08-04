@@ -2,7 +2,7 @@
 
 Set up for ECS
 
-This role prepares a host for Cloudera's ECS (Embedded Container Service) usage by creating the required local users and configuring the firewall and network settings. It ensures that the host's environment is properly configured to support ECS components and operations, including user permissions and network security rules.
+This role prepares a host for Cloudera Embedded Container Service (ECS) usage by creating the required local users and configuring the firewall and network settings. It ensures that the host's environment is properly configured to support ECS components and operations, including user permissions and network security rules.
 
 The role will:
 - Create the necessary system users and groups for ECS, based on a list provided by the `prereq_cloudera_manager` role.

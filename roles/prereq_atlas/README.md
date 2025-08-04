@@ -2,7 +2,7 @@
 
 Set up for Atlas
 
-This role prepares a host for Atlas usage by creating a dedicated system user and group named `atlas`. This user is essential for running Atlas processes with appropriate permissions and isolation within a Hadoop environment.
+This role prepares a host for Apache Atlas usage by creating a dedicated system user and group named `atlas`. This user is essential for running Atlas processes with appropriate permissions and isolation within a Hadoop environment.
 
 The role will:
 - Create the `atlas` system user and group.

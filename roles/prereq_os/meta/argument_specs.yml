@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Update general OS requirements.
+    short_description: Update general OS requirements for deployments
     description:
       - Update timezone.
       - Update Cloudera Manager access to global C(/tmp) directory.

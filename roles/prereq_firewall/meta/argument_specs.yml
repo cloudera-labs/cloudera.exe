@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Disable firewalls
+    short_description: Disable firewalls for a deployment
     description:
       - Disable firewalls, if installed, and optionally back up iptable rules.
       - Backup files include all iptable tables for both IPv4 and IPv6.

@@ -1,6 +1,6 @@
 # prereq_druid
 
-Set up for Apache Druid
+Set up for Druid
 
 This role prepares a host for Apache Druid usage by creating a dedicated system user and group named `druid`. This user is essential for running Apache Druid processes with appropriate permissions and isolation.
 

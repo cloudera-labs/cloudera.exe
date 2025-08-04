@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for Schema Registry
+    short_description: Set up user accounts for Schema Registry
     description: |
       Set up for Schema Registry usage, notably, create the local C(schemaregistry) user.
       Optionally, set up ACLs on TLS entities.

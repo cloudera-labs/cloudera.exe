@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up JDK
+    short_description: Set up the JDK
     description:
       - Set up the Java Development Kit (JDK), optionally installing the JDK itself.
       - For JDK 9 and below, optionally enable the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy.

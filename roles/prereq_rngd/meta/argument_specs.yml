@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: "Install the Random Number Generator package"
+    short_description: Install the Random Number Generator package for deployments
     description:
       - Installs and configures the Random Number Generator (rngd) package.
     author:

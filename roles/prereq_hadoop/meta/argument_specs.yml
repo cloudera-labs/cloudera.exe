@@ -15,8 +15,8 @@
 
 argument_specs:
   main:
-    short_description: Set up for Hadoop
+    short_description: Set up user accounts for Hadoop
     description: |
-      Set up for Hadoop usage, notably, create the local C(hadoop) user group.
+      Set up for Apache Hadoop usage, notably, create the local C(hadoop) user group.
     author: Cloudera Labs
     options: {}

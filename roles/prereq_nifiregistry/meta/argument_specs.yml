@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for NiFi Registry
+    short_description: Set up user accounts for NiFi Registry
     description: |
       Set up for Apache NiFi Registry usage, notably, create the local C(nifiregistry) user.
       Optionally, set up ACLs on TLS entities.

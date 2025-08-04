@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Set up for SSB
+    short_description: Set up user accounts for SSB
     description: |
       Set up for SQL Stream Builder (SSB) usage, notably, create the local C(ssb) user.
       Optionally, set up ACLs on TLS entities.

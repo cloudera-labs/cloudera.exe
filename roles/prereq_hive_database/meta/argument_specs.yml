@@ -17,7 +17,7 @@ argument_specs:
   main:
     short_description: Set up database and user accounts for Hive
     description:
-      - Set up the Hive database and its associated user accounts, ensuring proper configuration for Hive operations.
+      - Set up the Apache Hive database and its associated user accounts, ensuring proper configuration for Hive operations.
       - Default values are used for the username, password, and database name, but these can be overwritten by setting the `hive_username`, `hive_password`, and
         `hive_database` variables.
     author: Cloudera Labs

@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: "Database and user for Cloudera Manager"
+    short_description: Set up database and user accounts for Cloudera Manager
     description:
       - Creates the database and user for Cloudera Manager on PostgreSQL
     author:

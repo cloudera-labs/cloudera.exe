@@ -15,9 +15,9 @@
 
 argument_specs:
   main:
-    short_description: Set up for Flume
+    short_description: Set up user accounts for Flume
     description: |
-      Set up for Flume usage, notably, create the local C(flume) user.
+      Set up for Apache Flume usage, notably, create the local C(flume) user.
       Optionally, set up ACLs on TLS entities.
     author: Cloudera Labs
     options: {}

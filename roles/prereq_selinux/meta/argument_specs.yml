@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: Manage SELinux policy enforcement.
+    short_description: Manage SELinux policy enforcement for deployments
     description:
       - Manage the enforcement of the SELinux.
       - Installs packages for SELinux management, if needed, but does not install SELinux.

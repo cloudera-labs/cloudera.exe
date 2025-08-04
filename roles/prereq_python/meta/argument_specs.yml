@@ -15,7 +15,7 @@
 
 argument_specs:
   main:
-    short_description: "Install Python"
+    short_description: Install Python for deployments
     description:
       - Ensures that the supported versions of Python for specified versions of Cloudera Manager and Runtime.
       - Also ensures that Pip is installed and updated.
