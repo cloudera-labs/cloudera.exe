@@ -1,0 +1,55 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+# Python3 and Pip
+- name: Install supported version of Python3 if required
+  when:
+    - not __python3_version is version(__required_python_version, 'ge', version_type='pep440')
+  block:
+    - name: Install python3 package if defined
+      when: python3_package is defined
+      ansible.builtin.package:
+        name: "{{ python3_package }}"
+        state: present
+
+    - name: Download and install
+      when: python3_package is not defined
+      ansible.builtin.debug:
+        msg:
+          - "TODO - install Python version {{ __required_python_version }}"
+
+- name: Ensure pip is installed
+  ansible.builtin.package:
+    name: "{{ python3_pip_package }}"
+    state: present
+
+- name: Ensure pip is upgraded
+  ansible.builtin.pip:
+    name: pip
+    extra_args: --upgrade
+
+# Python2 and Pip
+- name: Ensure supported version of Python2
+  when:
+    - __required_python2_version is defined
+  block:
+    - name: Install Python2 if required
+      when:
+        - not __python2_version is version(__required_python2_version, 'ge', version_type='pep440')
+      block:
+        - name: Download and install
+          ansible.builtin.debug:
+            msg:
+              - "TODO - install Python version {{ __required_python2_version }}"
