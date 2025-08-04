@@ -1,0 +1,43 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check for test user
+      ansible.builtin.command: grep test /etc/passwd
+      register: __user
+      failed_when: __user.rc != 0
+      changed_when: false
+
+    - name: Check for test user group membership
+      ansible.builtin.command: groups test
+      register: __groups
+      failed_when: __groups.rc != 0 and __groups.stdout is not search("example")
+      changed_when: false
+
+    - name: Stat test user home directory
+      ansible.builtin.stat:
+        path: "{{ local_accounts[0].home }}"
+      register: __home
+
+    - name: Check test user home directory
+      ansible.builtin.assert:
+        that:
+          - __home.stat.exists
+          - __home.stat.mode == "0700"
+          - __home.stat.pw_name == "test"
+          - __home.stat.gr_name == "test"
