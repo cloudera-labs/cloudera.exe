@@ -1,0 +1,21 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "{{ pgadmin_port }}:80"
+    entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
+    user: root
+    environment:
+      PGADMIN_DEFAULT_EMAIL: {{ pgadmin_default_email }}
+      PGADMIN_DEFAULT_PASSWORD: {{ pgadmin_default_password }}
+      PGADMIN_DISABLE_POSTFIX: True
+      PGPASSFILE: /pgpass
+    volumes:
+      - {{ service_root_dir }}/servers.json:/pgadmin4/servers.json
+      - {{ service_root_dir }}/pgpass:/pgpass:0400
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  pgadmin-data:

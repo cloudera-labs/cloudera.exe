@@ -1,0 +1,8 @@
+{
+"Servers": {
+{% for server in pgadmin_db_servers %}
+    "{{ loop.index }}":
+    {{ server|tojson(indent=4)}}
+{% endfor %}
+    }
+}

@@ -1,0 +1,83 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: "Install pgAdmin"
+    description:
+      - Install pgAdmin and configure access to a list of specified databases.
+      - pgAdmin is run as a container with systemd service file is used to control container stop and start.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    version_added: "5.0.0"
+    options:
+      database_admin_user:
+        description:
+          - Username for database superuser account
+        type: str
+        required: true
+      database_admin_password:
+        description:
+          - Password for database superuser account
+        type: str
+        required: true
+      database_host:
+        description: The hostname or IP address of the database server.
+        type: str
+        required: true
+      database_port:
+        description: The port for connecting to the database server.
+        type: int
+        required: false
+        default: 5432
+      pgadmin_db_servers:
+        description: List of database connections to pre-load into pgAdmin at first launch
+        type: list
+        elements: dict
+        default:
+          - Name: "CE Postgres"
+            Group: "Servers"
+            Port: "{{ database_port }}"
+            Username: "{{ database_admin_user }}"
+            PassFile: /pgpass
+            Host: "{{ database_host }}"
+            SSLMode: prefer
+            MaintenanceDB: postgres
+      pgadmin_pgpass:
+        description: Contents of pgpass file with credentials for databases accessed from pgAdmin
+        type: list
+        elements: str
+        default:
+          - "{{ database_host }}:{{ database_port }}:*:{{ database_admin_user }}:{{ database_admin_password }}"
+      pgadmin_port:
+        description: Port where pgAdmin web ui service will be listening.
+        type: int
+        required: false
+        default: 5050
+      pgadmin_default_email:
+        description: Email account for default user to access the pgAdmin web ui.
+        type: str
+        required: false
+        default: "pgadmin@cloudera-labs.com"
+      pgadmin_default_password:
+        description: Password for default user to access the pgAdmin web ui.
+        type: str
+        required: false
+        default: "pgadmin"
+      pgadmin_docker_exe:
+        description: Directory of docker executable.
+        type: str
+        required: false
+        default: "/usr/bin/docker"
