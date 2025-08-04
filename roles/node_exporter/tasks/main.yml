@@ -1,5 +1,4 @@
----
-# Copyright 2024 Cloudera, Inc. All Rights Reserved.
+# Copyright 2025 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Create nodexporter group
+---
+
+- name: Create nodeexporter group
   ansible.builtin.user:
     name: "{{ node_exporter_group }}"
 
-- name: Create nodexporter user
+- name: Create nodeexporter user
   ansible.builtin.user:
     name: "{{ node_exporter_user }}"
     group: "{{ node_exporter_group }}"
@@ -25,6 +26,7 @@
 - name: Create node_exporter directory
   ansible.builtin.file:
     path: "{{ node_exporter_directory }}"
+    mode: "0755"
     state: directory
 
 - name: Create a temporary directory
@@ -36,6 +38,7 @@
   ansible.builtin.get_url:
     url: "{{ node_exporter_tarball_url }}"
     dest: "{{ __exporter_tmp.path }}/{{ node_exporter_tarball_file }}"
+    mode: "0755"
 
 - name: Extract tarball
   ansible.builtin.unarchive:
@@ -46,27 +49,15 @@
     group: "{{ node_exporter_group }}"
     remote_src: true
 
-- name: Remove the temporary  directory
+- name: Remove the temporary directory
   when: __exporter_tmp is defined
   ansible.builtin.file:
     path: "{{ __exporter_tmp.path }}"
     state: absent
 
-- name: Copy Node Exporter service file
+- name: Copy node exporter service file
   ansible.builtin.template:
     src: node_exporter.service.j2
     dest: "{{ node_exporter_service_directory }}"
-  register: __exporter_service
-
-- name: Start and enable node_exporter service
-  when: __exporter_service.changed
-  block:
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: true
-
-    - name: Enable and start node_exporter service
-      ansible.builtin.systemd:
-        name: node_exporter
-        state: started
-        enabled: true
+    mode: "0755"
+  notify: Start node_exporter service
