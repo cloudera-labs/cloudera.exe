@@ -1,0 +1,51 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up hostname and DNS networking
+    description:
+      - Set up hostname and DNS networking, targeting various systems that control such configuration, such as C(cloud-init) and C(NetworkManager).
+      - Set up DNS forwarders for name resolution.
+    author: Cloudera Labs
+    version_added: "5.0.0"
+    options:
+      network_cloud_init_path:
+        description:
+          - Path to the C(cloud-init) configuration file.
+        type: path
+        default: /etc/cloud/cloud.cfg
+      network_dhclient_path:
+        description:
+          - Path to the DHCP client configuration file.
+        type: path
+        default: /etc/dhcp/dhclient.conf
+      network_netplan_dir:
+        description:
+          - Path to the Netplan configuration directory.
+        type: path
+        default: /etc/netplan
+      network_dns_domain:
+        description:
+          - DNS search domain.
+        required: true
+      network_dns_forwarders:
+        description:
+          - List of DNS name servers, in preferred order.
+        required: true
+      network_ip_address:
+        description:
+          - IP address of the host to set as default.
+        required: true

@@ -1,0 +1,82 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+- name: Install Kerberos packages
+  ansible.builtin.package:
+    name: "{{ kerberos_packages | default(__kerberos_packages) }}"
+    state: present
+
+- name: Update renewable Kerberos ticket lifetime
+  community.general.ini_file:
+    path: "{{ kerberos_config_path }}"
+    section: libdefaults
+    option: "{{ __conf.key }}"
+    value: "{{ __conf.value }}"
+    mode: "0755"
+  loop: "{{ updates | dict2items }}"
+  loop_control:
+    loop_var: __conf
+    label: "{{ __conf.key }}"
+  vars:
+    updates:
+      renew_lifetime: 7d
+      max_life: 365d
+      max_renewable_life: 365d
+
+- name: Remove default Kerberos credential cache option
+  community.general.ini_file:
+    path: "{{ krb_ccache }}"
+    section: libdefaults
+    option: default_ccache_name
+    state: absent
+    mode: "0755"
+  loop:
+    - "{{ kerberos_config_path }}"
+    - "{{ kerberos_kcm_credential_cache_config_path }}"
+  loop_control:
+    loop_var: krb_ccache
+
+- name: Get stats for SSSD configuration
+  ansible.builtin.stat:
+    path: "{{ sssd_config_path }}"
+  register: __sssd
+
+- name: Update SSSD to cache Kerberos tickets as files
+  when: __sssd.stat.exists
+  community.general.ini_file:
+    path: "{{ sssd_config_path }}"
+    section: "domain/{{ kerberos_realm | lower }}"
+    option: "{{ __sssd_conf.key }}"
+    value: "{{ __sssd_conf.value | string }}"
+    mode: "0755"
+  loop: "{{ entries | dict2items }}"
+  loop_control:
+    loop_var: __sssd_conf
+    label: "{{ __sssd_conf.key }}"
+  vars:
+    entries:
+      krb5_ccname_template: "FILE:/tmp/krb5cc_%U_XXXXXX"
+  notify: Restart SSSD

@@ -1,0 +1,74 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up database and user accounts for SQL Stream Builder
+    description:
+      - Set up the SQL Stream Builder (SSB) database and its associated user accounts, ensuring proper configuration for SSB operations.
+      - Default values are used for the username, password, and database names, but these can be overwritten by setting appropriate variables.
+    author: Cloudera Labs
+    version_added: "5.0.0"
+    options:
+      database_type:
+        description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).
+        type: str
+        required: true
+        choices:
+          - postgresql
+          - mysql
+          - oracle
+      database_host:
+        description: The hostname or IP address of the database server to establish the connection.
+        type: str
+        required: true
+      database_admin_user:
+        description: The username with administrative privileges to manage the database.
+        type: str
+        required: true
+      database_admin_password:
+        description: The password for the database administrative user.
+        type: str
+        required: true
+      ssb_admin_username:
+        description: The username for the SQL Stream Builder database user and owner of the database.
+        type: str
+        required: false
+        default: ssb_admin
+      ssb_admin_password:
+        description: The password for the SQL Stream Builder database user.
+        type: str
+        required: false
+        default: ssb_admin
+      ssb_admin_database:
+        description: The name of the database to be created for SQL Stream Builder.
+        type: str
+        required: false
+        default: ssb_admin
+      ssb_mve_username:
+        description: The username for the Materialized View Engine database user and owner of the database.
+        type: str
+        required: false
+        default: ssb_mve
+      ssb_mve_password:
+        description: The password for the Materialized View Engine database user.
+        type: str
+        required: false
+        default: ssb_mve
+      ssb_mve_database:
+        description: The name of the database to be created for Materialized View Engine.
+        type: str
+        required: false
+        default: ssb_mve

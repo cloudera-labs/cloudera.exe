@@ -1,0 +1,49 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Checks for Postgres database type
+      when: cloudera_manager_database_type == 'postgresql'
+      block:
+        - name: Check if the databases exists
+          community.postgresql.postgresql_query:
+            login_user: "{{ database_admin_user }}"
+            login_password: "{{ database_admin_password }}"
+            login_host: "{{ database_host }}"
+            db: "postgres"
+            query: "SELECT 1 FROM pg_database WHERE datname = 'scm';"
+          register: db_check
+
+        - name: Fail if database does not exist
+          ansible.builtin.fail:
+            msg: "Database amon does not exist!"
+          when: db_check.query_result | length == 0
+
+        - name: Check if the users exists
+          community.postgresql.postgresql_query:
+            login_user: "{{ database_admin_user }}"
+            login_password: "{{ database_admin_password }}"
+            login_host: "{{ database_host }}"
+            db: "postgres"
+            query: "SELECT 1 FROM pg_roles WHERE rolname = 'scm';"
+          register: user_check
+
+        - name: Fail if user does not exist
+          ansible.builtin.fail:
+            msg: "User amon does not exist!"
+          when: user_check.query_result | length == 0

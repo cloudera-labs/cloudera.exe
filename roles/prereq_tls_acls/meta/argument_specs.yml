@@ -1,0 +1,137 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up local user ACLs for TLS
+    description:
+      - Set up local user ACLs for TLS entities, i.e. TLS keystore, private key, and password file.
+      - The TLS entity variables are typically set as C(hostvars).
+    author: Cloudera Labs
+    version_added: "5.0.0"
+    options:
+      acl_user_accounts:
+        description: A list of user accounts to apply to the TLS entities.
+        type: list
+        elements: dict
+        default: []
+        options:
+          user:
+            description: User account name
+            required: true
+          keystore_acl:
+            description: Flag to set ACL on TLS keystore variations.
+            type: bool
+            default: false
+          key_acl:
+            description: Flag to set ACL on TLS private key variations.
+            type: bool
+            default: false
+          key_password_acl:
+            description: Flag to set ACL on TLS private key password file variations.
+            type: bool
+            default: false
+          unencrypted_key_acl:
+            description: Flag to set ACL on unencrypted TLS private key variations.
+            type: bool
+            default: false
+      tls_keystore_path:
+        description:
+          - Path of the TLS keystore.
+        type: path
+      tls_keystore_path_generic:
+        description:
+          - Path of the hardlink to the TLS keystore.
+        type: path
+      tls_key_path:
+        description:
+          - Path of the encrypted TLS private key.
+        type: path
+      tls_key_path_generic:
+        description:
+          - Path of the hardlink to the encrypted TLS private key.
+        type: path
+      tls_key_password_file:
+        description:
+          - Path of the TLS private key password file.
+        type: path
+      tls_key_path_plaintext:
+        description:
+          - Path of the unencrypted TLS private key.
+        type: path
+      tls_key_path_plaintext_generic:
+        description:
+          - Path of the hardlink to the unencrypted TLS private key.
+        type: path
+  validate:
+    short_description: Validate local user ACLs for TLS
+    description: |
+      Assert validity of local user ACLs for TLS entities, i.e. TLS keystore, private key, and password file.
+      The TLS entity variables are typically set as C(hostvars).
+    author: Cloudera Labs
+    options:
+      acl_user_accounts:
+        description: A list of user accounts to check for TLS entity ACLs.
+        type: list
+        elements: dict
+        default: []
+        options:
+          user:
+            description: User account name
+            required: true
+          keystore_acl:
+            description: Flag to set ACL on TLS keystore variations.
+            type: bool
+            default: false
+          key_acl:
+            description: Flag to set ACL on TLS private key variations.
+            type: bool
+            default: false
+          key_password_acl:
+            description: Flag to set ACL on TLS private key password file variations.
+            type: bool
+            default: false
+          unencrypted_key_acl:
+            description: Flag to set ACL on unencrypted TLS private key variations.
+            type: bool
+            default: false
+      tls_keystore_path:
+        description:
+          - Path of the TLS keystore.
+        type: path
+      tls_keystore_path_generic:
+        description:
+          - Path of the hardlink to the TLS keystore.
+        type: path
+      tls_key_path:
+        description:
+          - Path of the encrypted TLS private key.
+        type: path
+      tls_key_path_generic:
+        description:
+          - Path of the hardlink to the encrypted TLS private key.
+        type: path
+      tls_key_password_file:
+        description:
+          - Path of the TLS private key password file.
+        type: path
+      tls_key_path_plaintext:
+        description:
+          - Path of the unencrypted TLS private key.
+        type: path
+      tls_key_path_plaintext_generic:
+        description:
+          - Path of the hardlink to the unencrypted TLS private key.
+        type: path

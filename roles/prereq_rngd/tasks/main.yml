@@ -1,0 +1,74 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+# NOTE: This role should only be used when run on virtual machine (VM)
+#       This can be checked with using ansible_virtualization_role == 'guest'
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+- name: Install rngd
+  ansible.builtin.package:
+    name: "{{ prereq_rngd__rngd_package }}"
+    state: present
+    update_cache: true
+
+- name: Enable rngd
+  ansible.builtin.service:
+    name: "{{ prereq_rngd__rngd_service }}"
+    enabled: true
+
+- name: Configure rngd to use /dev/urandom (RHEL/CentOS 7)
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version|int >= 7
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/rngd
+    regexp: "^RNGD_ARGS="
+    line: 'RNGD_ARGS="-r /dev/urandom --fill-watermark=0 -x pkcs11 -x nist -x qrypt -D daemon:daemon"'
+    backup: true
+    create: true
+    mode: "0644"
+    state: present
+  notify: Restart rngd
+
+- name: Configure rngd to use /dev/urandom (Ubuntu)
+  when: ansible_distribution == 'Ubuntu'
+  block:
+    - name: Update rng-tools config file
+      ansible.builtin.lineinfile:
+        path: /etc/default/rng-tools
+        regexp: "^HRNGDEVICE="
+        line: "HRNGDEVICE=/dev/urandom"
+        backup: true
+        create: true
+        mode: "0644"
+        state: present
+      notify: Restart rngd
+
+    - name: Update the rngd service file
+      ansible.builtin.template:
+        src: rngd_Ubuntu.service.j2
+        dest: "{{ prereq_rngd__rngd_service_file }}"
+        mode: "0755"
+      notify: Restart rngd

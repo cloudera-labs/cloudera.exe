@@ -1,0 +1,39 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create local user accounts
+  ansible.builtin.user:
+    name: "{{ account.user }}"
+    home: "{{ account.home }}"
+    comment: "{{ account.comment | default(omit) }}"
+    groups: "{{ account.extra_groups | default(omit) }}"
+    append: true
+    uid: "{{ account.uid | default(omit) }}"
+    shell: "{{ account.shell | default(superset_default_shell) }}"
+  loop: "{{ superset_local_accounts }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+
+- name: Set local user home directory permissions
+  ansible.builtin.file:
+    path: "{{ account.home }}"
+    owner: "{{ account.user }}"
+    group: "{{ account.user }}"
+    mode: "{{ account.mode | default(superset_default_home_dir_mode) }}"
+  loop: "{{ superset_local_accounts }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.home }}"

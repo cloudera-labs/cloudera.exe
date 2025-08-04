@@ -1,0 +1,63 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create local user accounts
+  ansible.builtin.import_role:
+    name: cloudera.exe.prereq_local_account
+  vars:
+    local_accounts: "{{ cloudera_manager_local_accounts | community.general.keep_keys(target=target_keys) | list }}"
+    target_keys:
+      - user
+      - home
+      - uid
+      - shell
+      - comment
+      - extra_groups
+      - mode
+
+- name: Set local user ACLs on TLS entities
+  ansible.builtin.import_role:
+    name: cloudera.exe.prereq_tls_acls
+  vars:
+    acl_user_accounts: "{{ cloudera_manager_local_accounts | community.general.keep_keys(target=target_keys) | list }}"
+    target_keys:
+      - user
+      - key_acl
+      - key_password_acl
+      - keystore_acl
+      - unencrypted_key_acl
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+- name: Get details of Kerberos configuration
+  ansible.builtin.stat:
+    path: "{{ kerberos_config_path }}"
+  register: __krb
+
+- name: Install LDAP client libraries for Kerberos
+  when: __krb.stat.exists
+  ansible.builtin.package:
+    lock_timeout: "{{ (ansible_os_family == 'RedHat') | ternary(60, omit) }}"
+    name: "{{ cloudera_manager_ldap_packages | default(ldap_packages) }}"
+    state: present

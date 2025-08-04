@@ -1,0 +1,8 @@
+# Managed by Ansible
+# See https://access.redhat.com/solutions/3078301
+
+[main]
+dns = default
+
+[global-dns-domain-*]
+servers={{ network_dns_forwarders | join(',') }}

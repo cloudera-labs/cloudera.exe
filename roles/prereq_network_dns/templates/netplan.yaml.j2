@@ -1,0 +1,7 @@
+network:
+  ethernets:
+    {{ internal_interface }}:
+      nameservers:
+        addresses: {{ network_dns_forwarders }}
+        search: [{{ network_dns_domain }}]
+  version: 2

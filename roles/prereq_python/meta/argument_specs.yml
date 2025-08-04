@@ -1,0 +1,51 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Install Python for deployments
+    description:
+      - Ensures that the supported versions of Python for specified versions of Cloudera Manager and Runtime.
+      - Also ensures that Pip is installed and updated.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    version_added: "5.0.0"
+    options:
+      cloudera_manager_version:
+        description: Version of Cloudera Manager
+        type: "str"
+        default: "7.11.3"
+      cloudera_runtime_version:
+        description: Version of Cloudera Runtime
+        type: "str"
+        default: "7.1.9"
+      python3_package:
+        description:
+          - Optional Python3 package to be installed.
+          - This is used only when a supported version of Python3 is not already installed.
+        type: str
+      python3_pip_package:
+        description:
+          - Python3 Pip package to be installed.
+        type: str
+        default: python-pip
+      python2_package_install:
+        description:
+          - Flag to specify if Python2, should be installed via system package manager.
+          - This is used only when Python2 is required and not already installed.
+          - If I(True) Python2 will be installed using pacakage manager.
+          - If I(False) Python2 will be installed from source.
+        type: bool
+        default: true

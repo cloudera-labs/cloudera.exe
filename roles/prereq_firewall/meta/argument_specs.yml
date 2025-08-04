@@ -1,0 +1,37 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Disable firewalls for a deployment
+    description:
+      - Disable firewalls, if installed, and optionally back up iptable rules.
+      - Backup files include all iptable tables for both IPv4 and IPv6.
+      - Backup file naming is C(iptables-rules-[ipv4|ipv6].TIMESTAMP), where TIMESTAMP is UTC.
+    author:
+      - Webster Mudge <wmudge@cloudera.com>
+    version_added: "5.0.0"
+    options:
+      firewall_backup_enabled:
+        description: Flag to enable timestamped backups of iptable rules.
+        type: bool
+        default: true
+      firewall_backup_dir:
+        description: Path of directory of the backup files. Defaults to C(ansible_user) home directory.
+        type: path
+      firewall_backup_format:
+        description: Timestamp format string of the backup files.
+        type: str
+        default: "%Y%m%dT%H%M%S"

@@ -1,0 +1,153 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# See the following:
+# https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/managing-clusters/topics/cm-disabling-transparent-hugepages.html
+# https://stackoverflow.com/a/57779424/1629168
+# https://access.redhat.com/solutions/1320153
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+# TODO Review usage for non-RHEL distros
+# - name: Install required packages
+#   ansible.builtin.package:
+#     name: "{{ sysfs_packages }}"
+#     state: latest
+
+# - name: Disable Transparent Huge Pages
+#   ansible.builtin.lineinfile:
+#     path: "{{ sysfs_config_file }}"
+#     regexp: "^kernel\/mm\/transparent\_hugepage\/enabled"
+#     line: kernel/mm/transparent_hugepage/enabled = never
+#     create: yes
+#   notify: reboot host
+
+- name: Discover GRUB configuration directory
+  ansible.builtin.stat:
+    path: /etc/default/grub.d
+  register: __grub_configs
+
+- name: Add THP fragment for GRUB configuration
+  when: __grub_configs.stat.exists
+  ansible.builtin.copy:
+    dest: /etc/default/grub.d/99-transparent-hugepage.cfg
+    content: |
+      GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT transparent_hugepage=never"
+    mode: "0644"
+  register: __grub_configs_edit
+
+- name: Disable Transparent Huge Pages in GRUB configuration file
+  when: not __grub_configs.stat.exists
+  block:
+    - name: Discover GRUB configuration file
+      ansible.builtin.stat:
+        path: /etc/default/grub
+      register: __grub
+
+    - name: Disable Transparent Huge Pages in GRUB configuration file
+      when: __grub.stat.exists
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        backup: true
+        backrefs: true
+        regexp: '^(GRUB_CMDLINE_LINUX=(?!.*hugepage)\"[^\"]+)(\".*)'
+        line: "\\1 transparent_hugepage=never\\2"
+        mode: "0644"
+      register: __grub_edit
+
+- name: Rebuild GRUB
+  when: __grub_configs_edit.changed or __grub_edit.changed
+  ansible.builtin.command: grub2-mkconfig -o /boot/grub2/grub.cfg
+  changed_when: true
+  notify: reboot host
+
+- name: Discover if Transparent Huge Pages are active
+  ansible.builtin.command: cat /sys/kernel/mm/transparent_hugepage/enabled
+  changed_when: false
+  register: __thp
+
+- name: Retrieve services
+  ansible.builtin.service_facts:
+
+- name: Disable Transparent Huge Pages in tuned profile
+  when: ('tuned.service' in ansible_facts.services) and __thp.stdout is not search("\[never\]")
+  block:
+    - name: Discover current active tuned profile
+      ansible.builtin.command: tuned-adm active
+      changed_when: false
+      register: __active
+
+    - name: Set active tuned profile
+      when: __active.stdout is not search("cldr")
+      block:
+        - name: Create tuned profile directory for disabled THP
+          ansible.builtin.file:
+            path: /etc/tuned/cldr
+            state: directory
+            mode: "0755"
+
+        - name: Discover existing Cloudera tuned profile
+          ansible.builtin.stat:
+            path: /etc/tuned/cldr/tuned.conf
+          register: __profile
+
+        - name: Create tuned profile configuration for disabled THP
+          when: not __profile.stat.exists
+          ansible.builtin.template:
+            src: cldr.conf
+            dest: /etc/tuned/cldr/tuned.conf
+            mode: "0644"
+          vars:
+            previous_profile: "{{ __active.stdout.split(':').1 | trim }}"
+          notify: Enable CLDR profile
+
+        - name: Update tuned profile configuration for disabled THP
+          when: __profile.stat.exists
+          community.general.ini_file:
+            path: /etc/tuned/cldr/tuned.conf
+            section: vm
+            option: transparent_hugepages
+            value: never
+            mode: "0644"
+          notify: Enable CLDR profile
+
+- name: Disable Transparent Huge Pages in rc.local
+  when: ('tuned.service' not in ansible_facts.services) and __thp.stdout is not search("\[never\]")
+  block:
+    - name: Check for rc.local
+      ansible.builtin.stat:
+        path: /etc/rc.d/rc.local
+      register: __rc_local
+
+    - name: Disable Transparent Huge Pages in rc.local
+      when: __rc_local.stat.exists
+      ansible.builtin.blockinfile:
+        path: /etc/rc.d/rc.local
+        block: |
+          echo never > /sys/kernel/mm/transparent_hugepage/enabled
+          echo never > /sys/kernel/mm/transparent_hugepage/defrag
+        mode: "+x"
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

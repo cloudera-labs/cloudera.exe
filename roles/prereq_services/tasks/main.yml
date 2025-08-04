@@ -1,0 +1,58 @@
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+# Disable unwanted services
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Disable unnecessary services
+  when: "__service + '.service' in ansible_facts.services"
+  ansible.builtin.service:
+    name: "{{ __service }}"
+    state: stopped
+    enabled: false
+  loop_control:
+    loop_var: __service
+  loop: "{{ prereq_services_unnecessary_services }}"
+
+# Enable and configure nscd service
+- name: Configure universe repository for Debian OS
+  when: ansible_facts['os_family'] == "Debian"
+  block:
+    - name: Enable universe repository
+      ansible.builtin.apt_repository:
+        repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
+        state: present
+        update_cache: true
+
+- name: Install nscd service
+  ansible.builtin.package:
+    lock_timeout: "{{ (ansible_os_family == 'RedHat') | ternary(60, omit) }}"
+    name: "{{ prereq_services_nscd_package }}"
+    state: present
+
+- name: Enable nscd service
+  ansible.builtin.service:
+    name: "{{ prereq_services_nscd_service }}"
+    state: started
+    enabled: true
+
+- name: Disable nscd caches for services 'passwd', 'group', 'netgroup'
+  ansible.builtin.replace:
+    path: /etc/nscd.conf
+    regexp: "^(.*enable-cache.*(passwd|group|netgroup).*)yes$"
+    replace: "\\1no"
+  notify:
+    - Restart nscd

@@ -1,0 +1,105 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Add local user ACLs to TLS keystore
+  when: tls_keystore_path is defined
+  ansible.posix.acl:
+    path: "{{ tls_keystore_path }}"
+    entity: "{{ account.user }}"
+    etype: group
+    permissions: r
+    state: present
+  loop: "{{ acl_user_accounts | rejectattr('keystore_acl', 'undefined') | list }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+
+- name: Add local user ACLs to TLS keystore hard link
+  when: tls_keystore_path_generic is defined
+  ansible.posix.acl:
+    path: "{{ tls_keystore_path_generic }}"
+    entity: "{{ account.user }}"
+    etype: group
+    permissions: r
+    state: present
+  loop: "{{ acl_user_accounts | rejectattr('keystore_acl', 'undefined') | list }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+
+- name: Add local user ACLs to TLS private key
+  when: tls_key_path is defined
+  ansible.posix.acl:
+    path: "{{ tls_key_path }}"
+    entity: "{{ account.user }}"
+    etype: group
+    permissions: r
+    state: present
+  loop: "{{ acl_user_accounts | rejectattr('key_acl', 'undefined') | list }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+
+- name: Add local user ACLs to TLS private key hard link
+  when: tls_key_path_generic is defined
+  ansible.posix.acl:
+    path: "{{ tls_key_path_generic }}"
+    entity: "{{ account.user }}"
+    etype: group
+    permissions: r
+    state: present
+  loop: "{{ acl_user_accounts | rejectattr('key_acl', 'undefined') | list }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+
+- name: Add local user ACLs to TLS private key password file
+  when: tls_key_password_file is defined
+  ansible.posix.acl:
+    path: "{{ tls_key_password_file }}"
+    entity: "{{ account.user }}"
+    etype: user
+    permissions: r
+    state: present
+  loop: "{{ acl_user_accounts | rejectattr('key_password_acl', 'undefined') | list }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+
+- name: Add local user ACLs to TLS private unencrypted key
+  when: tls_key_path_plaintext is defined
+  ansible.posix.acl:
+    path: "{{ tls_key_path_plaintext }}"
+    entity: "{{ account.user }}"
+    etype: group
+    permissions: r
+    state: present
+  loop: "{{ acl_user_accounts | rejectattr('unencrypted_key_acl', 'undefined') | list }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+
+- name: Add local user ACLs to TLS private unencrypted key hard link
+  when: tls_key_path_plaintext_generic is defined
+  ansible.posix.acl:
+    path: "{{ tls_key_path_plaintext_generic }}"
+    entity: "{{ account.user }}"
+    etype: group
+    permissions: r
+    state: present
+  loop: "{{ acl_user_accounts | rejectattr('unencrypted_key_acl', 'undefined') | list }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
