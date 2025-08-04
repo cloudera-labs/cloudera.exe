@@ -1,0 +1,57 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create PostgreSQL database
+  community.postgresql.postgresql_db:
+    login_user: "{{ database_admin_user }}"
+    login_password: "{{ database_admin_password }}"
+    login_host: "{{ database_host }}"
+    name: "{{ account.db }}"
+    port: "{{ database_port | default(omit) }}"
+    encoding: UTF-8
+  loop: "{{ database_accounts }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.db }}"
+  no_log: true
+
+- name: Create PostgreSQL role
+  community.postgresql.postgresql_user:
+    login_user: "{{ database_admin_user }}"
+    login_password: "{{ database_admin_password }}"
+    login_host: "{{ database_host }}"
+    login_db: "{{ account.db }}"
+    name: "{{ account.user }}"
+    password: "{{ account.password }}"
+  loop: "{{ database_accounts }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+  no_log: true
+
+- name: Set owner for PostgreSQL database
+  community.postgresql.postgresql_owner:
+    login_user: "{{ database_admin_user }}"
+    login_password: "{{ database_admin_password }}"
+    login_host: "{{ database_host }}"
+    login_db: "{{ account.db }}"
+    new_owner: "{{ account.user }}"
+    obj_type: database
+    obj_name: "{{ account.db }}"
+  loop: "{{ database_accounts }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.user }}"
+  no_log: true
