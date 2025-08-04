@@ -21,6 +21,7 @@ argument_specs:
       - Default values are used for the username, password, and database name, but these can be overwritten by setting the `hue_username`, `hue_password`, and
         `hue_database` variables.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       database_type:
         description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).

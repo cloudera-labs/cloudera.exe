@@ -9,7 +9,7 @@ Typically, TLS entity variables are set as `hostvars`.
 The role will:
 - **`main` mode**:
     - Iterate through the `acl_user_accounts` list.
-    - For each specified user, it will apply `read` file ACLs for the users' `group` to the TLS keystore, encrypted private key, unencrypted private key, and password file, as directed by the corresponding Boolean flags (`keystore_acl`, `key_acl`, etc.). 
+    - For each specified user, it will apply `read` file ACLs for the users' `group` to the TLS keystore, encrypted private key, unencrypted private key, and password file, as directed by the corresponding Boolean flags (`keystore_acl`, `key_acl`, etc.).
     - It uses the specified TLS path variables to locate the files to which ACLs should be applied.
 - **`validate` mode**:
     - Iterate through the `acl_user_accounts` list.

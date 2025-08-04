@@ -20,4 +20,5 @@ argument_specs:
       - Set up for Streams Messaging Manager usage, notably, create the local C(streamsmsgmgr) and C(streamsrepmgr) users.
       - Also creates a symbolic link of the Streams Messaging Manager user home directory required for the Custom Service Descriptor (CSD) installation.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options: {}

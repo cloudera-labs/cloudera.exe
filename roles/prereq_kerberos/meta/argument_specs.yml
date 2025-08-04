@@ -21,6 +21,7 @@ argument_specs:
       - Configure Kerberos credential cache.
       - Configure SSSD, if needed.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       kerberos_packages:
         description:

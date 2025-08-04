@@ -46,4 +46,3 @@
           ansible.builtin.fail:
             msg: "User streamsmsgmgr does not exist!"
           when: user_check.query_result | length == 0
-      

@@ -16,7 +16,8 @@
 argument_specs:
   main:
     short_description: Set up user accounts for Accumulo
-    description: |
-      Set up for Apache Accumulo usage, notably, create the local C(accumulo) user.
+    description:
+      - Set up for Apache Accumulo usage, notably, create the local C(accumulo) user.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options: {}

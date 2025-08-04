@@ -16,10 +16,11 @@
 argument_specs:
   main:
     short_description: Set up hostname and DNS networking
-    description: |
-      Set up hostname and DNS networking, targeting various systems that control such configuration, such as C(cloud-init) and C(NetworkManager).
-      Set up DNS forwarders for name resolution.
+    description:
+      - Set up hostname and DNS networking, targeting various systems that control such configuration, such as C(cloud-init) and C(NetworkManager).
+      - Set up DNS forwarders for name resolution.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       network_cloud_init_path:
         description:

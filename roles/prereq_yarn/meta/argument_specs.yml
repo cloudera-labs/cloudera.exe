@@ -16,8 +16,9 @@
 argument_specs:
   main:
     short_description: Set up user accounts for YARN
-    description: |
-      Set up for Apache Hadoop YARN usage, notably, create the local C(yarn) user.
-      Optionally, set up ACLs on TLS entities.
+    description:
+      - Set up for Apache Hadoop YARN usage, notably, create the local C(yarn) user.
+      - Optionally, set up ACLs on TLS entities.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options: {}

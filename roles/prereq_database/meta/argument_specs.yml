@@ -16,9 +16,10 @@
 argument_specs:
   main:
     short_description: Create and manage databases and users
-    description: |
-      This role configures databases and their associated users in the specified database system.
+    description:
+      - Configure databases and their associated users in the specified database system.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       database_type:
         description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).

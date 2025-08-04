@@ -21,6 +21,7 @@ argument_specs:
       - Installs packages for SELinux management, if needed, but does not install SELinux.
     author:
       - Webster Mudge (wmudge@cloudera.com)
+    version_added: "5.0.0"
     options:
       selinux_state:
         description:

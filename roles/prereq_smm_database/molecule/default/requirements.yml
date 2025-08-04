@@ -19,4 +19,3 @@ collections:
   - ansible.utils
   - community.general
   - community.postgresql
-

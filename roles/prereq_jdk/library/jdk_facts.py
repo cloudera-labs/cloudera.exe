@@ -112,7 +112,7 @@ VERSION_REGEX = re.compile(
     + "[+-_]?(?P<release>[\\w\\d]*)"
     + "[+-_]?(?P<build>[\\w\\d]*)"
     + ")"
-    + "\\)"
+    + "\\)",
 )
 
 UPDATE_REGEX = re.compile('".+"\\s*([\\w-]*)')

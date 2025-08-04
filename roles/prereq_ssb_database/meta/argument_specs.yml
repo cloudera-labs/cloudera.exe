@@ -18,9 +18,9 @@ argument_specs:
     short_description: Set up database and user accounts for SQL Stream Builder
     description:
       - Set up the SQL Stream Builder (SSB) database and its associated user accounts, ensuring proper configuration for SSB operations.
-      - Default values are used for the username, password, and database name, but these can be overwritten by setting the I(ssb_username), I(ssb_password), and
-        I(ssb_database) variables.
+      - Default values are used for the username, password, and database names, but these can be overwritten by setting appropriate variables.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       database_type:
         description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).

@@ -20,4 +20,5 @@ argument_specs:
       - Installs and configures the Random Number Generator (rngd) package.
     author:
       - "Jim Enright <jenright@cloudera.com>"
+    version_added: "5.0.0"
     options: {}

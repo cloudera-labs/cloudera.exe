@@ -23,5 +23,3 @@
         password: "{{ smm_password }}"
         db: "{{ smm_database }}"
   no_log: true
-
-

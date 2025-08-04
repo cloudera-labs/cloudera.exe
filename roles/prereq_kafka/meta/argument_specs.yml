@@ -16,7 +16,8 @@
 argument_specs:
   main:
     short_description: Set up user accounts for Kafka
-    description: |
-      Set up for Apache Kafka usage, notably, create the local C(kafka) and C(cruisecontrol) users.
+    description:
+      - Set up for Apache Kafka usage, notably, create the local C(kafka) and C(cruisecontrol) users.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options: {}

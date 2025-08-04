@@ -30,4 +30,3 @@
             name: "{{ database_admin_user }}"
             password: "{{ database_admin_password }}"
           become_user: postgres
-      

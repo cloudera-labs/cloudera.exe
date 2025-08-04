@@ -16,9 +16,10 @@
 argument_specs:
   main:
     short_description: Set up local user accounts
-    description: |
-      Set up local user accounts and create the user's C(HOME) directory.
+    description:
+      - Set up local user accounts and create the user's C(HOME) directory.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       local_accounts:
         description: A list of user accounts.

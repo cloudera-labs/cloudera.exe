@@ -14,11 +14,13 @@
 
 argument_specs:
   main:
-    short_description: Set up database and user accounts for Streams Messaging Manager 
+    short_description: Set up database and user accounts for Streams Messaging Manager
     description:
-      - Set up the Streams Messaging Manager database and its associated user accounts, ensuring proper configuration for Streams Messaging Manager operations.  
-      - Default values are used for the username, password, and database name, but these can be overwritten by setting the I(smm_username), I(smm_password), and I(smm_database) variables.  
+      - Set up the Streams Messaging Manager database and its associated user accounts, ensuring proper configuration for Streams Messaging Manager operations.
+      - Default values are used for the username, password, and database name, but these can be overwritten by setting the O(smm_username), O(smm_password),
+        and I(smm_database) variables.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       database_type:
         description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).

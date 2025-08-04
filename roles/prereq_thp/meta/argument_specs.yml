@@ -16,7 +16,8 @@
 argument_specs:
   main:
     short_description: Disable Transparent Huge Pages for deployments
-    description: |
-      Disable Transparent Huge Pages (THP) and, optionally, rebuild the GRUB bootloader.
+    description:
+      - Disable Transparent Huge Pages (THP) and, optionally, rebuild the GRUB bootloader.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options: {}

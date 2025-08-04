@@ -16,7 +16,8 @@
 argument_specs:
   main:
     short_description: Set up user accounts for Superset
-    description: |
-      Set up for Apache Superset usage, notably, create the local C(superset) user.
+    description:
+      - Set up for Apache Superset usage, notably, create the local C(superset) user.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options: {}

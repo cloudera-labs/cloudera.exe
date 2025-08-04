@@ -18,9 +18,10 @@ argument_specs:
     short_description: Set up database and user accounts for Dataviz
     description:
       - Set up the Dataviz database and its associated user accounts, ensuring proper configuration for Dataviz operations.
-      - Default values are used for the username, password, and database name, but these can be overwritten by setting the `dataviz_username`,
-        `dataviz_password`, and `dataviz_database` variables.
+      - Default values are used for the username, password, and database name, but these can be overwritten by setting the c(dataviz_username),
+        C(dataviz_password), and C(dataviz_database) variables.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options:
       database_type:
         description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).

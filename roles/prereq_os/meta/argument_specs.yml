@@ -22,6 +22,7 @@ argument_specs:
       - Update Ubuntu 20.04 root permissions to global C(/tmp) directory.
     author:
       - Webster Mudge (wmudge@cloudera.com)
+    version_added: "5.0.0"
     options:
       os_timezone:
         description: Timezone to set on the host.

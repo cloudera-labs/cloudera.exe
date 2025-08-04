@@ -16,8 +16,9 @@
 argument_specs:
   main:
     short_description: Set up user accounts for NiFi
-    description: |
-      Set up for Apache NiFi usage, notably, create the local C(nifi) user.
-      Optionally, set up ACLs on TLS entities.
+    description:
+      - Set up for Apache NiFi usage, notably, create the local C(nifi) user.
+      - Optionally, set up ACLs on TLS entities.
     author: Cloudera Labs
+    version_added: "5.0.0"
     options: {}
