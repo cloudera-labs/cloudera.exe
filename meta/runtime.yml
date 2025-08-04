@@ -25,6 +25,11 @@ plugin_routing:
       redirect: cloudera.exe.rdbms_server
     nodeexporter:
       deprecation:
-        removal_version: 6.0.0
+        removal_version: 4.0.0
         warning_text: Please update references to the renamed role, cloudera.exe.node_exporter
       redirect: cloudera.exe.node_exporter
+    blackbox:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Please update references to the renamed role, cloudera.exe.blackbox_exporter
+      redirect: cloudera.exe.blackbox_exporter
