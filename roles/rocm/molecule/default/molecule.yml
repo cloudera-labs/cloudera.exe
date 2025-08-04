@@ -1,0 +1,44 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+
+# Requires AWS credentials, including region
+
+# Requires the following Python libraries on localhost
+# - netaddr
+# - boto3
+
+driver:
+  name: ec2
+platforms:
+  - name: rhel9-4.molecule.internal
+    image_owner: "309956199498"
+    image_name: RHEL-9.4.0_HVM-*
+    instance_type: g4ad.xlarge
+    volumes:
+      - device_name: /dev/sda1
+        ebs:
+          volume_size: 50
+          delete_on_termination: true
+    boot_wait_seconds: 15
+    vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
+    tags:
+      Name: molecule-rocm-rhel9-4
+      Project: Molecule testing for rocm
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        rocm_crb_repo_name: codeready-builder-for-rhel-9-rhui-rpms

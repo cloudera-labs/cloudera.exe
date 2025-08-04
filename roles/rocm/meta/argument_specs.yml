@@ -1,0 +1,81 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+
+argument_specs:
+  main:
+    short_description: Provision AMD ROCm GPU drivers
+    description: |
+      Install and configure a host for AMD ROCm GPU packages and drivers.
+    author: Cloudera Labs
+    version_added: "5.0.0"
+    options:
+      rocm_version:
+        description:
+          - Version of the AMD ROCm package.
+        type: str
+        required: false
+        default: "6.4.1"
+      amdgpu_version:
+        description:
+          - Version of the AMD GPU drivers.
+        type: str
+        required: false
+        default: "6.4.1"
+      rocm_crb_repo_name:
+        description:
+          - CodeReady repository name to enable (Red Hat)
+        type: str
+        required: false
+      rocm_epel_rpm:
+        description:
+          - EPEL RPM to install (Red Hat)
+        type: str
+        required: false
+      rocm_python_packages:
+        description:
+          - System Python packages to install
+        type: list
+        elements: str
+        required: false
+      rocm_repo_name:
+        description:
+          - Name (identifier) of the AMD ROCm repository (Red Hat)
+        type: str
+        required: false
+      rocm_repo_baseurl:
+        description:
+          - URL of the AMD ROCm repository (Red Hat)
+        type: str
+        required: false
+      rocm_repo_gpgkey:
+        description:
+          - URL of the AMD ROCm repository GPG key (Red Hat)
+        type: str
+        required: false
+      amdgpu_repo_name:
+        description:
+          - Name (identifier) of the AMD GPU repository (Red Hat)
+        type: str
+        required: false
+      amdgpu_repo_baseurl:
+        description:
+          - URL of the AMD GPU repository (Red Hat)
+        type: str
+        required: false
+      amdgpu_repo_gpgkey:
+        description:
+          - URL of the AMD ROCm repository GPG key (Red Hat)
+        type: str
+        required: false
