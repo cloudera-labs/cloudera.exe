@@ -1,0 +1,116 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Install PostgreSQL server for Cloudera Manager
+    description:
+      - Install and configure PostgreSQL server, including required users, for Cloudera Manager.
+      - Will install C(psycopg2) (or C(psycopg3)).
+      - Optionally, will enable TLS.
+      - Optionally, will create a database superuser.
+    author: Cloudera Labs
+    version_added: "5.0.0"
+    options:
+      create_database_admin_user:
+        description:
+          - Flag to specify if a database superuser should be created
+        type: bool
+        default: false
+      database_admin_user:
+        description:
+          - Username for database superuser account
+        type: str
+        required: false
+      database_admin_password:
+        description:
+          - Password for database superuser account
+        type: str
+        required: false
+      postgresql_version:
+        description:
+          - PostgreSQL version to install.
+        default: 14
+      postgresql_packages:
+        description:
+          - List of packages for the PostgreSQL installation.
+          - If not defined, defaults are specified by OS distribution.
+        type: list
+        elements: str
+      postgresql_repo_enabled:
+        description:
+          - Flag enabling the setup and teardown of the PostgreSQL repository.
+          - If I(postgresql_repo_enable=no), then any existing repositories will be employed.
+        type: bool
+        default: true
+      postgresql_tls_enabled:
+        description:
+          - Flag enabling TLS connections.
+        type: bool
+        default: false
+      postgresql_tls_cert_path:
+        description:
+          - Path to the TLS certificate file.
+          - If not specified, the PostgreSQL server will employ its default, typically C($PGDATA/server.crt).
+        type: path
+      postgresql_tls_key_path:
+        description:
+          - Path to the TLS private key file.
+          - If not specified, the PostgreSQL server will employ its default, typically C($PGDATA/server.key).
+        type: path
+      postgresql_tls_ca_path:
+        description:
+          - Path to the TLS certificate authority (CA) file.
+          - If not specified, the PostgreSQL server will employ its default, typically C(None), i.e. empty.
+        type: path
+      postgresql_config_options:
+        description:
+          - List of global configuration entries for PostgreSQL server, i.e. C(postgres.conf) file.
+        type: list
+        elements: dict
+        options:
+          option:
+            description:
+              - Name of the parameter.
+            required: true
+          value:
+            description:
+              - Value of the parameter.
+            required: true
+      postgresql_access_entries:
+        description:
+          - List of host-based authentication (HBA) entries for PostgreSQL server, i.e. C(pg_hba.conf) file.
+        type: list
+        elements: dict
+        options:
+          type:
+            description:
+              - Authentication scope (type).
+            required: true
+          database:
+            description:
+              - Database target.
+            required: true
+          user:
+            description:
+              - User or user type.
+            required: true
+          address:
+            description:
+              - Networking scope.
+          auth_method:
+            description:
+              - Authentication method.
+            required: true

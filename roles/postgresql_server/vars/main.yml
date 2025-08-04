@@ -1,0 +1,90 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+postgresql_ssl_options:
+  - option: ssl
+    value: "{{ postgresql_tls_enabled | ternary('on', 'off') }}"
+  - option: ssl_cert_file
+    value: "{{ postgresql_tls_enabled | ternary(postgresql_tls_cert_path, None) }}"
+  - option: ssl_key_file
+    value: "{{ postgresql_tls_enabled | ternary(postgresql_tls_key_path, None) }}"
+  - option: ssl_ca_file
+    value: "{{ postgresql_tls_enabled | ternary(postgresql_tls_ca_path, None) }}"
+
+postgresql_cldr_options:
+  - option: password_encryption
+    value: "scram-sha-256"
+
+__postgresql_global_config_options:
+  - option: shared_buffers
+    value: "256MB"
+  - option: wal_buffers
+    value: "8MB"
+  - option: max_wal_size
+    value: "768MB"
+  - option: checkpoint_completion_target
+    value: 0.9
+  - option: log_directory
+    value: "log"
+  - option: listen_addresses
+    value: "*"
+  - option: max_connections
+    value: 300
+
+__postgresql_hba_entries:
+  - type: local
+    database: all
+    user: postgres
+    auth_method: peer
+  - type: local
+    database: all
+    user: all
+    auth_method: peer
+  - type: host
+    database: all
+    user: all
+    address: "127.0.0.1/32"
+    auth_method: scram-sha-256
+  - type: host
+    database: all
+    user: all
+    address: "127.0.0.1/32"
+    auth_method: md5
+  - type: host
+    database: all
+    user: all
+    address: "::1/128"
+    auth_method: md5
+  - type: host
+    database: all
+    user: all
+    address: "samenet"
+    auth_method: scram-sha-256
+  - type: host
+    database: all
+    user: all
+    address: "samenet"
+    auth_method: md5
+
+postgresql_locales:
+  - "en_US.UTF-8"
+
+postgresql_local_accounts:
+  - user: postgres
+    # home: /var/lib/pgsql
+    # comment: PostgreSQL Server
+    # mode: "700"
+    # shell: /bin/bash
+    unencrypted_key_acl: true
