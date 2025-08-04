@@ -11,3 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+roles/auto_repo_mirror/defaults/main.yml var-naming[no-role-prefix] skip
+roles/auto_repo_mirror/tasks/inject.yml ignore-errors skip
+roles/auto_repo_mirror/tasks/inject.yml yaml[line-length] skip
+roles/auto_repo_mirror/tasks/inject.yml fqcn[action-core]s skip
+roles/auto_repo_mirror/tasks/inject.yml risky-file-permissions skip
+roles/auto_repo_mirror/tasks/inject.yml fqcn[action-core] skip
+roles/auto_repo_mirror/tasks/inject.yml jinja[spacing][/] skip
+roles/auto_repo_mirror/tasks/inject.yml jinja[spacing][/] skip
+roles/auto_repo_mirror/tasks/inject.yml yaml[line-length] skip
+roles/auto_repo_mirror/tasks/inject.yml:104: yaml[line-length] skip
+roles/auto_repo_mirror/tasks/inject.yml:134: jinja[spacing][/] skip
+roles/auto_repo_mirror/tasks/parse_definition_for_mirror_targets.yml yaml[line-length] skip
+roles/auto_repo_mirror/tasks/parse_definition_for_mirror_targets.yml yaml[line-length] skip
+roles/auto_repo_mirror/tasks/parse_definition_for_mirror_targets.yml:104: yaml[line-length] skip
+roles/auto_repo_mirror/tasks/populate_from_upstream.yml risky-file-permissions skip
+roles/auto_repo_mirror/tasks/populate_from_upstream.yml risky-file-permissions skip
+roles/auto_repo_mirror/tasks/populate_from_upstream.yml ignore-errors skip
+roles/auto_repo_mirror/tasks/update_mirror_cache.yml yaml[line-length] skip
+roles/auto_repo_mirror/tasks/update_mirror_cache.yml risky-file-permissions skip
+roles/auto_repo_mirror/vars/main.yml var-naming[no-role-prefix] skip

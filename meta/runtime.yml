@@ -33,3 +33,7 @@ plugin_routing:
         removal_version: 4.0.0
         warning_text: Please update references to the renamed role, cloudera.exe.blackbox_exporter
       redirect: cloudera.exe.blackbox_exporter
+    auto_repo_mirror:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, auto_repo_mirror, is not longer supported.

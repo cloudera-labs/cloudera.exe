@@ -1,4 +1,11 @@
 ---
+
+- name: Deprecation warning
+  run_once: true
+  cloudera.exe.deprecation:
+    msg: "Role, {{ ansible_role_name }}, is no longer supported."
+    version: 4.0.0
+
 - name: Fetch necessary variables from Ansible Controller
   ansible.builtin.set_fact:
     globals: "{{ hostvars['localhost']['globals'] }}"
