@@ -1,0 +1,62 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up database and user accounts for Schema Registry
+    description: |
+      This role manages the creation of the database and its associated user accounts for Schema Registry.
+    author: Cloudera Labs
+    options:
+      database_type:
+        description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).
+        type: str
+        required: true
+        choices:
+          - postgresql
+          - mysql
+          - oracle
+      database_admin_user:
+        description: The username for the database admin login.
+        type: str
+        required: true
+      database_admin_password:
+        description: The password for the database admin login.
+        type: str
+        required: true
+        no_log: true
+      database_host:
+        description: The hostname or IP address of the database server.
+        type: str
+        required: true
+      database_port:
+        description: The port for connecting to the database server.
+        type: int
+        required: false
+      schemaregistry_username:
+        description: The username for the Schema Registry database user and owner of the database.
+        type: str
+        required: false
+        default: registry
+      schemaregistry_password:
+        description: The password for the Schema Registry database user.
+        type: str
+        required: false
+        default: registry
+      schemaregistry_database:
+        description: The name of the database to be created for Schema Registry.
+        type: str
+        required: false
+        default: registry
