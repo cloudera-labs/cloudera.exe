@@ -21,7 +21,7 @@ argument_specs:
       - Default values are used for the username, password, and database name, but these can be overwritten by setting the O(activity_monitor_username),
         O(activity_monitor_password), and O(activity_monitor_database) variables.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       database_type:
         description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).

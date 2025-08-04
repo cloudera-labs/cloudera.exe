@@ -19,7 +19,7 @@ argument_specs:
     description:
       - Configure databases and their associated users in the specified database system.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       database_type:
         description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).

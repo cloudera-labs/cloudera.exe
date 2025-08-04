@@ -20,7 +20,7 @@ argument_specs:
       - Install of the Postgres Connector JDBC Driver.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       postgresql_connector_url:
         description: URL for PostgreSQL connector

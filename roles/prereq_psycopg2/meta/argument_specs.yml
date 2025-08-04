@@ -20,7 +20,7 @@ argument_specs:
       - Installs the psycopg2 Python package for PostgreSQL database.
     author:
       - "Jim Enright <jenright@cloudera.com>"
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       rdbms_repo_disable:
         description: Disable PSQL repositories before installing psycopg2

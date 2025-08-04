@@ -22,7 +22,7 @@ argument_specs:
       - Optionally, provision the Caddy with external CA certificates.
       - If Caddy self-signing is enabled and an external CA certificate is not defined, retrieve the Caddy self-signed CA certificate to the target host.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       caddy_domain:
         description: Domain name for the Caddy reverse proxy.

@@ -20,5 +20,5 @@ argument_specs:
       - Set up for Apache HBase usage, notably, create the local C(hbase) user.
       - Optionally, set up ACLs on TLS entities.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options: {}

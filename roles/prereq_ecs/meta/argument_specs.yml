@@ -21,5 +21,5 @@ argument_specs:
         of firewall and networking configuration.
       - The list of local users are taken from the P(cloudera.exe.prereq_cloudera_manager#role) role.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options: {}

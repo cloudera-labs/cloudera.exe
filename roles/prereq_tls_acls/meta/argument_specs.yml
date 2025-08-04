@@ -20,7 +20,7 @@ argument_specs:
       - Set up local user ACLs for TLS entities, i.e. TLS keystore, private key, and password file.
       - The TLS entity variables are typically set as C(hostvars).
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       acl_user_accounts:
         description: A list of user accounts to apply to the TLS entities.

@@ -19,5 +19,5 @@ argument_specs:
     description:
       - Disable Transparent Huge Pages (THP) and, optionally, rebuild the GRUB bootloader.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options: {}

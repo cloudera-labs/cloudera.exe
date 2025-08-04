@@ -20,5 +20,5 @@ argument_specs:
       - Set up for HttpFS usage, notably, create the local C(httpfs) user.
       - Optionally, set up ACLs on TLS entities.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options: {}

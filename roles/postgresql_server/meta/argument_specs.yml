@@ -22,7 +22,7 @@ argument_specs:
       - Optionally, will enable TLS.
       - Optionally, will create a database superuser.
     author: Cloudera Labs
-    version_added: "5.0.0"
+    version_added: "3.0.0"
     options:
       create_database_admin_user:
         description:
