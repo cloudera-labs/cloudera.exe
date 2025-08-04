@@ -42,7 +42,6 @@ argument_specs:
         description: The password for the database administrative user.
         type: str
         required: true
-        no_log: true
       dataviz_username:
         description: The username for the Dataviz database user and owner of the database.
         type: str

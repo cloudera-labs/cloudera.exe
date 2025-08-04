@@ -50,7 +50,6 @@ argument_specs:
         description: The password for the database admin login.
         type: str
         required: true
-        no_log: true
       database_host:
         description: The hostname or IP address of the database server.
         type: str

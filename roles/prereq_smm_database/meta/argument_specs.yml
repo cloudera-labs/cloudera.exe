@@ -40,7 +40,6 @@ argument_specs:
         description: The password for the database administrative user.
         type: str
         required: true
-        no_log: true
       smm_username:
         description: The username for the Streams Messaging Manager database user and owner of the database.
         type: str

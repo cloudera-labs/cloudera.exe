@@ -36,7 +36,6 @@ argument_specs:
         description: The password for the database admin login.
         type: str
         required: true
-        no_log: true
       database_host:
         description: The hostname or IP address of the database server.
         type: str
@@ -63,8 +62,7 @@ argument_specs:
             description: The password for the database user.
             type: str
             required: true
-            no_log: true
           owner:
-            description: The name of the database user owning the database. Defaults to O(user).
+            description: The name of the database user owning the database. Defaults to O(database_accounts.user).
             type: str
             required: false

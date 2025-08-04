@@ -42,7 +42,6 @@ argument_specs:
         description: The password for the database administrative user.
         type: str
         required: true
-        no_log: true
       hue_username:
         description: The username for the Hue database user and owner of the database.
         type: str
