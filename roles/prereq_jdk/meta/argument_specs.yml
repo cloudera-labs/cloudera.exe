@@ -1,0 +1,61 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up JDK
+    description:
+      - Set up the Java Development Kit (JDK), optionally installing the JDK itself.
+      - For JDK 9 and below, optionally enable the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy.
+      - If the JDK is installed from the Cloudera repo, add any missing symlinks.
+    author: Cloudera Labs
+    options:
+      jdk_provider:
+        description:
+          - JDK vendor or provider.
+        default: openjdk
+        choices:
+          - openjdk
+          - oracle
+          - azul
+      jdk_install_packages:
+        description:
+          - Flag to enable JDK package installation.
+        type: bool
+        default: true
+      jdk_packages:
+        description:
+          - List of OS packages to install if I(jdk_install_packages=true).
+        type: list
+        elements: str
+      jdk_version:
+        description:
+          - Supported JDK version.
+        type: int
+        choices:
+          - 8
+          - 11
+          - 17
+        default: 17
+      jdk_security_paths:
+        description:
+          - List of paths to search for C(java.security) files to manage for JCE enablement.
+        type: list
+        elements: path
+      jdk_security_paths_override:
+        description:
+          - Flag to disable JCE changes ifo multiple C(java.security) files are found.
+        type: bool
+        default: false

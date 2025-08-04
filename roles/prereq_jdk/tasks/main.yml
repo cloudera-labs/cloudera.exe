@@ -1,0 +1,108 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
+
+- name: Install JDK
+  when: jdk_install_packages
+  ansible.builtin.include_tasks: "{{ jdk_provider }}_tasks.yml"
+
+- name: Check for Cloudera-repo JDK
+  ansible.builtin.stat:
+    path: /usr/java
+  register: __cldr_jdk
+
+- name: Set up JDK symlinks for Cloudera-repo JDK
+  when: __cldr_jdk.stat.exists
+  block:
+    - name: Discover the Cloudera Java binary
+      ansible.builtin.find:
+        paths: /usr/java
+        patterns: "jdk*-cloudera"
+        file_type: directory
+        recurse: false
+      register: __jdk_home
+
+    - name: Create alternatives symlink for Cloudera Java binary
+      ansible.builtin.alternatives:
+        name: java
+        link: /usr/bin/java
+        path: "{{ __jdk_home.files[0].path }}/bin/java"
+      when: __jdk_home.matched
+
+    - name: Create symlinks for Cloudera Java home directory
+      ansible.builtin.file:
+        src: "{{ __jdk_home.files[0].path }}"
+        dest: /usr/java/default
+        state: link
+      when: __jdk_home.matched
+
+- name: Discover installed JDK details
+  jdk_facts:
+
+- name: Enable JCE policy for JDK 9 or lower
+  when: ansible_facts.jdk["version"] is not version("10.0.0", ">=", version_type="loose")
+  block:
+    - name: Discover JDK java.security files
+      ansible.builtin.find:
+        paths: "{{ jdk_security_paths | default(__java_security_paths[jdk_version]) }}"
+        pattern: "java.security"
+        follow: true
+        recurse: true
+      register: __java_security
+
+    - name: Check JDK java.security files
+      ansible.builtin.fail:
+        msg: >
+          Multiple copies of java.security were found. Exiting to avoid editing the incorrect one.
+          To override, set variable "jdk_security_paths_override=True".
+      when: __java_security.matched > 1 and not jdk_security_paths_override
+
+    - name: Enable Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy
+      ansible.builtin.lineinfile:
+        path: "{{ jce_file.path }}"
+        regexp: "#?crypto.policy="
+        line: crypto.policy=unlimited
+      loop: "{{ __java_security.files }}"
+      loop_control:
+        loop_var: jce_file
+
+- name: Patch Kerberos cross-realm referrals (JDK-8215032)
+  ansible.builtin.lineinfile:
+    path: "{{ krb_file.path }}"
+    regexp: "^sun.security.krb5.disableReferrals="
+    line: sun.security.krb5.disableReferrals=true
+  loop: "{{ __java_security.files }}"
+  loop_control:
+    loop_var: krb_file
+  when: >
+    ansible_facts.jdk["provider"] == "openjdk" and
+    (
+      (ansible_facts.jdk["version"] is version("1.8", ">=", version_type="loose") and ansible_facts.jdk["version"] is version("1.9", "<=", version_type="loose") and
+    ansible_facts.jdk["update"]|int >= 242)
+      or
+      (ansible_facts.jdk["version"] is version("11.0.6", ">=", version_type="semver"))
+    )
+
+# https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-manually-installing-openjdk.html
