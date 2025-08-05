@@ -31,3 +31,9 @@ roles/data/tasks/main.yml name[missing][/] skip
 roles/data/tasks/setup_aws.yml risky-file-permissions skip
 roles/data/tasks/setup_aws.yml yaml[line-length] skip
 roles/data/tasks/teardown_aws_policies.yml yaml[line-length] skip
+roles/dynamic_inventory/defaults/main.yml var-naming[no-role-prefix] skip
+roles/dynamic_inventory/defaults/main.yml jinja[spacing][/] skip
+roles/dynamic_inventory/tasks/create_static_inventory.yml risky-file-permissions skip
+roles/dynamic_inventory/tasks/create_static_inventory.yml jinja[spacing][/] skip
+roles/dynamic_inventory/tasks/refresh_inventory.yml risky-file-permissions skip
+roles/dynamic_inventory/tasks/retire_static_inventory.yml risky-file-permissions skip

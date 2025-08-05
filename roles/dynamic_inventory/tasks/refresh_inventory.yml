@@ -15,6 +15,12 @@
 
 # TODO Consider converting to a handler?
 
+- name: Deprecation warning
+  run_once: true
+  cloudera.exe.deprecation:
+    msg: "Role, {{ ansible_role_name }}, is no longer supported."
+    version: 4.0.0
+
 - name: Check for additional inventory file
   ansible.builtin.stat:
     path: "{{ include_inventory_file | default('') }}"
