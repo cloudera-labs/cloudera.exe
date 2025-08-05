@@ -15,6 +15,12 @@
 
 # Sequential management (individual tasks that execute implicit runlevel dependencies and order-of-operations)
 
+- name: Deprecation warning
+  run_once: true
+  cloudera.exe.deprecation:
+    msg: "Role, {{ ansible_role_name }}, is no longer supported."
+    version: 4.0.0
+
 - name: Validate Infrastructure Configuration
   ansible.builtin.include_role:
     name: cloudera.exe.infrastructure
