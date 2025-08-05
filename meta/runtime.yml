@@ -65,3 +65,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, init_deployment, is not longer supported.
+    platform:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, platform, is not longer supported.
