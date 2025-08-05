@@ -84,3 +84,11 @@ roles/infrastructure/tasks/validate_azure.yml yaml[line-length] skip
 roles/infrastructure/tests/test.yml syntax-check[specific][/] skip
 roles/infrastructure/vars/main.yml var-naming[no-role-prefix] skip
 roles/infrastructure/vars/main.yml jinja[spacing][/] skip
+roles/init_deployment/defaults/main.yml var-naming[no-role-prefix] skip
+roles/init_deployment/tasks/marshall.yml name[template][/] skip
+roles/init_deployment/tasks/marshall.yml jinja[invalid][/] skip
+roles/init_deployment/tasks/runlevels.yml yaml[line-length] skip
+roles/init_deployment/tasks/validate.yml no-jinja-when skip
+roles/init_deployment/vars/basic_cluster.yml schema[vars][/] skip
+roles/init_deployment/vars/basic_cluster.yml var-naming[no-role-prefix] skip
+roles/init_deployment/vars/basic_cluster.yml var-naming[no-reserved] skip
