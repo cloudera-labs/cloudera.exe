@@ -13,36 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-galaxy_info:
-  author: Webster Mudge (wmudge@cloudera.com)
-  description: >
-    Deployment and management of cloud provider and/or infrastucture provider
-    artifacts for Cloudera Data Platform (CDP) Public Cloud and Private Cloud,
-    including Private Cloud Base, in addition to artifacts required for auxillary
-    services, e.g. Keycloak, external data locations.
-  company: Cloudera
-  license: Apache-2.0
-
-  min_ansible_version: 2.10
-
-  platforms:
-    - name: Debian
-      versions: all
-    - name: Fedora
-      versions: all
-    - name: GenericLinux
-      versions: all
-    - name: MacOSX
-      versions: all
-    - name: Ubuntu
-      versions: all
-
-  galaxy_tags:
-    - cloudera
-    - cdp
-    - aws
-    - gcloud
-    - azure
-    - openstack
-
 dependencies: ["cloudera.exe.common"]
