@@ -49,3 +49,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, dynamic_inventory, is not longer supported.
+    freeipa_host_group:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, freeipa_host_group, is not longer supported.

@@ -13,30 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-galaxy_info:
-  author: Jim Enright (jenright@cloudera.com)
-  description: >
-    Creation of FreeIPA host group.
-  company: Cloudera
-  license: Apache-2.0
-
-  min_ansible_version: 2.10
-
-  platforms:
-    - name: Debian
-      versions: all
-    - name: Fedora
-      versions: all
-    - name: GenericLinux
-      versions: all
-    - name: MacOSX
-      versions: all
-    - name: Ubuntu
-      versions: all
-
-  galaxy_tags:
-    - cloudera
-    - cdp
-    - freeipa
-
 dependencies: ["cloudera.exe.common"]
