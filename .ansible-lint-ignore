@@ -189,3 +189,16 @@ roles/rdbms_server/vars/postgresql/RedHat.yml var-naming[no-role-prefix] skip
 roles/rdbms_server/vars/postgresql/RedHat.yml jinja[spacing][/] skip
 roles/rdbms_server/vars/postgresql/RedHat.yml var-naming[no-role-prefix] skip
 roles/rdbms_server/vars/postgresql/common.yml var-naming[no-role-prefix] skip
+roles/runtime/defaults/main.yml var-naming[no-role-prefix] skip
+roles/runtime/defaults/main.yml jinja[spacing][/] skip
+roles/runtime/molecule/default/molecule.yml yaml[truthy][/] skip
+roles/runtime/molecule/level0/molecule.yml yaml[truthy][/] skip
+roles/runtime/molecule/shared/prepare.yml risky-file-permissions skip
+roles/runtime/molecule/shared/prepare.yml no-changed-when skip
+roles/runtime/tasks/initialize_base.yml yaml[line-length] skip
+roles/runtime/tasks/initialize_base.yml jinja[spacing][/] skip
+roles/runtime/tasks/initialize_setup_azure.yml yaml[line-length] skip
+roles/runtime/tasks/main.yml name[missing][/] skip
+roles/runtime/tasks/setup_aws.yml yaml[comments][/] skip
+roles/runtime/tasks/setup_base.yml yaml[line-length] skip
+roles/runtime/vars/main.yml var-naming[no-role-prefix] skip
