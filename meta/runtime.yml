@@ -92,3 +92,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, runtime, is not longer supported.
+    sequence:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, sequence, is not longer supported.
