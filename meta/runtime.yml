@@ -37,3 +37,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, auto_repo_mirror, is not longer supported.
+    common:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, common, is not longer supported.
