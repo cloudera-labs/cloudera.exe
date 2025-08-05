@@ -57,3 +57,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, info, is not longer supported.
+    infrastructure:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, infrastructure, is not longer supported.
