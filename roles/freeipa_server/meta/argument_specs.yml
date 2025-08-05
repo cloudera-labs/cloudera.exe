@@ -23,7 +23,7 @@ argument_specs:
       ipaserver_packages:
         description:
           - List of FreeIPA packages to install.
-          - If not defined, the role will default to the packages defined in the P(freeipa.ansible_freeipa.ipaserver#role) role.
+          - If not defined, the role will default to the packages defined in the C(freeipa.ansible_freeipa.ipaserver) role.
         type: list
         elements: str
       ipaserver_domain:
