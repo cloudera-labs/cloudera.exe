@@ -131,3 +131,5 @@ roles/platform/tasks/teardown_gcp_authz.yml jinja[spacing][/] skip
 roles/platform/tasks/validate.yml no-changed-when skip
 roles/platform/tasks/validate_aws_terraform.yml yaml[line-length] skip
 roles/platform/vars/main.yml var-naming[no-role-prefix] skip
+roles/provision/defaults/main.yml yaml[comments][/] skip
+roles/provision/tasks/present.yml risky-file-permissions skip
