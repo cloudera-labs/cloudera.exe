@@ -26,3 +26,8 @@ roles/auto_repo_mirror/tasks/update_mirror_cache.yml risky-file-permissions skip
 roles/auto_repo_mirror/vars/main.yml var-naming[no-role-prefix] skip
 roles/common/defaults/main.yml jinja[spacing][/] skip
 roles/common/defaults/main.yml yaml[line-length] skip
+roles/data/tasks/initialize.yml yaml[line-length] skip
+roles/data/tasks/main.yml name[missing][/] skip
+roles/data/tasks/setup_aws.yml risky-file-permissions skip
+roles/data/tasks/setup_aws.yml yaml[line-length] skip
+roles/data/tasks/teardown_aws_policies.yml yaml[line-length] skip
