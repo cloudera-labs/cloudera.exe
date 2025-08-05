@@ -18,11 +18,6 @@ requires_ansible: ">=2.15.0"
 
 plugin_routing:
   role: # Not yet supported
-    rdbms.server:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: Use cloudera.exe.rdbms_server instead of this nested role.
-      redirect: cloudera.exe.rdbms_server
     nodeexporter:
       deprecation:
         removal_version: 4.0.0
@@ -89,3 +84,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, rdbms.server, is not longer supported.
+    rdbms_server:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, rdbms_server, is not longer supported.
