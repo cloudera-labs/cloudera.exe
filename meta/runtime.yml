@@ -73,3 +73,19 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, provision, is not longer supported.
+    mysql_connector:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, rdbms.client.mysql_connector, is not longer supported.
+    oracle_connector:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, rdbms.client.oracle_connector, is not longer supported.
+    postgresql_connector:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, rdbms.client.postgresql_connector, is not longer supported.
+    rdbms.server:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, rdbms.server, is not longer supported.

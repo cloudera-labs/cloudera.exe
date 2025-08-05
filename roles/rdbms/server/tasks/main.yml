@@ -13,11 +13,12 @@
 # limitations under the License.
 
 ---
-- name: DEPRECATION WARNING
-  ansible.builtin.debug:
-    msg:
-      - This role has been moved to cloudera.exe.rdbms_server.
-      - Please update your playbooks and roles accordingly.
+
+- name: Deprecation warning
+  run_once: true
+  cloudera.exe.deprecation:
+    msg: "Role, {{ ansible_role_name }}, is no longer supported."
+    version: 4.0.0
 
 - name: Include database type variables
   ansible.builtin.include_vars:
