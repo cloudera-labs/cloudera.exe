@@ -1,4 +1,11 @@
 ---
+
+- name: Deprecation warning
+  run_once: true
+  cloudera.exe.deprecation:
+    msg: "Role, {{ ansible_role_name }}, is no longer supported."
+    version: 4.0.0
+
 - name: Refresh Listing of target cache contents
   when:
     - init__auto_repo_mirror_bucket_name is defined

@@ -15,3 +15,6 @@
 -->
 
 # auto_repo_mirror
+
+> [!WARNING]
+> No longer supported and will be removed in version 4.0.0

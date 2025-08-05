@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Deprecation warning
+  run_once: true
+  cloudera.exe.deprecation:
+    msg: "Role, {{ ansible_role_name }}, is no longer supported."
+    version: 4.0.0
+
 # Read in cluster definition without jinja parsing=
 - name: Fetch repositories from cluster definition
   ansible.builtin.set_fact:
