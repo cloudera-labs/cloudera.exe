@@ -13,33 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-galaxy_info:
-  author: Webster Mudge (wmudge@cloudera.com)
-  description: >
-    Deployment and management of Cloudera Data Platform (CDP) Public Cloud
-    Experiences, e.g. Machine Learning, Data Engineering, Data Warehousing.
-  company: Cloudera, Inc.
-  license: Apache-2.0
-
-  min_ansible_version: 2.10
-  platforms:
-    - name: Debian
-      versions: all
-    - name: Fedora
-      versions: all
-    - name: GenericLinux
-      versions: all
-    - name: MacOSX
-      versions: all
-    - name: Ubuntu
-      versions: all
-
-  galaxy_tags:
-    - cloudera
-    - cdp
-    - machine_learning
-    - data_engineering
-    - data_warehousing
-    - operationa_database
-
 dependencies: ["cloudera.exe.common"]

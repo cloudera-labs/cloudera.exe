@@ -88,3 +88,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, rdbms_server, is not longer supported.
+    runtime:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, runtime, is not longer supported.
