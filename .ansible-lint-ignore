@@ -37,3 +37,5 @@ roles/dynamic_inventory/tasks/create_static_inventory.yml risky-file-permissions
 roles/dynamic_inventory/tasks/create_static_inventory.yml jinja[spacing][/] skip
 roles/dynamic_inventory/tasks/refresh_inventory.yml risky-file-permissions skip
 roles/dynamic_inventory/tasks/retire_static_inventory.yml risky-file-permissions skip
+roles/info/tasks/main.yml risky-file-permissions skip
+roles/info/tasks/main.yml jinja[spacing][/] skip

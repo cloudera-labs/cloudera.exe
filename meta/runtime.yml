@@ -53,3 +53,7 @@ plugin_routing:
       deprecation:
         removal_version: 4.0.0
         warning_text: Role, freeipa_host_group, is not longer supported.
+    info:
+      deprecation:
+        removal_version: 4.0.0
+        warning_text: Role, info, is not longer supported.
