@@ -70,7 +70,7 @@ EXAMPLES = r"""
 - name: Get support matrix for Cloudera Runtimer version
   cloudera.exe.supported:
     cloudera_data_services_version: "1.5.4"
-  register: ds_support  
+  register: ds_support
 """
 
 RETURN = r"""
@@ -90,7 +90,7 @@ support_matrix_data:
             sample: [
                 {
                     "version": "13",
-                    "family": "PostgreSQL", 
+                    "family": "PostgreSQL",
                     "description": "PostgreSQL-13",
                     "id": 801
                 }
@@ -170,58 +170,59 @@ import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
+
 class ClouderaSupportMatrix:
     """
     Class to handle Cloudera Support Matrix API interactions.
-    
+
     This class manages the construction of API requests, filtering parameters,
     and processing of responses from the Cloudera Support Matrix API.
     """
-    
+
     BASE_URL = "https://supportmatrix.cloudera.com/supportmatrices/cldr"
-    
+
     # Mapping of parameter names to actual product names in the API
     PRODUCT_NAME_MAPPING = {
-        'cloudera_manager_version': 'Cloudera Manager',
-        'cloudera_runtime_version': 'CDP Private Cloud Base',
-        'cloudera_data_services_version': 'CDP Private Cloud Data Services',
+        "cloudera_manager_version": "Cloudera Manager",
+        "cloudera_runtime_version": "CDP Private Cloud Base",
+        "cloudera_data_services_version": "CDP Private Cloud Data Services",
     }
-    
+
     def __init__(self, module):
         """
         Initialize the ClouderaSupportMatrix class.
-        
+
         Args:
             module: AnsibleModule instance
         """
         self.module = module
-        
+
         # Extract product version parameters
         self.product_versions = {}
         for param_name in self.PRODUCT_NAME_MAPPING.keys():
             version = module.params.get(param_name)
             if version:
                 self.product_versions[param_name] = version
-       
-        self.timeout = module.params.get('timeout', 30)
+
+        self.timeout = module.params.get("timeout", 30)
 
         # Initialize return values
         self.support_matrix_data = {}
         self.filters_applied = {}
         self.api_url = self.BASE_URL
-   
+
         # Execute the logic
         self.process()
 
     def _build_query_conditions(self):
         """
         Build query conditions for API filtering.
-        
+
         Returns:
             str: Query conditions string for the API request
         """
         conditions = []
-       
+
         # Build single PRODUCT condition with comma-separated values
         if self.product_versions:
             products = []
@@ -233,111 +234,114 @@ class ClouderaSupportMatrix:
                 encoded_product_version = requests.utils.quote(product_version_string)
                 products.append(encoded_product_version)
                 self.filters_applied[param_name] = version
-            
+
             if products:
                 # Join products with commas for a single PRODUCT parameter
                 product_condition = f"PRODUCT={','.join(products)}"
-                conditions.append(product_condition)           
-        
+                conditions.append(product_condition)
+
         return ";".join(conditions)
-    
+
     def _build_api_url(self):
         """
         Build the complete API URL with query parameters.
-        
+
         Returns:
             str: Complete API URL
         """
         conditions = self._build_query_conditions()
-        
+
         if conditions:
             # Add trailing semicolon as shown in the curl example
             # Don't URL encode the entire condition string, only spaces are encoded
             self.api_url = f"{self.BASE_URL}?condition={conditions};"
         else:
             self.api_url = self.BASE_URL
-            
+
         return self.api_url
-    
+
     def process(self):
         """
         Fetch support matrix data from the Cloudera API using requests library.
-        
+
         Returns:
             bool: True if successful, False otherwise
         """
-            
+
         try:
             # Build the API URL
             api_url = self._build_api_url()
-            
+
             # Prepare headers
             headers = {
-                'Accept': '*/*',
-                'Content-Type': 'application/json',
-                'User-Agent': 'Ansible/cloudera.cluster'
+                "Accept": "*/*",
+                "Content-Type": "application/json",
+                "User-Agent": "Ansible/cloudera.cluster",
             }
-            
+
             # Make the API request using requests
             response = requests.get(
                 api_url,
                 headers=headers,
-                timeout=self.timeout
+                timeout=self.timeout,
             )
-            
+
             # Raise an exception for bad status codes
             response.raise_for_status()
-            
+
             # Parse JSON response
             if response.text:
                 try:
                     self.support_matrix_data = response.json()
-                    
+
                 except json.JSONDecodeError as e:
                     self.module.fail_json(
                         msg=f"Failed to parse JSON response: {to_native(e)}",
                         api_url=api_url,
-                        response_text=response.text[:500]  # First 500 chars for debugging
+                        response_text=response.text[
+                            :500
+                        ],  # First 500 chars for debugging
                     )
 
             else:
                 self.module.fail_json(
                     msg="Empty response received from API",
-                    api_url=api_url
+                    api_url=api_url,
                 )
-            
+
         except requests.exceptions.HTTPError as e:
             self.module.fail_json(
                 msg=f"HTTP error occurred: {to_native(e)}",
                 api_url=api_url,
                 http_status=e.response.status_code if e.response else None,
-                http_reason=str(e.response.reason) if e.response else None
+                http_reason=str(e.response.reason) if e.response else None,
             )
-            
+
         except requests.exceptions.ConnectionError as e:
             self.module.fail_json(
                 msg=f"Connection error occurred: {to_native(e)}",
-                api_url=api_url
+                api_url=api_url,
             )
-            
+
         except requests.exceptions.Timeout as e:
             self.module.fail_json(
                 msg=f"Request timeout occurred: {to_native(e)}",
                 api_url=api_url,
-                timeout=self.timeout
+                timeout=self.timeout,
             )
-            
+
         except requests.exceptions.RequestException as e:
             self.module.fail_json(
                 msg=f"Request error occurred: {to_native(e)}",
-                api_url=api_url
+                api_url=api_url,
             )
-            
+
         except Exception as e:
             self.module.fail_json(
                 msg=f"Unexpected error occurred: {to_native(e)}",
-                api_url=api_url
+                api_url=api_url,
             )
+
 
 def main():
     """
@@ -347,28 +351,33 @@ def main():
     # Define module arguments
     module = AnsibleModule(
         argument_spec=dict(
-        cloudera_manager_version=dict(type='str', required=False),
-        cloudera_runtime_version=dict(type='str', required=False),
-        cloudera_data_services_version=dict(type='str', required=False),
-        timeout=dict(type='int', default=30),
-    ),
+            cloudera_manager_version=dict(type="str", required=False),
+            cloudera_runtime_version=dict(type="str", required=False),
+            cloudera_data_services_version=dict(type="str", required=False),
+            timeout=dict(type="int", default=30),
+        ),
         mutually_exclusive=[
-            ('cloudera_manager_version', 'cloudera_runtime_version', 'cloudera_data_services_version'),
-  ],
+            (
+                "cloudera_manager_version",
+                "cloudera_runtime_version",
+                "cloudera_data_services_version",
+            ),
+        ],
     )
 
     # Create and Fetch support matrix
     result = ClouderaSupportMatrix(module)
-    
+
     # Prepare successful response
     output = dict(
         changed=False,
         support_matrix_data=result.support_matrix_data,
         filters_applied=result.filters_applied,
-        api_url=result.api_url
+        api_url=result.api_url,
     )
 
     module.exit_json(**output)
 
+
 if __name__ == "__main__":
-    main() 
+    main()
