@@ -25,8 +25,6 @@ description:
 author:
   - "Jim Enright (@jimright)"
 version_added: "3.0.0"
-requirements:
-  - requests (Python library)
 options:
   cloudera_manager_version:
     description:
@@ -165,10 +163,10 @@ api_url:
 """
 
 import json
-import requests
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.urls import fetch_url, to_text
+from urllib.parse import quote
 
 
 class ClouderaSupportMatrix:
@@ -229,9 +227,9 @@ class ClouderaSupportMatrix:
             for param_name, version in self.product_versions.items():
                 product_name = self.PRODUCT_NAME_MAPPING[param_name]
                 # URL encode spaces in both product name and version
-                # Use requests.utils.quote for proper URL encoding since we're already using requests
+                # Use urllib.parse.quote for proper URL encoding
                 product_version_string = f"{product_name}-{version}"
-                encoded_product_version = requests.utils.quote(product_version_string)
+                encoded_product_version = quote(product_version_string)
                 products.append(encoded_product_version)
                 self.filters_applied[param_name] = version
 
@@ -262,7 +260,7 @@ class ClouderaSupportMatrix:
 
     def process(self):
         """
-        Fetch support matrix data from the Cloudera API using requests library.
+        Fetch support matrix data from the Cloudera API using Ansible's fetch_url.
 
         Returns:
             bool: True if successful, False otherwise
@@ -279,62 +277,38 @@ class ClouderaSupportMatrix:
                 "User-Agent": "Ansible/cloudera.cluster",
             }
 
-            # Make the API request using requests
-            response = requests.get(
-                api_url,
-                headers=headers,
-                timeout=self.timeout,
+            # Use Ansible's fetch_url
+            response, info = fetch_url(
+                self.module, api_url, headers=headers, timeout=self.timeout
             )
 
-            # Raise an exception for bad status codes
-            response.raise_for_status()
+            if info.get("status") != 200:
+                self.module.fail_json(
+                    msg=f"HTTP error occurred: {info.get('msg', 'Unknown error')}",
+                    api_url=api_url,
+                    http_status=info.get("status"),
+                    http_reason=info.get("msg"),
+                )
+
+            response_text = to_text(response.read()) if response else ""
 
             # Parse JSON response
-            if response.text:
+            if response_text:
                 try:
-                    self.support_matrix_data = response.json()
-
+                    self.support_matrix_data = json.loads(response_text)
                 except json.JSONDecodeError as e:
                     self.module.fail_json(
                         msg=f"Failed to parse JSON response: {to_native(e)}",
                         api_url=api_url,
-                        response_text=response.text[
+                        response_text=response_text[
                             :500
                         ],  # First 500 chars for debugging
                     )
-
             else:
                 self.module.fail_json(
                     msg="Empty response received from API",
                     api_url=api_url,
                 )
-
-        except requests.exceptions.HTTPError as e:
-            self.module.fail_json(
-                msg=f"HTTP error occurred: {to_native(e)}",
-                api_url=api_url,
-                http_status=e.response.status_code if e.response else None,
-                http_reason=str(e.response.reason) if e.response else None,
-            )
-
-        except requests.exceptions.ConnectionError as e:
-            self.module.fail_json(
-                msg=f"Connection error occurred: {to_native(e)}",
-                api_url=api_url,
-            )
-
-        except requests.exceptions.Timeout as e:
-            self.module.fail_json(
-                msg=f"Request timeout occurred: {to_native(e)}",
-                api_url=api_url,
-                timeout=self.timeout,
-            )
-
-        except requests.exceptions.RequestException as e:
-            self.module.fail_json(
-                msg=f"Request error occurred: {to_native(e)}",
-                api_url=api_url,
-            )
 
         except Exception as e:
             self.module.fail_json(
