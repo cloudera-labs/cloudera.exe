@@ -279,7 +279,10 @@ class ClouderaSupportMatrix:
 
             # Use Ansible's fetch_url
             response, info = fetch_url(
-                self.module, api_url, headers=headers, timeout=self.timeout
+                self.module,
+                api_url,
+                headers=headers,
+                timeout=self.timeout,
             )
 
             if info.get("status") != 200:
