@@ -45,7 +45,7 @@
       register: __jdk_home
 
     - name: Create alternatives symlink for Cloudera Java binary
-      ansible.builtin.alternatives:
+      community.general.alternatives:
         name: java
         link: /usr/bin/java
         path: "{{ __jdk_home.files[0].path }}/bin/java"
@@ -59,7 +59,7 @@
       when: __jdk_home.matched
 
 - name: Discover installed JDK details
-  jdk_facts:
+  cloudera.exe.jdk_facts:
 
 - name: Enable JCE policy for JDK 9 or lower
   when: ansible_facts.jdk["version"] is not version("10.0.0", ">=", version_type="loose")
@@ -99,10 +99,15 @@
   when: >
     ansible_facts.jdk["provider"] == "openjdk" and
     (
-      (ansible_facts.jdk["version"] is version("1.8", ">=", version_type="loose") and ansible_facts.jdk["version"] is version("1.9", "<=", version_type="loose") and
-    ansible_facts.jdk["update"]|int >= 242)
+      (
+        ansible_facts.jdk["version"] is version("1.8", ">=", version_type="loose") and
+        ansible_facts.jdk["version"] is version("1.9", "<=", version_type="loose") and
+        ansible_facts.jdk["update"] | int >= 242
+      )
       or
-      (ansible_facts.jdk["version"] is version("11.0.6", ">=", version_type="semver"))
+      (
+        ansible_facts.jdk["version"] is version("11.0.6", ">=", version_type="semver")
+      )
     )
 
 # https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-manually-installing-openjdk.html

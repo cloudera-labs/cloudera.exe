@@ -60,15 +60,16 @@
       ansible.builtin.package_facts:
 
     - name: Prepare Cloudera Manager server external database
-      cm_prepare_db:
-        script: "{{
-          (
-            ansible_facts.packages['cloudera-manager-server'] |
-            map(attribute='version') |
-            first is version('6.0.0', '>=')
-          ) |
-          ternary('/opt/cloudera/cm/schema/scm_prepare_database.sh', '/usr/share/cmf/schema/scm_prepare_database.sh')
-        }}"
+      cloudera.exe.cm_prepare_db:
+        script: >
+          {{
+            (
+              ansible_facts.packages['cloudera-manager-server'] |
+              map(attribute='version') |
+              first is version('6.0.0', '>=')
+            ) |
+            ternary('/opt/cloudera/cm/schema/scm_prepare_database.sh', '/usr/share/cmf/schema/scm_prepare_database.sh')
+          }}
         type: "{{ cloudera_manager_database_type }}"
         host: "{{ cloudera_manager_database_host }}"
         port: "{{ cloudera_manager_database_port }}"
