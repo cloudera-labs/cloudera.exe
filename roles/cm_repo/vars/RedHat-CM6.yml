@@ -19,7 +19,7 @@ __cm_repo_enterprise_url: >-
     [
       __cm_repo_default_url,
       'p',
-      'cm' + (cloudera_manager_version | cm_version).major,
+      'cm' + (cloudera_manager_version | cloudera.exe.cm_version).major,
       cloudera_manager_version,
       (ansible_os_family | lower) + ansible_distribution_major_version,
       'yum'

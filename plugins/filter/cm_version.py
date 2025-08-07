@@ -33,17 +33,21 @@ DOCUMENTATION = """
 """
 
 EXAMPLES = """
-# Parse a standard version string
-standard: "{{ '1.2.3' | cm_version }}"
+- name: Parse a standard version string
+  ansible.builtin.set_fact:
+    standard: "{{ '1.2.3' | cm_version }}"
 
-# Parse a version plus build number
-build: "{{ '1.2.3.4' | cm_version }}"
+- name: Parse a version plus build number
+  ansible.builtin.set_fact:
+    build: "{{ '1.2.3.4' | cm_version }}"
 
-# Parse a version plus build metadata string
-build: "{{ '1.2.3+build7' | cm_version }}"
+- name: Parse a version plus build metadata string
+  ansible.builtin.set_fact:
+    build: "{{ '1.2.3+build7' | cm_version }}"
 
-# Parse a version plus prerelease and build string
-full: "{{ '1.2.3-rc1+build7' | cm_version }}"
+- name: Parse a version plus prerelease and build string
+  ansible.builtin.set_fact:
+    full: "{{ '1.2.3-rc1+build7' | cm_version }}"
 """
 
 RETURN = """
