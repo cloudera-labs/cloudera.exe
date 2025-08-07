@@ -13,8 +13,7 @@
 # limitations under the License.
 
 ---
-
 - name: Reload Caddy
   ansible.builtin.service:
-      name: "{{ caddy_service }}"
-      state: reloaded
+    name: "{{ caddy_service }}"
+    state: reloaded

@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +18,8 @@ argument_specs:
     short_description: Set up database and user accounts for Streams Messaging Manager
     description:
       - Set up the Streams Messaging Manager database and its associated user accounts, ensuring proper configuration for Streams Messaging Manager operations.
-      - Default values are used for the username, password, and database name, but these can be overwritten by setting the O(smm_username), O(smm_password),
-        and I(smm_database) variables.
+      - Default values are used for the username, password, and database name, but these can be overwritten by setting the O(smm_username), O(smm_password), and
+        I(smm_database) variables.
     author: Cloudera Labs
     version_added: "3.0.0"
     options:

@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
 
 - name: Prepare
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: Set up enterprise Cloudera Manager package repository
       ansible.builtin.import_role:

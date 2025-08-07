@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: Create CSD directory
   ansible.builtin.file:
     path: "{{ cloudera_manager_csd_directory }}"

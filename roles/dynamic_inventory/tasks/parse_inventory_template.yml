@@ -1,11 +1,9 @@
 ---
-
 - name: Deprecation warning
   run_once: true
   cloudera.exe.deprecation:
     msg: "Role, {{ ansible_role_name }}, is no longer supported."
     version: 4.0.0
-
 
 # Read in Dynamic Inventory
 - name: Seek Inventory Template in Definition Path

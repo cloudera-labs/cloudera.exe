@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: Gather host distribution details
   ansible.builtin.setup:
     gather_subset: distribution

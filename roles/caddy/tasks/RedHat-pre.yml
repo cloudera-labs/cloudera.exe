@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: Enable Fedora COPR
   ansible.builtin.package:
     name: "dnf-command(copr)"
