@@ -24,7 +24,7 @@ None.
 ```yaml
 - name: Install FreeIPA server for DNS, Kerberos, TLS, and LDAP.
   ansible.builtin.import_role:
-    name: freeipa_server
+    name: cloudera.exe.freeipa_server
   vars:
     ipaserver_forwarders: [ "1.1.1.1" ]
     ipaserver_cidr: [ "10.0.0.1/20" ]

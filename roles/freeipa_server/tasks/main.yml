@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,11 +37,11 @@
       net.ipv6.conf.lo.disable_ipv6: 0
 
 - name: Install defined FreeIPA server packages
-  when: ipaserver_packages is defined
+  when: freeipa_server_packages is defined
   ansible.builtin.package:
     name: "{{ __ipa_package }}"
     state: present
-  loop: "{{ ipaserver_packages }}"
+  loop: "{{ freeipa_server_packages }}"
   loop_control:
     loop_var: __ipa_package
 
@@ -51,7 +52,7 @@
     state: present
     ipaserver_hostname: "{{ inventory_hostname }}"
     # ipaserver_no_host_dns: yes # redundant with ipaserver_setup_dns
-    ipaserver_install_packages: "{{ (ipaserver_packages is undefined) | ternary('true', 'false') }}"
+    ipaserver_install_packages: "{{ freeipa_server_packages is undefined }}"
     ipaserver_setup_firewalld: false
     ipaserver_setup_dns: true
     ipaserver_auto_reverse: true
