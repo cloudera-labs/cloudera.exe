@@ -29,16 +29,19 @@ options:
   cloudera_manager_version:
     description:
       - Filter by specific Cloudera Manager version.
+      - Mutually exclusive with the O(cloudera_runtime_version) and O(cloudera_data_services_version) parameters.
     type: str
     required: false
   cloudera_runtime_version:
     description:
       - Filter by specific CDP Private Cloud Base (Cloudera Runtime) version.
+      - Mutually exclusive with the O(cloudera_manager_version) and O(cloudera_data_services_version) parameters.
     type: str
     required: false
   cloudera_data_services_version:
     description:
       - Filter by specific CDP Private Cloud Data Services version.
+      - Mutually exclusive with the O(cloudera_manager_version) and O(cloudera_runtime_version) parameters.
     type: str
     required: false
   timeout:
@@ -60,12 +63,12 @@ EXAMPLES = r"""
     cloudera_manager_version: "7.13.1"
   register: cm_support
 
-- name: Get support matrix for Cloudera Runtimer version
+- name: Get support matrix for Cloudera Runtime version
   cloudera.exe.supported:
     cloudera_runtime_version: "7.1.9 SP1"
   register: base_support
 
-- name: Get support matrix for Cloudera Runtimer version
+- name: Get support matrix for Cloudera Data Services version
   cloudera.exe.supported:
     cloudera_data_services_version: "1.5.4"
   register: ds_support
@@ -156,10 +159,6 @@ filters_applied:
             description: CDP Private Cloud Data Services version filter applied
             type: str
             returned: when filter applied
-api_url:
-    description: The complete API URL that was called
-    type: str
-    returned: always
 """
 
 import json
@@ -207,7 +206,6 @@ class ClouderaSupportMatrix:
         # Initialize return values
         self.support_matrix_data = {}
         self.filters_applied = {}
-        self.api_url = self.BASE_URL
 
         # Execute the logic
         self.process()
@@ -252,11 +250,11 @@ class ClouderaSupportMatrix:
         if conditions:
             # Add trailing semicolon as shown in the curl example
             # Don't URL encode the entire condition string, only spaces are encoded
-            self.api_url = f"{self.BASE_URL}?condition={conditions};"
+            api_url = f"{self.BASE_URL}?condition={conditions};"
         else:
-            self.api_url = self.BASE_URL
+            api_url = self.BASE_URL
 
-        return self.api_url
+        return api_url
 
     def process(self):
         """
@@ -293,24 +291,22 @@ class ClouderaSupportMatrix:
                     http_reason=info.get("msg"),
                 )
 
-            response_text = to_text(response.read()) if response else ""
-
-            # Parse JSON response
-            if response_text:
-                try:
-                    self.support_matrix_data = json.loads(response_text)
-                except json.JSONDecodeError as e:
-                    self.module.fail_json(
-                        msg=f"Failed to parse JSON response: {to_native(e)}",
-                        api_url=api_url,
-                        response_text=response_text[
-                            :500
-                        ],  # First 500 chars for debugging
-                    )
+            if response:
+                response_text = to_text(response.read())
             else:
                 self.module.fail_json(
                     msg="Empty response received from API",
                     api_url=api_url,
+                )
+
+            # Parse JSON response
+            try:
+                self.support_matrix_data = json.loads(response_text)
+            except json.JSONDecodeError as e:
+                self.module.fail_json(
+                    msg=f"Failed to parse JSON response: {to_native(e)}",
+                    api_url=api_url,
+                    response_text=response_text,
                 )
 
         except Exception as e:
@@ -350,7 +346,6 @@ def main():
         changed=False,
         support_matrix_data=result.support_matrix_data,
         filters_applied=result.filters_applied,
-        api_url=result.api_url,
     )
 
     module.exit_json(**output)
