@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,7 @@ argument_specs:
       Optionally, install the FreeIPA server packages.
     author: Cloudera Labs
     options:
-      ipaserver_packages:
+      freeipa_server_packages:
         description:
           - List of FreeIPA packages to install.
           - If not defined, the role will default to the packages defined in the C(freeipa.ansible_freeipa.ipaserver) role.
