@@ -1,3 +1,4 @@
+---
 # Copyright 2025 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +24,7 @@ argument_specs:
     author: Cloudera Labs
     version_added: "3.0.0"
     options:
-      ipaclient_packages:
+      freeipa_client_packages:
         description:
           - List of FreeIPA packages to install.
           - If not defined, the role will default to the packages defined in the

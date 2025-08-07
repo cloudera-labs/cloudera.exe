@@ -1,3 +1,4 @@
+---
 # Copyright 2025 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# ipaclient_packages: []
+# freeipa_client_packages: []
 
 ipaclient_domain: "{{ undef(hint='Please define the DNS domain') }}"
 ipaclient_realm: "{{ undef(hint='Please define the Kerberos realm') }}"

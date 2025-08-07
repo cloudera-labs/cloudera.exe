@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
 
 - name: Prepare server
   hosts: server
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: Extract the VPC subnet ID from the Molecule platform configuration
       ansible.builtin.set_fact:
@@ -25,14 +26,14 @@
       amazon.aws.ec2_vpc_subnet_info:
         subnet_id: "{{ test_subnet_id }}"
       register: __subnet
-      become: no
+      become: false
       delegate_to: localhost
 
     - name: Retrieve the VPC details
       amazon.aws.ec2_vpc_net_info:
         vpc_ids: "{{ __subnet.subnets | map(attribute='vpc_id') | first }}"
       register: __vpc
-      become: no
+      become: false
       delegate_to: localhost
 
     - name: Update the core networking
@@ -57,8 +58,8 @@
 
 - name: Prepare clients
   hosts: clients
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: Extract the VPC subnet ID from the Molecule platform configuration
       ansible.builtin.set_fact:
@@ -68,14 +69,14 @@
       amazon.aws.ec2_vpc_subnet_info:
         subnet_id: "{{ test_subnet_id }}"
       register: __subnet
-      become: no
+      become: false
       delegate_to: localhost
 
     - name: Retrieve the VPC details
       amazon.aws.ec2_vpc_net_info:
         vpc_ids: "{{ __subnet.subnets | map(attribute='vpc_id') | first }}"
       register: __vpc
-      become: no
+      become: false
       delegate_to: localhost
 
     - name: Update the core networking
@@ -86,4 +87,5 @@
         network_dns_domain: "{{ ipaserver_domain }}"
         # See https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html
         vpc_cidr: "{{ __vpc.vpcs | map(attribute='cidr_block') | list }}"
-        network_dns_forwarders: "{{ groups['server'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | community.general.lists_union(vpc_cidr | map('ansible.utils.ipmath', '2') | list) }}"
+        network_dns_forwarders: "{{ groups['server'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | community.general.lists_union(vpc_cidr | map('ansible.utils.ipmath',
+          '2') | list) }}"
