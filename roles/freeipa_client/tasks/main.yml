@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,11 +45,11 @@
   ansible.builtin.meta: flush_handlers
 
 - name: Install defined FreeIPA client packages
-  when: ipaclient_packages is defined
+  when: freeipa_client_packages is defined
   ansible.builtin.package:
     name: "{{ __ipa_package }}"
     state: present
-  loop: "{{ ipaclient_packages }}"
+  loop: "{{ freeipa_client_packages }}"
   loop_control:
     loop_var: __ipa_package
 
@@ -59,6 +60,6 @@
     state: present
     ipaclient_hostname: "{{ inventory_hostname }}"
     ipaclient_mkhomedir: true
-    ipaclient_install_packages: "{{ (ipaclient_packages is undefined) | ternary('true', 'false') }}"
+    ipaclient_install_packages: "{{ freeipa_client_packages is undefined }}"
     ipaserver_setup_dns: true
     ipasssd_enable_dns_updates: true
