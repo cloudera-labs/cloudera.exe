@@ -259,9 +259,6 @@ class ClouderaSupportMatrix:
     def process(self):
         """
         Fetch support matrix data from the Cloudera API using Ansible's fetch_url.
-
-        Returns:
-            bool: True if successful, False otherwise
         """
 
         try:
