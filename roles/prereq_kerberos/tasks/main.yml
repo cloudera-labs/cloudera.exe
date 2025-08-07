@@ -35,7 +35,7 @@
     section: libdefaults
     option: "{{ __conf.key }}"
     value: "{{ __conf.value }}"
-    mode: "0755"
+    mode: "0644"
   loop: "{{ updates | dict2items }}"
   loop_control:
     loop_var: __conf
@@ -52,7 +52,7 @@
     section: libdefaults
     option: default_ccache_name
     state: absent
-    mode: "0755"
+    mode: "0644"
   loop:
     - "{{ kerberos_config_path }}"
     - "{{ kerberos_kcm_credential_cache_config_path }}"
@@ -71,7 +71,7 @@
     section: "domain/{{ kerberos_realm | lower }}"
     option: "{{ __sssd_conf.key }}"
     value: "{{ __sssd_conf.value | string }}"
-    mode: "0755"
+    mode: "0600"
   loop: "{{ entries | dict2items }}"
   loop_control:
     loop_var: __sssd_conf
