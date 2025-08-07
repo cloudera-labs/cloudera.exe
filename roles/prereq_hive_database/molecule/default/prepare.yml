@@ -18,7 +18,9 @@
   gather_facts: true
   become: true
   tasks:
-    - block:
+    - name: PostgreSQL
+      when: database_type == 'postgresql'
+      block:
         - name: Install Postgresql server
           ansible.builtin.import_role:
             name: postgresql_server
@@ -28,5 +30,5 @@
             role_attr_flags: SUPERUSER
             name: "{{ database_admin_user }}"
             password: "{{ database_admin_password }}"
+          become: true
           become_user: postgres
-      when: database_type == 'postgresql'

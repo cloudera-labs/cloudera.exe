@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,8 @@
 
 - name: Setup database and configure superuser
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: PostgreSQL
       when: database_type == 'postgresql'
@@ -29,4 +30,5 @@
             role_attr_flags: SUPERUSER
             name: "{{ database_admin_user }}"
             password: "{{ database_admin_password }}"
+          become: true
           become_user: postgres

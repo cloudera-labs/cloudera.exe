@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: Import Grafana GPG key
   ansible.builtin.rpm_key:
     state: present

@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +26,8 @@ argument_specs:
       cloudera_manager_version:
         description:
           - Version of Cloudera Manager.
-          - If not defined and C(cloudera_manager_repo_username) is not defined, will default to the C(7.4.4) trial version,
-            if compatiable with the OS distribution.
+          - If not defined and C(cloudera_manager_repo_username) is not defined, will default to the C(7.4.4) trial version, if compatiable with the OS
+            distribution.
         default: 7.11.3
       cloudera_manager_repo_url:
         description:

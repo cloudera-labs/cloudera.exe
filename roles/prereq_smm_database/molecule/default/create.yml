@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +26,7 @@
 
     run_config_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/run-config.yml"
     run_config_from_file: "{{ (lookup('file', run_config_path, errors='ignore') or '{}') | from_yaml }}"
-    run_config: '{{ default_run_config | combine(run_config_from_file) }}'
+    run_config: "{{ default_run_config | combine(run_config_from_file) }}"
 
     # Platform settings handling
     default_assign_public_ip: true
@@ -38,7 +39,7 @@
     default_public_key_path: "{{ default_private_key_path }}.pub"
     default_ssh_user: ansible
     default_ssh_port: 22
-    default_user_data: ''
+    default_user_data: ""
 
     default_security_group_name: "molecule-{{ run_config.run_id }}"
     default_security_group_description: Ephemeral security group for Molecule instances
@@ -123,7 +124,7 @@
           - platform.vpc_id is string
           - platform.vpc_subnet_id is string and platform.vpc_subnet_id | length > 0
         quiet: true
-      loop: '{{ platforms }}'
+      loop: "{{ platforms }}"
       loop_control:
         loop_var: platform
         label: "{{ platform.name }}"

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: Verify
   hosts: all
   gather_facts: false
@@ -23,7 +22,7 @@
       ansible.builtin.find:
         paths: "/opt/cloudera/csd"
         patterns:
-          - '*.jar'
+          - "*.jar"
         recurse: false
       register: __csd
       failed_when: __csd.matched != 3

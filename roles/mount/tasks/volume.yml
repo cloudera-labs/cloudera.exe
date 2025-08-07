@@ -44,5 +44,3 @@
     src: "{{ '/'.join(['/dev', volume.vg_name, volume.lv_name]) }}"
     fstype: "{{ volume.fstype | default(mount_fstype) }}"
     state: mounted
-
-...

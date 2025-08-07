@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: Create Prometheus directory
   ansible.builtin.file:
     path: "{{ prometheus_directory }}"

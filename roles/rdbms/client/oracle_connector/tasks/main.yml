@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-
 - name: Deprecation warning
   run_once: true
   cloudera.exe.deprecation:

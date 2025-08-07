@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,19 +38,19 @@ platforms:
     tags:
       Name: rhel9-4.cm_server.molecule
       Project: Molecule testing for cm_server
-  # - name: rhel8-10.molecule.internal  # Enable once prereq_supported matrix is expanded
-  #   image_owner: "309956199498"
-  #   image_name: RHEL-8.10.0_HVM-*
-  #   image_filters:
-  #     architecture: x86_64
-  #   instance_type: t3.medium
-  #   boot_wait_seconds: 15
-  #   vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
-  #   groups:
-  #     - redhat
-  #   tags:
-  #     Name: rhel8-10.cm_repo.molecule
-  #     Project: Molecule testing for cm_repo
+# - name: rhel8-10.molecule.internal  # Enable once prereq_supported matrix is expanded
+#   image_owner: "309956199498"
+#   image_name: RHEL-8.10.0_HVM-*
+#   image_filters:
+#     architecture: x86_64
+#   instance_type: t3.medium
+#   boot_wait_seconds: 15
+#   vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
+#   groups:
+#     - redhat
+#   tags:
+#     Name: rhel8-10.cm_repo.molecule
+#     Project: Molecule testing for cm_repo
 provisioner:
   name: ansible
   inventory:

@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,16 +38,16 @@ platforms:
     tags:
       Name: molecule-cm_agent-rhel9-4
       Project: Molecule testing for cm_agent
-  # Ubuntu 20.04
-  # - name: ubuntu20.04.molecule.internal
-  #   image_owner: "099720109477"
-  #   image_name: ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*
-  #   instance_type: t3.medium
-  #   boot_wait_seconds: 15
-  #   vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
-  #   tags:
-  #     Name: molecule-cm_agent-ubuntu20-04
-  #     Project: Molecule testing for cm_agent
+# Ubuntu 20.04
+# - name: ubuntu20.04.molecule.internal
+#   image_owner: "099720109477"
+#   image_name: ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*
+#   instance_type: t3.medium
+#   boot_wait_seconds: 15
+#   vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
+#   tags:
+#     Name: molecule-cm_agent-ubuntu20-04
+#     Project: Molecule testing for cm_agent
 provisioner:
   name: ansible
   inventory:

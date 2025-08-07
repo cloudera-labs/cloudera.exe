@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 database_type: "{{ undef(hint='Please defined the database type.') }}"
 database_host: "{{ undef(hint='Please defined the database server hostname or IP address.') }}"
 # database_port:

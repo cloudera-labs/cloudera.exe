@@ -18,8 +18,8 @@ argument_specs:
     short_description: Set up database and user accounts for Knox
     description:
       - Set up the Apache Knox database and its associated user accounts, ensuring proper configuration for Knox operations.
-      - Default values are used for the username, password, and database name, but these can be overwritten by setting the O(knox_username), O(knox_password), and
-        O(knox_database) variables.
+      - Default values are used for the username, password, and database name, but these can be overwritten by setting the O(knox_username), O(knox_password),
+        and O(knox_database) variables.
     author: Cloudera Labs
     version_added: "3.0.0"
     options:
