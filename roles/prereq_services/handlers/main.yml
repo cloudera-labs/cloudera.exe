@@ -17,5 +17,5 @@
 
 - name: Restart nscd
   ansible.builtin.service:
-    name: "{{ prereq_services__nscd_service }}"
+    name: "{{ prereq_services_nscd_service }}"
     state: restarted
