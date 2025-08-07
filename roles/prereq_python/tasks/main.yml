@@ -29,10 +29,8 @@
     __required_python_version: >-
       {{
         support_matrix |
-        selectattr('manager_version', '==', (cm_version.major + '.' + cm_version.minor + '.' + cm_version.patch)) |
-        selectattr('runtime_version', '==', (
-          cloudera_runtime_version | regex_search('(\\d+\\.\\d+\\.\\d+)')
-        )) |
+        selectattr('manager_version', 'ansible.builtin.version', cloudera_manager_version) |
+        selectattr('runtime_version', 'ansible.builtin.version', cloudera_runtime_version) |
         map(attribute='python_version') |
         first
       }}
@@ -40,10 +38,8 @@
       {{
         (
           support_matrix |
-          selectattr('manager_version', '==', (cm_version.major + '.' + cm_version.minor + '.' + cm_version.patch)) |
-          selectattr('runtime_version', '==', (
-            cloudera_runtime_version | regex_search('(\\d+\\.\\d+\\.\\d+)')
-          )) |
+          selectattr('manager_version', 'ansible.builtin.version', cloudera_manager_version) |
+          selectattr('runtime_version', 'ansible.builtin.version', cloudera_runtime_version) |
           map(attribute='python2') |
           first
         ) |
