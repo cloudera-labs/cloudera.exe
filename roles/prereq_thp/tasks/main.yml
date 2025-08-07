@@ -80,7 +80,7 @@
   when: __grub_configs_edit.changed or __grub_edit.changed
   ansible.builtin.command: grub2-mkconfig -o /boot/grub2/grub.cfg
   changed_when: true
-  notify: reboot host
+  notify: Reboot host
 
 - name: Discover if Transparent Huge Pages are active
   ansible.builtin.command: cat /sys/kernel/mm/transparent_hugepage/enabled
