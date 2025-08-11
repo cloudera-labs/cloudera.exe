@@ -19,66 +19,14 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
-name: combine_onto
-author: Webster Mudge (@wmudge) <wmudge@cloudera.com>
-short_description: combine two dictionaries
-description:
-    - Create a dictionary (hash/associative array) as a result of merging existing dictionaries.
-    - This is the reverse of the C(ansible.builtin.combine) filter.
-positional: _input, _dicts
-options:
-    _input:
-        description:
-            - First dictionary to combine.
-        type: dict
-        required: True
-    _dicts:
-        description:
-            - The list of dictionaries to combine
-        type: list
-        elements: dict
-        required: True
-    recursive:
-        description:
-            - If V(True), merge elements recursively.
-        type: boolean
-        default: False
-    list_merge:
-        description: Behavior when encountering list elements.
-        type: str
-        default: replace
-        choices:
-            replace: overwrite older entries with newer ones
-            keep: discard newer entries
-            append: append newer entries to the older ones
-            prepend: insert newer entries in front of the older ones
-            append_rp: append newer entries to the older ones, overwrite duplicates
-            prepend_rp: insert newer entries in front of the older ones, discard duplicates
-"""
-
-EXAMPLES = """
-# ab => {'a':1, 'b':2, 'c': 4}
-ab: "{{ {'a':1, 'b':2} | cloudera.exe.combine_onto({'b':3, 'c':4}) }}"
-
-many: "{{ dict1 | cloudera.exe.combine_onto(dict2, dict3, dict4) }}"
-
-# defaults => {'a':{'b':3, 'c':4}, 'd': 5}
-# customization => {'a':{'c':20}}
-# final => {'a':{'b':3, 'c':20}, 'd': 5}
-final: "{{ customization | cloudera.exe.combine_onto(defaults, recursive=true) }}"
-"""
-
-RETURN = """
-_value:
-    description: Resulting merge of supplied dictionaries.
-    type: dict
-"""
-
 from ansible.errors import AnsibleFilterError
 from ansible.plugins.filter.core import flatten
 from ansible.template import recursive_check_defined
 from ansible.utils.vars import merge_hash
+
+from ansible_collections.cloudera.exe.plugins.module_utils.cldr_version import (
+    ClouderaVersion,
+)
 
 
 def combine_onto(*terms, **kwargs):
@@ -112,10 +60,31 @@ def combine_onto(*terms, **kwargs):
     return result
 
 
+def cldr_version(version: str):
+    """
+    Parse a Cloudera version string into its parts.
+    """
+
+    try:
+        parsed_version = ClouderaVersion(version)
+        return dict(
+            major=parsed_version.major,
+            minor=parsed_version.minor,
+            patch=parsed_version.patch,
+            prerelease=parsed_version.prerelease,
+            buildmetadata=parsed_version.buildmetadata,
+        )
+    except Exception as e:
+        raise AnsibleFilterError(orig_exc=e)
+
+
 class FilterModule(object):
-    """Derivatives of Ansible jinja2 filters"""
+    """Cloudera Ansible jinja2 filters"""
 
     def filters(self):
-        filters = {"combine_onto": combine_onto}
+        filters = {
+            "combine_onto": combine_onto,
+            "version": cldr_version,
+        }
 
         return filters
