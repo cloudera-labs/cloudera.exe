@@ -31,7 +31,7 @@ dataset = [
     ("1.2.3 SP2", "1.2.3 SP1", "eq", False),
     ("1.2.3 SP2", "1.2.2 SP2", "eq", False),
     ("1.2.2 SP2", "1.2.3 SP2", "eq", False),
-    ("1.2.3+100", "1.2.3+100", "eq", True), # Buildmetadata is ignored
+    ("1.2.3+100", "1.2.3+100", "eq", True),  # Buildmetadata is ignored
     ("1.2.3+100", "1.2.3+200", "eq", True),
     ("1.2.3+200", "1.2.3+100", "eq", True),
     ("1.2.3+100", "1.2.4+100", "eq", False),
@@ -45,7 +45,7 @@ dataset = [
     ("1.2.3 SP2", "1.2.3 SP1", "ne", True),
     ("1.2.3 SP2", "1.2.2 SP2", "ne", True),
     ("1.2.2 SP2", "1.2.3 SP2", "ne", True),
-    ("1.2.3+100", "1.2.3+100", "ne", False), # Buildmetadata is ignored
+    ("1.2.3+100", "1.2.3+100", "ne", False),  # Buildmetadata is ignored
     ("1.2.3+100", "1.2.3+200", "ne", False),
     ("1.2.3+200", "1.2.3+100", "ne", False),
     ("1.2.3+100", "1.2.4+100", "ne", True),
@@ -59,7 +59,7 @@ dataset = [
     ("1.2.3 SP2", "1.2.3 SP1", "lt", False),
     ("1.2.3 SP2", "1.2.2 SP2", "lt", False),
     ("1.2.2 SP2", "1.2.3 SP2", "lt", True),
-    ("1.2.3+100", "1.2.3+100", "lt", False), # Buildmetadata is ignored
+    ("1.2.3+100", "1.2.3+100", "lt", False),  # Buildmetadata is ignored
     ("1.2.3+100", "1.2.3+200", "lt", False),
     ("1.2.3+200", "1.2.3+100", "lt", False),
     ("1.2.3+100", "1.2.4+100", "lt", True),
@@ -73,7 +73,7 @@ dataset = [
     ("1.2.3 SP2", "1.2.3 SP1", "le", False),
     ("1.2.3 SP2", "1.2.2 SP2", "le", False),
     ("1.2.2 SP2", "1.2.3 SP2", "le", True),
-    ("1.2.3+100", "1.2.3+100", "le", True), # Buildmetadata is ignored
+    ("1.2.3+100", "1.2.3+100", "le", True),  # Buildmetadata is ignored
     ("1.2.3+100", "1.2.3+200", "le", True),
     ("1.2.3+200", "1.2.3+100", "le", True),
     ("1.2.3+100", "1.2.4+100", "le", True),
@@ -87,7 +87,7 @@ dataset = [
     ("1.2.3 SP2", "1.2.3 SP1", "gt", True),
     ("1.2.3 SP2", "1.2.2 SP2", "gt", True),
     ("1.2.2 SP2", "1.2.3 SP2", "gt", False),
-    ("1.2.3+100", "1.2.3+100", "gt", False), # Buildmetadata is ignored
+    ("1.2.3+100", "1.2.3+100", "gt", False),  # Buildmetadata is ignored
     ("1.2.3+100", "1.2.3+200", "gt", False),
     ("1.2.3+200", "1.2.3+100", "gt", False),
     ("1.2.3+100", "1.2.4+100", "gt", False),
@@ -101,7 +101,7 @@ dataset = [
     ("1.2.3 SP2", "1.2.3 SP1", "ge", True),
     ("1.2.3 SP2", "1.2.2 SP2", "ge", True),
     ("1.2.2 SP2", "1.2.3 SP2", "ge", False),
-    ("1.2.3+100", "1.2.3+100", "ge", True), # Buildmetadata is ignored
+    ("1.2.3+100", "1.2.3+100", "ge", True),  # Buildmetadata is ignored
     ("1.2.3+100", "1.2.3+200", "ge", True),
     ("1.2.3+200", "1.2.3+100", "ge", True),
     ("1.2.3+100", "1.2.4+100", "ge", False),

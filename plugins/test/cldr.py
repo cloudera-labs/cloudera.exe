@@ -19,40 +19,53 @@ import operator as py_operator
 from ansible import errors
 from ansible.module_utils.common.text.converters import to_native, to_text
 
-from ansible_collections.cloudera.exe.plugins.module_utils.cldr_version import ClouderaVersion
+from ansible_collections.cloudera.exe.plugins.module_utils.cldr_version import (
+    ClouderaVersion,
+)
 
 
 def cldr_version_compare(value, version, operator="eq"):
-    """ Perform a Cloudera version comparison on a value """
+    """Perform a Cloudera version comparison on a value"""
     op_map = {
-        '==': 'eq', '=': 'eq', 'eq': 'eq',
-        '<': 'lt', 'lt': 'lt',
-        '<=': 'le', 'le': 'le',
-        '>': 'gt', 'gt': 'gt',
-        '>=': 'ge', 'ge': 'ge',
-        '!=': 'ne', '<>': 'ne', 'ne': 'ne'
+        "==": "eq",
+        "=": "eq",
+        "eq": "eq",
+        "<": "lt",
+        "lt": "lt",
+        "<=": "le",
+        "le": "le",
+        ">": "gt",
+        "gt": "gt",
+        ">=": "ge",
+        "ge": "ge",
+        "!=": "ne",
+        "<>": "ne",
+        "ne": "ne",
     }
 
     if operator in op_map:
         operator = op_map[operator]
     else:
         raise errors.AnsibleFilterError(
-            'Invalid operator type (%s). Must be one of %s' % (operator, ', '.join(map(repr, op_map)))
+            "Invalid operator type (%s). Must be one of %s"
+            % (operator, ", ".join(map(repr, op_map))),
         )
-    
+
     try:
         method = getattr(py_operator, operator)
-        return method(ClouderaVersion(to_text(value)), ClouderaVersion(to_text(version)))
+        return method(
+            ClouderaVersion(to_text(value)),
+            ClouderaVersion(to_text(version)),
+        )
     except Exception as e:
-        raise errors.AnsibleFilterError('Version comparison failed: %s' % to_native(e))
+        raise errors.AnsibleFilterError("Version comparison failed: %s" % to_native(e))
 
 
 class TestModule(object):
-    """ Cloudera jinja2 tests """
+    """Cloudera jinja2 tests"""
 
     def tests(self):
         return {
             # failure testing
-            'version': cldr_version_compare,
+            "version": cldr_version_compare,
         }
-  

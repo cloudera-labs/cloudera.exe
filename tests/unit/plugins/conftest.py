@@ -21,7 +21,9 @@ __metaclass__ = type
 import logging
 import pytest
 
-from ansible_collections.cloudera.exe.plugins.filter.core_exe import FilterModule as filters_exe
+from ansible_collections.cloudera.exe.plugins.filter.core_exe import (
+    FilterModule as filters_exe,
+)
 from ansible_collections.cloudera.exe.plugins.test.cldr import TestModule as tests_exe
 
 
@@ -29,14 +31,18 @@ LOG = logging.getLogger(__name__)
 
 # Pytest fixtures
 
+
 @pytest.fixture(scope="module")
 def filter():
     def get_filter(filter_short_name: str):
         return filters_exe().filters().get(filter_short_name)
+
     return get_filter
+
 
 @pytest.fixture(scope="module")
 def test():
     def get_test(test_short_name: str):
         return tests_exe().tests().get(test_short_name)
+
     return get_test

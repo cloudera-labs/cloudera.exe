@@ -41,17 +41,18 @@ CLDR_RE = re.compile(
         )?
     $
     """,
-    flags=re.X
+    flags=re.X,
 )
+
 
 class ClouderaVersion(Version):
     """Version comparison class that implements Cloudera versioning.
 
     Cloudera versioning is an extension of Semantic Versioning that uses the
     ``prerelease`` segment as service packs or patch releases.
-    
+
     Moreover, this versioning scheme allow the ``prerelease`` delimiter
-    to use whitespace (' ') and dots  ('.') in addition to the semantic 
+    to use whitespace (' ') and dots  ('.') in addition to the semantic
     version's dash ('-').
 
     Based off of ``distutils.version.Version`` and ``ansible.utils.version``.
@@ -71,7 +72,7 @@ class ClouderaVersion(Version):
             self.parse(vstring)
 
     def __repr__(self):
-        return 'ClouderaVersion(%r)' % self.vstring
+        return "ClouderaVersion(%r)" % self.vstring
 
     @staticmethod
     def from_loose_version(loose_version):
@@ -90,7 +91,7 @@ class ClouderaVersion(Version):
             raise ValueError("%r is not a LooseVersion" % loose_version)
 
         extra_idx = 3
-        for marker in ('-', '+'):
+        for marker in ("-", "+"):
             try:
                 idx = version.index(marker)
             except ValueError:
@@ -104,14 +105,15 @@ class ClouderaVersion(Version):
             raise ValueError("Non integer values in %r" % loose_version)
 
         # Extra is everything to the right of the core version
-        extra = re.search('[+-].+$', loose_version.vstring)
+        extra = re.search("[+-].+$", loose_version.vstring)
 
         version = version + [0] * (3 - len(version))
         return ClouderaVersion(
-            '%s%s' % (
-                '.'.join(str(v) for v in version),
-                extra.group(0) if extra else ''
-            )
+            "%s%s"
+            % (
+                ".".join(str(v) for v in version),
+                extra.group(0) if extra else "",
+            ),
         )
 
     def parse(self, vstring) -> None:
@@ -129,9 +131,14 @@ class ClouderaVersion(Version):
         self.buildmetadata = None
 
         if prerelease:
-            self.prerelease = tuple(_Numeric(x) if x.isdigit() else _Alpha(x) for x in prerelease.split('.'))
+            self.prerelease = tuple(
+                _Numeric(x) if x.isdigit() else _Alpha(x) for x in prerelease.split(".")
+            )
         if buildmetadata:
-            self.buildmetadata = tuple(_Numeric(x) if x.isdigit() else _Alpha(x) for x in buildmetadata.split('.'))
+            self.buildmetadata = tuple(
+                _Numeric(x) if x.isdigit() else _Alpha(x)
+                for x in buildmetadata.split(".")
+            )
 
     @property
     def core(self) -> tuple[int | None, int | None, int | None]:

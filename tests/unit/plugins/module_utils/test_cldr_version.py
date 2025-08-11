@@ -20,33 +20,38 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.cloudera.exe.plugins.module_utils.cldr_version import ClouderaVersion
+from ansible_collections.cloudera.exe.plugins.module_utils.cldr_version import (
+    ClouderaVersion,
+)
 
 dataset = [
     # Core
-    ("1.2.3", (1,2,3, None, None)),
+    ("1.2.3", (1, 2, 3, None, None)),
     ("1.2", None),
     ("1", None),
     # Prerelease
-    ("1.2.3-rc1", (1,2,3, tuple(["rc1"]), None)),
-    ("1.2.3-rc1.foo", (1,2,3, tuple(["rc1", "foo"]), None)),
-    ("1.2.3-rc1.400", (1,2,3, tuple(["rc1", 400]), None)),
-    ("1.2.3-rc1-foo", (1,2,3, tuple(["rc1-foo"]), None)),
-    ("1.2.3 SP1", (1,2,3, tuple(["SP1"]), None)),
-    ("1.2.3 SP1.foo", (1,2,3, tuple(["SP1", "foo"]), None)),
-    ("1.2.3 SP1.400", (1,2,3, tuple(["SP1", 400]), None)),
-    ("1.2.3 SP1-foo", (1,2,3, tuple(["SP1-foo"]), None)),
-    ("1.2.3.100", (1,2,3, tuple([100]), None)),
-    ("1.2.3.100.400", (1,2,3, tuple([100, 400]), None)),
-    ("1.2.3.100-400", (1,2,3, tuple(["100-400"]), None)),
+    ("1.2.3-rc1", (1, 2, 3, tuple(["rc1"]), None)),
+    ("1.2.3-rc1.foo", (1, 2, 3, tuple(["rc1", "foo"]), None)),
+    ("1.2.3-rc1.400", (1, 2, 3, tuple(["rc1", 400]), None)),
+    ("1.2.3-rc1-foo", (1, 2, 3, tuple(["rc1-foo"]), None)),
+    ("1.2.3 SP1", (1, 2, 3, tuple(["SP1"]), None)),
+    ("1.2.3 SP1.foo", (1, 2, 3, tuple(["SP1", "foo"]), None)),
+    ("1.2.3 SP1.400", (1, 2, 3, tuple(["SP1", 400]), None)),
+    ("1.2.3 SP1-foo", (1, 2, 3, tuple(["SP1-foo"]), None)),
+    ("1.2.3.100", (1, 2, 3, tuple([100]), None)),
+    ("1.2.3.100.400", (1, 2, 3, tuple([100, 400]), None)),
+    ("1.2.3.100-400", (1, 2, 3, tuple(["100-400"]), None)),
     # Buildmeta
-    ("1.2.3+400", (1,2,3, None, tuple([400]))),
-    ("1.2.3+400.things", (1,2,3, None, tuple([400, "things"]))),
-    ("1.2.3+400-things", (1,2,3, None, tuple(["400-things"]))),
+    ("1.2.3+400", (1, 2, 3, None, tuple([400]))),
+    ("1.2.3+400.things", (1, 2, 3, None, tuple([400, "things"]))),
+    ("1.2.3+400-things", (1, 2, 3, None, tuple(["400-things"]))),
     # Combined
-    ("1.2.3-rc1+400", (1,2,3, tuple(["rc1"]), tuple([400]))),
-    ("1.2.3-rc1.foo+400", (1,2,3, tuple(["rc1", "foo"]), tuple([400]))),
-    ("1.2.3-rc1.foo+400.things", (1,2,3, tuple(["rc1", "foo"]), tuple([400, "things"]))),
+    ("1.2.3-rc1+400", (1, 2, 3, tuple(["rc1"]), tuple([400]))),
+    ("1.2.3-rc1.foo+400", (1, 2, 3, tuple(["rc1", "foo"]), tuple([400]))),
+    (
+        "1.2.3-rc1.foo+400.things",
+        (1, 2, 3, tuple(["rc1", "foo"]), tuple([400, "things"])),
+    ),
     # Invalid
     ("1.2.3=boom", None),
     ("1.2.3 boom=boom", None),
@@ -91,6 +96,7 @@ def test_parse(vstring, expected):
         assert version.buildmetadata == expected[4]
 
         assert version.core == (expected[0], expected[1], expected[2])
+
 
 @pytest.mark.parametrize("vstring,compare,expected", comparisons)
 def test_comparisons(vstring, compare, expected):
