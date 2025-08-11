@@ -1,0 +1,64 @@
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+DOCUMENTATION:
+  name: version
+  author: Cloudera Labs
+  version_added: "3.0.0"
+  short_description: compare Cloudera version strings
+  description:
+    - Compare version strings using the Cloudera versioning scheme.
+    - Cloudera versioning is an extension of Semantic Versioning that uses the C(prerelease) segment to indicate service packs or extended patch releases.
+    - Moreover, this versioning scheme allow the C(prerelease) delimiter to use whitespace (C(' ')) and dots  (C('.')) in addition to the semantic version's
+      dash (C('-')).
+  options:
+    _input:
+      description: Left hand version to compare
+      type: string
+      required: true
+    version:
+      description: Right hand version to compare
+      type: string
+      required: true
+    operator:
+      description: Comparison operator
+      type: string
+      required: false
+      choices:
+        - ==
+        - "="
+        - eq
+        - <
+        - lt
+        - <=
+        - le
+        - ">"
+        - gt
+        - ">="
+        - ge
+        - "!="
+        - <>
+        - ne
+      default: eq
+EXAMPLES: |
+  - name: Cloudera version test examples
+    assert:
+      that:
+        - "'7.3.1' is version('8.0.0', 'lt')"
+        - "'7.1.9 SP3' is version('7.1.9', 'gt')"
+        - "'7.1.9 SP3' is version('7.1.9 SP2', 'gt')"
+RETURN:
+  _value:
+    description: Returns V(True) or V(False) depending on the outcome of the comparison.
+    type: boolean
