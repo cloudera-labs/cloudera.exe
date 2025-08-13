@@ -1,0 +1,69 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up superusers in FreeIPA
+    description: |
+      Creates superusers in FreeIPA and adds them to a specified group.
+    author: Cloudera Labs
+    version_added: 3.0.0
+    options:
+      superuser_accounts:
+        description: List of superuser accounts to create, with details such as username, display name, given name, surname, and password.
+        type: list
+        elements: dict
+        options:
+          user:
+            description:
+              - Username for the superuser account.
+            required: true
+          given_name:
+            description:
+              - Given (first) name for the superuser account.
+            required: true
+          surname:
+            description:
+              - Surname (last name) for the superuser account.
+            required: true
+          password:
+            description:
+              - Password for the superuser account.
+            required: true
+          display_name:
+            description:
+              - Display name for the superuser account.
+        default:
+          - user: superuser
+            given_name: Cloudera
+            surname: Labs
+            password: superuser
+            display_name: Cloudera Labs Superuser
+      superuser_group:
+        description: The group to which the superusers will be added.
+        type: str
+        default: admins
+      ipaadmin_password:
+        description: The password for IPA admin authentication.
+        type: str
+        required: true
+      ipaadmin_principal:
+        description: The principal for IPA admin authentication.
+        type: str
+        default: admin
+      ipaserver_host:
+        description: The IPA server host.
+        type: str
+        default: C(inventory_hostname)

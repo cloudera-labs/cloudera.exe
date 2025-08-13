@@ -1,0 +1,39 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Create superusers
+  community.general.ipa_user:
+    displayname: "{{ __su.display_name | default(omit) }}"
+    givenname: "{{ __su.given_name }}"
+    name: "{{ __su.user }}"
+    sn: "{{ __su.surname }}"
+    password: "{{ __su.password }}"
+    update_password: on_create
+    ipa_pass: "{{ ipaadmin_password }}"
+    ipa_user: "{{ ipaadmin_principal }}"
+    ipa_host: "{{ ipaserver_host }}"
+  loop: "{{ superuser_accounts }}"
+  loop_control:
+    loop_var: __su
+    label: "{{ __su.user }}"
+
+- name: Add superusers to groups
+  community.general.ipa_group:
+    name: "{{ superuser_group }}"
+    user: "{{ superuser_accounts | map(attribute='user') | list }}"
+    append: true
+    ipa_pass: "{{ ipaadmin_password }}"
+    ipa_user: "{{ ipaadmin_principal }}"
+    ipa_host: "{{ ipaserver_host }}"
