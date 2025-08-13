@@ -1,0 +1,42 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  vars:
+    freeipa_dns_records:
+      - zone_name: "apps.{{ ipaserver_domain }}"
+        record_name: "*"
+        record_type: "A"
+      - zone_name: "{{ ipaserver_domain }}"
+        record_name: "*"
+        record_type: "A"
+  tasks:
+    - name: Verify that the DNS zone exists
+      ansible.builtin.command: ipa dnszone-find apps.{{ ipaserver_realm }}
+      register: zone_check
+      changed_when: false
+      failed_when: "'Number of entries returned 0' in zone_check.stdout"
+
+    - name: Verify that the DNS records exist
+      ansible.builtin.command: ipa dnsrecord-find {{ __rec.zone_name }} --all
+      register: record_check
+      failed_when: "'Number of entries returned 0' in record_check.stdout"
+      changed_when: false
+      loop: "{{ freeipa_dns_records }}"
+      loop_control:
+        loop_var: __rec
+        label: "{{ __rec.zone_name }}"

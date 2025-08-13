@@ -1,0 +1,41 @@
+---
+# Copyright 2024 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# NOTE: Below task replaces community.general.ipa_dnszone while waiting for a patch to include skip_overlap_check
+- name: Ensure apps zone is present for PvC ECS
+  freeipa.ansible_freeipa.ipadnszone:
+    zone_name: "apps.{{ ipaserver_domain }}"
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    ipaadmin_principal: "{{ ipaadmin_principal }}"
+    ipaapi_context: "{{ ipaapi_context | default(omit) }}"
+    skip_overlap_check: "{{ dnszone_skip_overlap_check }}"
+    state: present
+  register: ipa_dnszone_result
+  failed_when: ipa_dnszone_result.failed and "no modifications to be performed" not in ipa_dnszone_result.msg
+
+- name: Ensure wildcard records are prepared for PvC ECS
+  community.general.ipa_dnsrecord:
+    zone_name: "{{ __rec.zone_name }}"
+    record_name: "{{ __rec.record_name }}"
+    record_type: "{{ __rec.record_type }}"
+    record_value: "{{ freeipa_dns_records_address }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    ipa_user: "{{ ipaadmin_principal }}"
+    ipa_host: "{{ ipaserver_host }}"
+    state: present
+  loop: "{{ freeipa_dns_records }}"
+  loop_control:
+    loop_var: __rec
+    label: "{{ __rec.zone_name }}"
