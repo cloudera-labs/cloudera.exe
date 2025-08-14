@@ -117,24 +117,24 @@ class LookupModule(LookupBase):
             )
         except HTTPError as e:
             if e.status == 302:
-                msg = ' '.join({f"{key}-{value}" for key, value in filters.items()})
+                msg = " ".join({f"{key}-{value}" for key, value in filters.items()})
                 display.warning(f"{msg} does not exist.")
                 return []
             raise AnsibleLookupError(
-                "Received HTTP error for %s : %s" % (matrix_url, to_native(e))
+                "Received HTTP error for %s : %s" % (matrix_url, to_native(e)),
             )
         except URLError as e:
             raise AnsibleLookupError(
-                "Failed lookup url for %s : %s" % (matrix_url, to_native(e))
+                "Failed lookup url for %s : %s" % (matrix_url, to_native(e)),
             )
         except SSLValidationError as e:
             raise AnsibleLookupError(
                 "Error validating the server's certificate for %s: %s"
-                % (matrix_url, to_native(e))
+                % (matrix_url, to_native(e)),
             )
         except ConnectionError as e:
             raise AnsibleLookupError(
-                "Error connecting to %s: %s" % (matrix_url, to_native(e))
+                "Error connecting to %s: %s" % (matrix_url, to_native(e)),
             )
 
         try:
@@ -142,14 +142,16 @@ class LookupModule(LookupBase):
 
             if terms:
                 for t in terms:
-                    ret.extend(parse_support_entries(matrix.get(_snake_to_camel(t), [])))
+                    ret.extend(
+                        parse_support_entries(matrix.get(_snake_to_camel(t), [])),
+                    )
             else:
                 for _, v in matrix.items():
                     if v:
                         ret.extend(parse_support_entries(v))
         except json.JSONDecodeError as e:
             raise AnsibleLookupError(
-                "Error parsing support matrix JSON: %s" % to_native(e)
+                "Error parsing support matrix JSON: %s" % to_native(e),
             )
 
         return ret

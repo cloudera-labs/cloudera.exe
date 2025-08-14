@@ -80,7 +80,7 @@ ENTRY_KEYS = set(
         "productName",
         "release_date",
         "name",
-    ]
+    ],
 )
 
 

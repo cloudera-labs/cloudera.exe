@@ -359,7 +359,9 @@ class ClouderaSupportMatrix:
             try:
                 matrix = json.loads(response_text)
                 for k, v in matrix.items():
-                    self.support_matrix_data[_camel_to_snake(k)] = parse_support_entries(v)
+                    self.support_matrix_data[_camel_to_snake(k)] = (
+                        parse_support_entries(v)
+                    )
             except json.JSONDecodeError as e:
                 self.module.fail_json(
                     msg=f"Failed to parse JSON response: {to_native(e)}",

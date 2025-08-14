@@ -17,21 +17,22 @@ argument_specs:
   main:
     short_description: Verify configuration against support matrix
     description:
-      - Verification of various system and configuration settings against the Cloudera on premise support matrix available at supportmatrix.cloudera.com.
-      - Additionally, the I(support_matrix) variable defined in this role can be imported and used in other roles.
+      - Verification of various system and configuration settings against the Cloudera on premise
+        support matrix available at L(Cloudera Support Matrix,https://supportmatrix.cloudera.com).
     author:
       - "Jim Enright <jenright@cloudera.com>"
+      - "Webster Mudge <wmudge@cloudera.com>"
     version_added: "3.0.0"
     options:
       cloudera_manager_version:
         description: Version of Cloudera Manager
-        type: "str"
+        type: str
         required: true
       cloudera_runtime_version:
         description: Version of Cloudera Runtime
-        type: "str"
+        type: str
         required: true
-      data_services_version:
+      cloudera_data_services_version:
         description: Version of Cloudera Runtime
-        type: "str"
+        type: str
         required: false

@@ -25,7 +25,9 @@ from ansible.plugins.loader import lookup_loader
 
 @pytest.mark.skip("Unable to load non-builtin collection resources")
 def test_lookup_supported():
-    supported_lookup = lookup_loader.get("cloudera.exe.supported") # , collection_list=[request.config.rootdir]
+    supported_lookup = lookup_loader.get(
+        "cloudera.exe.supported",
+    )  # , collection_list=[request.config.rootdir]
 
     # lookup('cloudera.exe.supported', "7.1.9", type="cloudera_manager", categories=["jdks", "products"])
     # lookup('cloudera.exe.supported', ["jdks", "products"], version="7.1.9", type="cloudera_manager")
