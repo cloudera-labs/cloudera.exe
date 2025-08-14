@@ -25,7 +25,7 @@ BASE_URL = "https://supportmatrix.cloudera.com/supportmatrices/cldr"
 PRODUCT_NAME_MAPPING = {
     "cloudera_manager": "Cloudera Manager",
     "cloudera_runtime": "CDP Private Cloud Base",
-    "clouder_data_services": "CDP Private Cloud Data Services",
+    "cloudera_data_services": "CDP Private Cloud Data Services",
 }
 
 
@@ -62,7 +62,7 @@ def support_matrix_url(product_versions: dict[str, str]) -> Tuple[str, dict[str,
     if conditions:
         # Add trailing semicolon as shown in the curl example
         # Don't URL encode the entire condition string, only spaces are encoded
-        api_url = f"{BASE_URL}?condition={";".join(conditions)};"
+        api_url = "%s?condition=%s;" % (BASE_URL, ";".join(conditions))
     else:
         api_url = BASE_URL
 
