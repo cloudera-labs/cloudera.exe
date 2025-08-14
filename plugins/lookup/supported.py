@@ -31,9 +31,16 @@ options:
             - The categories to return from the support matrix.
             - All category entries will be flattened into a single list.
             - If undefined, all categories will be returned.
-            - Current categories - C(browsers, databases, jdks, kubernetes, operating_systems, processor, products).
         type: str
         required: false
+        choices:
+            - browsers
+            - databases
+            - jdks
+            - kubernetes
+            - operating_systems
+            - processor
+            - products
     version:
         description: The version of the product
         type: str
@@ -70,6 +77,7 @@ from urllib.error import HTTPError, URLError
 
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.dict_transformations import _snake_to_camel
 from ansible.module_utils.urls import open_url, ConnectionError, SSLValidationError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
@@ -109,9 +117,8 @@ class LookupModule(LookupBase):
             )
         except HTTPError as e:
             if e.status == 302:
-                display.warning(
-                    f"{' '.join(f"{key}-{value}" for key, value in filters.items())} does not exist."
-                )
+                msg = ' '.join({f"{key}-{value}" for key, value in filters.items()})
+                display.warning(f"{msg} does not exist.")
                 return []
             raise AnsibleLookupError(
                 "Received HTTP error for %s : %s" % (matrix_url, to_native(e))
@@ -135,7 +142,7 @@ class LookupModule(LookupBase):
 
             if terms:
                 for t in terms:
-                    ret.extend(parse_support_entries(matrix.get(t, [])))
+                    ret.extend(parse_support_entries(matrix.get(_snake_to_camel(t), [])))
             else:
                 for _, v in matrix.items():
                     if v:
