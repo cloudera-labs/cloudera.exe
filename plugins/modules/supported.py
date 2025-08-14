@@ -218,7 +218,7 @@ support_matrix_data:
                     description: Version of the architecture
                     type: str
                     returned: always
-        operatingSystems:
+        operating_systems:
             description: Operating system compatibility
             type: list
             elements: dict
@@ -268,6 +268,7 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.dict_transformations import _camel_to_snake
 from ansible.module_utils.urls import fetch_url, to_text
 
 from ansible_collections.cloudera.exe.plugins.module_utils.cldr_supported import (
@@ -358,7 +359,7 @@ class ClouderaSupportMatrix:
             try:
                 matrix = json.loads(response_text)
                 for k, v in matrix.items():
-                    self.support_matrix_data[k] = parse_support_entries(v)
+                    self.support_matrix_data[_camel_to_snake(k)] = parse_support_entries(v)
             except json.JSONDecodeError as e:
                 self.module.fail_json(
                     msg=f"Failed to parse JSON response: {to_native(e)}",
