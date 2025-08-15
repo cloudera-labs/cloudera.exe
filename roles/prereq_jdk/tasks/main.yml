@@ -13,6 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Assert JDK support for Cloudera Runtime and Manager versions
+  ansible.builtin.assert:
+    that:
+      - supported_cms |
+        selectattr('family', 'eq', prereq_jdk_supported_map[jdk_provider]) |
+        selectattr('version', 'eq', 'JDK' + jdk_version | string) |
+        length > 0
+      - supported_runtime |
+        selectattr('family', 'eq', prereq_jdk_supported_map[jdk_provider]) |
+        selectattr('version', 'eq', 'JDK' + jdk_version | string) |
+        length > 0
+    fail_msg: "{{ jdk_provider }} {{ jdk_version }} not supported."
+  vars:
+    supported_cms: "{{ lookup('cloudera.exe.supported', 'jdks', product='cloudera_manager', version=cloudera_manager_version) }}"
+    supported_runtime: "{{ lookup('cloudera.exe.supported', 'jdks', product='cloudera_runtime', version=cloudera_runtime_version) }}"
+
+- name: Gather distribution details
+  ansible.builtin.setup:
+    gather_subset: distribution
+
 - name: Include OS-specific variables
   ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
