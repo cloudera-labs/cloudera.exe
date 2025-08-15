@@ -13,25 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Load support matrix variables for OS
-  ansible.builtin.include_vars: "{{ item }}"
-  with_first_found:
-    - "../../prereq_supported/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
-    - "../../prereq_supported/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "../../prereq_supported/vars/{{ ansible_facts['distribution'] }}.yml"
-    - "../../prereq_supported/vars/{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
-    - "../../prereq_supported/vars/{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "../../prereq_supported/vars/{{ ansible_facts['os_family'] }}.yml"
-    - "../../prereq_supported/vars/default.yml"
+- name: Gather distribution details
+  ansible.builtin.setup:
+    gather_subset: distribution
 
-- name: Assert that OS is supported for Cloudera Manager version
+- name: Assert OS support for Cloudera Manager versions
   ansible.builtin.assert:
     that:
-      - support_matrix | selectattr('manager_version', 'version', cloudera_manager_version, 'le') | length > 0
-    fail_msg: >
-      Cloudera Manager version {{ cloudera_manager_version }} not supported for
-      OS {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.
-    quiet: true
+      - supported_cms |
+        selectattr('family', 'eq', cm_repo_supported_distribution_map[ansible_facts['distribution']] | default(ansible_facts['distribution'])) |
+        selectattr('version', 'eq', ansible_facts['distribution_version']) |
+        length > 0
+    fail_msg: "OS {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }} not supported."
+  vars:
+    supported_cms: "{{ lookup('cloudera.exe.supported', 'operating_systems', product='cloudera_manager', version=cloudera_manager_version) }}"
 
 - name: Load Cloudera Manager package repository variables for OS and CM version
   ansible.builtin.include_vars: "{{ item }}"
@@ -44,7 +39,7 @@
     - "{{ ansible_facts['os_family'] }}.yml"
     - "default.yml"
   vars:
-    cm_version: "{{ cloudera_manager_version | cloudera.exe.cm_version }}"
+    cm_version: "{{ cloudera_manager_version | cloudera.exe.version }}"
 
 - name: Configure Cloudera Manager package repository
   ansible.builtin.include_tasks:

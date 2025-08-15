@@ -64,7 +64,7 @@ class ClouderaVersion(Version):
 
     version_re = CLDR_RE
 
-    def __init__(self, vstring:str = None):
+    def __init__(self, vstring: str = None):
         self.vstring = vstring
         self.major = None
         self.minor = None
