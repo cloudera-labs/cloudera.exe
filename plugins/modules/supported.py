@@ -44,6 +44,14 @@ options:
       - Mutually exclusive with the O(cloudera_manager) and O(cloudera_runtime) parameters.
     type: str
     required: false
+  raw_filters:
+    description:
+      - Additional raw filters to add to the support matrix URL.
+      - Each filter will be appended to the URL, delimited by colons (C(;)).
+    type: list
+    elements: str
+    required: false
+    default: []
   timeout:
     description:
       - HTTP request timeout in seconds.
@@ -71,6 +79,13 @@ EXAMPLES = r"""
 - name: Get support matrix for Cloudera Data Services version
   cloudera.exe.supported:
     cloudera_data_services: "1.5.4"
+  register: ds_support
+
+- name: Get support matrix for Cloudera Manager version and OS
+  cloudera.exe.supported:
+    cloudera_manager: "7.13.1"
+    raw_filters:
+      - OPERATING_SYSTEMS=RHEL-9.2
   register: ds_support
 """
 
@@ -302,7 +317,8 @@ class ClouderaSupportMatrix:
             if version:
                 self.product_versions[param_name] = version
 
-        self.timeout = module.params.get("timeout", 30)
+        self.raw_filters = module.params.get("raw_filters")
+        self.timeout = module.params.get("timeout")
 
         # Initialize return values
         self.support_matrix_data = {}
@@ -318,7 +334,10 @@ class ClouderaSupportMatrix:
 
         try:
             # Build the API URL
-            api_url, self.filters = support_matrix_url(self.product_versions)
+            api_url, self.filters = support_matrix_url(
+                self.product_versions,
+                raw_filters=self.raw_filters,
+            )
 
             # Prepare headers
             headers = {
@@ -387,6 +406,7 @@ def main():
             cloudera_manager=dict(type="str", required=False),
             cloudera_runtime=dict(type="str", required=False),
             cloudera_data_services=dict(type="str", required=False),
+            raw_filters=dict(type="list", elements="str", required=False, default=[]),
             timeout=dict(type="int", default=30),
         ),
         mutually_exclusive=[

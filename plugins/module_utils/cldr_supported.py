@@ -29,7 +29,10 @@ PRODUCT_NAME_MAPPING = {
 }
 
 
-def support_matrix_url(product_versions: dict[str, str]) -> Tuple[str, dict[str, str]]:
+def support_matrix_url(
+    product_versions: dict[str, str],
+    raw_filters: list[str] = [],
+) -> Tuple[str, dict[str, str]]:
     """Construct the URL to the Support Matrix server.
 
     Args:
@@ -58,6 +61,10 @@ def support_matrix_url(product_versions: dict[str, str]) -> Tuple[str, dict[str,
             # Join products with commas for a single PRODUCT parameter
             product_condition = f"PRODUCT={','.join(products)}"
             conditions.append(product_condition)
+
+    # Example of additional filters
+    # ?condition=PRODUCT=CDP%20Private%20Cloud%20Base-7.1.9%20SP1,Cloudera%20Manager-7.13.1;OPERATING_SYSTEM=RHEL-9.2;
+    conditions.extend(raw_filters)
 
     if conditions:
         # Add trailing semicolon as shown in the curl example

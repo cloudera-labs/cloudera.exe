@@ -53,6 +53,13 @@ options:
             - cloudera_manager
             - cloudera_runtime
             - cloudera_data_services
+    raw_filters:
+        description:
+          - Additional raw filters to add to the support matrix URL.
+          - Each filter will be appended to the URL, delimited by colons (C(;)).
+        type: list
+        elements: str
+        required: false
     timeout:
         description: Query timeout (seconds)
         type: int
@@ -97,8 +104,11 @@ class LookupModule(LookupBase):
         product = self.get_option("product")
         version = self.get_option("version")
         timeout = self.get_option("timeout")
+        raw_filters = self.get_option("raw_filters")
+        if raw_filters is None:
+            raw_filters = []
 
-        matrix_url, filters = support_matrix_url({product: version})
+        matrix_url, filters = support_matrix_url({product: version}, raw_filters)
 
         display.v(f"[DEBUG] Support Matrix URL: {matrix_url}")
 
