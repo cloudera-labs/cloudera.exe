@@ -1,0 +1,59 @@
+# Copyright 2025 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+
+argument_specs:
+  main:
+    short_description: Install Blackbox Exporter
+    description:
+      - Download and install the Blackbox Explorer (blackbox_exporter) for Prometheus.
+    author: Cloudera Labs
+    version_added: 5.0.0
+    options:
+      blackbox_tarball_url:
+        description: Blackbox distribution URL
+        type: str
+        required: false
+        default: https://github.com/prometheus/blackbox_exporter/releases/download/v0.24.0/blackbox_exporter-0.24.0.linux-amd64.tar.gz
+      blackbox_directory:
+        description: Blackbox configuration directory
+        type: path
+        required: false
+        default: /etc/blackbox
+      blackbox_bin_directory:
+        description: Blackbox binary directory
+        type: path
+        required: false
+        default: /usr/local/bin
+      blackbox_tarball_file:
+        description: Blackbox download file name
+        type: str
+        required: false
+        default: blackbox.tar.gz
+      blackbox_user:
+        description: Blackbox service username
+        type: str
+        required: false
+        default: blackbox
+      blackbox_group:
+        description: Blackbox service group
+        type: str
+        required: false
+        default: blackbox
+      blackbox_service_directory:
+        description: Blackbox Systemd service file
+        type: path
+        required: false
+        default: /etc/systemd/system/blackbox.service
