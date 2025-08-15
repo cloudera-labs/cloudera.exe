@@ -1,4 +1,5 @@
-# Copyright 2024 Cloudera, Inc.
+---
+# Copyright 2025 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,54 +13,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-- name: Load support matrix variables for OS
-  ansible.builtin.include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
-    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "{{ ansible_facts['distribution'] }}.yml"
-    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
-    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "{{ ansible_facts['os_family'] }}.yml"
-    - "default.yml"
+- name: Gather distribution details
+  ansible.builtin.setup:
+    gather_subset: distribution
 
-- name: Print discovered support matrix based on manager and runtime version
-  ansible.builtin.debug:
-    var: support_matrix | selectattr('manager_version', '==', (cm_version.major + '.' + cm_version.minor + '.' + cm_version.patch)) |
-      selectattr('runtime_version', '==', cloudera_runtime_version | regex_search('(\\d+\\.\\d+\\.\\d+)'))
-    verbosity: 2
-  vars:
-    cm_version: "{{ cloudera_manager_version | cloudera.exe.cm_version }}"
-
-# Validation 1 - Operating Supported OS for given inputs
-- name: Assert that OS is supported for Cloudera Runtime and Manager versions
+- name: Assert OS support for Cloudera Runtime and Manager versions
   ansible.builtin.assert:
     that:
-      - support_matrix | selectattr('manager_version', '==', (cm_version.major + '.' + cm_version.minor + '.' + cm_version.patch)) |
-        selectattr('runtime_version', '==', cloudera_runtime_version | regex_search('(\\d+\\.\\d+\\.\\d+)')) | length > 0
+      - supported_cms |
+        selectattr('family', 'eq', prereq_supported_distribution_map[ansible_facts['distribution']] | default(ansible_facts['distribution'])) |
+        selectattr('version', 'eq', ansible_facts['distribution_version']) |
+        length > 0
+      - supported_runtime |
+        selectattr('family', 'eq', prereq_supported_distribution_map[ansible_facts['distribution']] | default(ansible_facts['distribution'])) |
+        selectattr('version', 'eq', ansible_facts['distribution_version']) |
+        length > 0
     fail_msg: "OS {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }} not supported."
   vars:
-    cm_version: "{{ cloudera_manager_version | cloudera.exe.cm_version }}"
+    supported_cms: "{{ lookup('cloudera.exe.supported', 'operating_systems', product='cloudera_manager', version=cloudera_manager_version) }}"
+    supported_runtime: "{{ lookup('cloudera.exe.supported', 'operating_systems', product='cloudera_runtime', version=cloudera_runtime_version) }}"
 
-# Validation 2 - Check if ECS is defined and supported
-- name: Data Services validations
-  when: data_services_version != None
+- name: Assert OS, Cloudera Manager, and Cloudera Runtime support for Cloudera Data Services version
+  when: cloudera_data_services_version is defined
+  vars:
+    supported_ecs: "{{ lookup('cloudera.exe.supported', 'products', 'operating_systems', product='cloudera_data_services', version=cloudera_data_services_version) }}"
   block:
-    - name: Asset that OS is supported for Data Services
+    - name: Assert OS support for Cloudera Data Services version
       ansible.builtin.assert:
         that:
-          - ansible_os_family in ecs_supported_os_families
-        fail_msg: "ECS '{{ data_services_version }}' is not supported on OS family '{{ ansible_os_family }}'."
+          - supported_ecs |
+            selectattr('family', 'defined') |
+            selectattr('family', 'eq', prereq_supported_distribution_map[ansible_facts['distribution']] | default(ansible_facts['distribution'])) |
+            selectattr('version', 'eq', ansible_facts['distribution_version']) |
+            length > 0
+        fail_msg: "OS {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }} not supported."
 
-    - name: Assert that Data Services Version is supported for Cloudera Runtime and Manager versions
+    - name: Assert Cloudera Runtime and Manager support for Cloudera Data Services version
       ansible.builtin.assert:
         that:
-          - support_matrix | selectattr('manager_version', '==', (cm_version.major + '.' + cm_version.minor + '.' + cm_version.patch)) |
-            selectattr('runtime_version', '==', cloudera_runtime_version) | selectattr('data_services_version', 'version', data_services_version, operator='le',
-            version_type='semver') | length > 0
-        fail_msg: >-
-          Data Services version '{{ data_services_version }}' not supported for runtime '{{ cloudera_runtime_version }}' and  manager version '{{ cloudera_manager_version
-          }}'.
-      vars:
-        cm_version: "{{ cloudera_manager_version | cloudera.exe.cm_version }}"
+          - supported_ecs |
+            selectattr('product_name', 'defined') |
+            selectattr('product_name', 'eq', 'CDP Private Cloud Base') |
+            selectattr('version', 'eq', cloudera_runtime_version) |
+            length > 0
+          - supported_ecs |
+            selectattr('product_name', 'defined') |
+            selectattr('product_name', 'eq', 'Cloudera Manager') |
+            selectattr('version', 'eq', cloudera_manager_version) |
+            length > 0
+        fail_msg: >
+          Data Services {{ cloudera_data_services_version }} not supported for
+          Runtime {{ cloudera_runtime_version }} and/or
+          Manager {{ cloudera_manager_version }}

@@ -14,5 +14,6 @@
 
 ---
 
-ecs_supported_os_families:
-  - "RedHat"
+# Map of ansible_distribution -> support matrix 'family'
+prereq_supported_distribution_map:
+  RedHat: RHEL
