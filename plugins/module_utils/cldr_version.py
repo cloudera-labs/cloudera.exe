@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import, division, print_function, annotations
+
+__metaclass__ = type
+
 import re
 
 from ansible.module_utils.compat.version import LooseVersion, Version
@@ -60,7 +64,7 @@ class ClouderaVersion(Version):
 
     version_re = CLDR_RE
 
-    def __init__(self, vstring=None):
+    def __init__(self, vstring:str = None):
         self.vstring = vstring
         self.major = None
         self.minor = None
@@ -141,7 +145,7 @@ class ClouderaVersion(Version):
             )
 
     @property
-    def core(self) -> tuple[int | None, int | None, int | None]:
+    def core(self) -> tuple:
         return self.major, self.minor, self.patch
 
     @property

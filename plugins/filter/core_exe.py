@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, annotations
 
 __metaclass__ = type
 
@@ -60,13 +60,16 @@ def combine_onto(*terms, **kwargs):
     return result
 
 
-def cldr_version(version: str):
+def cldr_version(*terms, **kwargs):
     """
     Parse a Cloudera version string into its parts.
     """
 
+    if not terms:
+        return {}
+
     try:
-        parsed_version = ClouderaVersion(version)
+        parsed_version = ClouderaVersion(terms[0])
         return dict(
             major=parsed_version.major,
             minor=parsed_version.minor,
