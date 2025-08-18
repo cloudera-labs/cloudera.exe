@@ -193,3 +193,70 @@ Commits and pull requests will fail if your contributions do not pass the `pre-c
 ```bash
 pre-commit run -a
 ```
+
+---
+
+# Testing
+
+This project uses [Hatch](https://hatch.pypa.io/dev/) to manage the project's dependencies, testing environments, and other activities. It also makes heavy use of [Ansible Molecule](https://ansible.readthedocs.io/projects/molecule/) and employs the [EC2 driver](https://github.com/ansible-community/molecule-plugins) to test using cloud instances.
+
+## Setup
+
+### Hatch Build System
+
+You should install `hatch` as [per its documentation](https://hatch.pypa.io/dev/install/#installers). `hatch` should be able to handle all dependencies, including Python versions and virtual environments.
+
+> [!danger] OSX `dirs.data` default!
+> The [default data directory](https://hatch.pypa.io/1.13/config/hatch/#data) for `hatch` is `~/Library/Application Support/hatch`, which causes trouble for `molecule`! You might need to change this location to a path with spaces!
+
+### AWS Credentials
+
+You will need valid AWS credentials set in your environment for `molecule` to operate successfully.
+
+In addition, make sure you have a default region declared, either in your `AWS_PROFILE` or `AWS_DEFAULT_REGION`.
+
+### Test Network
+
+`molecule` only manages the EC2 instances, not the VPC and associated networking.  To set up the required infrastructure, you can run the following `hatch` commands.
+
+```bash
+hatch run molecule:init
+```
+
+This will initialize the `tests/terraform` project which establishes the testing network in AWS.
+
+```bash
+hatch run molecule:setup
+```
+
+This command executes the `tests/terraform` project.
+
+Once your network is set up, be sure to set the `TEST_VPC_SUBNET_ID` and `TEST_VPC_SECURITY_GROUP` variables with the public subnet ID and intra-traffic security group name, respectively, of your testing network.
+
+```bash
+$(hatch run molecule:export-subnet)
+$(hatch run molecule:export-security-group)
+```
+
+## Execution
+
+Running `molecule` is straightforward. First, enable the `hatch` environment:
+
+```bash
+hatch shell molecule
+```
+
+And then change into the role directory that you wish to test, e.g. `cd roles/prereq_thp`, and run `molecule` from there.
+
+> [!info]
+> In some cases, you might need to set your `ANSIBLE_ROLES_PATH` to the `roles` directory of this project.
+
+## Teardown
+
+First, make sure that you have destroyed any `molecule` scenarios that are using your test infrastructure.
+
+And then, from the _project root_, run:
+
+```bash
+hatch run molecule:teardown
+```
