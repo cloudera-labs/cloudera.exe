@@ -71,6 +71,27 @@ filterwarnings = [
   "ignore:'crypt' is deprecated and slated for removal in Python 3.13:DeprecationWarning",
 ]
 
+[tool.hatch.envs.molecule]
+python = "3.12"
+detached = true
+extra-dependencies = [
+  "molecule",
+  # "molecule-plugins",
+  # "molecule-plugins[ec2]",
+  "molecule-plugins @ git+https://github.com/ansible-community/molecule-plugins.git", # Fixes https://github.com/ansible-community/molecule-plugins/issues/239
+  "boto",
+  "boto3",
+  "netaddr",
+]
+
+[tool.hatch.envs.molecule.scripts]
+init = "terraform -chdir=tests/terraform init"
+setup = "terraform -chdir=tests/terraform apply --auto-approve"
+teardown = "terraform -chdir=tests/terraform destroy --auto-approve"
+subnet = "terraform -chdir=tests/terraform output"
+export-subnet = "echo 'export TEST_VPC_SUBNET_ID='$(terraform -chdir=tests/terraform output public_subnet)"
+export-security-group = "echo 'export TEST_VPC_SECURITY_GROUP='$(terraform -chdir=tests/terraform output security_group)"
+
 [build-system]
 requires = [
   "hatchling",
