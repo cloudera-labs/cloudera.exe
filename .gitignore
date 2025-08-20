@@ -24,6 +24,10 @@ tests/integration/integration_config.yml
 # Remove molecule testing deployments
 **/molecule/*/deployment
 
+# Remove any Terraform for testing
+tests/terraform/.terraform*
+tests/terraform/terraform.tfstate*
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
