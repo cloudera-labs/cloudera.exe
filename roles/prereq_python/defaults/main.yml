@@ -16,12 +16,7 @@
 cloudera_manager_version: "{{ undef(hint='Please specify the Cloudera Manager version') }}"
 cloudera_runtime_version: "{{ undef(hint='Please specify the Cloudera Runtime version') }}"
 
-# python_version:
-# python3_package:
-# python3_pip_package:
-# python2_package:
-# python2_pip_package;
+# python_packages:
+# python_pip_packages:
 
 prereq_python_upgrade: true
-
-# TODO REMOVE? python2_package_install: true
