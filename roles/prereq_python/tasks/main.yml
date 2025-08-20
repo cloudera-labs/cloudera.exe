@@ -1,3 +1,4 @@
+---
 # Copyright 2024 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,68 +13,59 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-- name: Load support matrix variables for OS
-  ansible.builtin.include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ role_path }}/../prereq_supported/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
-    - "{{ role_path }}/../prereq_supported/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "{{ role_path }}/../prereq_supported/vars/{{ ansible_facts['distribution'] }}.yml"
-    - "{{ role_path }}/../prereq_supported/vars/{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
-    - "{{ role_path }}/../prereq_supported/vars/{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "{{ role_path }}/../prereq_supported/vars/{{ ansible_facts['os_family'] }}.yml"
-    - "{{ role_path }}/../prereq_supported/vars/default.yml"
+- name: Gather distribution and Python details
+  ansible.builtin.setup:
+    gather_subset:
+      - distribution
+      - python
 
-- name: Set required python version for specified runtime and manager versions
+- name: Gather supported Python versions for Cloudera Runtime and Manager versions and OS
   ansible.builtin.set_fact:
-    __required_python_version: >-
-      {{
-        support_matrix |
-        selectattr('manager_version', 'ansible.builtin.version', cloudera_manager_version) |
-        selectattr('runtime_version', 'ansible.builtin.version', cloudera_runtime_version) |
-        map(attribute='python_version') |
-        first
-      }}
-    __required_python2_version: >-
-      {{
-        (
-          support_matrix |
-          selectattr('manager_version', 'ansible.builtin.version', cloudera_manager_version) |
-          selectattr('runtime_version', 'ansible.builtin.version', cloudera_runtime_version) |
-          map(attribute='python2') |
-          first
-        ) |
-        default(omit)
-      }}
-    __python3_version: "{{ ansible_python_version }}"
+    prereq_python_supported: "{{ supported_cms | intersect(supported_runtime) | sort | list }}"
   vars:
-    cm_version: "{{ cloudera_manager_version | cloudera.exe.cm_version }}"
+    supported_cms: "{{
+      lookup('cloudera.exe.supported', 'products', product='cloudera_manager', version=cloudera_manager_version, raw_filters=['OPERATING_SYSTEMS=' + supported_os + '-' + ansible_facts['distribution_version']]) |
+      selectattr('product_name', 'eq', 'Python') |
+      map(attribute='version') |
+      unique |
+      list
+    }}"
+    supported_runtime: "{{
+      lookup('cloudera.exe.supported', 'products', product='cloudera_runtime', version=cloudera_runtime_version, raw_filters=['OPERATING_SYSTEMS=' + supported_os + '-' + ansible_facts['distribution_version']]) |
+      selectattr('product_name', 'eq', 'Python') |
+      map(attribute='version') |
+      unique |
+      list
+    }}"
+    supported_os: "{{ prereq_python_supported_os_map[ansible_facts['distribution']] | default(ansible_facts['distribution']) }}"
 
-- name: If required check if Python2 is installed
+# - name: Validate specified Python against supported versions
+#   when: python_version is defined
+#   ansible.builtin.assert:
+#     that:
+#       -  prereq_python_supported is contains(python_split[:2] | join("."))
+#     failed_msg:
+#       "Python version {{ python_version }} is not supported for Cloudera Manager
+#       {{ cloudera_manager_version }} and/or Cloudera Runtime {{ cloudera_runtime_version }}"
+#   vars:
+#     python_version_split: "{{ python_version | ansible.builtin.split('.') }}"
+
+- name: Update or install Python
   when:
-    - __required_python2_version is defined
-  block:
-    - name: Check python2 version
-      ansible.builtin.command: python2 --version
-      register: __py2_check
-      changed_when: false
-      ignore_errors: true
 
-    - name: Set facts for Python versions
-      ansible.builtin.set_fact:
-        __python2_installed: "{{ __py2_check.rc == 0 }}"
-        __python2_version: "{{ (__py2_check.stdout.split(' ')[1]) if __py2_check.rc == 0 else '0.0.0' }}"
-
-- name: Print Python versions
-  ansible.builtin.debug:
-    msg:
-      - "Required Python version: {{ __required_python_version }}"
-      - "Python version installed: {{ __python3_version }}"
-      - "Python2 required: {{ True if __required_python2_version is defined else False }}"
-      - "Python2 vesion installed: {{ __python2_version if __python2_version is defined else 'N/A' }}"
-    verbosity: 2
-
-- name: Include OS-specific tasks to update or install Python
+    # (
+    #   python_version is defined and
+    #   python_version is not version(ansible_python_version, "eq", version_type="pep440")
+    # ) or (
+    prereq_python_upgrade and
+    prereq_python_supported is not contains(
+      [
+        ansible_python["version"]["major"],
+        ansible_python["version"]["minor"]
+      ] |
+      join(".")
+    )
+    # )
   ansible.builtin.include_tasks: "{{ item }}"
   with_first_found:
     - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
@@ -83,3 +75,8 @@
     - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
     - "{{ ansible_facts['os_family'] }}.yml"
     - "default.yml"
+
+- name: Ensure pip is upgraded
+  ansible.builtin.pip:
+    name: pip
+    extra_args: --upgrade

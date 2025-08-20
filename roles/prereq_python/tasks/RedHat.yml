@@ -14,42 +14,68 @@
 
 ---
 # Python3 and Pip
-- name: Install supported version of Python3 if required
+- name: Install supported version of Python3
   when:
-    - not __python3_version is version(__required_python_version, 'ge', version_type='pep440')
+    # (
+    #   python_version is defined and
+    #   python_version |
+    #   ansible.builtin.split(".") |
+    #   first == "3"
+    # ) or (
+    prereq_python_supported |
+    first |
+    ansible.builtin.split(".") |
+    first == "3"
+    # )
+  vars:
+    __p3_version: "{{ prereq_python_supported | first | string }}"
   block:
-    - name: Install python3 package if defined
-      when: python3_package is defined
+    - name: Install python3
       ansible.builtin.package:
-        name: "{{ python3_package }}"
+        name: "{{ python3_package | default('python' + __p3_version) }}"
         state: present
 
-    - name: Download and install
-      when: python3_package is not defined
-      ansible.builtin.debug:
-        msg:
-          - "TODO - install Python version {{ __required_python_version }}"
+    # - name: Download and install
+    #   when: python3_package is not defined
+    #   ansible.builtin.debug:
+    #     msg:
+    #       - "TODO - install Python version {{ __required_python_version }}"
 
-- name: Ensure pip is installed
-  ansible.builtin.package:
-    name: "{{ python3_pip_package }}"
-    state: present
-
-- name: Ensure pip is upgraded
-  ansible.builtin.pip:
-    name: pip
-    extra_args: --upgrade
+    - name: Install pip3
+      ansible.builtin.package:
+        name: "{{ python3_pip_package | default('python' + __p3_version + '-pip') }}"
+        state: present
 
 # Python2 and Pip
 - name: Ensure supported version of Python2
   when:
-    - __required_python2_version is defined
+    # (
+    #   python_version is defined and
+    #   python_version |
+    #   ansible.builtin.split(".") |
+    #   first == "2"
+    # ) or (
+    prereq_python_supported |
+    first |
+    ansible.builtin.split(".") |
+    first == "2"
+    # )
+  vars:
+    __p2_version: "{{ prereq_python_supported | first | string }}"
   block:
-    - name: Install Python2 if required
-      when:
-        - not __python2_version is version(__required_python2_version, 'ge', version_type='pep440')
-      block:
-        - name: Download and install
-          ansible.builtin.debug:
-            msg:
-              - "TODO - install Python version {{ __required_python2_version }}"
+    # TODO Confirm Python2 package names
+    - name: Install python2
+      ansible.builtin.package:
+        name: "{{ python2_package | default('python' + __p2_version) }}"
+        state: present
+
+    # - name: Download and install
+    #   when: python2_package is not defined
+    #   ansible.builtin.debug:
+    #     msg:
+    #       - "TODO - install Python version {{ __required_python_version }}"
+
+    - name: Install pip2
+      ansible.builtin.package:
+        name: "{{ python2_pip_package | default('python' + __p2_version + '-pip') }}"
+        state: present

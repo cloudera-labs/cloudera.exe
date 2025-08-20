@@ -14,9 +14,21 @@
 
 ---
 # Python3 and Pip
-- name: Install supported version of Python3 if required
+- name: Install supported version of Python3
   when:
-    - not __python3_version is version(__required_python_version, 'ge', version_type='pep440')
+    # (
+    #   python_version is defined and
+    #   python_version |
+    #   ansible.builtin.split(".") |
+    #   first == "3"
+    # ) or (
+    prereq_python_supported |
+    first |
+    ansible.builtin.split(".") |
+    first == "3"
+    # )
+  vars:
+    __p3_version: "{{ prereq_python_supported | first | string }}"
   block:
     - name: Ensure required dependencies are installed
       ansible.builtin.package:
@@ -37,81 +49,84 @@
 
     - name: Extract Python3 source
       ansible.builtin.unarchive:
-        src: https://www.python.org/ftp/python/{{ __required_python_version }}/Python-{{ __required_python_version }}.tgz
+        src: https://www.python.org/ftp/python/{{ __p3_version }}/Python-{{ __p3_version }}.tgz
         dest: /tmp
         remote_src: true
 
     - name: Configure Python3 for installation
       ansible.builtin.command: ./configure --enable-optimizations
       args:
-        chdir: /tmp/Python-{{ __required_python_version }}
+        chdir: /tmp/Python-{{ __p3_version }}
       changed_when: true
 
     - name: Build Python3 'all' target with extra arguments
       community.general.make:
-        chdir: /tmp/Python-{{ __required_python_version }}
+        chdir: /tmp/Python-{{ __p3_version }}
         target: altinstall
 
-- name: Ensure pip is installed
-  ansible.builtin.package:
-    name: python3-pip
-    state: present
-
-- name: Ensure pip is upgraded
-  ansible.builtin.pip:
-    name: pip
-    extra_args: --upgrade
+    - name: Ensure pip is installed
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
 
 # Python2 and Pip
 - name: Ensure supported version of Python2
   when:
-    - __required_python2_version is defined
+    # (
+    #   python_version is defined and
+    #   python_version |
+    #   ansible.builtin.split(".") |
+    #   first == "2"
+    # ) or (
+    prereq_python_supported |
+    first |
+    ansible.builtin.split(".") |
+    first == "2"
+    # )
+  vars:
+    __p2_version: "{{ prereq_python_supported | first | string }}"
   block:
-    - name: Install Python2 if required
-      when:
-        - not (__python2_version is version(__required_python2_version, 'ge', version_type='pep440'))
+    # Install Python2 via system package
+    - name: Install Python2 package
+      when: python2_package_install
+      ansible.builtin.package:
+        name: "python{{ __p2_version }}"
+        state: present
+
+    # Install Python2 via source
+    - name: Install Python2 source
+      when: not python2_package_install
       block:
-        # Install Python2 via system package
-        - name: Install Python2 package
-          when: python2_package_install
+        - name: Ensure required dependencies are installed
           ansible.builtin.package:
-            name: "python{{ __required_python2_version }}"
+            name:
+              - build-essential
+              - zlib1g-dev
+              - libncurses5-dev
+              - libgdbm-dev
+              - libnss3-dev
+              - libssl-dev
+              - libreadline-dev
+              - libffi-dev
+              - curl
+              - libsqlite3-dev
+              - libbz2-dev
             state: present
+            update_cache: true
 
-        # Install Python2 via source
-        - name: Install Python2 source
-          when: not python2_package_install
-          block:
-            - name: Ensure required dependencies are installed
-              ansible.builtin.package:
-                name:
-                  - build-essential
-                  - zlib1g-dev
-                  - libncurses5-dev
-                  - libgdbm-dev
-                  - libnss3-dev
-                  - libssl-dev
-                  - libreadline-dev
-                  - libffi-dev
-                  - curl
-                  - libsqlite3-dev
-                  - libbz2-dev
-                state: present
-                update_cache: true
+        - name: Extract Python2 source
+          ansible.builtin.unarchive:
+            src: https://www.python.org/ftp/python/{{ __p2_version }}/Python-{{ __p2_version }}.tgz
+            dest: /tmp
+            remote_src: true
 
-            - name: Extract Python2 source
-              ansible.builtin.unarchive:
-                src: https://www.python.org/ftp/python/{{ __required_python2_version }}/Python-{{ __required_python2_version }}.tgz
-                dest: /tmp
-                remote_src: true
+        - name: Configure Python2 for installation
+          ansible.builtin.command: ./configure --enable-optimizations
+          args:
+            chdir: /tmp/Python-{{ __p2_version }}
+          changed_when: true
 
-            - name: Configure Python2 for installation
-              ansible.builtin.command: ./configure --enable-optimizations
-              args:
-                chdir: /tmp/Python-{{ __required_python2_version }}
-              changed_when: true
-
-            - name: Build Python2 'all' target with extra arguments
-              community.general.make:
-                chdir: /tmp/Python-{{ __required_python2_version }}
-                target: altinstall
+        - name: Build Python2 'all' target with extra arguments
+          community.general.make:
+            chdir: /tmp/Python-{{ __p2_version }}
+            target: altinstall
