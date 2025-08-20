@@ -1,23 +1,21 @@
 # prereq_python
 
-Install Python
+Install Python and pip.
 
-This role ensures that the correct versions of Python are installed on a host to meet the requirements of specified Cloudera Manager and Cloudera Runtime versions. It also handles the installation and update of the `pip` package manager for Python 3. For environments that still require Python 2, the role provides a flag to control whether the installation is done via the system package manager or from source.
+This role ensures that the correct versions of Python are installed on a host to meet the requirements of specified Cloudera Manager and Cloudera Runtime versions. It also handles the installation and update of the `pip` package manager. For environments that still require Python 2, the role provides a flag to control whether the installation is done via the system package manager or from source.
 
 To validate the required Python version for a given Cloudera Manager and Runtime, the [Cloudera on premise documentation](https://docs.cloudera.com/cdp-private-cloud-base/latest/installation/topics/cdpdc-cm-install-python-3.8.html) and the support matrix variables defined in the `cloudera.exe.prereq_supported` role are used.
 
 The role will:
 - Determine the required Python versions based on `cloudera_manager_version` and `cloudera_runtime_version`.
-- Install the necessary Python 3 packages if a supported version is not already present.
-- Install or update the `pip` package for Python 3.
-- If Python 2 is required, install it either via the system's package manager (`python2_package_install: true`) or from source (`python2_package_install: false`).
-- Ensure that the installed Python versions and `pip` are properly configured and accessible.
+- Install the necessary Python packages if a supported version is not already present and installations and upgrades are enabled.
+- Install or update the `pip` package for Python.
+- Ensure that the installed Python versions and `pip` are properly configured and updated.
 
 # Requirements
 
 - Root or `sudo` privileges are required on the target host to install system packages.
 - Network access to package repositories (for system packages) and PyPI (for pip).
-- If installing Python 2 from source, the host will require build tools (e.g., `gcc`, `make`, development headers).
 
 # Dependencies
 
@@ -27,11 +25,11 @@ None.
 
 | Variable | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `cloudera_manager_version` | `str` | `False` | `7.11.3` | The version of Cloudera Manager to use for determining Python version requirements. |
-| `cloudera_runtime_version` | `str` | `False` | `7.1.9` | The version of Cloudera Runtime to use for determining Python version requirements. |
-| `python3_package` | `str` | `False` | - | An optional name of the Python 3 package to install. This is only used when a supported version of Python 3 is not found. If not specified, the role will use OS-specific default package names. |
-| `python3_pip_package` | `str` | `False` | `python-pip` | The name of the Python 3 Pip package to be installed or updated. |
-| `python2_package_install` | `bool` | `False` | `true` | Flag to specify if Python 2 should be installed via the system package manager. If `false`, the role will attempt to install Python 2 from source. |
+| `cloudera_manager_version` | `str` | `True` | | The version of Cloudera Manager to use for determining Python version requirements. |
+| `cloudera_runtime_version` | `str` | `True` | | The version of Cloudera Runtime to use for determining Python version requirements. |
+| `python_packages` | `list[str]` | `False` | - | Optional names of the Python packages to install. This is only used when a supported version of Python is not found. If not specified, the role will use OS-specific default package names. |
+| `python_pip_packages` | `list[str]` | `False` | `[ python-pip ]` | The names of the Python pip packages to be installed or updated. |
+| `prereq_python_upgrade` | `bool` | `False` | `true` | Flag to enable Python installation or upgrade if a supported version is not present. If `true`, the latest supported version or the `python_packages` will be installed. |
 
 # Example Playbook
 
@@ -41,22 +39,20 @@ None.
     - name: Install Python for Cloudera Manager 7.11.3 / Cloudera Runtime 7.1.9
       ansible.builtin.import_role:
         name: cloudera.exe.prereq_python
-      # All variables will use their defaults, installing Python 3 with pip and Python 2 via package manager.
+      vars:
+        cloudera_manager_version: 7.11.3
+        cloudera_runtime_version: 7.1.9
 
-    - name: Install Python for a different version of Cloudera Runtime
+    - name: Install Python with custom package names
       ansible.builtin.import_role:
         name: cloudera.exe.prereq_python
       vars:
-        cloudera_runtime_version: "7.1.8"
-        # The role will adjust Python version requirements accordingly.
-
-    - name: Install Python with custom package names and install Python 2 from source
-      ansible.builtin.import_role:
-        name: cloudera.exe.prereq_python
-      vars:
-        python3_package: "python39" # Example custom package name for Python 3.9
-        python3_pip_package: "python3-pip"
-        python2_package_install: false # Install Python 2 from source
+        cloudera_manager_version: 7.11.3
+        cloudera_runtime_version: 7.1.9
+        python_packages:
+          - python39 # Example custom package name for Python 3.9
+        python_pip_package:
+          - python3-pip
 ```
 
 # License

@@ -30,6 +30,8 @@ platforms:
   - name: rhel9-4.molecule.internal
     image_owner: "309956199498"
     image_name: RHEL-9.4.0_HVM-*
+    image_filters:
+      architecture: x86_64
     instance_type: t3.medium
     boot_wait_seconds: 15
     vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
@@ -48,6 +50,8 @@ platforms:
       Project: Molecule testing for prereq_python
 provisioner:
   name: ansible
-  # inventory:
-  #   group_vars:
-  #     all:
+  inventory:
+    group_vars:
+      all:
+        cloudera_manager_version: 7.13.1
+        cloudera_runtime_version: 7.1.9 SP1

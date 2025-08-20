@@ -13,43 +13,43 @@
 # limitations under the License.
 
 ---
-# Python3 and Pip
-- name: Install supported version of Python3 if required
+
+- name: Install supported Python
   when:
-    - not __python3_version is version(__required_python_version, 'ge', version_type='pep440')
+    prereq_python_upgrade and
+    prereq_python_supported is not contains(
+      [
+        ansible_python["version"]["major"],
+        ansible_python["version"]["minor"]
+      ] |
+      join(".")
+    )
+  vars:
+    __python_version: "{{ prereq_python_supported | first | string }}"
   block:
-    - name: Install python3 package if defined
-      when: python3_package is defined
+    - name: Install supported version of Python3
+      when:
+        prereq_python_supported |
+        first |
+        ansible.builtin.split(".") |
+        first == "3"
       ansible.builtin.package:
-        name: "{{ python3_package }}"
+        name: "{{ python_packages | default('python' + __python_version) }}"
         state: present
 
-    - name: Download and install
-      when: python3_package is not defined
-      ansible.builtin.debug:
-        msg:
-          - "TODO - install Python version {{ __required_python_version }}"
-
-- name: Ensure pip is installed
-  ansible.builtin.package:
-    name: "{{ python3_pip_package }}"
-    state: present
-
-- name: Ensure pip is upgraded
-  ansible.builtin.pip:
-    name: pip
-    extra_args: --upgrade
-
-# Python2 and Pip
-- name: Ensure supported version of Python2
-  when:
-    - __required_python2_version is defined
-  block:
-    - name: Install Python2 if required
+    # TODO Confirm Python2 package names
+    - name: Install supported version of Python2
       when:
-        - not __python2_version is version(__required_python2_version, 'ge', version_type='pep440')
-      block:
-        - name: Download and install
-          ansible.builtin.debug:
-            msg:
-              - "TODO - install Python version {{ __required_python2_version }}"
+        prereq_python_supported |
+        first |
+        ansible.builtin.split(".") |
+        first == "2"
+      ansible.builtin.package:
+        name: "{{ python_packages | default('python' + __python_version) }}"
+        state: present
+
+# TODO Confirm Python2-pip package names
+- name: Install pip
+  ansible.builtin.package:
+    name: "{{ python_pip_packages | default('python-pip') }}"
+    state: present
