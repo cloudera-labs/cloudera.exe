@@ -39,33 +39,16 @@
     }}"
     supported_os: "{{ prereq_python_supported_os_map[ansible_facts['distribution']] | default(ansible_facts['distribution']) }}"
 
-# - name: Validate specified Python against supported versions
-#   when: python_version is defined
-#   ansible.builtin.assert:
-#     that:
-#       -  prereq_python_supported is contains(python_split[:2] | join("."))
-#     failed_msg:
-#       "Python version {{ python_version }} is not supported for Cloudera Manager
-#       {{ cloudera_manager_version }} and/or Cloudera Runtime {{ cloudera_runtime_version }}"
-#   vars:
-#     python_version_split: "{{ python_version | ansible.builtin.split('.') }}"
+- name: Confirm Python version(s) for Cloudera Runtime and Manager versions and OS
+  ansible.builtin.assert:
+    that:
+      - prereq_python_supported | length > 0
+    fail_msg:
+      "{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
+      is not supported by Cloudera Manager {{ cloudera_manager_version }}
+      and Cloudera Runtime {{ cloudera_runtime_version }}"
 
 - name: Update or install Python
-  when:
-
-    # (
-    #   python_version is defined and
-    #   python_version is not version(ansible_python_version, "eq", version_type="pep440")
-    # ) or (
-    prereq_python_upgrade and
-    prereq_python_supported is not contains(
-      [
-        ansible_python["version"]["major"],
-        ansible_python["version"]["minor"]
-      ] |
-      join(".")
-    )
-    # )
   ansible.builtin.include_tasks: "{{ item }}"
   with_first_found:
     - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
