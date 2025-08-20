@@ -23,7 +23,7 @@ module: jdk_facts
 short_description: Retrieve JDK information
 description:
   - Retrieve information about the installed Java JDK as facts.
-options: {}
+version_added: 3.0.0
 author:
   - Webster Mudge <wmudge@cloudera.com>
 extends_documentation_fragment:
@@ -38,7 +38,8 @@ attributes:
     support: full
   platform:
     support: full
-  seealso:
+seealso:
+  - name: Java version history
     description: Java version history
     link: https://en.wikipedia.org/wiki/Java_version_history
 """

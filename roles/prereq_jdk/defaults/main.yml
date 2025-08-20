@@ -19,3 +19,6 @@ jdk_install_packages: true
 jdk_version: 17
 # jdk_security_paths: []
 jdk_security_paths_override: false
+
+cloudera_manager_version: "{{ undef(hint='Please specify the Cloudera Manager version') }}"
+cloudera_runtime_version: "{{ undef(hint='Please specify the Cloudera Runtime version') }}"

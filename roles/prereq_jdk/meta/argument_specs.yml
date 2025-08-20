@@ -60,3 +60,11 @@ argument_specs:
           - Flag to disable JCE changes ifo multiple C(java.security) files are found.
         type: bool
         default: false
+      cloudera_manager_version:
+        description: Version of Cloudera Manager for validation testing
+        type: str
+        required: true
+      cloudera_runtime_version:
+        description: Version of Cloudera Runtime for validation testing
+        type: str
+        required: true
