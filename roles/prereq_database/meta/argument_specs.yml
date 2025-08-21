@@ -64,6 +64,6 @@ argument_specs:
             type: str
             required: true
           owner:
-            description: The name of the database user owning the database. Defaults to O(database_accounts.user).
+            description: The name of the database user owning the database. Defaults to O(database_accounts[].user).
             type: str
             required: false
