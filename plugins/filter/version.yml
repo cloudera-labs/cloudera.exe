@@ -57,7 +57,7 @@ RETURN:
       - A dictionary of the version parts.
       - If unable to parse the string, returns C(None).
     type: dict
-    options:
+    contains:
       major:
         description: Major version
       minor:
