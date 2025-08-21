@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Copyright 2024 Cloudera, Inc.
 #
@@ -23,7 +24,7 @@ module: jdk_facts
 short_description: Retrieve JDK information
 description:
   - Retrieve information about the installed Java JDK as facts.
-version_added: 3.0.0
+version_added: "3.0.0"
 author:
   - Webster Mudge <wmudge@cloudera.com>
 extends_documentation_fragment:
