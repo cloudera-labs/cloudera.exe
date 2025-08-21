@@ -1,16 +1,17 @@
-# prereq_ecs
+# prereq_cloudera_users
 
-Set up for ECS
+Set up for Local User Accounts required by Cloudera services
 
-This role prepares a host for Cloudera Embedded Container Service (ECS) usage by configuring the firewall and network settings. It ensures that the host's environment is properly configured to support ECS components and operations, including user permissions and network security rules.
+This role prepares a host for Cloudera Manager usage by performing several foundational setup tasks. It creates the dedicated `cloudera-scm` system user and group and configures the user's home directory and permissions.
 
 The role will:
-- Configure firewall rules to allow traffic required by ECS components.
-- Set up networking configurations to ensure proper communication within the ECS environment.
+- Create the `cloudera-scm` system user and group.
+- Configure permissions for the `cloudera-scm` user's home directory (`/var/lib/cloudera-scm`).
+- Set up TLS ACLs (Access Control Lists) on the host, if needed by the Cloudera Manager service.
 
 # Requirements
 
-- Root or `sudo` privileges are required on the target host to manage system users, firewall rules, and network configurations.
+- Root or `sudo` privileges are required on the target host to manage system users, groups, and packages.
 
 # Dependencies
 
@@ -25,14 +26,16 @@ None.
 # Example Playbook
 
 ```yaml
-- hosts: ecs_nodes
+- hosts: cm_nodes
   tasks:
-    - name: Set up the host for ECS usage
+    - name: Perform default Cloudera User Setup
       ansible.builtin.import_role:
-        name: cloudera.exe.prereq_ecs
+        name: cloudera.exe.prereq_cloudera_users
+      # This will create the cloudera-scm user
+
 ```
 
-## License
+# License
 
 ```
 Copyright 2025 Cloudera, Inc.

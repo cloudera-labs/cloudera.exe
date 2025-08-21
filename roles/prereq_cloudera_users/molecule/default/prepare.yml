@@ -1,5 +1,5 @@
 ---
-# Copyright 2024 Cloudera, Inc.
+# Copyright 2025 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Verify
+- name: Prepare
   hosts: all
   gather_facts: false
+  become: true
   tasks:
-    - name: Skip verify
-      meta: noop
+    - name: Create TLS paths
+      when: lookup('vars', tls_file, default=False)
+      ansible.builtin.file:
+        path: "{{ lookup('vars', tls_file) }}"
+        state: touch
+        owner: root
+        group: root
+        mode: "0640"
+      loop:
+        - tls_keystore_path
+        - tls_keystore_path_generic
+        - tls_key_path
+        - tls_key_path_generic
+        - tls_key_password_file
+        - tls_key_path_plaintext
+        - tls_key_path_plaintext_generic
+      loop_control:
+        loop_var: tls_file

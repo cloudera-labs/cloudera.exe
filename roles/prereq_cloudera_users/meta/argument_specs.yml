@@ -15,11 +15,9 @@
 
 argument_specs:
   main:
-    short_description: Set up firewall, and networking for ECS
+    short_description: Set up user accounts Cloudera Manager
     description:
-      - Set up for Cloudera Embedded Container Service (ECS) usage including configuration of firewall and networking
-        configuration.
-      - The creation of required local users is handled by the dependant P(cloudera.exe.prereq_users#role) role.
+      - Set up for Cloudera users, notably, create the local C(cloudera-scm) user, including C(HOME) directory permissions.
     author: Cloudera Labs
     version_added: "3.0.0"
     options: {}
