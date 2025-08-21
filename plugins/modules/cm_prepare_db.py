@@ -15,7 +15,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
+DOCUMENTATION = r"""
+module: cm_prepare_db
+short_description: Configure the external Cloudera Manager server database
+description:
+  - Configure the external Cloudera Manager server database.
+author:
+  - "Webster Mudge (@wmudge)"
+version_added: "3.0.0"
+options:
+  config:
+    description:
+      - The database properties configuration file.
+    type: path
+    required: false
+    default: "/etc/cloudera-scm-server/db.properties"
+  script:
+    description:
+      - The script to execute.
+    type: path
+    required: true
+  type:
+    description:
+      - The database type to install.
+    type: str
+    required: true
+    choices:
+      - postgresql
+      - oracle
+      - mysql
+  host:
+    description:
+      - The database server host.
+    type: str
+    required: true
+  port:
+    description:
+      - The database server port.
+    type: int
+    required: true
+  database:
+    description:
+      - The name of the database.
+    type: str
+    required: true
+  username:
+    description:
+      - The username to access the database server.
+    type: str
+    required: true
+  password:
+    description:
+      - The password to access the database server.
+    type: str
+    required: true
+"""
+
+EXAMPLES = r"""
+- name: Prepare Cloudera Manager server external database
+  cloudera.exe.cm_prepare_db:
+    script: /opt/scm_prepare_database.sh
+    type: postreqsql
+    host: db.example.internal
+    port: 7717
+    database: cms
+    username: cms_db_user
+    password: SuperSecretPassword
+"""
+
+RETURN = r""""""
 
 import configparser
 
