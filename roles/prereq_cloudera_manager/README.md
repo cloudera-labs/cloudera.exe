@@ -18,7 +18,7 @@ The role will:
 
 # Dependencies
 
-None.
+- `cloudera.exe.prereq_cloudera_users`
 
 # Parameters
 
