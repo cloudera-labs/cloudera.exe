@@ -13,41 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Include local_accounts from Cloudera Manager role
-  ansible.builtin.include_role:
-    name: cloudera.exe.prereq_cloudera_manager
-    public: true
-    rolespec_validate: false
-    tasks_from: no_op.yml
-
-- name: Create local user accounts
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_local_account
-    rolespec_validate: false
-  vars:
-    local_accounts: "{{ cloudera_manager_local_accounts | community.general.keep_keys(target=target_keys) | list }}"
-    target_keys:
-      - user
-      - home
-      - uid
-      - shell
-      - comment
-      - extra_groups
-      - mode
-
-- name: Set local user ACLs on TLS entities
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_tls_acls
-    rolespec_validate: false
-  vars:
-    acl_user_accounts: "{{ cloudera_manager_local_accounts | community.general.keep_keys(target=target_keys) | list }}"
-    target_keys:
-      - user
-      - key_acl
-      - key_password_acl
-      - keystore_acl
-      - unencrypted_key_acl
-
 - name: Gather host distribution details
   ansible.builtin.setup:
     gather_subset: distribution

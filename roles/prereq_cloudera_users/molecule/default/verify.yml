@@ -16,8 +16,28 @@
 - name: Verify
   hosts: all
   gather_facts: false
-  # vars_files: "../../vars/main.yml"
+  vars_files: "../../vars/main.yml"
   tasks:
+    - name: Check users
+      ansible.builtin.command: "grep {{ account.user }} /etc/passwd"
+      register: result
+      failed_when: result.rc != 0
+      changed_when: false
+      loop: "{{ cloudera_manager_local_accounts }}"
+      loop_control:
+        loop_var: account
+        label: "{{ account.user }}"
+
+    - name: Check HOME directory permissions
+      ansible.builtin.stat:
+        path: "{{ account.home }}"
+      register: __home
+      failed_when: not __home.stat.exists or __home.stat.mode != account.mode
+      loop: "{{ cloudera_manager_local_accounts | rejectattr('mode', 'undefined') | list }}"
+      loop_control:
+        loop_var: account
+        label: "{{ account.user }}"
+
     - name: Check TLS ACLs
       ansible.builtin.include_role:
         name: cloudera.exe.prereq_tls_acls

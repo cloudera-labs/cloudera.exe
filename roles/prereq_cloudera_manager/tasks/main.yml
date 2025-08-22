@@ -13,32 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Create local user accounts
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_local_account
-  vars:
-    local_accounts: "{{ cloudera_manager_local_accounts | community.general.keep_keys(target=target_keys) | list }}"
-    target_keys:
-      - user
-      - home
-      - uid
-      - shell
-      - comment
-      - extra_groups
-      - mode
-
-- name: Set local user ACLs on TLS entities
-  ansible.builtin.import_role:
-    name: cloudera.exe.prereq_tls_acls
-  vars:
-    acl_user_accounts: "{{ cloudera_manager_local_accounts | community.general.keep_keys(target=target_keys) | list }}"
-    target_keys:
-      - user
-      - key_acl
-      - key_password_acl
-      - keystore_acl
-      - unencrypted_key_acl
-
 - name: Include OS-specific variables
   ansible.builtin.include_vars: "{{ item }}"
   with_first_found:

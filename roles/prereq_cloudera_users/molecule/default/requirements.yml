@@ -13,13 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-argument_specs:
-  main:
-    short_description: Set up firewall, and networking for ECS
-    description:
-      - Set up for Cloudera Embedded Container Service (ECS) usage including configuration of firewall and networking
-        configuration.
-      - The creation of required local users is handled by the dependant P(cloudera.exe.prereq_users#role) role.
-    author: Cloudera Labs
-    version_added: "3.0.0"
-    options: {}
+collections:
+  - community.crypto
+  - amazon.aws
+  - ansible.posix
+  - ansible.utils
+  - community.general
