@@ -18,3 +18,4 @@ __cm_repo_default_url: https://archive.cloudera.com
 # Map of ansible_distribution -> support matrix 'family'
 cm_repo_supported_distribution_map:
   RedHat: RHEL
+  Rocky: "Rocky Linux"

@@ -37,7 +37,7 @@
       unique |
       list
     }}"
-    supported_os: "{{ prereq_python_supported_os_map[ansible_facts['distribution']] | default(ansible_facts['distribution']) }}"
+    supported_os: "{{ prereq_python_supported_os_map[ansible_facts['distribution']] | default(ansible_facts['distribution']) | urlencode }}"
 
 - name: Confirm Python version(s) for Cloudera Runtime and Manager versions and OS
   ansible.builtin.assert:
