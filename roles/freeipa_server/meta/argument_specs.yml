@@ -60,7 +60,7 @@ argument_specs:
       ipaserver_forward_no_overlap_check:
         description:
           - Skip overlap check for forward DNS zones.
-        default: false      
+        default: false
       ipaserver_reverse_no_overlap_check:
         description:
           - Skip overlap check for reverse DNS zones.
