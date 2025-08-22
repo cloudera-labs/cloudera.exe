@@ -1,0 +1,488 @@
+objects:
+  role:
+    auto_repo_mirror:
+      description: Repository preseed
+      name: auto_repo_mirror
+      version_added: 2.0.0
+    blackbox:
+      description: Install Blackbox Exporter
+      name: blackbox
+      version_added: 2.4.0
+    blackbox_exporter:
+      description: Install Blackbox Exporter
+      name: blackbox_exporter
+      version_added: 3.0.0
+    caddy:
+      description: Install Caddy proxy packages.
+      name: caddy
+      version_added: 3.0.0
+    cm_agent:
+      description: Install Cloudera Manager agent packages.
+      name: cm_agent
+      version_added: 3.0.0
+    cm_csd:
+      description: Install Cloudera CSDs
+      name: cm_csd
+      version_added: 3.0.0
+    cm_repo:
+      description: Manage the package repository for Cloudera Manager.
+      name: cm_repo
+      version_added: 3.0.0
+    cm_server:
+      description: Install Cloudera Manager server
+      name: cm_server
+      version_added: 3.0.0
+    common:
+      description: Common configuration
+      name: common
+      version_added: 1.0.0
+    data:
+      description: Data
+      name: data
+      version_added: 1.0.0
+    docker:
+      description: Install Docker
+      name: docker
+      version_added: 3.0.0
+    dynamic_inventory:
+      description: Dynamic inventory
+      name: dynamic_inventory
+      version_added: 2.0.0
+    freeipa_client:
+      description: Set up FreeIPA client
+      name: freeipa_client
+      version_added: 2.0.0
+    freeipa_host_group:
+      description: FreeIPA host inventory
+      name: freeipa_host_group
+      version_added: 1.2.0
+    freeipa_server:
+      description: Set up FreeIPA server
+      name: freeipa_server
+      version_added: 2.0.0
+    freeipa_server_ecs:
+      description: Configure DNS zones and wildcard records for ECS
+      name: freeipa_server_ecs
+      version_added: 3.0.0
+    freeipa_server_users:
+      description: Set up superusers in FreeIPA
+      name: freeipa_server_users
+      version_added: 3.0.0
+    grafana:
+      description: Set up Grafana server
+      name: grafana
+      version_added: 2.4.0
+    info:
+      description: Info
+      name: info
+      version_added: 1.0.0
+    infrastructure:
+      description: Infrastructure
+      name: infrastructure
+      version_added: 1.0.0
+    init_deployment:
+      description: Configuration init
+      name: init_deployment
+      version_added: 2.0.0
+    mount:
+      description: Create and mount a storage volume
+      name: mount
+      version_added: 2.0.1
+    node_exporter:
+      description: Install Node Exporter
+      name: node_exporter
+      version_added: 3.0.0
+    nodeexporter:
+      description: Install Node Exporter
+      name: nodeexporter
+      version_added: 2.4.0
+    pgadmin:
+      description: Install pgAdmin
+      name: pgadmin
+      version_added: 3.0.0
+    platform:
+      description: Platform
+      name: platform
+      version_added: 1.0.0
+    postgresql_client:
+      description: Client configuration for PostgreSQL database
+      name: postgresql_client
+      version_added: 3.0.0
+    postgresql_server:
+      description: Install PostgreSQL server for Cloudera Manager
+      name: postgresql_server
+      version_added: 3.0.0
+    prereq_accumulo:
+      description: Set up user accounts for Accumulo
+      name: prereq_accumulo
+      version_added: 3.0.0
+    prereq_activitymonitor:
+      description: Set up database and user accounts for Activity Monitor
+      name: prereq_activitymonitor
+      version_added: 3.0.0
+    prereq_atlas:
+      description: Set up user accounts for Atlas
+      name: prereq_atlas
+      version_added: 3.0.0
+    prereq_cloudera_manager:
+      description: Set up user accounts and LDAP for Kerberos for Cloudera Manager
+      name: prereq_cloudera_manager
+      version_added: 3.0.0
+    prereq_cm_database:
+      description: Set up database and user accounts for Cloudera Manager
+      name: prereq_cm_database
+      version_added: 3.0.0
+    prereq_database:
+      description: Create and manage databases and users
+      name: prereq_database
+      version_added: 3.0.0
+    prereq_dataviz:
+      description: Set up user accounts for Dataviz
+      name: prereq_dataviz
+      version_added: 3.0.0
+    prereq_dataviz_database:
+      description: Set up database and user accounts for Dataviz
+      name: prereq_dataviz_database
+      version_added: 3.0.0
+    prereq_druid:
+      description: Set up user accounts for Druid
+      name: prereq_druid
+      version_added: 3.0.0
+    prereq_ecs:
+      description: Set up user accounts, firewall, and networking for ECS
+      name: prereq_ecs
+      version_added: 3.0.0
+    prereq_firewall:
+      description: Disable firewalls for a deployment
+      name: prereq_firewall
+      version_added: 3.0.0
+    prereq_flink:
+      description: Set up user accounts for Flink
+      name: prereq_flink
+      version_added: 3.0.0
+    prereq_flume:
+      description: Set up user accounts for Flume
+      name: prereq_flume
+      version_added: 3.0.0
+    prereq_hadoop:
+      description: Set up user accounts for Hadoop
+      name: prereq_hadoop
+      version_added: 3.0.0
+    prereq_hbase:
+      description: Set up user accounts for HBase
+      name: prereq_hbase
+      version_added: 3.0.0
+    prereq_hdfs:
+      description: Set up for Hdfs
+      name: prereq_hdfs
+      version_added: 3.0.0
+    prereq_hive:
+      description: Set up user accounts for Hive
+      name: prereq_hive
+      version_added: 3.0.0
+    prereq_hive_database:
+      description: Set up database and user accounts for Hive
+      name: prereq_hive_database
+      version_added: 3.0.0
+    prereq_httpfs:
+      description: Set up user accounts for HttpFS
+      name: prereq_httpfs
+      version_added: 3.0.0
+    prereq_hue:
+      description: Set up user accounts and Kerberos for Hue
+      name: prereq_hue
+      version_added: 3.0.0
+    prereq_hue_database:
+      description: Set up database and user accounts for Hue
+      name: prereq_hue_database
+      version_added: 3.0.0
+    prereq_impala:
+      description: Set up user accounts for Impala
+      name: prereq_impala
+      version_added: 3.0.0
+    prereq_jdk:
+      description: Set up the JDK
+      name: prereq_jdk
+      version_added: 3.0.0
+    prereq_kafka:
+      description: Set up user accounts for Kafka
+      name: prereq_kafka
+      version_added: 3.0.0
+    prereq_kerberos:
+      description: Set up Kerberos for deployments
+      name: prereq_kerberos
+      version_added: 3.0.0
+    prereq_kernel:
+      description: Update OS kernel parameters for deployments
+      name: prereq_kernel
+      version_added: 3.0.0
+    prereq_keytrustee:
+      description: Set up user accounts for Key Trustee
+      name: prereq_keytrustee
+      version_added: 3.0.0
+    prereq_kms:
+      description: Set up user accounts for KMS
+      name: prereq_kms
+      version_added: 3.0.0
+    prereq_knox:
+      description: Set up user accounts for Knox
+      name: prereq_knox
+      version_added: 3.0.0
+    prereq_knox_database:
+      description: Set up database and user accounts for Knox
+      name: prereq_knox_database
+      version_added: 3.0.0
+    prereq_kudu:
+      description: Set up user accounts for Kudu
+      name: prereq_kudu
+      version_added: 3.0.0
+    prereq_livy:
+      description: Set up user accounts for Livy
+      name: prereq_livy
+      version_added: 3.0.0
+    prereq_local_account:
+      description: Set up local user accounts
+      name: prereq_local_account
+      version_added: 3.0.0
+    prereq_mapreduce:
+      description: Set up user accounts for MapReduce
+      name: prereq_mapreduce
+      version_added: 3.0.0
+    prereq_network_dns:
+      description: Set up hostname and DNS networking
+      name: prereq_network_dns
+      version_added: 3.0.0
+    prereq_nifi:
+      description: Set up user accounts for NiFi
+      name: prereq_nifi
+      version_added: 3.0.0
+    prereq_nifiregistry:
+      description: Set up user accounts for NiFi Registry
+      name: prereq_nifiregistry
+      version_added: 3.0.0
+    prereq_ntp:
+      description: Set up NTP services for deployments
+      name: prereq_ntp
+      version_added: 3.0.0
+    prereq_oozie:
+      description: Set up user accounts for Oozie
+      name: prereq_oozie
+      version_added: 3.0.0
+    prereq_oozie_database:
+      description: Set up database and user accounts for Oozie
+      name: prereq_oozie_database
+      version_added: 3.0.0
+    prereq_os:
+      description: Update general OS requirements for deployments
+      name: prereq_os
+      version_added: 3.0.0
+    prereq_phoenix:
+      description: Set up user accounts for Phoenix
+      name: prereq_phoenix
+      version_added: 3.0.0
+    prereq_psycopg2:
+      description: Install psycopg2 for PostgreSQL for deployments
+      name: prereq_psycopg2
+      version_added: 3.0.0
+    prereq_python:
+      description: Install Python for deployments
+      name: prereq_python
+      version_added: 3.0.0
+    prereq_query_processor_database:
+      description: Set up database and user accounts for Query Processor
+      name: prereq_query_processor_database
+      version_added: 3.0.0
+    prereq_ranger:
+      description: Set up user accounts for Ranger
+      name: prereq_ranger
+      version_added: 3.0.0
+    prereq_ranger_database:
+      description: Set up database and user accounts for Ranger
+      name: prereq_ranger_database
+      version_added: 3.0.0
+    prereq_reportsmanager:
+      description: Set up database and user accounts for Reports Manager
+      name: prereq_reportsmanager
+      version_added: 3.0.0
+    prereq_rngd:
+      description: Install the Random Number Generator package for deployments
+      name: prereq_rngd
+      version_added: 3.0.0
+    prereq_schemaregistry:
+      description: Set up user accounts for Schema Registry
+      name: prereq_schemaregistry
+      version_added: 3.0.0
+    prereq_schemaregistry_database:
+      description: Set up database and user accounts for Schema Registry
+      name: prereq_schemaregistry_database
+      version_added: 3.0.0
+    prereq_selinux:
+      description: Manage SELinux policy enforcement for deployments
+      name: prereq_selinux
+      version_added: 3.0.0
+    prereq_sentry:
+      description: Set up user accounts for Sentry
+      name: prereq_sentry
+      version_added: 3.0.0
+    prereq_services:
+      description: Manage operating system services for deployments
+      name: prereq_services
+      version_added: 3.0.0
+    prereq_smm:
+      description: Set up user accounts and directories for Streams Messaging Manager
+      name: prereq_smm
+      version_added: 3.0.0
+    prereq_smm_database:
+      description: Set up database and user accounts for Streams Messaging Manager
+      name: prereq_smm_database
+      version_added: 3.0.0
+    prereq_solr:
+      description: Set up user accounts for Solr
+      name: prereq_solr
+      version_added: 3.0.0
+    prereq_spark:
+      description: Set up user accounts for Spark
+      name: prereq_spark
+      version_added: 3.0.0
+    prereq_spark2:
+      description: Set up user accounts for Spark2
+      name: prereq_spark2
+      version_added: 3.0.0
+    prereq_sqoop:
+      description: Set up user accounts for Sqoop
+      name: prereq_sqoop
+      version_added: 3.0.0
+    prereq_ssb:
+      description: Set up user accounts for SSB
+      name: prereq_ssb
+      version_added: 3.0.0
+    prereq_ssb_database:
+      description: Set up database and user accounts for SQL Stream Builder
+      name: prereq_ssb_database
+      version_added: 3.0.0
+    prereq_superset:
+      description: Set up user accounts for Superset
+      name: prereq_superset
+      version_added: 3.0.0
+    prereq_supported:
+      description: Verify configuration against support matrix
+      name: prereq_supported
+      version_added: 3.0.0
+    prereq_thp:
+      description: Disable Transparent Huge Pages for deployments
+      name: prereq_thp
+      version_added: 3.0.0
+    prereq_tls_acls:
+      description: Set up local user ACLs for TLS
+      name: prereq_tls_acls
+      version_added: 3.0.0
+    prereq_yarn:
+      description: Set up user accounts for YARN
+      name: prereq_yarn
+      version_added: 3.0.0
+    prereq_zeppelin:
+      description: Set up user accounts for Zeppelin
+      name: prereq_zeppelin
+      version_added: 3.0.0
+    prereq_zookeeper:
+      description: Set up for Zookeeper
+      name: prereq_zookeeper
+      version_added: 3.0.0
+    prometheus:
+      description: Install Prometheus.
+      name: prometheus
+      version_added: 2.4.0
+    provision:
+      description: Provision
+      name: provision
+      version_added: 2.0.1
+    rdbms_server:
+      description: Install standalone RDBMS instance
+      name: rdbms_server
+      version_added: 3.0.0
+    rocm:
+      description: Provision AMD ROCm GPU drivers
+      name: rocm
+      version_added: 3.0.0
+    runtime:
+      description: Runtime
+      name: runtime
+      version_added: 1.0.0
+    sequence:
+      description: Sequence
+      name: sequence
+      version_added: 1.0.0
+    sudoers:
+      description: Sudoers
+      name: sudoers
+      version_added: 1.2.0
+    tls_fetch_ca_certs:
+      description: Bring CA root and intermediate cert back to controller
+      name: tls_fetch_ca_certs
+      version_added: 3.0.0
+    tls_generate_csr:
+      description: Generates a CSR on each host and copies it back to the Ansible
+        controller
+      name: tls_generate_csr
+      version_added: 3.0.0
+    tls_install_certs:
+      description: Copy and install the signed TLS certificates to each cluster
+      name: tls_install_certs
+      version_added: 3.0.0
+    tls_signing:
+      description: Sign of CSRs by a CA Server
+      name: tls_signing
+      version_added: 3.0.0
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  filter:
+    combine_onto:
+      description: Combine two dictionaries
+      name: combine_onto
+      version_added: 1.0.0
+    version:
+      description: Parse a Cloudera Manager version string
+      name: version
+      version_added: 3.0.0
+  httpapi: {}
+  inventory: {}
+  lookup:
+    supported:
+      description: Get support matrix details
+      name: supported
+      version_added: 3.0.0
+  module:
+    cm_prepare_db:
+      description: Configure the external Cloudera Manager server database
+      name: cm_prepare_db
+      namespace: ''
+      version_added: 3.0.0
+    deprecation:
+      description: Display a deprecation warning
+      name: deprecation
+      namespace: ''
+      version_added: 3.0.0
+    jdk_facts:
+      description: Retrieve JDK information
+      name: jdk_facts
+      namespace: ''
+      version_added: 3.0.0
+    supported:
+      description: Retrieve Cloudera Support Matrix information
+      name: supported
+      namespace: ''
+      version_added: 3.0.0
+  netconf: {}
+  shell: {}
+  strategy: {}
+  test:
+    version:
+      description: compare Cloudera version strings
+      name: version
+      version_added: 3.0.0
+  vars: {}
+version: 2.4.1

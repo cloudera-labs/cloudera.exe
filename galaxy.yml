@@ -31,14 +31,13 @@ license_file: LICENSE
 tags:
   - cloudera
   - cdp
-  - azure
-  - aws
-  - gcp
   - private_cloud
   - public_cloud
   - data_service
-  - cloudera_manager
-  - cm
+  - cloud
+  - infrastructure
+  - storage
+  - tools
 
 dependencies:
   "ansible.netcommon": "2.5.1"
