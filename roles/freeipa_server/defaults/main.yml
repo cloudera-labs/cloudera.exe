@@ -28,3 +28,6 @@ ipaadmin_principal: admin
 ipaadmin_password: "{{ undef(hint='Please define the FreeIPA administrator principal password') }}"
 
 ipadm_password: "{{ undef(hint='Please define the FreeIPA Directory Manager admin password') }}"
+
+ipaserver_forward_no_overlap_check: false
+ipaserver_reverse_no_overlap_check: false

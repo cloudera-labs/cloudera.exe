@@ -57,6 +57,14 @@ argument_specs:
         description:
           - Certificate Authority subject for the self-signed root CA.
         default: "CN=CLDR-RootCA,O=ipaserver_domain"
+      ipaserver_forward_no_overlap_check:
+        description:
+          - Skip overlap check for forward DNS zones.
+        default: false
+      ipaserver_reverse_no_overlap_check:
+        description:
+          - Skip overlap check for reverse DNS zones.
+        default: false
       ipaadmin_principal:
         description:
           - Kerberos principal for the FreeIPA administrator account.
