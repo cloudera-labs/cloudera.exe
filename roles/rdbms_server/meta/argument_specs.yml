@@ -21,6 +21,7 @@ argument_specs:
       - Install and configure a standalone RDBMS instance for use with Cloudera Manager.
       - Database options include PostgreSQL, MySQL, and MariaDB.
       - Supports TLS connections.
+    version_added: "3.0.0"
     options:
       database_tls:
         description: Flag to enable TLS configuration.

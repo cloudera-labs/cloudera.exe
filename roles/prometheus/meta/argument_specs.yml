@@ -22,6 +22,7 @@ argument_specs:
       - Set up the service user and group.
       - Install a basic configuration.
     author: Cloudera Labs
+    version_added: "2.4.0"
     options:
       prometheus_tarball_url:
         description: URL to the Prometheus distribution archive file.

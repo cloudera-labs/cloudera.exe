@@ -15,13 +15,13 @@
 DOCUMENTATION:
   name: version
   author: Cloudera Labs
-  version_added: "3.0.0"
   short_description: compare Cloudera version strings
   description:
     - Compare version strings using the Cloudera versioning scheme.
     - Cloudera versioning is an extension of Semantic Versioning that uses the C(prerelease) segment to indicate service packs or extended patch releases.
     - Moreover, this versioning scheme allow the C(prerelease) delimiter to use whitespace (C(' ')) and dots  (C('.')) in addition to the semantic version's
       dash (C('-')).
+  version_added: "3.0.0"
   options:
     _input:
       description: Left hand version to compare

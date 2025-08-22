@@ -20,7 +20,7 @@ argument_specs:
     description:
       - Download and install the Node Exporter (node_exporter) for Prometheus.
     author: Cloudera Labs
-    version_added: 5.0.0
+    version_added: "2.4.0"
     options:
       node_exporter_directory:
         description: Configuration directory

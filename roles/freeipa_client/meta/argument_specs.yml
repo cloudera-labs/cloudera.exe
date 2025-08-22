@@ -22,7 +22,7 @@ argument_specs:
       - Install either defined or default FreeIPA client packages.
       - Optionally, configure SSSD to enumerate users and groups.
     author: Cloudera Labs
-    version_added: "3.0.0"
+    version_added: "2.0.0"
     options:
       freeipa_client_packages:
         description:

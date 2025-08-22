@@ -19,6 +19,7 @@ argument_specs:
       Create, format, and mount an LVM partition for a specified storage volume.
       Includes the installation of the LVM2 OS package.
     author: Cloudera Labs
+    version_added: "2.0.1"
     options:
       mount_volumes:
         description:

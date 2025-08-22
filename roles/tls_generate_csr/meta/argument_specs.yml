@@ -22,6 +22,7 @@ argument_specs:
       - Once created the CSR file is copied back to the Ansibles controller.
     author:
       - "Jim Enright <jenright@cloudera.com>"
+    version_added: "3.0.0"
     options:
       base_dir_security:
         description: "Base directory for Cloudera CDP security related files"
