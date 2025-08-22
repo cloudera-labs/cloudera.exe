@@ -86,6 +86,7 @@
     dynamic_update: true
     allow_sync_ptr: true
     forward_policy: none
+    skip_overlap_check: "{{ ipaserver_forward_no_overlap_check }}"
     ipaadmin_password: "{{ ipaadmin_password }}"
 
 - name: Create reverse DNS zones in provisioned FreeIPA service
@@ -93,6 +94,7 @@
     name_from_ip: "{{ cidr }}"
     dynamic_update: true
     allow_sync_ptr: true
+    skip_overlap_check: "{{ ipaserver_reverse_no_overlap_check }}"
     ipaadmin_password: "{{ ipaadmin_password }}"
   loop: "{{ ipaserver_cidr }}"
   loop_control:
