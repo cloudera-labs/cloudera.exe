@@ -24,7 +24,7 @@ short_description: Get support matrix details
 description:
     - Retrieve support matrix details for Cloudera Manager, Runtime, or Data Services versions.
 author: Cloudera Labs
-version_added: 3.0.0
+version_added: "3.0.0"
 options:
     _terms:
         description:

@@ -19,6 +19,7 @@ argument_specs:
     description: |
       Set up Grafana server, connected to a Prometheus server.
     author: Cloudera Labs
+    version_added: "2.4.0"
     options:
       grafana_datasource_directory:
         description:

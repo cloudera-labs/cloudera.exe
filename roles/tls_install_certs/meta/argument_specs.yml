@@ -22,6 +22,7 @@ argument_specs:
       - Updates the Java keystore with the renewed certificate
     author:
       - "Jim Enright <jenright@cloudera.com>"
+    version_added: "3.0.0"
     options:
       openssl_path:
         description: "Absolute path to the C(openssl) executable"

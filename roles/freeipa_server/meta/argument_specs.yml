@@ -20,6 +20,7 @@ argument_specs:
       Set up FreeIPA server with support for DNS, Kerberos, TLS, and LDAP.
       Optionally, install the FreeIPA server packages.
     author: Cloudera Labs
+    version_added: "2.0.0"
     options:
       freeipa_server_packages:
         description:

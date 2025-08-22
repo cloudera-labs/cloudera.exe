@@ -23,6 +23,7 @@ argument_specs:
       - Upon completion the signed certs are copied back to the Ansible controller.
     author:
       - "Jim Enright <jenright@cloudera.com>"
+    version_added: "3.0.0"
     options:
       csrs_to_sign:
         description: "List of full path locations of the CSRs to sign."
