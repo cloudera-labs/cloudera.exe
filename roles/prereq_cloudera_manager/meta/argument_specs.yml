@@ -20,7 +20,7 @@ argument_specs:
       - Set up for Cloudera Manager usage, notably, create the local C(cloudera-scm) user, including C(HOME) directory permissions.
       - Set up TLS ACLs, if needed.
       - Install LDAP packages for Kerberos, if needed.
-      - The creation of required local users is handled by the dependant P(cloudera.exe.prereq_users#role) role.
+      - The creation of required local users is handled by the dependant P(cloudera.exe.prereq_cloudera_users#role) role.
     author: Cloudera Labs
     version_added: "3.0.0"
     options:

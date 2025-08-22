@@ -19,7 +19,7 @@ argument_specs:
     description:
       - Set up for Cloudera Embedded Container Service (ECS) usage including configuration of firewall and networking
         configuration.
-      - The creation of required local users is handled by the dependant P(cloudera.exe.prereq_users#role) role.
+      - The creation of required local users is handled by the dependant P(cloudera.exe.prereq_cloudera_users#role) role.
     author: Cloudera Labs
     version_added: "3.0.0"
     options: {}
