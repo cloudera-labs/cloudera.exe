@@ -21,3 +21,4 @@ __python2_pip_package: python-pip
 
 prereq_python_supported_os_map:
   RedHat: RHEL
+  Rocky: "Rocky Linux"
