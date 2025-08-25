@@ -109,7 +109,7 @@
       failed_when:
         - __auto_repo_mirror_lookup_initial.s3_keys is not defined
         - "'cannot be found' not in __auto_repo_mirror_lookup_initial.msg"
-      amazon.aws.aws_s3:
+      amazon.aws.s3_object:
         bucket: "{{ init__auto_repo_mirror_bucket_name }}"
         mode: list
 

@@ -229,7 +229,7 @@
       rule_desc: "Extra access CIDR blocks"
 
 - name: Create AWS Security Groups
-  amazon.aws.ec2_group:
+  amazon.aws.ec2_security_group:
     state: present
     region: "{{ infra__region }}"
     vpc_id: "{{ infra__aws_vpc_id }}"
@@ -260,7 +260,7 @@
   when: infra__aws_private_endpoints | bool
   block:
     - name: Create VPC Endpoint Security Group (Skip if infra__aws_private_endpoints is false)
-      amazon.aws.ec2_group:
+      amazon.aws.ec2_security_group:
         state: present
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
@@ -319,7 +319,7 @@
       register: __aws_interface_vpc_endpoints
 
     - name: List Default Security Group for VPC (Skip if infra__aws_private_endpoints is false)
-      amazon.aws.ec2_group_info:
+      amazon.aws.ec2_security_group_info:
         filters:
           vpc-id: "{{ infra__aws_vpc_id }}"
           group-name:

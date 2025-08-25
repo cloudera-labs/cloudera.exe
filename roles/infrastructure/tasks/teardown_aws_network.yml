@@ -20,7 +20,7 @@
     - not infra__force_teardown
   block:
     - name: Remove AWS Security Group resources
-      amazon.aws.ec2_group:
+      amazon.aws.ec2_security_group:
         region: "{{ infra__region }}"
         vpc_id: "{{ infra__aws_vpc_id }}"
         name: "{{ __security_group_name_item }}"
@@ -147,7 +147,7 @@
           block:
             - name: Clean rules for discovered AWS Security Groups
               when: __security_group_rule_item.group_name != 'default'
-              amazon.aws.ec2_group:
+              amazon.aws.ec2_security_group:
                 region: "{{ infra__region }}"
                 vpc_id: "{{ infra__aws_vpc_id }}"
                 name: "{{ __security_group_rule_item.group_name }}"
@@ -162,7 +162,7 @@
 
             - name: Remove discovered AWS Security Groups
               when: __security_group_purge_item.group_name != 'default'
-              amazon.aws.ec2_group:
+              amazon.aws.ec2_security_group:
                 region: "{{ infra__region }}"
                 vpc_id: "{{ infra__aws_vpc_id }}"
                 name: "{{ __security_group_purge_item.group_name }}"
@@ -235,7 +235,7 @@
           delay: 10
 
         - name: Delete VPC Endpoint Security Group
-          amazon.aws.ec2_group:
+          amazon.aws.ec2_security_group:
             region: "{{ infra__region }}"
             vpc_id: "{{ infra__aws_vpc_id }}"
             name: "{{ infra__security_group_vpce_name }}"

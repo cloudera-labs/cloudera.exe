@@ -1,0 +1,41 @@
+---
+
+# Copyright 2025 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+extends: default
+rules:
+  comments:
+    # https://github.com/prettier/prettier/issues/6780
+    min-spaces-from-content: 1
+  # https://github.com/adrienverge/yamllint/issues/384
+  comments-indentation: false
+  document-start: disable
+  # 160 chars was the default used by old E204 rule, but
+  # you can easily change it or disable in your .yamllint file.
+  line-length:
+    max: 200
+  # We are adding an extra space inside braces as that's how prettier does it
+  # and we are trying not to fight other linters.
+  braces:
+    min-spaces-inside: 0 # yamllint defaults to 0
+    max-spaces-inside: 1 # yamllint defaults to 0
+  # key-duplicates:
+  #   forbid-duplicated-merge-keys: true # not enabled by default
+  octal-values:
+    forbid-implicit-octal: true # yamllint defaults to false
+    forbid-explicit-octal: true # yamllint defaults to false
+  # quoted-strings:
+  #   quote-type: double
+  #   required: only-when-needed
