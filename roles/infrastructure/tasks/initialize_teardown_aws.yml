@@ -128,7 +128,7 @@
 
     - name: List all AWS VPC Security Groups
       register: __infra_aws_sgs
-      amazon.aws.ec2_group_info:
+      amazon.aws.ec2_security_group_info:
         region: "{{ infra__region }}"
         filters:
           vpc-id: "{{ infra__aws_vpc_id }}"

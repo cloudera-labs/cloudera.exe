@@ -42,7 +42,7 @@
   register: __infra_aws_storage_locations_info
 
 - name: Create AWS Buckets directory structures
-  amazon.aws.aws_s3:
+  amazon.aws.s3_object:
     region: "{{ infra__region }}"
     bucket: "{{ __aws_storage_object_item.bucket }}"
     object: "{{ __aws_storage_object_item.path }}"
