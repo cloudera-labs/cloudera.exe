@@ -13,6 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# cloudera_manager_version: 7.13.1.300
+# cloudera_runtime_version: 7.1.9.1044
+# cloudera_parcels: # Note, the entries are processed in order
+#   CDH: "7.1.9-1.cdh7.1.9.p1044.66549863"
+# cloudera_manager_version: 7.13.1 CHF2
+# cloudera_manager_release: 7.13.1.300
+
+# cloudera_parcels: # Note, the entries are processed in order AS PARAMETERS TO CLUSTER, THEREFORE MUST BE PRECONFIGURED VIA CM ETC
+#   CDH: "7.1.9-1.cdh7.1.9.p1044.66549863"
 - name: Gather distribution details
   ansible.builtin.setup:
     gather_subset: distribution
@@ -20,10 +29,8 @@
 - name: Assert OS support for Cloudera Manager versions
   ansible.builtin.assert:
     that:
-      - supported_cms |
-        selectattr('family', 'eq', cm_repo_supported_distribution_map[ansible_facts['distribution']] | default(ansible_facts['distribution'])) |
-        selectattr('version', 'eq', ansible_facts['distribution_version']) |
-        length > 0
+      - supported_cms | selectattr('family', 'eq', cm_repo_supported_distribution_map[ansible_facts['distribution']] | default(ansible_facts['distribution'])) |
+        selectattr('version', 'eq', ansible_facts['distribution_version']) | length > 0
     fail_msg: "OS {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }} not supported."
   vars:
     supported_cms: "{{ lookup('cloudera.exe.supported', 'operating_systems', product='cloudera_manager', version=cloudera_manager_version) }}"

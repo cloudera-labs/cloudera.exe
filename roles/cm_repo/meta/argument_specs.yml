@@ -29,6 +29,12 @@ argument_specs:
           - If not defined and C(cloudera_manager_repo_username) is not defined, will default to the C(7.4.4) trial version, if compatiable with the OS
             distribution.
         default: 7.11.3
+      cloudera_manager_release:
+        description:
+          - Release of Cloudera Manager.
+          - Defines the specific release directory, e.g. C(7.11.3.9), for a standard Cloudera Manager repository URL for the L(Cloudera Archive,
+            https://archive.cloudera.com/).
+          - If not defined, will default to the value of O(cloudera_manager_version).
       cloudera_manager_repo_url:
         description:
           - Base URL for the package repository.

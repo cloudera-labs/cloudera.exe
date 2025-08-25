@@ -25,7 +25,7 @@ __cm_repo_enterprise_url: >-
       ansible_distribution_major_version,
       ansible_architecture,
       'cm',
-      cloudera_manager_version
+      cloudera_manager_release
     ]
     | path_join
   }}
