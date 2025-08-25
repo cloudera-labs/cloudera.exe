@@ -14,6 +14,7 @@
 # limitations under the License.
 
 cloudera_manager_version: 7.11.3
+# cloudera_manager_release: "{{ cloudera_manager_version }}"
 
 # cloudera_manager_repo_url:
 # cloudera_manager_repo_username:

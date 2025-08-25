@@ -24,6 +24,7 @@ None.
 | Variable | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `cloudera_manager_version` | `str` | `False` | `7.11.3` | Version of Cloudera Manager for which the repository is being configured. If not defined and `cloudera_manager_repo_username` is not set, it will typically default to a trial version like `7.4.4`, if compatible with the OS distribution and if the `cloudera_manager_repo_url` is not explicitly set to an enterprise archive. |
+| `cloudera_manager_release` | `str` | `False` | | Release of Cloudera Manager. This parameter defines the specific release directory, e.g. C(7.11.3.9), for a standard Cloudera Manager repository URL for the [Cloudera Archive](https://archive.cloudera.com/). If not defined, will default to the value of `cloudera_manager_version`. |
 | `cloudera_manager_repo_url` | `str` | `False` | - | Base URL for the package repository. If not defined and `cloudera_manager_repo_username` is set, it will default to the Cloudera enterprise archive URL for the specified version. Otherwise, it defaults to the Cloudera trial archive URL. |
 | `cloudera_manager_repo_username` | `str` | `False` | | Username for authenticating to the package repository. For Cloudera enterprise licenses, this corresponds to the `uuid` value provided by Cloudera. |
 | `cloudera_manager_repo_password` | `str` | `False` | | Password for authenticating to the package repository. For Cloudera enterprise licenses, this corresponds to the derived `password` value associated with your `uuid`. |
@@ -51,6 +52,15 @@ None.
         cloudera_manager_repo_password: "YOUR_PASSWORD_HERE" # Replace with your actual password
         # cloudera_manager_repo_url will default to the enterprise archive for 7.11.3
 
+    - name: Configure Cloudera Manager enterprise repository for a specific release
+      ansible.builtin.import_role:
+        name: cloudera.exe.cm_repo
+      vars:
+        cloudera_manager_version: 7.11.3
+        cloudera_manager_release: 7.11.3.36
+        cloudera_manager_repo_username: "YOUR_UUID_HERE" # Replace with your actual UUID
+        cloudera_manager_repo_password: "YOUR_PASSWORD_HERE" # Replace with your actual password
+
     - name: Configure a custom Cloudera Manager repository
       ansible.builtin.import_role:
         name: cloudera.exe.cm_repo
@@ -63,7 +73,7 @@ None.
         cloudera_manager_repo_gpgcheck: true
 ```
 
-## License
+# License
 
 ```
 Copyright 2025 Cloudera, Inc.
