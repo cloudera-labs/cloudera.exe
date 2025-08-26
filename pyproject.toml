@@ -59,6 +59,7 @@ build = "docsbuild/build.sh"
 changelog = [
   # Read the version in galaxy.yml via hatch itself (normalizes release candidates, etc.)
   # Use 'hatch version' to manage the version, i.e. 'hatch version major,rc'
+  # Be sure to set GITHUB_TOKEN (read-only scope) for antsichaut to read the pull requests and labels
   "antsibull-changelog release --version $(hatch version)",
   "antsichaut --repository cloudera-labs/cloudera.exe --since_version=latest",
   "antsibull-changelog generate",

@@ -1,6 +1,377 @@
 ---
 ancestor:
 releases:
+  3.0.0:
+    changes:
+      minor_changes:
+        - Add yamllint config (https://github.com/cloudera-labs/cloudera.exe/pull/277)
+        - Add cloudera_manager_release parameter (https://github.com/cloudera-labs/cloudera.exe/pull/276)
+        - Add variables to skip of overlap check for FreeIPA server DNS zones (https://github.com/cloudera-labs/cloudera.exe/pull/272)
+        - Add changelog (https://github.com/cloudera-labs/cloudera.exe/pull/271)
+        - Update copyright (https://github.com/cloudera-labs/cloudera.exe/pull/270)
+        - Update version_added to roles, modules, and plugins (https://github.com/cloudera-labs/cloudera.exe/pull/269)
+        - Update API docs and fix linting issues (https://github.com/cloudera-labs/cloudera.exe/pull/268)
+        - Add cloudera service users role (https://github.com/cloudera-labs/cloudera.exe/pull/267)
+        - Add unit tests for cloudera.exe.jdk_facts (https://github.com/cloudera-labs/cloudera.exe/pull/266)
+        - Add Molecule testing (https://github.com/cloudera-labs/cloudera.exe/pull/265)
+        - Update cm_repo role to use supported lookup (https://github.com/cloudera-labs/cloudera.exe/pull/264)
+        - Update prereq_python to use support matrix lookup (https://github.com/cloudera-labs/cloudera.exe/pull/263)
+        - Add raw_filters parameter to supported lookup and module (https://github.com/cloudera-labs/cloudera.exe/pull/262)
+        - Update prereq_jdk role to validate Manager and Runtime versions (https://github.com/cloudera-labs/cloudera.exe/pull/260)
+        - Update support matrix plugins and role (https://github.com/cloudera-labs/cloudera.exe/pull/259)
+        - Add FreeIPA users role (https://github.com/cloudera-labs/cloudera.exe/pull/258)
+        - Add FreeIPA DNS for ECS role (https://github.com/cloudera-labs/cloudera.exe/pull/257)
+        - Update tests and filters to include Cloudera versioning scheme (https://github.com/cloudera-labs/cloudera.exe/pull/256)
+        - Add module to query Cloudera support matrix (https://github.com/cloudera-labs/cloudera.exe/pull/246)
+        - Add deprecation module for legacy roles (https://github.com/cloudera-labs/cloudera.exe/pull/229)
+        - Add CM agent installation role (https://github.com/cloudera-labs/cloudera.exe/pull/227)
+        - Add CM server installation role (https://github.com/cloudera-labs/cloudera.exe/pull/226)
+        - Add CSD installation role (https://github.com/cloudera-labs/cloudera.exe/pull/225)
+        - Add CM repository installation role (https://github.com/cloudera-labs/cloudera.exe/pull/224)
+        - Add prerequisite roles for Cloudera on premise (private cloud) (https://github.com/cloudera-labs/cloudera.exe/pull/223)
+        - Add PostgreSQL client installation role (https://github.com/cloudera-labs/cloudera.exe/pull/222)
+        - Add PostgreSQL server installation role (https://github.com/cloudera-labs/cloudera.exe/pull/221)
+        - Add AMD ROCm drivers installation role (https://github.com/cloudera-labs/cloudera.exe/pull/218)
+        - Add Caddy reverse proxy role (https://github.com/cloudera-labs/cloudera.exe/pull/217)
+        - Add pgAdmin installation role (https://github.com/cloudera-labs/cloudera.exe/pull/216)
+        - Add Docker installation role (https://github.com/cloudera-labs/cloudera.exe/pull/215)
+        - Update mount role for ansible-lint, argument specs, and README (https://github.com/cloudera-labs/cloudera.exe/pull/212)
+        - Update grafana role for ansible-lint, consolidate tasks, and add README
+          (https://github.com/cloudera-labs/cloudera.exe/pull/211)
+        - Add ansible-lint, update hatch environments and pre-commit (https://github.com/cloudera-labs/cloudera.exe/pull/205)
+        - Update volume discovery in mount role to exclude root volume (https://github.com/cloudera-labs/cloudera.exe/pull/200)
+        - Add Molecule testing (https://github.com/cloudera-labs/cloudera.exe/pull/197)
+        - Update deprecated actions (https://github.com/cloudera-labs/cloudera.exe/pull/190)
+        - Add roles and example playbook for PVC cert renewal (https://github.com/cloudera-labs/cloudera.exe/pull/189)
+      bugfixes:
+        - Update support matrix lookup maps for Rocky (https://github.com/cloudera-labs/cloudera.exe/pull/273)
+        - Replace blackbox and nodeexporter role symlinks with copy (https://github.com/cloudera-labs/cloudera.exe/pull/261)
+        - Update plugins for ansible-lint (https://github.com/cloudera-labs/cloudera.exe/pull/214)
+        - Update playbooks for ansible-lint (https://github.com/cloudera-labs/cloudera.exe/pull/213)
+        - Update prometheus role for ansible-lint, argument specs, and README (https://github.com/cloudera-labs/cloudera.exe/pull/208)
+        - Add JMESPath to requirements (https://github.com/cloudera-labs/cloudera.exe/pull/207)
+        - Update upload-artifact to v4 (https://github.com/cloudera-labs/cloudera.exe/pull/202)
+        - freeipa_sidecar and freeipa_client & server fixes for el9 (https://github.com/cloudera-labs/cloudera.exe/pull/199)
+        - Update RDBMS PostgreSQL server role (https://github.com/cloudera-labs/cloudera.exe/pull/194)
+      major_changes:
+        - Update freeipa_client role (https://github.com/cloudera-labs/cloudera.exe/pull/220)
+        - Update freeipa_server role (https://github.com/cloudera-labs/cloudera.exe/pull/219)
+        - Update Blackbox Exporter role for documentation, specs, and rename (https://github.com/cloudera-labs/cloudera.exe/pull/210)
+        - Rename nodeexporter role to node_exporter and update documentation, specs,
+          and linting fixes (https://github.com/cloudera-labs/cloudera.exe/pull/209)
+      deprecated_features:
+        - Deprecate sequence role (https://github.com/cloudera-labs/cloudera.exe/pull/243)
+        - Deprecate runtime role (https://github.com/cloudera-labs/cloudera.exe/pull/242)
+        - Deprecate rdbms_server role (https://github.com/cloudera-labs/cloudera.exe/pull/241)
+        - Deprecate rdbms.client and rdbms.server roles (https://github.com/cloudera-labs/cloudera.exe/pull/240)
+        - Deprecate provision role (https://github.com/cloudera-labs/cloudera.exe/pull/239)
+        - Deprecate platform role (https://github.com/cloudera-labs/cloudera.exe/pull/238)
+        - Deprecate init_deployment role (https://github.com/cloudera-labs/cloudera.exe/pull/237)
+        - Deprecate infrastructure role (https://github.com/cloudera-labs/cloudera.exe/pull/236)
+        - Deprecate info role (https://github.com/cloudera-labs/cloudera.exe/pull/235)
+        - Deprecate freeipa_host_group role (https://github.com/cloudera-labs/cloudera.exe/pull/234)
+        - Deprecate dynamic_inventory role (https://github.com/cloudera-labs/cloudera.exe/pull/233)
+        - Deprecate data role (https://github.com/cloudera-labs/cloudera.exe/pull/232)
+        - Deprecate common role (https://github.com/cloudera-labs/cloudera.exe/pull/231)
+        - Deprecate auto_repo_mirror role (https://github.com/cloudera-labs/cloudera.exe/pull/230)
+    modules:
+      - description: Configure the external Cloudera Manager server database.
+        name: cm_prepare_db
+        namespace: ''
+      - description: Display a deprecation warning.
+        name: deprecation
+        namespace: ''
+      - description: Retrieve JDK information.
+        name: jdk_facts
+        namespace: ''
+      - description: Retrieve Cloudera Support Matrix information.
+        name: supported
+        namespace: ''
+    objects:
+      role:
+        - description: Install Blackbox Exporter.
+          name: blackbox_exporter
+          namespace:
+        - description: Install Caddy proxy packages.
+          name: caddy
+          namespace:
+        - description: Install Cloudera Manager agent packages.
+          name: cm_agent
+          namespace:
+        - description: Install Cloudera CSDs.
+          name: cm_csd
+          namespace:
+        - description: Manage the package repository for Cloudera Manager.
+          name: cm_repo
+          namespace:
+        - description: Install Cloudera Manager server.
+          name: cm_server
+          namespace:
+        - description: Install Docker.
+          name: docker
+          namespace:
+        - description: Configure DNS zones and wildcard records for ECS.
+          name: freeipa_server_ecs
+          namespace:
+        - description: Set up superusers in FreeIPA.
+          name: freeipa_server_users
+          namespace:
+        - description: Install Node Exporter.
+          name: node_exporter
+          namespace:
+        - description: Install pgAdmin.
+          name: pgadmin
+          namespace:
+        - description: Client configuration for PostgreSQL database.
+          name: postgresql_client
+          namespace:
+        - description: Install PostgreSQL server for Cloudera Manager.
+          name: postgresql_server
+          namespace:
+        - description: Set up user accounts for Accumulo.
+          name: prereq_accumulo
+          namespace:
+        - description: Set up database and user accounts for Activity Monitor.
+          name: prereq_activitymonitor
+          namespace:
+        - description: Set up user accounts for Atlas.
+          name: prereq_atlas
+          namespace:
+        - description: Set up user accounts and LDAP for Kerberos for Cloudera Manager.
+          name: prereq_cloudera_manager
+          namespace:
+        - description: Set up user accounts Cloudera Manager.
+          name: prereq_cloudera_users
+          namespace:
+        - description: Set up database and user accounts for Cloudera Manager.
+          name: prereq_cm_database
+          namespace:
+        - description: Create and manage databases and users.
+          name: prereq_database
+          namespace:
+        - description: Set up user accounts for Dataviz.
+          name: prereq_dataviz
+          namespace:
+        - description: Set up database and user accounts for Dataviz.
+          name: prereq_dataviz_database
+          namespace:
+        - description: Set up user accounts for Druid.
+          name: prereq_druid
+          namespace:
+        - description: Set up firewall, and networking for ECS.
+          name: prereq_ecs
+          namespace:
+        - description: Disable firewalls for a deployment.
+          name: prereq_firewall
+          namespace:
+        - description: Set up user accounts for Flink.
+          name: prereq_flink
+          namespace:
+        - description: Set up user accounts for Flume.
+          name: prereq_flume
+          namespace:
+        - description: Set up user accounts for Hadoop.
+          name: prereq_hadoop
+          namespace:
+        - description: Set up user accounts for HBase.
+          name: prereq_hbase
+          namespace:
+        - description: Set up for Hdfs.
+          name: prereq_hdfs
+          namespace:
+        - description: Set up user accounts for Hive.
+          name: prereq_hive
+          namespace:
+        - description: Set up database and user accounts for Hive.
+          name: prereq_hive_database
+          namespace:
+        - description: Set up user accounts for HttpFS.
+          name: prereq_httpfs
+          namespace:
+        - description: Set up user accounts and Kerberos for Hue.
+          name: prereq_hue
+          namespace:
+        - description: Set up database and user accounts for Hue.
+          name: prereq_hue_database
+          namespace:
+        - description: Set up user accounts for Impala.
+          name: prereq_impala
+          namespace:
+        - description: Set up the JDK.
+          name: prereq_jdk
+          namespace:
+        - description: Set up user accounts for Kafka.
+          name: prereq_kafka
+          namespace:
+        - description: Set up Kerberos for deployments.
+          name: prereq_kerberos
+          namespace:
+        - description: Update OS kernel parameters for deployments.
+          name: prereq_kernel
+          namespace:
+        - description: Set up user accounts for Key Trustee.
+          name: prereq_keytrustee
+          namespace:
+        - description: Set up user accounts for KMS.
+          name: prereq_kms
+          namespace:
+        - description: Set up user accounts for Knox.
+          name: prereq_knox
+          namespace:
+        - description: Set up database and user accounts for Knox.
+          name: prereq_knox_database
+          namespace:
+        - description: Set up user accounts for Kudu.
+          name: prereq_kudu
+          namespace:
+        - description: Set up user accounts for Livy.
+          name: prereq_livy
+          namespace:
+        - description: Set up local user accounts.
+          name: prereq_local_account
+          namespace:
+        - description: Set up user accounts for MapReduce.
+          name: prereq_mapreduce
+          namespace:
+        - description: Set up hostname and DNS networking.
+          name: prereq_network_dns
+          namespace:
+        - description: Set up user accounts for NiFi.
+          name: prereq_nifi
+          namespace:
+        - description: Set up user accounts for NiFi Registry.
+          name: prereq_nifiregistry
+          namespace:
+        - description: Set up NTP services for deployments.
+          name: prereq_ntp
+          namespace:
+        - description: Set up user accounts for Oozie.
+          name: prereq_oozie
+          namespace:
+        - description: Set up database and user accounts for Oozie.
+          name: prereq_oozie_database
+          namespace:
+        - description: Update general OS requirements for deployments.
+          name: prereq_os
+          namespace:
+        - description: Set up user accounts for Phoenix.
+          name: prereq_phoenix
+          namespace:
+        - description: Install psycopg2 for PostgreSQL for deployments.
+          name: prereq_psycopg2
+          namespace:
+        - description: Install Python for deployments.
+          name: prereq_python
+          namespace:
+        - description: Set up database and user accounts for Query Processor.
+          name: prereq_query_processor_database
+          namespace:
+        - description: Set up user accounts for Ranger.
+          name: prereq_ranger
+          namespace:
+        - description: Set up database and user accounts for Ranger.
+          name: prereq_ranger_database
+          namespace:
+        - description: Set up database and user accounts for Reports Manager.
+          name: prereq_reportsmanager
+          namespace:
+        - description: Install the Random Number Generator package for deployments.
+          name: prereq_rngd
+          namespace:
+        - description: Set up user accounts for Schema Registry.
+          name: prereq_schemaregistry
+          namespace:
+        - description: Set up database and user accounts for Schema Registry.
+          name: prereq_schemaregistry_database
+          namespace:
+        - description: Manage SELinux policy enforcement for deployments.
+          name: prereq_selinux
+          namespace:
+        - description: Set up user accounts for Sentry.
+          name: prereq_sentry
+          namespace:
+        - description: Manage operating system services for deployments.
+          name: prereq_services
+          namespace:
+        - description: Set up user accounts and directories for Streams Messaging
+            Manager.
+          name: prereq_smm
+          namespace:
+        - description: Set up database and user accounts for Streams Messaging Manager.
+          name: prereq_smm_database
+          namespace:
+        - description: Set up user accounts for Solr.
+          name: prereq_solr
+          namespace:
+        - description: Set up user accounts for Spark.
+          name: prereq_spark
+          namespace:
+        - description: Set up user accounts for Spark2.
+          name: prereq_spark2
+          namespace:
+        - description: Set up user accounts for Sqoop.
+          name: prereq_sqoop
+          namespace:
+        - description: Set up user accounts for SSB.
+          name: prereq_ssb
+          namespace:
+        - description: Set up database and user accounts for SQL Stream Builder.
+          name: prereq_ssb_database
+          namespace:
+        - description: Set up user accounts for Superset.
+          name: prereq_superset
+          namespace:
+        - description: Verify configuration against support matrix.
+          name: prereq_supported
+          namespace:
+        - description: Disable Transparent Huge Pages for deployments.
+          name: prereq_thp
+          namespace:
+        - description: Set up local user ACLs for TLS.
+          name: prereq_tls_acls
+          namespace:
+        - description: Set up user accounts for YARN.
+          name: prereq_yarn
+          namespace:
+        - description: Set up user accounts for Zeppelin.
+          name: prereq_zeppelin
+          namespace:
+        - description: Set up for Zookeeper.
+          name: prereq_zookeeper
+          namespace:
+        - description: Install standalone RDBMS instance.
+          name: rdbms_server
+          namespace:
+        - description: Provision AMD ROCm GPU drivers.
+          name: rocm
+          namespace:
+        - description: Bring CA root and intermediate cert back to controller.
+          name: tls_fetch_ca_certs
+          namespace:
+        - description: Generates a CSR on each host and copies it back to the Ansible
+            controller.
+          name: tls_generate_csr
+          namespace:
+        - description: Copy and install the signed TLS certificates to each cluster.
+          name: tls_install_certs
+          namespace:
+        - description: Sign of CSRs by a CA Server.
+          name: tls_signing
+          namespace:
+    plugins:
+      filter:
+        - description: Parse a Cloudera Manager version string.
+          name: version
+          namespace:
+      lookup:
+        - description: Get support matrix details.
+          name: supported
+          namespace:
+      test:
+        - description: compare Cloudera version strings.
+          name: version
+          namespace:
+    release_date: '2025-08-26'
   2.4.1:
     changes:
       bugfixes:
