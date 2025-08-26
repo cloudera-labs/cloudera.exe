@@ -26,7 +26,7 @@ import yaml
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 
-from tests.unit import (
+from ansible_collections.cloudera.exe.tests.unit import (
     AnsibleFailJson,
     AnsibleExitJson,
 )
