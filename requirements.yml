@@ -23,9 +23,9 @@ roles:
 
 collections:
   - name: cloudera.cloud
-    version: 2.4.0
+    version: 3.0.0
   - name: cloudera.cluster
-    version: 4.4.0
+    version: 5.0.0
   - name: ansible.netcommon
     version: 2.5.1
   - name: community.general
