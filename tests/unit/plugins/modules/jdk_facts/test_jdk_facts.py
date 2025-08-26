@@ -20,13 +20,9 @@ __metaclass__ = type
 
 import pytest
 
-
-from tests.unit import (
-    AnsibleExitJson,
-)
-
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.cloudera.exe.tests.unit import AnsibleExitJson
 from ansible_collections.cloudera.exe.plugins.modules import jdk_facts
 
 
