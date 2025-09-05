@@ -21,4 +21,3 @@
       ansible.builtin.import_role:
         name: cloudera.exe.freeipa_server_wildcard_profile
       vars:
-        
