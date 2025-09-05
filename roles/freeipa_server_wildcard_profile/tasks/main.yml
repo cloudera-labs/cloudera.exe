@@ -1,0 +1,44 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Establish Kerberos credentials
+  community.general.krb_ticket:
+    principal: "{{ ipaadmin_principal }}"
+    password: "{{ ipaadmin_password }}"
+    state: present
+
+- name: Create wildcard certificate profile
+  ansible.builtin.template:
+    src: wildcard_profile.cfg.j2
+    dest: /etc/pki/pki-tomcat/ca/{{ freeipa_wildcard_profile_name }}.cfg
+    mode: "0600"
+    owner: "pkiuser"
+    group: "pkiuser"
+
+- name: Import FreeIPA wildcard certificate profile
+  ansible.builtin.command:
+    argv:
+      - ipa
+      - certprofile-import
+      - "{{ freeipa_wildcard_profile_name }}"
+      - --desc
+      - "SAN wildcard certificate profile"
+      - --store
+      - 1
+      - --file
+      - "/etc/pki/pki-tomcat/ca/{{ freeipa_wildcard_profile_name }}.cfg"
+  register: __wildcard
+  changed_when: __wildcard.rc == 0
+  failed_when: __wildcard.rc != 0 and __wildcard.stderr.find('already exists') == -1
