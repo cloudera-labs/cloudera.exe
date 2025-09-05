@@ -46,6 +46,18 @@
       max_life: 365d
       max_renewable_life: 365d
 
+- name: Update Kerberos encryption types
+  community.general.ini_file:
+    path: "{{ kerberos_config_path }}"
+    section: libdefaults
+    option: "{{ __conf.key }}"
+    value: "{{ __conf.value | join(' ') }}"
+    mode: "0644"
+  loop: "{{ kerberos_encryption_types | dict2items }}"
+  loop_control:
+    loop_var: __conf
+    label: "{{ __conf.key }}"
+
 - name: Remove default Kerberos credential cache option
   community.general.ini_file:
     path: "{{ krb_ccache }}"

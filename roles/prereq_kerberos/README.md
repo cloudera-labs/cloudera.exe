@@ -9,6 +9,7 @@ The role will:
 - Configure the Kerberos client by managing the `krb5.conf` file, including setting the `kerberos_realm`.
 - Configure the Kerberos Credential Manager (KCM) to be the default credential cache.
 - If SSSD is used, the role will configure the `sssd.conf` file and manage the `sssd` service.
+- Set the Kerberos encryption types.
 
 # Requirements
 
@@ -26,6 +27,7 @@ None.
 | --- | --- | --- | --- | --- |
 | `kerberos_packages` | `list` of `str` | `False` | `[defaults based on OS]` | List of Kerberos client packages to install. If not defined, the role will install default packages based on the OS distribution. |
 | `kerberos_config_path` | `path` | `False` | `/etc/krb5.conf` | Path to the main Kerberos configuration file. |
+| `kerberos_encryption_types` | `dict` | `False` | `{"default_tgs_enctypes": ["aes256-cts", "aes128-cts"], "default_tkt_enctypes": ["aes256-cts", "aes128-cts"], "permitted_enctypes": ["aes256-cts", "aes128-cts"]}` | Dictionary of Kerberos encryption types to configure. |
 | `kerberos_kcm_credential_cache_config_path` | `path` | `False` | `/etc/krb5.conf.d/kcm_default_ccache` | Path to the configuration file that sets the default credential cache type to KCM. |
 | `kerberos_realm` | `str` | `True` | | The name of the Kerberos realm to which the host will belong. This is a mandatory parameter. |
 | `sssd_config_path` | `path` | `False` | `/etc/sssd/sssd.conf` | Path to the SSSD configuration file. The role will only manage this file if SSSD is part of the overall setup. |
