@@ -24,4 +24,4 @@ sssd_service: sssd
 kerberos_encryption_types:
   default_tgs_enctypes: ["aes256-cts", "aes128-cts"]
   default_tkt_enctypes: ["aes256-cts", "aes128-cts"]
-  permitted_enctypes: ["aes256-cts", "aes128-cts"]`
+  permitted_enctypes: ["aes256-cts", "aes128-cts"]
