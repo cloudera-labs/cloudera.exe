@@ -57,6 +57,7 @@
   loop_control:
     loop_var: __conf
     label: "{{ __conf.key }}"
+  notify: Restart IPA
 
 - name: Remove default Kerberos credential cache option
   community.general.ini_file:
