@@ -52,3 +52,25 @@ argument_specs:
         description:
           - Name of the SSSD service.
         default: sssd
+      kerberos_encryption_types:
+        description:
+          - Dictionary of Kerberos encryption types to configure.
+          - Keys are the configuration options, and values are lists of encryption types.
+        type: dict
+        suboptions:
+          default_tgs_enctypes:
+            description: List of default TGS encryption types.
+            type: list
+            elements: str
+          default_tkt_enctypes:
+            description: List of default ticket encryption types.
+            type: list
+            elements: str
+          permitted_enctypes:
+            description: List of permitted encryption types.
+            type: list
+            elements: str
+        default:
+          default_tgs_enctypes: ["aes256-cts", "aes128-cts"]
+          default_tkt_enctypes: ["aes256-cts", "aes128-cts"]
+          permitted_enctypes: ["aes256-cts", "aes128-cts"]

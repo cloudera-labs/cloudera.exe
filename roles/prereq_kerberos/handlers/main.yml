@@ -17,3 +17,14 @@
   ansible.builtin.service:
     name: "{{ sssd_service }}"
     state: restarted
+
+- name: Gather service details for IPA
+  ansible.builtin.service_facts:
+  listen: "Restart IPA"
+
+- name: Restart ipa service if exists
+  ansible.builtin.service:
+    name: ipa
+    state: restarted
+  when: "'ipa.service' in ansible_facts.services"
+  listen: "Restart IPA"
