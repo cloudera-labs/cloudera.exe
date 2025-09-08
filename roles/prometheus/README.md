@@ -9,6 +9,7 @@ The role will:
 - Create necessary directories for Prometheus configuration (`/etc/prometheus`) and TSDB storage (`/var/lib/prometheus`).
 - Download the Prometheus distribution tarball.
 - Extract the Prometheus binary and related files to the installation directory.
+- Set SELinux to permissive mode on the target host.
 - Install a basic `prometheus.yml` configuration file.
 - Set up a `systemd` service for Prometheus.
 - Enable and start the Prometheus service, ensuring it runs on system boot.
@@ -33,6 +34,7 @@ None.
 | `prometheus_user` | `str` | `False` | `prometheus` | Prometheus service user. |
 | `prometheus_group` | `str` | `False` | `prometheus` | Prometheus service group. |
 | `prometheus_service_directory` | `path` | `False` | `/etc/systemd/system/prometheus.service` | Prometheus Systemd service directory (full path to the service file). |
+| `prometheus_scrape_targets` | `list` | `False` | `["localhost"]` | List of hosts to scrape with node_exporter. |
 
 # Example Playbook
 

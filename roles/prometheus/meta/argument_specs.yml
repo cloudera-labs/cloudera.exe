@@ -18,6 +18,7 @@ argument_specs:
     short_description: Install Prometheus.
     description:
       - Install Prometheus from the distribution archive file.
+      - Set up SELinux to permissive mode (to ensure Prometheus can run without policy restrictions).
       - Set up the local time-series database.
       - Set up the service user and group.
       - Install a basic configuration.
