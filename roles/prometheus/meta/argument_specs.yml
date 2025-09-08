@@ -18,6 +18,7 @@ argument_specs:
     short_description: Install Prometheus.
     description:
       - Install Prometheus from the distribution archive file.
+      - Set up SELinux to permissive mode (to ensure Prometheus can run without policy restrictions).
       - Set up the local time-series database.
       - Set up the service user and group.
       - Install a basic configuration.
@@ -59,3 +60,10 @@ argument_specs:
         type: path
         required: false
         default: /etc/systemd/system/prometheus.service
+      prometheus_scrape_targets:
+        description: List of hosts to scrape with node_exporter
+        type: list
+        elements: str
+        required: false
+        default:
+          - "localhost"

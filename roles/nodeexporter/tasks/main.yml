@@ -59,4 +59,4 @@
     src: node_exporter.service.j2
     dest: "{{ node_exporter_service_directory }}"
     mode: "0755"
-  notify: Start node_exporter service
+  notify: Reload and restart node_exporter

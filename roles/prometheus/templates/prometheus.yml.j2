@@ -1,23 +1,16 @@
-
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
-# alerting:
-  # alertmanagers:
-  #   - static_configs:
-  #       - targets:
-          # - alertmanager:9093
-
-# rule_files:
-
-
 scrape_configs:
 
-  - job_name: "prometheus"
-    static_configs:
-      - targets: ["localhost:9090"]
+  # - job_name: "prometheus"
+  #   static_configs:
+  #     - targets: ["localhost:9090"]
 
-  - job_name: "node_exporter"
+  - job_name: "Host Node Exporter Metrics"
     static_configs:
-      - targets: ['localhost:9100']
+      - targets:
+{% for host in prometheus_scrape_targets | default(['localhost']) %}
+          - '{{ host }}:9100'
+{% endfor %}

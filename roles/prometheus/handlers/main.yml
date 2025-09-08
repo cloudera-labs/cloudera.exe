@@ -13,19 +13,9 @@
 # limitations under the License.
 
 ---
-- name: Enable Prometheus
-  block:
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: true
-
-    - name: Enable and start Prometheus service
-      ansible.builtin.systemd:
-        name: prometheus
-        state: started
-        enabled: true
-
-- name: Restart Prometheus
-  ansible.builtin.service:
+- name: Manage Prometheus Service
+  ansible.builtin.systemd:
     name: prometheus
+    daemon_reload: true
     state: restarted
+    enabled: true

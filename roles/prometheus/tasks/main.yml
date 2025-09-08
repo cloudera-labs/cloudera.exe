@@ -13,6 +13,11 @@
 # limitations under the License.
 
 ---
+- name: Set SELinux to permissive mode
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
 - name: Create Prometheus directory
   ansible.builtin.file:
     path: "{{ prometheus_directory }}"
@@ -69,11 +74,11 @@
     src: prometheus.service.j2
     dest: "{{ prometheus_service_directory }}"
     mode: "0755"
-  notify: Enable Prometheus
+  notify: Manage Prometheus Service
 
 - name: Update Prometheus configuration
   ansible.builtin.template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
     mode: "0755"
-  notify: Restart Prometheus
+  notify: Manage Prometheus Service

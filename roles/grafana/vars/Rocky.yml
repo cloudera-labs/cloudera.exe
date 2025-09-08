@@ -1,3 +1,5 @@
+---
+
 # Copyright 2025 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-- name: Reload and restart node_exporter
-  become: true
-  ansible.builtin.systemd:
-    name: node_exporter
-    daemon_reload: true
-    state: restarted
-    enabled: true
+grafana_tarball_url: https://dl.grafana.com/oss/release/grafana-10.2.3-1.x86_64.rpm
+grafana_gpg_key_url: https://rpm.grafana.com/gpg.key
+
+grafana_service: grafana-server

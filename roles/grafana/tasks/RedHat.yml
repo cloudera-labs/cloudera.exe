@@ -13,10 +13,12 @@
 # limitations under the License.
 
 ---
-- name: Reload and restart node_exporter
-  become: true
-  ansible.builtin.systemd:
-    name: node_exporter
-    daemon_reload: true
-    state: restarted
-    enabled: true
+- name: Import Grafana GPG key
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ grafana_gpg_key_url }}"
+
+- name: Install Grafana packages
+  ansible.builtin.yum:
+    name: "{{ grafana_tarball_url }}"
+    state: present
