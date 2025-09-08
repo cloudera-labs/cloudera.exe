@@ -59,3 +59,10 @@ argument_specs:
         type: path
         required: false
         default: /etc/systemd/system/prometheus.service
+      prometheus_scrape_targets:
+        description: List of hosts to scrape with node_exporter
+        type: list
+        elements: str
+        required: false
+        default:
+          - "localhost"
