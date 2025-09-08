@@ -13,14 +13,10 @@
 # limitations under the License.
 
 ---
-- name: Start node_exporter service
-  block:
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: true
-
-    - name: Enable and start node_exporter service
-      ansible.builtin.systemd:
-        name: node_exporter
-        state: started
-        enabled: true
+- name: Reload and restart node_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: node_exporter
+    daemon_reload: true
+    state: restarted
+    enabled: true
