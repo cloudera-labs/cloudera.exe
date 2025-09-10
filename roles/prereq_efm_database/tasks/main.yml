@@ -1,0 +1,36 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+- name: Provision databases and user accounts
+  ansible.builtin.import_role:
+    name: cloudera.exe.prereq_database
+  vars:
+    database_accounts: "{{ efm_details }}"
+    efm_details:
+      - user: "{{ efm_username }}"
+        password: "{{ efm_password }}"
+        db: "{{ efm_database }}"
+  no_log: true
+
+
+- name: Grant all privileges to EFM user on its database
+  community.postgresql.postgresql_privs:
+    login_user: "{{ database_admin_user }}"
+    login_password: "{{ database_admin_password }}"
+    login_host: "{{ database_host }}"
+    db: "{{ efm_database }}"
+    role: "{{ efm_username }}"
+    privs: ALL 
+    type: database
+  no_log: true
