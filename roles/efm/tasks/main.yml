@@ -1,0 +1,81 @@
+
+---
+
+- name: Create EFM directory
+  ansible.builtin.file:
+    path: "{{ efm_directory }}"
+    state: directory
+    owner: "{{ efm_user }}"
+    group: "{{ efm_group }}"
+    mode: 0755
+
+- name: Create a temporary directory for EFM tarball
+  ansible.builtin.tempfile:
+    state: directory
+  register: __efm_tmp
+
+- name: Download EFM tarball to the temporary directory
+  ansible.builtin.get_url:
+    url: "{{ efm_tarball_url }}"
+    dest: "{{ __efm_tmp.path }}/{{ efm_tarball_url | basename }}"
+    url_username: "{{ cloudera_manager_repo_username | default(omit) }}"
+    url_password: "{{ cloudera_manager_repo_password | default(omit) }}"
+    mode: '0644'
+
+- name: Extract the EFM tarball
+  ansible.builtin.unarchive:
+    src: "{{ __efm_tmp.path }}/{{ efm_tarball_url | basename }}"
+    dest: "{{ efm_directory }}"
+    remote_src: true
+
+- name: Remove the temporary directory and EFM tarball
+  ansible.builtin.file:
+    path: "{{ __efm_tmp.path }}"
+    state: absent
+  when: __efm_tmp.path is defined
+
+- name: Find the folder with full EFM Version name
+  ansible.builtin.find:
+    paths: "{{ efm_directory }}"
+    file_type: directory
+    patterns: "efm-*"
+  register: efm_tarball
+
+- name: Set the full folder PATH as a variable
+  ansible.builtin.set_fact:
+    efm_tarball_folder: "{{ efm_tarball.files[0].path }}"
+  when: efm_tarball.files | length > 0
+
+- name: Create a symbolic link "efm" to full version folder name
+  ansible.builtin.file:
+    src: "{{ efm_tarball_folder }}"
+    dest: "{{ efm_directory }}/efm"
+    owner: "{{ efm_user }}"
+    group: "{{ efm_group }}"
+    state: link
+  when: efm_tarball_folder is defined
+
+- name: Set ownership of EFM installation directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ efm_directory }}"
+    state: directory
+    owner: "{{ efm_user }}"
+    group: "{{ efm_group }}"
+    recurse: true
+
+- name: Configure efm.properties
+  ansible.builtin.template:
+    src: efm.properties.j2
+    dest: "{{ efm_properties_directory }}"
+
+- name: Create EFM systemd service file
+  become: true
+  ansible.builtin.template:
+    src: efm.service.j2
+    dest: "{{ efm_service_directory }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: start efm service
+

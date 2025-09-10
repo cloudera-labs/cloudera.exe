@@ -1,0 +1,8 @@
+---
+
+- name: start efm service
+  ansible.builtin.systemd:
+    name: efm
+    daemon_reload: true
+    enabled: true
+    state: started
