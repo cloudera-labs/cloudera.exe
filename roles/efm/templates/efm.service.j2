@@ -1,0 +1,17 @@
+[Unit]
+Description=Cloudera Edge Flow Manager (EFM)
+After=network.target
+
+[Service]
+# The user that will run the EFM service
+User={{ efm_user }}
+
+# The main command to start the service
+ExecStart={{ efm_directory }}/efm/bin/efm.sh run
+
+# EFM exits with status 143 on a graceful shutdown (SIGTERM).
+# We need to tell systemd this is a successful exit code.
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

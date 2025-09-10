@@ -1,0 +1,62 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure Cloudera Edge Flow Manager (EFM)
+    description:
+      - Downloads, installs, and configures Cloudera Edge Flow Manager (EFM) on the target host.
+      - Sets up the EFM properties, and manages the systemd service.
+    author: Cloudera Labs
+    version_added: "3.0.0"
+    options:
+      efm_tarball_url:
+        description: URL to the EFM tarball to download and install.
+        type: str
+        required: false
+        default: "https://archive.cloudera.com/p/CEM/redhat9/2.x/updates/2.1.3.0/tars/efm/efm-2.1.3.0-2-bin.tar.gz"
+      efm_directory:
+        description: Directory where EFM will be installed.
+        type: str
+        required: false
+        default: "/opt/cloudera/cem"
+      efm_properties_directory:
+        description: Path to the EFM properties file.
+        type: str
+        required: false
+        default: "/opt/cloudera/cem/efm/conf/efm.properties"
+      efm_service_directory:
+        description: Path to the EFM systemd service file.
+        type: str
+        required: false
+        default: "/etc/systemd/system/efm.service"
+      efm_user:
+        description: System user to own EFM files and run the service.
+        type: str
+        required: false
+        default: "efm"
+      efm_group:
+        description: System group to own EFM files.
+        type: str
+        required: false
+        default: "efm"
+      efm_server_address:
+        description: The address to which the EFM server will bind.
+        type: str
+        required: false
+        default: "0.0.0.0"
+      efm_server_port:
+        description: The port on which the EFM server will listen.
+        type: str
+        required: false
+        default: "10090"
+      efm_encryption_password:
+        description: Password used for EFM encryption. This must be provided by the user.
+        type: str
+        required: true
+      cloudera_manager_repo_username:
+        description: Username for protected Cloudera repositories (if required).
+        type: str
+        required: false
+      cloudera_manager_repo_password:
+        description: Password for protected Cloudera repositories (if required).
+        type: str
+        required: false
