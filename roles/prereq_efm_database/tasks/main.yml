@@ -23,7 +23,6 @@
         db: "{{ efm_database }}"
   no_log: true
 
-
 - name: Grant all privileges to EFM user on its database
   community.postgresql.postgresql_privs:
     login_user: "{{ database_admin_user }}"
@@ -31,6 +30,6 @@
     login_host: "{{ database_host }}"
     db: "{{ efm_database }}"
     role: "{{ efm_username }}"
-    privs: ALL 
+    privs: ALL
     type: database
   no_log: true
