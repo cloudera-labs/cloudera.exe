@@ -40,8 +40,8 @@ tags:
   - tools
 
 dependencies:
-  "ansible.netcommon": "2.5.1"
-  "community.general": "4.5.0"
+  "ansible.netcommon": ">=2.5.1"
+  "community.general": ">=4.5.0"
 
 repository: https://github.com/cloudera-labs/cloudera.exe
 homepage: https://github.com/cloudera-labs/cloudera.exe
