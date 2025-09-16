@@ -4,20 +4,14 @@ datasources:
   type: prometheus
   access: proxy
   url: {{ prometheus_url }}
-  password:
-  user: ""
-  database: ""
-  basicAuth: false
-  basicAuthUser: ""
-  basicAuthPassword: ""
-  withCredentials: false
   isDefault: true
   jsonData:
-     tlsAuth: false
+     tlsAuth: true
      tlsAuthWithCACert: false
+     tlsSkipVerify: false
+     serverName: {{ prometheus_hostname }}
   secureJsonData:
-    tlsCACert: ""
-    tlsClientCert: ""
-    tlsClientKey: ""
+    tlsClientCert: "{{ (__prometheus_cert_content.content | b64decode) if tls_enabled | bool else '' }}"
+    tlsClientKey: "{{ (__prometheus_key_content.content | b64decode) if tls_enabled | bool else '' }}"
   version: 1
   editable: true

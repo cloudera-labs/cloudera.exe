@@ -42,6 +42,19 @@
     - { option: "cert_key", value: "{{ grafana_tls_key_path }}" }
   notify: Manage Grafana Service
 
+- name: Read remote Prometheus certificate content
+  ansible.builtin.slurp:
+    src: "{{ prometheus_tls_cert_path }}"
+  register: __prometheus_cert_content
+  when: tls_enabled
+
+- name: Read remote Prometheus key content
+  ansible.builtin.slurp:
+    src: "{{ prometheus_tls_key_path }}"
+  register: __prometheus_key_content
+  no_log: true
+  when: tls_enabled
+
 - name: Connect Prometheus datasource
   ansible.builtin.template:
     src: prometheus_source.yml.j2

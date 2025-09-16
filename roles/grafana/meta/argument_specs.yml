@@ -22,6 +22,24 @@ argument_specs:
     author: Cloudera Labs
     version_added: "2.4.0"
     options:
+      prometheus_hostname:
+        description:
+          - Hostname of the Prometheus server for TLS server name verification.
+        type: str
+        default: localhost
+        required: false
+      prometheus_tls_cert_path:
+        description:
+          - Path to the Prometheus server TLS certificate (for client auth, if needed).
+        type: str
+        default: /etc/pki/tls/certs/prometheus.crt
+        required: false
+      prometheus_tls_key_path:
+        description:
+          - Path to the Prometheus server TLS key (for client auth, if needed).
+        type: str
+        default: /etc/pki/tls/private/prometheus.key
+        required: false
       grafana_config_file:
         description:
           - Path to the main Grafana configuration file.
