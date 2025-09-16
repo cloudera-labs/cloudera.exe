@@ -1,7 +1,7 @@
 
 # grafana
 
-Automates the installation and configuration of a Grafana server, with Prometheus integration for monitoring and observability. 
+Automates the installation and configuration of a Grafana server, with Prometheus integration for monitoring and observability.
 
 ## Features
 
