@@ -13,13 +13,16 @@
 # limitations under the License.
 
 ---
-
 prometheus_tarball_url: https://github.com/prometheus/prometheus/releases/download/v2.48.1/prometheus-2.48.1.linux-amd64.tar.gz
 prometheus_directory: /etc/prometheus
 prometheus_tsdb_directory: /var/lib/prometheus
 prometheus_tarball_file: prometheus.tar.gz
 
-prometheus_user: prometheus
-prometheus_group: prometheus
+tls_enabled: false
+prometheus_tls_cert_path: /etc/pki/tls/certs/prometheus.crt
+prometheus_tls_key_path: /etc/pki/tls/private/prometheus.key
+prometheus_web_config_file: /etc/prometheus/web.yml
 
 prometheus_service_directory: /etc/systemd/system/prometheus.service
+prometheus_user: prometheus
+prometheus_group: prometheus

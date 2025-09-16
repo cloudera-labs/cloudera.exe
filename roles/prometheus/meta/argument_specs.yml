@@ -15,16 +15,42 @@
 
 argument_specs:
   main:
-    short_description: Install Prometheus.
+    short_description: Install, configure, and provision Prometheus server with optional TLS/HTTPS support
     description:
-      - Install Prometheus from the distribution archive file.
-      - Set up SELinux to permissive mode (to ensure Prometheus can run without policy restrictions).
-      - Set up the local time-series database.
-      - Set up the service user and group.
-      - Install a basic configuration.
+      - Create a dedicated system user and group for Prometheus.
+      - Create necessary directories for Prometheus configuration and TSDB storage.
+      - Download the Prometheus distribution tarball from the official source.
+      - Extract the Prometheus binary and related files to the installation directory.
+      - Set SELinux to permissive mode on the target host.
+      - Install a basic prometheus.yml configuration file.
+      - Set up a systemd service for Prometheus.
+      - Enable and start the Prometheus service, ensuring it runs on system boot.
+      - Optionally enable TLS/HTTPS support for secure endpoints.
+      - Optionally configure a Prometheus web config file for TLS settings.
+      - Allow flexible configuration of scrape targets and storage locations via variables.
     author: Cloudera Labs
     version_added: "2.4.0"
     options:
+      tls_enabled:
+        description: Enable or disable TLS/SSL for Prometheus (HTTPS support).
+        type: bool
+        required: false
+        default: false
+      prometheus_tls_cert_path:
+        description: Path to the TLS certificate file for Prometheus.
+        type: str
+        required: false
+        default: /etc/pki/tls/certs/prometheus.crt
+      prometheus_tls_key_path:
+        description: Path to the TLS private key file for Prometheus.
+        type: str
+        required: false
+        default: /etc/pki/tls/private/prometheus.key
+      prometheus_web_config_file:
+        description: Path to the Prometheus web config file (for TLS settings).
+        type: str
+        required: false
+        default: /etc/prometheus/web.yml
       prometheus_tarball_url:
         description: URL to the Prometheus distribution archive file.
         type: str

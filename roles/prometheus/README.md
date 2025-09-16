@@ -1,9 +1,5 @@
 # prometheus
 
-Install Prometheus.
-
-This role automates the installation of the Prometheus monitoring system from its official distribution archive. It sets up the necessary directories for configuration and the time-series database (TSDB), creates a dedicated system user and group for the service, and installs a basic Prometheus configuration to get started.
-
 The role will:
 - Create a dedicated system user and group (`prometheus`).
 - Create necessary directories for Prometheus configuration (`/etc/prometheus`) and TSDB storage (`/var/lib/prometheus`).
@@ -31,6 +27,10 @@ None.
 | `prometheus_directory` | `path` | `False` | `/etc/prometheus` | Prometheus configuration directory. |
 | `prometheus_tsdb_directory` | `path` | `False` | `/var/lib/prometheus` | Prometheus TSDB directory. |
 | `prometheus_tarball_file` | `str` | `False` | `prometheus.tar.gz` | Intermediate archive file name for the downloaded tarball. |
+| `tls_enabled` | `bool` | `False` | `false` | Enable or disable TLS/SSL for Prometheus (HTTPS support). |
+| `prometheus_tls_cert_path` | `str` | `False` | `/etc/pki/tls/certs/prometheus.crt` | Path to the TLS certificate file for Prometheus. |
+| `prometheus_tls_key_path` | `str` | `False` | `/etc/pki/tls/private/prometheus.key` | Path to the TLS private key file for Prometheus. |
+| `prometheus_web_config_file` | `str` | `False` | `/etc/prometheus/web.yml` | Path to the Prometheus web config file (for TLS settings). |
 | `prometheus_user` | `str` | `False` | `prometheus` | Prometheus service user. |
 | `prometheus_group` | `str` | `False` | `prometheus` | Prometheus service group. |
 | `prometheus_service_directory` | `path` | `False` | `/etc/systemd/system/prometheus.service` | Prometheus Systemd service directory (full path to the service file). |
@@ -48,8 +48,8 @@ None.
         prometheus_tarball_url: "[https://github.com/prometheus/prometheus/releases/download/v2.49.0/prometheus-2.49.0.linux-amd64.tar.gz](https://github.com/prometheus/prometheus/releases/download/v2.49.0/prometheus-2.49.0.linux-amd64.tar.gz)"
         prometheus_directory: "/opt/prometheus/config"
         prometheus_tsdb_directory: "/data/prometheus_tsdb"
-        prometheus_user: "prom_admin"
-        prometheus_group: "prom_admin"
+        prometheus_user: "prometheus"
+        prometheus_group: "prometheus"
 ```
 
 # License
