@@ -32,14 +32,14 @@
     section: server
     option: "{{ item.option }}"
     value: "{{ item.value }}"
-    mode: '0640'
+    mode: "0640"
   loop:
-  - { option: 'protocol', value: 'https' }
-  - { option: 'http_port', value: '{{ grafana_http_port }}' }
-  - { option: 'domain', value: '{{ grafana_domain }}' }
-  - { option: 'root_url', value: '{{ grafana_root_url }}' }
-  - { option: 'cert_file', value: '{{ grafana_tls_cert_path }}' }
-  - { option: 'cert_key', value: '{{ grafana_tls_key_path }}' }
+    - { option: "protocol", value: "https" }
+    - { option: "http_port", value: "{{ grafana_http_port }}" }
+    - { option: "domain", value: "{{ grafana_domain }}" }
+    - { option: "root_url", value: "{{ grafana_root_url }}" }
+    - { option: "cert_file", value: "{{ grafana_tls_cert_path }}" }
+    - { option: "cert_key", value: "{{ grafana_tls_key_path }}" }
   notify: Manage Grafana Service
 
 - name: Connect Prometheus datasource
@@ -65,6 +65,3 @@
     src: files/base_dashboard.json
     dest: "{{ grafana_dashboard_directory }}/base_dashboard.json"
     mode: "0755"
-
-
-
