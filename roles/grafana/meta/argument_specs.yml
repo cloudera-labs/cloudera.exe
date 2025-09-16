@@ -15,29 +15,82 @@
 
 argument_specs:
   main:
-    short_description: Set up Grafana server
+    short_description: Install, configure, and provision Grafana server with Prometheus integration and optional TLS/HTTPS support
     description: |
-      Set up Grafana server, connected to a Prometheus server.
+      This role automates the installation and configuration of a Grafana server, supporting secure HTTPS/TLS access, custom admin credentials, and flexible provisioning of data sources and dashboards.
+      It is designed for seamless integration with Prometheus, but can be extended to other monitoring backends. The role handles OS-specific installation, server and security configuration, and dashboard/data source provisioning, making it suitable for a wide range of deployment scenarios.
     author: Cloudera Labs
     version_added: "2.4.0"
     options:
+      grafana_config_file:
+        description:
+          - Path to the main Grafana configuration file.
+        type: str
+        default: /etc/grafana/grafana.ini
+        required: false
+      grafana_http_port:
+        description:
+          - HTTP port for Grafana to listen on.
+        type: int
+        default: 3000
+        required: false
+      grafana_security_admin_password:
+        description:
+          - Admin password for Grafana web interface.
+        type: str
+        default: admin
+        required: false
+      grafana_domain:
+        description:
+          - Domain name for the Grafana server (used in server configuration).
+        type: str
+        default: "localhost"
+        required: false
+      grafana_root_url:
+        description:
+          - The root URL for accessing Grafana (used in server configuration).
+        type: str
+        default: "http://localhost:3000"
+        required: false
+      tls_enabled:
+        description:
+          - Enable or disable TLS/SSL for Grafana (HTTPS support).
+        type: bool
+        default: false
+        required: false
+      grafana_tls_cert_path:
+        description:
+          - Path to the TLS certificate file for Grafana.
+        type: str
+        default: /etc/pki/tls/certs/grafana.crt
+        required: false
+      grafana_tls_key_path:
+        description:
+          - Path to the TLS private key file for Grafana.
+        type: str
+        default: /etc/pki/tls/private/grafana.key
+        required: false
       grafana_datasource_directory:
         description:
           - Location of the Grafana data sources.
         type: str
         default: /etc/grafana/provisioning/datasources/automatic.yml
+        required: false
       grafana_providers_configuration:
         description:
           - Location of the Grafana provider configurations.
         type: str
         default: /etc/grafana/provisioning/dashboards/providers.yml
+        required: false
       grafana_dashboard_directory:
         description:
           - Locattion of the Grafana dashboard configurations.
         type: str
         default: /var/lib/grafana/dashboards
+        required: false
       prometheus_url:
         description:
           - URL (host:port) to the Prometheus server.
         type: str
-        default: localhost:9090
+        default: https://localhost:9090
+        required: false

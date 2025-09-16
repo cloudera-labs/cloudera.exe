@@ -19,6 +19,29 @@
 - name: Execute OS-specific Grafana installation
   ansible.builtin.include_tasks: "{{ ansible_facts['distribution'] }}.yml"
 
+- name: Configure Grafana security settings (admin password)
+  ansible.builtin.command:
+    cmd: "grafana-cli admin reset-admin-password {{ grafana_security_admin_password }}"
+  no_log: true
+  notify: Manage Grafana Service
+
+- name: Configure Grafana server if TLS is enabled
+  when: tls_enabled
+  ansible.builtin.ini_file:
+    path: "{{ grafana_config_file }}"
+    section: server
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: '0640'
+  loop:
+  - { option: 'protocol', value: 'https' }
+  - { option: 'http_port', value: '{{ grafana_http_port }}' }
+  - { option: 'domain', value: '{{ grafana_domain }}' }
+  - { option: 'root_url', value: '{{ grafana_root_url }}' }
+  - { option: 'cert_file', value: '{{ grafana_tls_cert_path }}' }
+  - { option: 'cert_key', value: '{{ grafana_tls_key_path }}' }
+  notify: Manage Grafana Service
+
 - name: Connect Prometheus datasource
   ansible.builtin.template:
     src: prometheus_source.yml.j2
@@ -43,7 +66,5 @@
     dest: "{{ grafana_dashboard_directory }}/base_dashboard.json"
     mode: "0755"
 
-- name: Start Grafana service
-  ansible.builtin.systemd:
-    name: "{{ grafana_service }}"
-    state: started
+
+

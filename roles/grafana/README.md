@@ -1,12 +1,27 @@
-# grafana_server
 
-Set up Grafana server, connected to a Prometheus server.
+# grafana
 
-The role will:
-- Install the Grafana server package(s).
-- Configure Grafana data sources, primarily for Prometheus, based on the provided `prometheus_url`.
-- Configure Grafana dashboard providers.
-- Provision a default dashboard.
+Automates the installation and configuration of a Grafana server, with Prometheus integration for monitoring and observability. 
+
+## Features
+
+- Installs Grafana using OS-specific package management for major Linux distributions (Ubuntu, CentOS, RedHat, Rocky).
+- Configures core Grafana server settings, including protocol (HTTP/HTTPS), port, domain, and root URL.
+- Optionally enables HTTPS/TLS for secure access, with configurable certificate and key paths.
+- Allows setting a custom admin password for the Grafana web interface.
+- Provisions Prometheus as a data source, with the ability to specify a custom Prometheus endpoint.
+- Configures dashboard providers and ensures dashboards are available at startup.
+- Supports custom locations for data source and dashboard configuration files.
+- Ensures idempotent and secure configuration changes, with sensitive values (like admin password) protected in logs.
+- Designed for flexibility and easy extension to other monitoring backends or dashboard sources.
+
+## How it works
+
+1. Installs Grafana using the appropriate package manager for the detected OS.
+2. Configures server and security settings in `grafana.ini`, including TLS and admin credentials if specified.
+3. Provisions Prometheus as a data source and sets up dashboard providers using Jinja2 templates.
+4. Ensures the dashboards directory exists and copies a default dashboard for immediate use.
+5. Restarts or reloads the Grafana service as needed to apply configuration changes.
 
 ## Requirements
 
@@ -20,10 +35,23 @@ None.
 
 | Parameter                        | Type | Default Value                                   | Description                                                               |
 |----------------------------------|------|-------------------------------------------------|---------------------------------------------------------------------------|
-| `grafana_datasource_directory`   | `str`| `/etc/grafana/provisioning/datasources/automatic.yml`| Location of the Grafana data sources configuration file.                 |
-| `grafana_providers_configuration`| `str`| `/etc/grafana/provisioning/dashboards/providers.yml` | Location of the Grafana dashboard provider configurations file.          |
-| `grafana_dashboard_directory`    | `str`| `/var/lib/grafana/dashboards`                   | Location of the Grafana dashboard configurations directory.              |
-| `prometheus_url`                 | `str`| `localhost:9090`                                | URL (host:port) to the Prometheus server that Grafana will connect to.   |
+| `grafana_datasource_directory`   | `str` | `/etc/grafana/provisioning/datasources/automatic.yml` | Location of the Grafana data sources configuration file.                 |
+| `grafana_providers_configuration`| `str` | `/etc/grafana/provisioning/dashboards/providers.yml`  | Location of the Grafana dashboard provider configurations file.          |
+| `grafana_dashboard_directory`    | `str` | `/var/lib/grafana/dashboards`                        | Location of the Grafana dashboard configurations directory.              |
+| `prometheus_url`                 | `str` | `http://localhost:9090`                             | URL (host:port) to the Prometheus server that Grafana will connect to.   |
+| `tls_enabled`                    | `bool`| `false`                                              | Enable or disable TLS/SSL for Grafana (HTTPS support).                   |
+| `grafana_tls_cert_path`          | `str` | `/etc/pki/tls/certs/grafana.crt`                     | Path to the TLS certificate file for Grafana.                            |
+| `grafana_tls_key_path`           | `str` | `/etc/pki/tls/private/grafana.key`                   | Path to the TLS private key file for Grafana.                            |
+| `grafana_domain`                 | `str` | `localhost`                                          | Domain name for the Grafana server (used in server configuration).       |
+| `grafana_root_url`               | `str` | `http://localhost:3000`                              | The root URL for accessing Grafana (used in server configuration).       |
+| `grafana_config_file`            | `str` | `/etc/grafana/grafana.ini`                           | Path to the main Grafana configuration file.                             |
+| `grafana_http_port`              | `int` | `3000`                                               | HTTP port for Grafana to listen on.                                      |
+| `grafana_security_admin_password`| `str` | `admin`                                              | Admin password for Grafana web interface.                                 |
+
+
+## TLS/HTTPS Support
+
+If `tls_enabled` is set to `true`, the role will configure Grafana to use HTTPS. You must provide valid certificate and key files at the specified paths (`grafana_tls_cert_path` and `grafana_tls_key_path`).
 
 ## Examples
 
@@ -33,8 +61,6 @@ Basic installation connecting to a local Prometheus server:
 - name: Set up Grafana server with local Prometheus
   ansible.builtin.import_role:
     name: grafana_server
-  # No variables needed here as defaults will be used for local Prometheus
-
 - name: Set up Grafana server for a specific Prometheus endpoint
   ansible.builtin.import_role:
     name: grafana_server
@@ -49,6 +75,19 @@ Basic installation connecting to a local Prometheus server:
     grafana_providers_configuration: "/opt/grafana/configs/providers.yml"
     grafana_dashboard_directory: "/opt/grafana/dashboards_custom"
     prometheus_url: "http://monitoring-cluster.internal:9090"
+
+- name: Set up Grafana server with TLS/HTTPS enabled
+  ansible.builtin.import_role:
+    name: grafana_server
+  vars:
+    tls_enabled: true
+    grafana_security_admin_password: secretpassword
+    grafana_domain: "grafana.1.1.1.1.pvc.labs.com"
+    grafana_root_url: "https://grafana.1.1.1.1.pvc.labs.com:3000"
+    grafana_tls_cert_path: "/etc/pki/tls/certs/grafana.crt"
+    grafana_tls_key_path: "/etc/pki/tls/private/grafana.key"
+    prometheus_url: "https://prometheus.example.com:9090"
+
 ```
 
 ## License
