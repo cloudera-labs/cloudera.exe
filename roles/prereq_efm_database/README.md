@@ -2,7 +2,7 @@
 
 Set up database and user accounts for Edge Flow Manager
 
-This role automates the setup of a database and its associated user accounts specifically for Apache Edge Flow Manager services. It supports various database types, including PostgreSQL, MySQL, and Oracle. The role creates the database and a dedicated user with ownership privileges, using sensible defaults that can be easily overridden.
+This role automates the setup of a database and its associated user accounts specifically for Apache Edge Flow Manager services. The role creates the database and a dedicated user with ownership privileges, using sensible defaults that can be easily overridden.
 
 The role will:
 - Connect to the specified database server using administrative credentials.
@@ -15,7 +15,6 @@ The role will:
 
 - A running and accessible database server of the specified `database_type`.
 - The `database_admin_user` must have sufficient administrative privileges to create new databases and users.
-- The machine running the Ansible playbook must have the necessary database client libraries installed to connect to the database (e.g., `psycopg2` for PostgreSQL, `mysql-connector-python` for MySQL).
 
 # Dependencies
 
