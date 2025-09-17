@@ -25,7 +25,7 @@ None.
 
 | Variable | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `database_type` | `str` | `True` | | Specifies the type of database to connect to. Valid choices are `postgresql`, `mysql`, and `oracle`. |
+| `database_type` | `str` | `True` | | Specifies the type of database to connect to. |
 | `database_host` | `str` | `True` | | The hostname or IP address of the database server. |
 | `database_admin_user` | `str` | `True` | | The username with administrative privileges used to manage the database. |
 | `database_admin_password` | `str` | `True` | | The password for the database administrative user. This variable is marked with `no_log: true` and will not be displayed in Ansible logs. |
@@ -45,19 +45,7 @@ None.
         database_type: "postgresql"
         database_host: "db-server.example.com"
         database_admin_user: "postgres"
-        database_admin_password: "my_postgres_admin_password" # Use Ansible Vault for this
-
-    - name: Set up efm database with custom credentials on MySQL
-      ansible.builtin.import_role:
-        name: cloudera.exe.prereq_efm_database
-      vars:
-        database_type: "mysql"
-        database_host: "mysql-db-server.example.com"
-        database_admin_user: "root"
-        database_admin_password: "my_mysql_root_password" # Use Ansible Vault for this
-        efm_username: "my_efm_user"
-        efm_password: "a_strong_efm_password"
-        efm_database: "my_efm_db"
+        database_admin_password: "my_postgres_admin_password"
 ```
 
 # License

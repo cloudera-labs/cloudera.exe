@@ -21,16 +21,14 @@ argument_specs:
       - Default values are used for the username, password, and database name, but these can be overwritten by setting the `efm_username`, `efm_password`,
         and `efm_database` variables.
     author: Cloudera Labs
-    version_added: "3.0.0"
+    version_added: "3.1.0"
     options:
       database_type:
-        description: Specifies the type of database to connect to (e.g., PostgreSQL, MySQL, Oracle).
+        description: Specifies the type of database to connect to.
         type: str
         required: true
         choices:
           - postgresql
-          - mysql
-          - oracle
       database_host:
         description: The hostname or IP address of the database server to establish the connection.
         type: str
@@ -46,13 +44,11 @@ argument_specs:
       efm_username:
         description: The username for the efm database user and owner of the database.
         type: str
-        required: false
-        default: efm
+        required: true
       efm_password:
         description: The password for the efm database user.
         type: str
-        required: false
-        default: efm
+        required: true
       efm_database:
         description: The name of the database to be created for efm.
         type: str

@@ -19,6 +19,6 @@ database_host: "{{ undef(hint='Please defined the database server hostname or IP
 database_admin_user: "{{ undef(hint='Please defined the adminstrator username for the database server.') }}"
 database_admin_password: "{{ undef(hint='Please defined the adminstrator password for the database server.') }}"
 
-efm_username: efm
-efm_password: efmPassword
+efm_username: "{{ undef(hint='Please defined the efm database username.') }}"
+efm_password: "{{ undef(hint='Please defined the efm database password.') }}"
 efm_database: efm
