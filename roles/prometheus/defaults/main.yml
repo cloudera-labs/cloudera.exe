@@ -18,7 +18,7 @@ prometheus_directory: /etc/prometheus
 prometheus_tsdb_directory: /var/lib/prometheus
 prometheus_tarball_file: prometheus.tar.gz
 
-tls_enabled: false
+prometheus_tls_enabled: false
 prometheus_tls_cert_path: /etc/pki/tls/certs/prometheus.crt
 prometheus_tls_key_path: /etc/pki/tls/private/prometheus.key
 prometheus_web_config_file: /etc/prometheus/web.yml

@@ -11,7 +11,7 @@ ExecStart={{ prometheus_directory }}/prometheus \
 --storage.tsdb.path {{ prometheus_tsdb_directory }}/ \
 --web.console.templates={{ prometheus_directory }}/consoles \
 --web.console.libraries={{ prometheus_directory }}/console_libraries \
-{% if tls_enabled | bool %}--web.config.file={{ prometheus_web_config_file }}{% endif %}
+{% if prometheus_tls_enabled | bool %}--web.config.file={{ prometheus_web_config_file }}{% endif %}
 
 [Install]
 WantedBy=multi-user.target

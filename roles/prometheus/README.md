@@ -27,7 +27,7 @@ None.
 | `prometheus_directory` | `path` | `False` | `/etc/prometheus` | Prometheus configuration directory. |
 | `prometheus_tsdb_directory` | `path` | `False` | `/var/lib/prometheus` | Prometheus TSDB directory. |
 | `prometheus_tarball_file` | `str` | `False` | `prometheus.tar.gz` | Intermediate archive file name for the downloaded tarball. |
-| `tls_enabled` | `bool` | `False` | `false` | Enable or disable TLS/SSL for Prometheus (HTTPS support). |
+| `prometheus_tls_enabled` | `bool` | `False` | `false` | Enable or disable TLS/SSL for Prometheus (HTTPS support). |
 | `prometheus_tls_cert_path` | `str` | `False` | `/etc/pki/tls/certs/prometheus.crt` | Path to the TLS certificate file for Prometheus. |
 | `prometheus_tls_key_path` | `str` | `False` | `/etc/pki/tls/private/prometheus.key` | Path to the TLS private key file for Prometheus. |
 | `prometheus_web_config_file` | `str` | `False` | `/etc/prometheus/web.yml` | Path to the Prometheus web config file (for TLS settings). |

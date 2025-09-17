@@ -31,7 +31,7 @@ argument_specs:
     author: Cloudera Labs
     version_added: "2.4.0"
     options:
-      tls_enabled:
+      prometheus_tls_enabled:
         description: Enable or disable TLS/SSL for Prometheus (HTTPS support).
         type: bool
         required: false
