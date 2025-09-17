@@ -13,7 +13,7 @@
 # limitations under the License.
 
 ---
-- name: Manage Grafana Service
+- name: Restart Grafana Service
   ansible.builtin.systemd:
     name: grafana-server
     daemon_reload: true

@@ -19,14 +19,27 @@
 - name: Execute OS-specific Grafana installation
   ansible.builtin.include_tasks: "{{ ansible_facts['distribution'] }}.yml"
 
+- name: Check if Grafana admin password has already been set
+  ansible.builtin.stat:
+    path: /etc/grafana/.admin_password_set
+  register: grafana_admin_password_marker
+
 - name: Configure Grafana security settings (admin password)
   ansible.builtin.command:
     cmd: "grafana-cli admin reset-admin-password {{ grafana_security_admin_password }}"
   no_log: true
-  notify: Manage Grafana Service
+  notify: Restart Grafana Service
+  when: not grafana_admin_password_marker.stat.exists
+
+- name: Create marker file after setting admin password
+  ansible.builtin.file:
+    path: /etc/grafana/.admin_password_set
+    state: touch
+    mode: "0600"
+  when: not grafana_admin_password_marker.stat.exists
 
 - name: Configure Grafana server if TLS is enabled
-  when: tls_enabled
+  when: grafana_tls_enabled
   ansible.builtin.ini_file:
     path: "{{ grafana_config_file }}"
     section: server
@@ -40,20 +53,20 @@
     - { option: "root_url", value: "{{ grafana_root_url }}" }
     - { option: "cert_file", value: "{{ grafana_tls_cert_path }}" }
     - { option: "cert_key", value: "{{ grafana_tls_key_path }}" }
-  notify: Manage Grafana Service
+  notify: Restart Grafana Service
 
 - name: Read remote Prometheus certificate content
   ansible.builtin.slurp:
     src: "{{ prometheus_tls_cert_path }}"
   register: __prometheus_cert_content
-  when: tls_enabled
+  when: grafana_tls_enabled
 
 - name: Read remote Prometheus key content
   ansible.builtin.slurp:
     src: "{{ prometheus_tls_key_path }}"
   register: __prometheus_key_content
   no_log: true
-  when: tls_enabled
+  when: grafana_tls_enabled
 
 - name: Connect Prometheus datasource
   ansible.builtin.template:

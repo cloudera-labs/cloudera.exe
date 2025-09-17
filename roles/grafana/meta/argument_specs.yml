@@ -70,7 +70,7 @@ argument_specs:
         type: str
         default: "http://localhost:3000"
         required: false
-      tls_enabled:
+      grafana_tls_enabled:
         description:
           - Enable or disable TLS/SSL for Grafana (HTTPS support).
         type: bool

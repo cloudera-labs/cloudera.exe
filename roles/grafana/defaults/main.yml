@@ -13,7 +13,7 @@
 # limitations under the License.
 
 ---
-tls_enabled: false
+grafana_tls_enabled: false
 grafana_http_port: 3000
 grafana_security_admin_password: admin
 grafana_tls_cert_path: /etc/pki/tls/certs/grafana.crt

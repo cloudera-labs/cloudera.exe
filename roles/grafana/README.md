@@ -42,7 +42,7 @@ None.
 | `prometheus_hostname`            | `str` | `localhost`                                          | Hostname of the Prometheus server for TLS server name verification.      |
 | `prometheus_tls_cert_path`       | `str` | `/etc/pki/tls/certs/prometheus.crt`                  | Path to the Prometheus server TLS certificate (for client auth, if needed). |
 | `prometheus_tls_key_path`        | `str` | `/etc/pki/tls/private/prometheus.key`                | Path to the Prometheus server TLS key (for client auth, if needed).      |
-| `tls_enabled`                    | `bool`| `false`                                              | Enable or disable TLS/SSL for Grafana (HTTPS support).                   |
+| `grafana_tls_enabled`                    | `bool`| `false`                                              | Enable or disable TLS/SSL for Grafana (HTTPS support).                   |
 | `grafana_tls_cert_path`          | `str` | `/etc/pki/tls/certs/grafana.crt`                     | Path to the TLS certificate file for Grafana.                            |
 | `grafana_tls_key_path`           | `str` | `/etc/pki/tls/private/grafana.key`                   | Path to the TLS private key file for Grafana.                            |
 | `grafana_domain`                 | `str` | `localhost`                                          | Domain name for the Grafana server (used in server configuration).       |
@@ -54,7 +54,7 @@ None.
 
 ## TLS/HTTPS Support
 
-If `tls_enabled` is set to `true`, the role will configure Grafana to use HTTPS. You must provide valid certificate and key files at the specified paths (`grafana_tls_cert_path` and `grafana_tls_key_path`).
+If `grafana_tls_enabled` is set to `true`, the role will configure Grafana to use HTTPS. You must provide valid certificate and key files at the specified paths (`grafana_tls_cert_path` and `grafana_tls_key_path`).
 
 ## Examples
 
@@ -83,7 +83,7 @@ Basic installation connecting to a local Prometheus server:
   ansible.builtin.import_role:
     name: grafana_server
   vars:
-    tls_enabled: true
+    grafana_tls_enabled: true
     grafana_security_admin_password: secretpassword
     grafana_domain: "grafana.1.1.1.1.pvc.labs.com"
     grafana_root_url: "https://grafana.1.1.1.1.pvc.labs.com:3000"
