@@ -30,6 +30,7 @@ None.
 | `cloudera_manager_repo_password` | `str` | `False` | | Password for authenticating to the package repository. For Cloudera enterprise licenses, this corresponds to the derived `password` value associated with your `uuid`. |
 | `cloudera_manager_repo_key` | `str` | `False` | | URL to the package repository's GPG public key for content validation. |
 | `cloudera_manager_repo_gpgcheck` | `bool` | `False` | - | Flag to manage validation checks (GPG checks) of the repository contents. Set to `true` to enable GPG signature verification during package installation. |
+| `cloudera_manager_skip_os_support_check` | `bool` | `False` | - | Flag to skip OS support checks for Cloudera Manager. |
 
 # Example Playbook
 
