@@ -18,6 +18,7 @@
     gather_subset: distribution
 
 - name: Assert OS support for Cloudera Manager versions
+  when: not cloudera_manager_skip_os_support_check
   ansible.builtin.assert:
     that:
       - supported_cms | selectattr('family', 'eq', cm_repo_supported_distribution_map[ansible_facts['distribution']] | default(ansible_facts['distribution'])) |

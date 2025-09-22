@@ -53,3 +53,7 @@ argument_specs:
       cloudera_manager_repo_gpgcheck:
         description: Flag to manage validation checks of the repository contents.
         type: bool
+      cloudera_manager_skip_os_support_check:
+        description: Flag to skip OS support checks for Cloudera Manager.
+        type: bool
+        default: false
