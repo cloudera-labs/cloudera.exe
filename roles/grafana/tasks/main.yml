@@ -28,7 +28,7 @@
     value: "{{ item.value }}"
     mode: "0640"
   loop:
-    - { option: "protocol", value: "https" }
+    - { option: "protocol", value: "{{ grafana_protocol }}" }
     - { option: "http_port", value: "{{ grafana_http_port }}" }
     - { option: "domain", value: "{{ grafana_domain }}" }
     - { option: "root_url", value: "{{ grafana_root_url }}" }
@@ -44,7 +44,7 @@
 
 - name: Test Grafana admin password via API
   ansible.builtin.uri:
-    url: "https://localhost:{{ grafana_http_port }}/api/user"
+    url: "{{ grafana_protocol }}://localhost:{{ grafana_http_port }}/api/user"
     method: GET
     user: admin
     password: "{{ grafana_security_admin_password }}"
