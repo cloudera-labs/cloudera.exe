@@ -19,25 +19,6 @@
 - name: Execute OS-specific Grafana installation
   ansible.builtin.include_tasks: "{{ ansible_facts['distribution'] }}.yml"
 
-- name: Check if Grafana admin password has already been set
-  ansible.builtin.stat:
-    path: /etc/grafana/.admin_password_set
-  register: grafana_admin_password_marker
-
-- name: Configure Grafana security settings (admin password)
-  ansible.builtin.command:
-    cmd: "grafana-cli admin reset-admin-password {{ grafana_security_admin_password }}"
-  no_log: true
-  notify: Restart Grafana Service
-  when: not grafana_admin_password_marker.stat.exists
-
-- name: Create marker file after setting admin password
-  ansible.builtin.file:
-    path: /etc/grafana/.admin_password_set
-    state: touch
-    mode: "0600"
-  when: not grafana_admin_password_marker.stat.exists
-
 - name: Configure Grafana server if TLS is enabled
   when: grafana_tls_enabled
   ansible.builtin.ini_file:
@@ -54,6 +35,31 @@
     - { option: "cert_file", value: "{{ grafana_tls_cert_path }}" }
     - { option: "cert_key", value: "{{ grafana_tls_key_path }}" }
   notify: Restart Grafana Service
+
+- name: Ensure Grafana service is running
+  ansible.builtin.service:
+    name: grafana-server
+    state: started
+    enabled: true
+
+- name: Test Grafana admin password via API
+  ansible.builtin.uri:
+    url: "https://localhost:{{ grafana_http_port }}/api/user"
+    method: GET
+    user: admin
+    password: "{{ grafana_security_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    validate_certs: false
+  register: grafana_admin_login
+  failed_when: false
+
+- name: Set Grafana admin password if API login fails
+  ansible.builtin.command: >
+    grafana-cli admin reset-admin-password {{ grafana_security_admin_password }}
+  no_log: true
+  notify: Restart Grafana Service
+  when: grafana_admin_login.status != 200
 
 - name: Read remote Prometheus certificate content
   ansible.builtin.slurp:

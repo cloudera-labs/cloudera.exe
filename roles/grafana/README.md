@@ -35,6 +35,7 @@ None.
 
 | Parameter                        | Type | Default Value                                   | Description                                                               |
 |----------------------------------|------|-------------------------------------------------|---------------------------------------------------------------------------|
+| `grafana_protocol`               | `str` | `http`                                          | Protocol to use for Grafana web interface and API (`http` or `https`).     |
 | `grafana_datasource_directory`   | `str` | `/etc/grafana/provisioning/datasources/automatic.yml` | Location of the Grafana data sources configuration file.                 |
 | `grafana_providers_configuration`| `str` | `/etc/grafana/provisioning/dashboards/providers.yml`  | Location of the Grafana dashboard provider configurations file.          |
 | `grafana_dashboard_directory`    | `str` | `/var/lib/grafana/dashboards`                        | Location of the Grafana dashboard configurations directory.              |
