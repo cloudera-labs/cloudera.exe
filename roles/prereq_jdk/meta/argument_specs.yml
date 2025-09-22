@@ -68,3 +68,18 @@ argument_specs:
         description: Version of Cloudera Runtime for validation testing
         type: str
         required: true
+      alternative_jdk_package:
+        description:
+          - Name of the alternative JDK package to install (e.g., openjdk-21-jdk, zulu21-jdk).
+        type: str
+        required: false
+      alternative_jdk_repository:
+        description:
+          - Repository URL for the alternative JDK.
+        type: str
+        required: false
+      alternative_jdk_key:
+        description:
+          - GPG key URL for the alternative JDK repository.
+        type: str
+        required: false

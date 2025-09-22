@@ -35,6 +35,9 @@ None.
 | `jdk_security_paths_override` | `bool` | `False` | `False` | Flag to control behavior when multiple `java.security` files are found in the specified paths. If `true`, the role will continue with JCE changes even if multiple files are found. If `false`, the role will fail, requiring a more specific path list. |
 | `cloudera_manager_version` | `str` | `True` | | The version of Cloudera Manager to validate against. |
 | `cloudera_runtime_version` | `str` | `True` | | The version of Cloudera Runtime to validate against. |
+| `alternative_jdk_package` | `str` | `False` |  | Name of the alternative JDK package to install (e.g., `openjdk-21-jdk`, `zulu21-jdk`). |
+| `alternative_jdk_repository` | `str` | `False` |  | Repository URL for the alternative JDK. |
+| `alternative_jdk_key` | `str` | `False` |  | GPG key URL for the alternative JDK repository. |
 
 # Example Playbook
 
@@ -70,6 +73,17 @@ None.
         jdk_security_paths_override: false
         cloudera_manager_version: "7.11.3"
         cloudera_runtime_version: "7.1.9"
+
+    - name: Set up OpenJDK 17 as default and Azul Zulu 21 as alternative
+      ansible.builtin.import_role:
+        name: cloudera.exe.prereq_jdk
+      vars:
+        cloudera_manager_version: "7.11.3"
+        cloudera_runtime_version: "7.1.9"
+        jdk_version: 17
+        alternative_jdk_package: "zulu21-jdk"
+        alternative_jdk_repository: "https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm"
+        alternative_jdk_key: "https://repos.azul.com/azul-repo.key"
 ```
 
 # License
