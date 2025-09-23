@@ -35,14 +35,11 @@ None.
 
 | Parameter                        | Type | Default Value                                   | Description                                                               |
 |----------------------------------|------|-------------------------------------------------|---------------------------------------------------------------------------|
-| `grafana_protocol`               | `str` | `http`                                          | Protocol to use for Grafana web interface and API (`http` or `https`).     |
 | `grafana_datasource_directory`   | `str` | `/etc/grafana/provisioning/datasources/automatic.yml` | Location of the Grafana data sources configuration file.                 |
 | `grafana_providers_configuration`| `str` | `/etc/grafana/provisioning/dashboards/providers.yml`  | Location of the Grafana dashboard provider configurations file.          |
 | `grafana_dashboard_directory`    | `str` | `/var/lib/grafana/dashboards`                        | Location of the Grafana dashboard configurations directory.              |
 | `prometheus_url`                 | `str` | `http://localhost:9090`                              | URL (host:port) to the Prometheus server that Grafana will connect to.   |
 | `prometheus_hostname`            | `str` | `localhost`                                          | Hostname of the Prometheus server for TLS server name verification.      |
-| `prometheus_tls_cert_path`       | `str` | `/etc/pki/tls/certs/prometheus.crt`                  | Path to the Prometheus server TLS certificate (for client auth, if needed). |
-| `prometheus_tls_key_path`        | `str` | `/etc/pki/tls/private/prometheus.key`                | Path to the Prometheus server TLS key (for client auth, if needed).      |
 | `grafana_tls_enabled`                    | `bool`| `false`                                              | Enable or disable TLS/SSL for Grafana (HTTPS support).                   |
 | `grafana_tls_cert_path`          | `str` | `/etc/pki/tls/certs/grafana.crt`                     | Path to the TLS certificate file for Grafana.                            |
 | `grafana_tls_key_path`           | `str` | `/etc/pki/tls/private/grafana.key`                   | Path to the TLS private key file for Grafana.                            |
@@ -90,8 +87,6 @@ Basic installation connecting to a local Prometheus server:
     grafana_root_url: "https://grafana.1.1.1.1.pvc.labs.com:3000"
     grafana_tls_cert_path: "/etc/grafana/certs/grafana.crt"
     grafana_tls_key_path: "/etc/grafana/private/grafana.key"
-    prometheus_tls_cert_path: /etc/prometheus/certs/prometheus.crt
-    prometheus_tls_key_path: /etc/prometheus/private/prometheus.key
     prometheus_url: "https://prometheus.example.com:9090"
 
 ```

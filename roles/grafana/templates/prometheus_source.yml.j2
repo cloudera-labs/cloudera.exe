@@ -1,17 +1,15 @@
 
 datasources:
-- name: Prometheus
+- name: prometheus
   type: prometheus
   access: proxy
   url: {{ prometheus_url }}
   isDefault: true
+  uid: PBFA97CFB590B2093
   jsonData:
      tlsAuth: true
      tlsAuthWithCACert: false
      tlsSkipVerify: false
      serverName: {{ prometheus_hostname }}
-  secureJsonData:
-    tlsClientCert: "{{ (__prometheus_cert_content.content | b64decode) if grafana_tls_enabled | bool else '' }}"
-    tlsClientKey: "{{ (__prometheus_key_content.content | b64decode) if grafana_tls_enabled | bool else '' }}"
   version: 1
   editable: true

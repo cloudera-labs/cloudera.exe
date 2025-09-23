@@ -28,7 +28,10 @@
     value: "{{ item.value }}"
     mode: "0640"
   loop:
-    - { option: "protocol", value: "{{ grafana_protocol }}" }
+    - {
+        option: "protocol",
+        value: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}",
+      }
     - { option: "http_port", value: "{{ grafana_http_port }}" }
     - { option: "domain", value: "{{ grafana_domain }}" }
     - { option: "root_url", value: "{{ grafana_root_url }}" }
@@ -44,7 +47,7 @@
 
 - name: Test Grafana admin password via API
   ansible.builtin.uri:
-    url: "{{ grafana_protocol }}://localhost:{{ grafana_http_port }}/api/user"
+    url: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}://localhost:{{ grafana_http_port }}/api/user"
     method: GET
     user: admin
     password: "{{ grafana_security_admin_password }}"
@@ -60,19 +63,6 @@
   no_log: true
   notify: Restart Grafana Service
   when: grafana_admin_login.status != 200
-
-- name: Read remote Prometheus certificate content
-  ansible.builtin.slurp:
-    src: "{{ prometheus_tls_cert_path }}"
-  register: __prometheus_cert_content
-  when: grafana_tls_enabled
-
-- name: Read remote Prometheus key content
-  ansible.builtin.slurp:
-    src: "{{ prometheus_tls_key_path }}"
-  register: __prometheus_key_content
-  no_log: true
-  when: grafana_tls_enabled
 
 - name: Connect Prometheus datasource
   ansible.builtin.template:

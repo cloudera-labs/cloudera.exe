@@ -13,7 +13,6 @@
 # limitations under the License.
 
 ---
-grafana_protocol: http
 grafana_tls_enabled: false
 grafana_http_port: 3000
 grafana_security_admin_password: admin
@@ -29,5 +28,3 @@ grafana_dashboard_directory: /var/lib/grafana/dashboards
 
 prometheus_url: http://localhost:9090
 prometheus_hostname: localhost
-prometheus_tls_cert_path: /etc/pki/tls/certs/prometheus.crt
-prometheus_tls_key_path: /etc/pki/tls/private/prometheus.key
