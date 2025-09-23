@@ -130,41 +130,26 @@
       )
     )
 
-- name: Install alternative JDK if alternative_jdk_package is set
-  when: alternative_jdk_package is defined and alternative_jdk_package is not none
+- name: Install alternative JDKs if additional_jdk_packages is set
+  when: additional_jdk_packages is defined and additional_jdk_packages | length > 0
   block:
-    - name: Import alternative JDK GPG key for RPM
-      ansible.builtin.rpm_key:
-        state: present
-        key: "{{ alternative_jdk_key }}"
-      when: alternative_jdk_repository is defined and alternative_jdk_key is defined
+    - name: Install alternative JDKs (OS-specific)
+      ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
-    - name: Install alternative JDK repository
-      ansible.builtin.dnf:
-        name: "{{ alternative_jdk_repository }}"
-        state: present
-      when: alternative_jdk_repository is defined
-
-    - name: Install alternative JDK (custom package)
-      ansible.builtin.package:
-        name: "{{ alternative_jdk_package }}"
-        state: present
-
-    - name: Find an existing OpenJDK installation
+    - name: Find an existing JDK installation
       ansible.builtin.stat:
         path: /usr/bin/java
-      register: openjdk_dir
+      register: jdk_dir
 
-    - name: Set java alternative back to OpenJDK
-      community.general.alternatives:
-        name: java
-        path: "{{ openjdk_dir.stat.lnk_source | default('/usr/bin/java') }}"
-      when: openjdk_dir.stat.exists and openjdk_dir.stat.islnk
+    - block:
+        - name: Set java alternative back to JDK
+          community.general.alternatives:
+            name: java
+            path: "{{ jdk_dir.stat.lnk_source | default('/usr/bin/java') }}"
 
-    - name: Set javac alternative back to OpenJDK
-      community.general.alternatives:
-        name: javac
-        path: "{{ (openjdk_dir.stat.lnk_source | regex_replace('java$', 'javac')) if openjdk_dir.stat.islnk else '/usr/bin/javac' }}"
-      when: openjdk_dir.stat.exists
-
+        - name: Set javac alternative back to JDK
+          community.general.alternatives:
+            name: javac
+            path: "{{ (jdk_dir.stat.lnk_source | regex_replace('java$', 'javac')) if jdk_dir.stat.islnk else '/usr/bin/javac' }}"
+      when: jdk_dir.stat.exists
 # https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-manually-installing-openjdk.html

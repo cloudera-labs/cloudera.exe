@@ -20,6 +20,8 @@ argument_specs:
       - Set up the Java Development Kit (JDK), optionally installing the JDK itself.
       - For JDK 9 and below, optionally enable the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy.
       - If the JDK is installed from the Cloudera repo, add any missing symlinks.
+      - The primary JDK (as defined by jdk_provider and jdk_version) will always be set as the system default and linked to /usr/bin/java.
+      - Any additional JDKs installed via additional_jdk_packages will not be set as the system default; to use them, explicit paths must be referenced in scripts or applications.
     author: Cloudera Labs
     version_added: "3.0.0"
     options:
@@ -68,17 +70,18 @@ argument_specs:
         description: Version of Cloudera Runtime for validation testing
         type: str
         required: true
-      alternative_jdk_package:
+      additional_jdk_packages:
         description:
-          - Name of the alternative JDK package to install (e.g., openjdk-21-jdk, zulu21-jdk).
-        type: str
+          - List of alternative JDK packages to install (e.g., openjdk-21-jdk, zulu21-jdk).
+        type: list
+        elements: str
         required: false
-      alternative_jdk_repository:
+      additional_jdk_repository:
         description:
           - Repository URL for the alternative JDK.
         type: str
         required: false
-      alternative_jdk_key:
+      additional_jdk_key:
         description:
           - GPG key URL for the alternative JDK repository.
         type: str
