@@ -19,6 +19,51 @@
 - name: Execute OS-specific Grafana installation
   ansible.builtin.include_tasks: "{{ ansible_facts['distribution'] }}.yml"
 
+- name: Configure Grafana server if TLS is enabled
+  when: grafana_tls_enabled
+  ansible.builtin.ini_file:
+    path: "{{ grafana_config_file }}"
+    section: server
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: "0640"
+  loop:
+    - {
+        option: "protocol",
+        value: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}",
+      }
+    - { option: "http_port", value: "{{ grafana_http_port }}" }
+    - { option: "domain", value: "{{ grafana_domain }}" }
+    - { option: "root_url", value: "{{ grafana_root_url }}" }
+    - { option: "cert_file", value: "{{ grafana_tls_cert_path }}" }
+    - { option: "cert_key", value: "{{ grafana_tls_key_path }}" }
+  notify: Restart Grafana Service
+
+- name: Ensure Grafana service is running
+  ansible.builtin.service:
+    name: grafana-server
+    state: started
+    enabled: true
+
+- name: Test Grafana admin password via API
+  ansible.builtin.uri:
+    url: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}://localhost:{{ grafana_http_port }}/api/user"
+    method: GET
+    user: admin
+    password: "{{ grafana_security_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    validate_certs: false
+  register: grafana_admin_login
+  failed_when: false
+
+- name: Set Grafana admin password if API login fails
+  ansible.builtin.command: >
+    grafana-cli admin reset-admin-password {{ grafana_security_admin_password }}
+  no_log: true
+  notify: Restart Grafana Service
+  when: grafana_admin_login.status != 200
+
 - name: Connect Prometheus datasource
   ansible.builtin.template:
     src: prometheus_source.yml.j2
@@ -42,8 +87,3 @@
     src: files/base_dashboard.json
     dest: "{{ grafana_dashboard_directory }}/base_dashboard.json"
     mode: "0755"
-
-- name: Start Grafana service
-  ansible.builtin.systemd:
-    name: "{{ grafana_service }}"
-    state: started

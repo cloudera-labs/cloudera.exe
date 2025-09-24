@@ -1,23 +1,14 @@
 
 datasources:
-- name: Prometheus
+- name: prometheus
   type: prometheus
   access: proxy
-  url: http://{{ prometheus_url }}
-  password:
-  user: ""
-  database: ""
-  basicAuth: false
-  basicAuthUser: ""
-  basicAuthPassword: ""
-  withCredentials: false
+  url: {{ prometheus_url }}
   isDefault: true
   jsonData:
-     tlsAuth: false
+     tlsAuth: true
      tlsAuthWithCACert: false
-  secureJsonData:
-    tlsCACert: ""
-    tlsClientCert: ""
-    tlsClientKey: ""
+     tlsSkipVerify: false
+     serverName: {{ prometheus_hostname }}
   version: 1
   editable: true

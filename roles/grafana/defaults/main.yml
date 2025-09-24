@@ -13,9 +13,18 @@
 # limitations under the License.
 
 ---
+grafana_tls_enabled: false
+grafana_http_port: 3000
+grafana_security_admin_password: admin
+grafana_tls_cert_path: /etc/pki/tls/certs/grafana.crt
+grafana_tls_key_path: /etc/pki/tls/private/grafana.key
+grafana_domain: "localhost"
+grafana_root_url: "http://localhost:3000"
+grafana_config_file: /etc/grafana/grafana.ini
 
 grafana_datasource_directory: /etc/grafana/provisioning/datasources/automatic.yml
 grafana_providers_configuration: /etc/grafana/provisioning/dashboards/providers.yml
 grafana_dashboard_directory: /var/lib/grafana/dashboards
 
-prometheus_url: localhost:9090
+prometheus_url: http://localhost:9090
+prometheus_hostname: localhost
