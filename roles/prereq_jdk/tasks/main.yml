@@ -130,4 +130,26 @@
       )
     )
 
+- name: Install alternative JDKs if additional_jdk_packages is set
+  when: additional_jdk_packages is defined and additional_jdk_packages | length > 0
+  block:
+    - name: Install alternative JDKs (OS-specific)
+      ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"
+
+    - name: Find an existing JDK installation
+      ansible.builtin.stat:
+        path: /usr/bin/java
+      register: jdk_dir
+
+    - block:
+        - name: Set java alternative back to JDK
+          community.general.alternatives:
+            name: java
+            path: "{{ jdk_dir.stat.lnk_source | default('/usr/bin/java') }}"
+
+        - name: Set javac alternative back to JDK
+          community.general.alternatives:
+            name: javac
+            path: "{{ (jdk_dir.stat.lnk_source | regex_replace('java$', 'javac')) if jdk_dir.stat.islnk else '/usr/bin/javac' }}"
+      when: jdk_dir.stat.exists
 # https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-manually-installing-openjdk.html

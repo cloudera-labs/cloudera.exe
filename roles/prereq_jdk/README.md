@@ -13,6 +13,8 @@ The role will:
 - For JDKs installed from Cloudera's repository, the role will ensure that any missing symbolic links are created to support a consistent JDK installation path.
 - Compare JDK against the support matrix at [supportmatrix.cloudera.com/](https://supportmatrix.cloudera.com) for the specified versions of Cloudera Manager and Cloudera Runtime.
 
+- The primary JDK (as defined by `jdk_provider` and `jdk_version`) will always be set as the system default and linked to `/usr/bin/java`.
+- Any additional JDKs installed via `additional_jdk_packages` will not be set as the system default. To use these alternative JDKs, you must reference their explicit paths in scripts or applications (e.g., `/usr/lib/jvm/zulu21-jdk/bin/java`).
 # Requirements
 
 - Root or `sudo` privileges are required to install packages and modify system-wide configuration files.
@@ -35,6 +37,9 @@ None.
 | `jdk_security_paths_override` | `bool` | `False` | `False` | Flag to control behavior when multiple `java.security` files are found in the specified paths. If `true`, the role will continue with JCE changes even if multiple files are found. If `false`, the role will fail, requiring a more specific path list. |
 | `cloudera_manager_version` | `str` | `True` | | The version of Cloudera Manager to validate against. |
 | `cloudera_runtime_version` | `str` | `True` | | The version of Cloudera Runtime to validate against. |
+| `additional_jdk_packages` | `list` of `str` | `False` |  | List of alternative JDK packages to install (e.g., `openjdk-21-jdk`, `zulu21-jdk`). |
+| `additional_jdk_repository` | `str` | `False` |  | Repository URL for the alternative JDK. |
+| `additional_jdk_key` | `str` | `False` |  | GPG key URL for the alternative JDK repository. |
 
 # Example Playbook
 
@@ -70,6 +75,18 @@ None.
         jdk_security_paths_override: false
         cloudera_manager_version: "7.11.3"
         cloudera_runtime_version: "7.1.9"
+
+    - name: Set up OpenJDK 17 as default and Azul Zulu 21 as alternative
+      ansible.builtin.import_role:
+        name: cloudera.exe.prereq_jdk
+      vars:
+        cloudera_manager_version: "7.11.3"
+        cloudera_runtime_version: "7.1.9"
+        jdk_version: 17
+        additional_jdk_packages:
+          - zulu21-jdk
+        additional_jdk_repository: "https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm"
+        additional_jdk_key: "https://repos.azul.com/azul-repo.key"
 ```
 
 # License
