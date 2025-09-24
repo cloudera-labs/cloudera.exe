@@ -43,3 +43,13 @@
   loop_control:
     loop_var: docker_user
   loop: "{{ docker_users }}"
+
+- name: Create /etc/docker/daemon.json from YAML variable
+  when: docker_daemon_config is defined and docker_daemon_config | length > 0
+  ansible.builtin.copy:
+    content: "{{ docker_daemon_config | to_nice_json }}"
+    dest: "/etc/docker/daemon.json"
+    owner: root
+    group: docker
+    mode: '0644'
+  notify: Restart Docker

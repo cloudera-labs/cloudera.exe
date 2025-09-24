@@ -50,3 +50,7 @@ argument_specs:
         type: list
         elements: str
         default: []
+      docker_daemon_config:
+        description: Configuration options for the Docker daemon
+        type: dict
+        default: {}
