@@ -57,7 +57,7 @@ argument_specs:
           - Dictionary of Kerberos encryption types to configure.
           - Keys are the configuration options, and values are lists of encryption types.
         type: dict
-        suboptions:
+        options:
           default_tgs_enctypes:
             description: List of default TGS encryption types.
             type: list

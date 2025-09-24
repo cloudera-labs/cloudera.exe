@@ -1,8 +1,73 @@
 ---
 ancestor:
 releases:
+  3.1.0:
+    changes:
+      minor_changes:
+        - Add support for alternative JDK installation options in prereq_jdk role
+          (https://github.com/cloudera-labs/cloudera.exe/pull/300)
+        - Add flag to skip os support check to cm_repo role (https://github.com/cloudera-labs/cloudera.exe/pull/299)
+        - Update Grafana role with TLS/HTTPS support (https://github.com/cloudera-labs/cloudera.exe/pull/297)
+        - Unpin collection dependencies (https://github.com/cloudera-labs/cloudera.exe/pull/296)
+        - Add Edge Flow Manager Database role  (https://github.com/cloudera-labs/cloudera.exe/pull/294)
+        - Add Edge Flow Manager user role (https://github.com/cloudera-labs/cloudera.exe/pull/293)
+        - Update monitoring roles (https://github.com/cloudera-labs/cloudera.exe/pull/292)
+        - Add FreeIPA unenrolled host TLS certificate role (https://github.com/cloudera-labs/cloudera.exe/pull/291)
+        - Add FreeIPA wildcard certificate profile role (https://github.com/cloudera-labs/cloudera.exe/pull/290)
+        - Set kerberos encryption types in prereq_kerberos role (https://github.com/cloudera-labs/cloudera.exe/pull/289)
+        - Add docsite configuration (https://github.com/cloudera-labs/cloudera.exe/pull/288)
+        - Update docsbuild process (https://github.com/cloudera-labs/cloudera.exe/pull/287)
+        - Add Umami metrics header to docs (https://github.com/cloudera-labs/cloudera.exe/pull/286)
+      trivial:
+        - Add TLS/HTTPS support for Prometheus (https://github.com/cloudera-labs/cloudera.exe/pull/298)
+    objects:
+      role:
+        - description: Issue a TLS certificate for an unenrolled host.
+          name: freeipa_server_unenrolled_tls
+          namespace:
+        - description: Install a wildcard certificate profile for FreeIPA.
+          name: freeipa_server_wildcard_profile
+          namespace:
+        - description: Set up for Edge Flow Manager.
+          name: prereq_efm
+          namespace:
+        - description: Set up database and user accounts for efm.
+          name: prereq_efm_database
+          namespace:
+    release_date: '2025-09-24'
   3.0.0:
     changes:
+      bugfixes:
+        - Update support matrix lookup maps for Rocky (https://github.com/cloudera-labs/cloudera.exe/pull/273)
+        - Replace blackbox and nodeexporter role symlinks with copy (https://github.com/cloudera-labs/cloudera.exe/pull/261)
+        - Update plugins for ansible-lint (https://github.com/cloudera-labs/cloudera.exe/pull/214)
+        - Update playbooks for ansible-lint (https://github.com/cloudera-labs/cloudera.exe/pull/213)
+        - Update prometheus role for ansible-lint, argument specs, and README (https://github.com/cloudera-labs/cloudera.exe/pull/208)
+        - Add JMESPath to requirements (https://github.com/cloudera-labs/cloudera.exe/pull/207)
+        - Update upload-artifact to v4 (https://github.com/cloudera-labs/cloudera.exe/pull/202)
+        - freeipa_sidecar and freeipa_client & server fixes for el9 (https://github.com/cloudera-labs/cloudera.exe/pull/199)
+        - Update RDBMS PostgreSQL server role (https://github.com/cloudera-labs/cloudera.exe/pull/194)
+      deprecated_features:
+        - Deprecate sequence role (https://github.com/cloudera-labs/cloudera.exe/pull/243)
+        - Deprecate runtime role (https://github.com/cloudera-labs/cloudera.exe/pull/242)
+        - Deprecate rdbms_server role (https://github.com/cloudera-labs/cloudera.exe/pull/241)
+        - Deprecate rdbms.client and rdbms.server roles (https://github.com/cloudera-labs/cloudera.exe/pull/240)
+        - Deprecate provision role (https://github.com/cloudera-labs/cloudera.exe/pull/239)
+        - Deprecate platform role (https://github.com/cloudera-labs/cloudera.exe/pull/238)
+        - Deprecate init_deployment role (https://github.com/cloudera-labs/cloudera.exe/pull/237)
+        - Deprecate infrastructure role (https://github.com/cloudera-labs/cloudera.exe/pull/236)
+        - Deprecate info role (https://github.com/cloudera-labs/cloudera.exe/pull/235)
+        - Deprecate freeipa_host_group role (https://github.com/cloudera-labs/cloudera.exe/pull/234)
+        - Deprecate dynamic_inventory role (https://github.com/cloudera-labs/cloudera.exe/pull/233)
+        - Deprecate data role (https://github.com/cloudera-labs/cloudera.exe/pull/232)
+        - Deprecate common role (https://github.com/cloudera-labs/cloudera.exe/pull/231)
+        - Deprecate auto_repo_mirror role (https://github.com/cloudera-labs/cloudera.exe/pull/230)
+      major_changes:
+        - Update freeipa_client role (https://github.com/cloudera-labs/cloudera.exe/pull/220)
+        - Update freeipa_server role (https://github.com/cloudera-labs/cloudera.exe/pull/219)
+        - Update Blackbox Exporter role for documentation, specs, and rename (https://github.com/cloudera-labs/cloudera.exe/pull/210)
+        - Rename nodeexporter role to node_exporter and update documentation, specs,
+          and linting fixes (https://github.com/cloudera-labs/cloudera.exe/pull/209)
       minor_changes:
         - Add yamllint config (https://github.com/cloudera-labs/cloudera.exe/pull/277)
         - Add cloudera_manager_release parameter (https://github.com/cloudera-labs/cloudera.exe/pull/276)
@@ -43,37 +108,6 @@ releases:
         - Add Molecule testing (https://github.com/cloudera-labs/cloudera.exe/pull/197)
         - Update deprecated actions (https://github.com/cloudera-labs/cloudera.exe/pull/190)
         - Add roles and example playbook for PVC cert renewal (https://github.com/cloudera-labs/cloudera.exe/pull/189)
-      bugfixes:
-        - Update support matrix lookup maps for Rocky (https://github.com/cloudera-labs/cloudera.exe/pull/273)
-        - Replace blackbox and nodeexporter role symlinks with copy (https://github.com/cloudera-labs/cloudera.exe/pull/261)
-        - Update plugins for ansible-lint (https://github.com/cloudera-labs/cloudera.exe/pull/214)
-        - Update playbooks for ansible-lint (https://github.com/cloudera-labs/cloudera.exe/pull/213)
-        - Update prometheus role for ansible-lint, argument specs, and README (https://github.com/cloudera-labs/cloudera.exe/pull/208)
-        - Add JMESPath to requirements (https://github.com/cloudera-labs/cloudera.exe/pull/207)
-        - Update upload-artifact to v4 (https://github.com/cloudera-labs/cloudera.exe/pull/202)
-        - freeipa_sidecar and freeipa_client & server fixes for el9 (https://github.com/cloudera-labs/cloudera.exe/pull/199)
-        - Update RDBMS PostgreSQL server role (https://github.com/cloudera-labs/cloudera.exe/pull/194)
-      major_changes:
-        - Update freeipa_client role (https://github.com/cloudera-labs/cloudera.exe/pull/220)
-        - Update freeipa_server role (https://github.com/cloudera-labs/cloudera.exe/pull/219)
-        - Update Blackbox Exporter role for documentation, specs, and rename (https://github.com/cloudera-labs/cloudera.exe/pull/210)
-        - Rename nodeexporter role to node_exporter and update documentation, specs,
-          and linting fixes (https://github.com/cloudera-labs/cloudera.exe/pull/209)
-      deprecated_features:
-        - Deprecate sequence role (https://github.com/cloudera-labs/cloudera.exe/pull/243)
-        - Deprecate runtime role (https://github.com/cloudera-labs/cloudera.exe/pull/242)
-        - Deprecate rdbms_server role (https://github.com/cloudera-labs/cloudera.exe/pull/241)
-        - Deprecate rdbms.client and rdbms.server roles (https://github.com/cloudera-labs/cloudera.exe/pull/240)
-        - Deprecate provision role (https://github.com/cloudera-labs/cloudera.exe/pull/239)
-        - Deprecate platform role (https://github.com/cloudera-labs/cloudera.exe/pull/238)
-        - Deprecate init_deployment role (https://github.com/cloudera-labs/cloudera.exe/pull/237)
-        - Deprecate infrastructure role (https://github.com/cloudera-labs/cloudera.exe/pull/236)
-        - Deprecate info role (https://github.com/cloudera-labs/cloudera.exe/pull/235)
-        - Deprecate freeipa_host_group role (https://github.com/cloudera-labs/cloudera.exe/pull/234)
-        - Deprecate dynamic_inventory role (https://github.com/cloudera-labs/cloudera.exe/pull/233)
-        - Deprecate data role (https://github.com/cloudera-labs/cloudera.exe/pull/232)
-        - Deprecate common role (https://github.com/cloudera-labs/cloudera.exe/pull/231)
-        - Deprecate auto_repo_mirror role (https://github.com/cloudera-labs/cloudera.exe/pull/230)
     modules:
       - description: Configure the external Cloudera Manager server database.
         name: cm_prepare_db
