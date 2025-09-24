@@ -30,6 +30,7 @@ None.
 | `docker_repo_key` | `str` | `False` | - | URL for the GPG key used to validate the Docker repository. If not specified, the value is taken from the role's default variables. |
 | `docker_packages` | `list` of `str` | `False` | `["docker-ce", "docker-ce-cli", "docker-ce-rootless-extras", "containerd.io", "docker-buildx-plugin"]` | List of Docker packages to install. This allows customization of installed components. |
 | `docker_users` | `list` of `str` | `False` | `[]` | List of usernames that should be added to the `docker` system group. These users will then be able to run Docker commands without `sudo`. |
+| `docker_daemon_config` | `dict` | `False` | `{}` | Configuration options for the Docker daemon. |
 
 # Example Playbook
 
