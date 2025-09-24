@@ -3,6 +3,8 @@ services:
     image: dpage/pgadmin4:latest
     container_name: pgadmin4_container
     restart: always
+    networks:
+      - pg_network
     ports:
       - "{{ pgadmin_port }}:80"
     entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
@@ -19,3 +21,11 @@ services:
 
 volumes:
   pgadmin-data:
+
+networks:
+  pg_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: {{ pgadmin_docker_network_subnet_cidr }}
+          gateway: {{ pgadmin_docker_network_subnet_gateway }}
