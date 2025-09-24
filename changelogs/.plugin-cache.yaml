@@ -64,12 +64,21 @@ objects:
       description: Configure DNS zones and wildcard records for ECS
       name: freeipa_server_ecs
       version_added: 3.0.0
+    freeipa_server_unenrolled_tls:
+      description: Issue a TLS certificate for an unenrolled host
+      name: freeipa_server_unenrolled_tls
+      version_added: 3.1.0
     freeipa_server_users:
       description: Set up superusers in FreeIPA
       name: freeipa_server_users
       version_added: 3.0.0
+    freeipa_server_wildcard_profile:
+      description: Install a wildcard certificate profile for FreeIPA
+      name: freeipa_server_wildcard_profile
+      version_added: 3.1.0
     grafana:
-      description: Set up Grafana server
+      description: Install, configure, and provision Grafana server with Prometheus
+        integration and optional TLS/HTTPS support
       name: grafana
       version_added: 2.4.0
     info:
@@ -156,6 +165,14 @@ objects:
       description: Set up firewall, and networking for ECS
       name: prereq_ecs
       version_added: 3.0.0
+    prereq_efm:
+      description: Set up for Edge Flow Manager
+      name: prereq_efm
+      version_added: 3.1.0
+    prereq_efm_database:
+      description: Set up database and user accounts for efm
+      name: prereq_efm_database
+      version_added: 3.1.0
     prereq_firewall:
       description: Disable firewalls for a deployment
       name: prereq_firewall
@@ -393,7 +410,8 @@ objects:
       name: prereq_zookeeper
       version_added: 3.0.0
     prometheus:
-      description: Install Prometheus.
+      description: Install, configure, and provision Prometheus server with optional
+        TLS/HTTPS support
       name: prometheus
       version_added: 2.4.0
     provision:
@@ -489,4 +507,4 @@ plugins:
       name: version
       version_added: 3.0.0
   vars: {}
-version: 3.0.0
+version: 3.1.0

@@ -4,6 +4,34 @@ cloudera.exe Release Notes
 
 .. contents:: Topics
 
+v3.1.0
+======
+
+Minor Changes
+-------------
+
+- Add Edge Flow Manager Database role  (https://github.com/cloudera-labs/cloudera.exe/pull/294)
+- Add Edge Flow Manager user role (https://github.com/cloudera-labs/cloudera.exe/pull/293)
+- Add FreeIPA unenrolled host TLS certificate role (https://github.com/cloudera-labs/cloudera.exe/pull/291)
+- Add FreeIPA wildcard certificate profile role (https://github.com/cloudera-labs/cloudera.exe/pull/290)
+- Add Umami metrics header to docs (https://github.com/cloudera-labs/cloudera.exe/pull/286)
+- Add docsite configuration (https://github.com/cloudera-labs/cloudera.exe/pull/288)
+- Add flag to skip os support check to cm_repo role (https://github.com/cloudera-labs/cloudera.exe/pull/299)
+- Add support for alternative JDK installation options in prereq_jdk role (https://github.com/cloudera-labs/cloudera.exe/pull/300)
+- Set kerberos encryption types in prereq_kerberos role (https://github.com/cloudera-labs/cloudera.exe/pull/289)
+- Unpin collection dependencies (https://github.com/cloudera-labs/cloudera.exe/pull/296)
+- Update Grafana role with TLS/HTTPS support (https://github.com/cloudera-labs/cloudera.exe/pull/297)
+- Update docsbuild process (https://github.com/cloudera-labs/cloudera.exe/pull/287)
+- Update monitoring roles (https://github.com/cloudera-labs/cloudera.exe/pull/292)
+
+New Roles
+---------
+
+- cloudera.exe.freeipa_server_unenrolled_tls - Issue a TLS certificate for an unenrolled host.
+- cloudera.exe.freeipa_server_wildcard_profile - Install a wildcard certificate profile for FreeIPA.
+- cloudera.exe.prereq_efm - Set up for Edge Flow Manager.
+- cloudera.exe.prereq_efm_database - Set up database and user accounts for efm.
+
 v3.0.0
 ======
 
