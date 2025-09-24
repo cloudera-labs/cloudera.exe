@@ -81,3 +81,13 @@ argument_specs:
         type: str
         required: false
         default: "/usr/bin/docker"
+      pgadmin_docker_network_subnet_cidr:
+        description: Subnet CIDR for the Docker bridge network used by pgadmin.
+        type: str
+        required: false
+        default: "172.21.0.0/16"
+      pgadmin_docker_network_subnet_gateway:
+        description: Gateway for the Docker bridge network subnet used by pgadmin.
+        type: str
+        required: false
+        default: "172.21.0.1"
