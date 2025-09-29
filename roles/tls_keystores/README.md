@@ -4,7 +4,7 @@ Creates Java keystores (JKS) and truststores from TLS certificates and private k
 
 ## Features
 - Creates JKS keystores from certificate and private key files
-- Creates JKS truststores with CA certificates 
+- Creates JKS truststores with CA certificates
 - Configurable keystore and truststore paths and aliases
 
 ## Requirements
