@@ -1,13 +1,11 @@
 # tls_keystores
 
-This role creates Java keystores (JKS) and truststores from TLS certificates and private keys. It is designed to work with certificates issued by FreeIPA or other Certificate Authorities.
+Creates Java keystores (JKS) and truststores from TLS certificates and private keys. It is designed to work with certificates issued by FreeIPA.
 
 ## Features
 - Creates JKS keystores from certificate and private key files
 - Creates JKS truststores with CA certificates 
 - Configurable keystore and truststore paths and aliases
-- Supports password-protected keystores
-- Idempotent operations suitable for automation
 
 ## Requirements
 - Java keytool (part of Java installation)
@@ -24,30 +22,37 @@ This role creates Java keystores (JKS) and truststores from TLS certificates and
 | `keystore_cert_path` | `str` | No | `/etc/pki/tls/certs/service.crt` | Path to the certificate file |
 | `keystore_key_path` | `str` | No | `/etc/pki/tls/private/service.key` | Path to the private key file |
 | `truststore_alias` | `str` | No | `ipa-ca` | Alias name for the CA certificate in the truststore |
-| `truststore_output_path` | `str` | No | `/etc/pki/tls/private/truststore.jks` | Path to output JKS truststore file |
-| `ca_cert_path` | `str` | No | `/etc/pki/tls/certs/ca.crt` | Path to the CA certificate file |
+| `truststore_path` | `str` | No | `/etc/pki/tls/private/truststore.jks` | Path to output JKS truststore file |
+| `ca_cert_path` | `str` | No | `/etc/ipa/ca.crt` | Path to the CA certificate file |
 
 ## Example Playbook
 
 ```yaml
-- hosts: all
-  vars:
-    keystore_password: "MySecurePassword123"
-    keystore_alias: "service-cert"
-  roles:
-    - tls_keystores
+- hosts: java_servers
+  tasks:
+    - name: Create Java keystores and truststores with default paths
+      ansible.builtin.import_role:
+        name: tls_keystores
+      vars:
+        keystore_password: "MySecurePassword123"
+        keystore_alias: "service-cert"
+        keystore_cert_path: "/etc/pki/tls/certs/host.crt"
+        keystore_key_path: "/etc/pki/tls/private/host.key"
+        truststore_alias: "ipa-ca"
+        ca_cert_path: "/etc/ipa/ca.crt"
 
-# Custom paths example
-- hosts: all
-  vars:
-    keystore_password: "MySecurePassword123"
-    keystore_alias: "efm-gateway"
-    keystore_output_path: "/opt/cloudera/cem/certs/keystore.jks"
-    truststore_output_path: "/opt/cloudera/cem/certs/truststore.jks"
-    keystore_cert_path: "/etc/pki/tls/certs/gateway.crt"
-    keystore_key_path: "/etc/pki/tls/private/gateway.key"
-  roles:
-    - tls_keystores
+    - name: Create Java keystores for EFM Gateway with custom paths
+      ansible.builtin.import_role:
+        name: tls_keystores
+      vars:
+        keystore_password: "MySecurePassword123"
+        keystore_alias: "efm-gateway"
+        keystore_output_path: "/opt/cloudera/cem/certs/keystore.jks"
+        truststore_path: "/opt/cloudera/cem/certs/truststore.jks"
+        keystore_cert_path: "/etc/pki/tls/certs/gateway.crt"
+        keystore_key_path: "/etc/pki/tls/private/gateway.key"
+        truststore_alias: "freeipa-ca"
+        ca_cert_path: "/etc/ipa/ca.crt"
 ```
 
 ## License

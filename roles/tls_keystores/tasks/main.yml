@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 - name: Create JKS keystore with private key and certificate chain
   community.general.java_keystore:
     name: "{{ keystore_alias }}"
@@ -22,36 +21,10 @@
     private_key_path: "{{ keystore_key_path }}"
     certificate_path: "{{ keystore_cert_path }}"
 
-
-- name: Create JKS truststore with the IPA CA certificate (using command)
-  ansible.builtin.command:
-    cmd: >
-      keytool -importcert -alias "{{ truststore_alias }}"
-      -file "{{ ca_cert_path }}"
-      -keystore "{{ truststore_output_path }}"
-      -storepass "{{ keystore_password }}"
-      -noprompt
-    creates: "{{ truststore_path }}"
-
-
-# - name: Create an empty JKS truststore file
-#   community.general.java_keystore:
-#     name: truststore
-#     dest: "{{ truststore_path }}"
-#     password: "{{ keystore_password }}"
-
-# - name: Create JKS truststore with the IPA CA certificate
-#   community.general.java_cert:
-#     cert_path: "{{ ca_cert_path }}"
-#     cert_alias: "{{ truststore_alias }}"
-#     keystore_path: "{{ truststore_path }}"
-#     keystore_pass: "{{ keystore_password }}"
-#     state: present
-
-# - name: Create JKS truststore with the IPA CA certificate
-#   community.general.java_keystore:
-#     name: "{{ truststore_alias }}"
-#     dest: "{{ truststore_path }}"
-#     password: "{{ keystore_password }}"
-#     # private_key_path: "{{ key_path }}"
-#     certificate_path: "{{ ca_cert_path }}"
+- name: Create JKS truststore with the IPA CA certificate
+  community.general.java_cert:
+    cert_path: "{{ ca_cert_path }}"
+    cert_alias: "{{ truststore_alias }}"
+    keystore_path: "{{ truststore_path }}"
+    keystore_pass: "{{ keystore_password }}"
+    keystore_create: true

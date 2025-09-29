@@ -13,13 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-keystore_alias: "{{ undef(hint='Please define the Keystore alias') }}"
-keystore_password: "{{ undef(hint='Please define the Keystore password') }}"
-
-keystore_cert_path: /etc/pki/tls/certs/service.crt
-keystore_key_path: /etc/pki/tls/private/service.key
-truststore_alias: ipa-ca
-ca_cert_path: /etc/ipa/ca.crt
-
-keystore_output_path: /etc/pki/tls/private/keystore.jks
-truststore_path: /etc/pki/tls/private/truststore.jks
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
