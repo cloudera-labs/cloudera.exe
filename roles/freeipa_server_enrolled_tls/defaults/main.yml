@@ -16,8 +16,7 @@
 ipaadmin_principal: admin
 ipaadmin_password: "{{ undef(hint='Please define the FreeIPA adminstrator principal password') }}"
 
-# enrolled_description:
-enrolled_cert_key_path: "/etc/pki/tls/private/service.key"
-enrolled_cert_csr_path: "/etc/pki/tls/private/service.csr"
-enrolled_cert_path: "/etc/pki/tls/certs/service.crt"
-# enrolled_cert_profile:
+enrolled_principal_type: host
+enrolled_cert_key_path: "/etc/pki/tls/private/host.key"
+enrolled_cert_csr_path: "/etc/pki/tls/private/host.csr"
+enrolled_cert_path: "/etc/pki/tls/certs/host.crt"

@@ -17,6 +17,6 @@
   hosts: all
   gather_facts: true
   tasks:
-    - name: Provision Unenrolled TLS
+    - name: Provision enrolled TLS
       ansible.builtin.import_role:
-        name: cloudera.exe.freeipa_server_unenrolled_tls
+        name: cloudera.exe.freeipa_server_enrolled_tls

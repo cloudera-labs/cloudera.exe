@@ -31,6 +31,6 @@
     ipaadmin_password: "{{ ipaadmin_password }}"
     csr_file: "{{ enrolled_cert_csr_path }}"
     profile_id: "{{ enrolled_cert_profile | default(omit) }}"
-    principal: "host/{{ enrolled_hostname }}"
+    principal: "{{ enrolled_principal_type }}/{{ enrolled_hostname }}"
     certificate_out: "{{ enrolled_cert_path }}"
     state: requested

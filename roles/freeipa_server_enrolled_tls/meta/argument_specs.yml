@@ -15,12 +15,10 @@
 
 argument_specs:
   main:
-    short_description: Issue a TLS certificate for an enrolled host
+    short_description: Issue a TLS certificate and private key for an enrolled host
     description:
-      - Issue a TLS certificate for a host that is already enrolled in FreeIPA.
-      - This process involves generating a private key and CSR on the target host.
+      - Issue a TLS certificate and private key for a host that is already enrolled in FreeIPA.
       - The certificate is requested from FreeIPA CA using the enrolled host's identity.
-      - Files are generated directly in their final locations.
     author: Cloudera Labs
     version_added: 3.1.0
     options:
@@ -35,22 +33,22 @@ argument_specs:
       enrolled_hostname:
         description:
           - The hostname for which the certificate will be issued.
-          - The host must already be enrolled in FreeIPA.
         type: str
         required: true
-      enrolled_cert_profile:
-        description: The certificate profile to use for the TLS certificate for the host.
-        type: str
-        required: false
       enrolled_cert_key_path:
         description: The path to the private key file for the TLS certificate.
         type: str
-        default: /etc/pki/tls/private/service.key
+        default: /etc/pki/tls/private/host.key
       enrolled_cert_csr_path:
         description: The path to the CSR file for the TLS certificate.
         type: str
-        default: /etc/pki/tls/private/service.csr
+        default: /etc/pki/tls/private/host.csr
       enrolled_cert_path:
         description: The path of issued TLS certificate.
         type: str
-        default: /etc/pki/tls/certs/service.crt
+        default: /etc/pki/tls/certs/host.crt
+      enrolled_principal_type:
+        description:
+          - The type of principal for certificate request (e.g., host, service).
+        type: str
+        default: host
