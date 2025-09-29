@@ -1,0 +1,57 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+- name: Create JKS keystore with private key and certificate chain
+  community.general.java_keystore:
+    name: "{{ keystore_alias }}"
+    dest: "{{ keystore_output_path }}"
+    password: "{{ keystore_password }}"
+    private_key_path: "{{ keystore_key_path }}"
+    certificate_path: "{{ keystore_cert_path }}"
+
+
+- name: Create JKS truststore with the IPA CA certificate (using command)
+  ansible.builtin.command:
+    cmd: >
+      keytool -importcert -alias "{{ truststore_alias }}"
+      -file "{{ ca_cert_path }}"
+      -keystore "{{ truststore_output_path }}"
+      -storepass "{{ keystore_password }}"
+      -noprompt
+    creates: "{{ truststore_path }}"
+
+
+# - name: Create an empty JKS truststore file
+#   community.general.java_keystore:
+#     name: truststore
+#     dest: "{{ truststore_path }}"
+#     password: "{{ keystore_password }}"
+
+# - name: Create JKS truststore with the IPA CA certificate
+#   community.general.java_cert:
+#     cert_path: "{{ ca_cert_path }}"
+#     cert_alias: "{{ truststore_alias }}"
+#     keystore_path: "{{ truststore_path }}"
+#     keystore_pass: "{{ keystore_password }}"
+#     state: present
+
+# - name: Create JKS truststore with the IPA CA certificate
+#   community.general.java_keystore:
+#     name: "{{ truststore_alias }}"
+#     dest: "{{ truststore_path }}"
+#     password: "{{ keystore_password }}"
+#     # private_key_path: "{{ key_path }}"
+#     certificate_path: "{{ ca_cert_path }}"
