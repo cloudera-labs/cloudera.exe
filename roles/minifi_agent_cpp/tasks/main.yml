@@ -30,8 +30,8 @@
   ansible.builtin.get_url:
     url: "{{ minifi_cpp_tarball_url }}"
     dest: "{{ __minifi_cpp_tmp.path }}/{{ minifi_cpp_tarball_url | basename }}"
-    url_username: "{{ cloudera_manager_repo_username | default(omit) }}"
-    url_password: "{{ cloudera_manager_repo_password | default(omit) }}"
+    url_username: "{{ minifi_cpp_repo_username | default(omit) }}"
+    url_password: "{{ minifi_cpp_repo_password | default(omit) }}"
     mode: '0644'
 
 - name: Extract the MiNiFi C++ tarball
@@ -47,11 +47,11 @@
     dest: "{{ minifi_cpp_properties_path }}"
 
 - name: Install MiNiFi C++ agent
-  ansible.builtin.shell: bin/minifi.sh install
+  ansible.builtin.command: bin/minifi.sh install
   args:
     chdir: "{{ minifi_cpp_directory }}"
 
 - name: Start MiNiFi C++ agent
-  ansible.builtin.shell: bin/minifi.sh start
+  ansible.builtin.command: bin/minifi.sh start
   args:
     chdir: "{{ minifi_cpp_directory }}"

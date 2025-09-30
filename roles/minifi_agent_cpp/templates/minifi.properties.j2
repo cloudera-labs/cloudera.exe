@@ -54,9 +54,9 @@ nifi.content.repository.class.name=DatabaseContentRepository
 {% if minifi_tls_enabled | default(false) %}
 nifi.remote.input.secure=true
 nifi.security.need.ClientAuth=true
-nifi.security.client.certificate={{ minifi_security_client_certificate }}
-nifi.security.client.private.key={{ minifi_security_client_private_key }}
-nifi.security.client.ca.certificate={{ minifi_security_client_ca_certificate }}
+nifi.security.client.certificate={{ minifi_tls_client_certificate }}
+nifi.security.client.private.key={{ minifi_tls_client_private_key }}
+nifi.security.client.ca.certificate={{ minifi_tls_client_ca_certificate }}
 #nifi.security.client.pass.phrase=
 #nifi.security.use.system.cert.store=
 {% else %}

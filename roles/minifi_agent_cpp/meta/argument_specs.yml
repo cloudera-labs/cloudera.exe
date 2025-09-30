@@ -20,7 +20,7 @@ argument_specs:
       - Downloads, installs, and configures Cloudera MiNiFi C++ Agent on the target host.
       - Sets up the MiNiFi properties, and manages the systemd service.
     author: Cloudera Labs
-    version_added: "3.1.0"
+    version_added: "3.2.0"
     options:
       minifi_cpp_tarball_url:
         description: URL to the MiNiFi C++ tarball to download and install.
@@ -43,15 +43,35 @@ argument_specs:
         required: false
         default: "minifi-agent-cpp2"
       efm_api_url:
-        description: URL for the EFM API.
+        description: URL for the Edge Flow Manager API.
         type: str
         required: false
         default: "http://localhost:10090/efm/api"
-      cloudera_manager_repo_username:
-        description: Username for protected Cloudera repositories (if required).
+      minifi_cpp_repo_username:
+        description: Username for protected Minifi repositories.
         type: str
         required: false
-      cloudera_manager_repo_password:
-        description: Password for protected Cloudera repositories (if required).
+      minifi_cpp_repo_password:
+        description: Password for protected Minifi repositories.
         type: str
         required: false
+      efm_host_url:
+        description: URL for the Edge Flow Manager server for C2 communication.
+        type: str
+        default: "http://localhost:10090"
+      minifi_tls_enabled:
+        description: Enable or disable TLS for MiNiFi C++ agent.
+        type: bool
+        default: false
+      minifi_tls_client_certificate:
+        description: Path to the client certificate file for TLS authentication.
+        type: str
+        default: "/etc/pki/tls/certs/host.crt"
+      minifi_tls_client_private_key:
+        description: Path to the client private key file for TLS authentication.
+        type: str
+        default: "/etc/pki/tls/private/host.key"
+      minifi_tls_client_ca_certificate:
+        description: Path to the CA certificate file for TLS authentication.
+        type: str
+        default: "/etc/ipa/ca.crt"

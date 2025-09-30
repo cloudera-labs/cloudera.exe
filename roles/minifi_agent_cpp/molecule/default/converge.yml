@@ -20,4 +20,4 @@
   tasks:
     - name: Install and configure MiNiFi C++ Agent
       ansible.builtin.import_role:
-        name: minifi_agent_cpp
+        name: cloudera.exe.minifi_agent_cpp

@@ -34,8 +34,8 @@ platforms:
     security_groups: ${TEST_VPC_SECURITY_GROUP}
     vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
     tags:
-      Name: molecule-prereq_databases-rhel9-4
-      Project: Molecule testing for prereq_databases
+      Name: molecule-minifi_agent_cpp-rhel9-4
+      Project: Molecule testing for minifi_agent_cpp
 provisioner:
   name: ansible
   inventory:

@@ -24,6 +24,6 @@ minifi_cpp_agent_class_name: "minifi-agent-cpp"
 minifi_tls_enabled: false
 
 # TLS settings (only used when minifi_tls_enabled is true)
-minifi_security_client_certificate: "/etc/pki/tls/certs/host.crt"
-minifi_security_client_private_key: "/etc/pki/tls/private/host.key"
-minifi_security_client_ca_certificate: "/etc/ipa/ca.crt"
+minifi_tls_client_certificate: "/etc/pki/tls/certs/host.crt"
+minifi_tls_client_private_key: "/etc/pki/tls/private/host.key"
+minifi_tls_client_ca_certificate: "/etc/ipa/ca.crt"
