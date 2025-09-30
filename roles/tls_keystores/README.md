@@ -19,8 +19,8 @@ Creates Java keystores (JKS) and truststores from TLS certificates and private k
 | `keystore_password` | `str` | Yes | `undef` | Password for both keystore and truststore |
 | `keystore_alias` | `str` | Yes | `undef` | Alias name for the certificate in the keystore |
 | `keystore_output_path` | `str` | No | `/etc/pki/tls/private/keystore.jks` | Path to output JKS keystore file |
-| `keystore_cert_path` | `str` | No | `/etc/pki/tls/certs/service.crt` | Path to the certificate file |
-| `keystore_key_path` | `str` | No | `/etc/pki/tls/private/service.key` | Path to the private key file |
+| `keystore_cert_path` | `str` | No | `/etc/pki/tls/certs/host.crt` | Path to the certificate file |
+| `keystore_key_path` | `str` | No | `/etc/pki/tls/private/host.key` | Path to the private key file |
 | `truststore_alias` | `str` | No | `ipa-ca` | Alias name for the CA certificate in the truststore |
 | `truststore_path` | `str` | No | `/etc/pki/tls/private/truststore.jks` | Path to output JKS truststore file |
 | `ca_cert_path` | `str` | No | `/etc/ipa/ca.crt` | Path to the CA certificate file |

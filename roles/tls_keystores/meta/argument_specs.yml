@@ -23,11 +23,11 @@ argument_specs:
       keystore_cert_path:
         description: Path to the certificate file
         type: str
-        default: /etc/pki/tls/certs/service.crt
+        default: /etc/pki/tls/certs/host.crt
       keystore_key_path:
         description: Path to the private key file
         type: str
-        default: /etc/pki/tls/private/service.key
+        default: /etc/pki/tls/private/host.key
       truststore_alias:
         description: Alias name for the CA certificate in the truststore
         type: str
