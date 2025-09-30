@@ -38,6 +38,8 @@ The role will:
 | `pgadmin_default_email` | `str` | `False` | `pgadmin@cloudera-labs.com` | Email account for the default user to access the pgAdmin web UI. This user is created on first launch of the container. |
 | `pgadmin_default_password` | `str` | `False` | `pgadmin` | Password for the default user to access the pgAdmin web UI. **It is highly recommended to change this default password for production environments.** |
 | `pgadmin_docker_exe` | `str` | `False` | `/usr/bin/docker` | The full path to the Docker executable on the target host. |
+| `pgadmin_docker_network_subnet_cidr` | `str` | `False` | `172.21.0.0/16` | Subnet CIDR for the Docker bridge network used by pgadmin. |
+| `pgadmin_docker_network_subnet_gateway` | `str` | `False` | `172.21.0.1` | Gateway for the Docker bridge network subnet used by pgadmin. |
 
 # Example Playbook
 

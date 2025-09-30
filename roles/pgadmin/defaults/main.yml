@@ -38,3 +38,6 @@ pgadmin_default_email: "pgadmin@cloudera-labs.com"
 pgadmin_default_password: "pgadmin"
 
 pgadmin_docker_exe: /usr/bin/docker
+
+pgadmin_docker_network_subnet_cidr: 172.21.0.0/16
+pgadmin_docker_network_subnet_gateway: 172.21.0.1
