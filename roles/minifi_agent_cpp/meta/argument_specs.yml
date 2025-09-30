@@ -1,0 +1,57 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Install and configure Cloudera MiNiFi C++ Agent
+    description:
+      - Downloads, installs, and configures Cloudera MiNiFi C++ Agent on the target host.
+      - Sets up the MiNiFi properties, and manages the systemd service.
+    author: Cloudera Labs
+    version_added: "3.1.0"
+    options:
+      minifi_cpp_tarball_url:
+        description: URL to the MiNiFi C++ tarball to download and install.
+        type: str
+        required: false
+        default: "https://archive.cloudera.com/p/cem-agents/1.25.05-h2/ubuntu22/apt/tars/nifi-minifi-cpp/nifi-minifi-cpp-1.25.05-h2-b5-bin-linux.tar.gz"
+      minifi_cpp_directory:
+        description: Directory where MiNiFi C++ will be installed.
+        type: str
+        required: false
+        default: "/opt/cloudera/cem/minifi-cpp"
+      minifi_cpp_properties_path:
+        description: Path to the MiNiFi C++ properties file.
+        type: str
+        required: false
+        default: "/opt/cloudera/cem/minifi-cpp/conf/minifi.properties"
+      minifi_cpp_agent_class_name:
+        description: Agent class name for MiNiFi C++ agent.
+        type: str
+        required: false
+        default: "minifi-agent-cpp2"
+      efm_api_url:
+        description: URL for the EFM API.
+        type: str
+        required: false
+        default: "http://localhost:10090/efm/api"
+      cloudera_manager_repo_username:
+        description: Username for protected Cloudera repositories (if required).
+        type: str
+        required: false
+      cloudera_manager_repo_password:
+        description: Password for protected Cloudera repositories (if required).
+        type: str
+        required: false

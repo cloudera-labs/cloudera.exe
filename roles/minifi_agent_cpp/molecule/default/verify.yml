@@ -1,0 +1,65 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+- name: Verify MiNiFi C++ Agent installation
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check MiNiFi C++ base directory exists
+      ansible.builtin.stat:
+        path: "{{ minifi_cpp_directory }}"
+      register: minifi_cpp_dir
+
+    - name: Assert MiNiFi C++ base directory exists
+      ansible.builtin.assert:
+        that:
+          - minifi_cpp_dir.stat.exists
+          - minifi_cpp_dir.stat.isdir
+
+    - name: Check MiNiFi C++ versioned directory or symlink exists
+      ansible.builtin.find:
+        paths: "{{ minifi_cpp_directory }}"
+        file_type: any
+        patterns: "nifi-minifi-cpp-*"
+      register: minifi_cpp_versioned
+
+    - name: Assert MiNiFi C++ versioned directory or symlink exists
+      ansible.builtin.assert:
+        that:
+          - minifi_cpp_versioned.matched > 0
+
+    - name: Check minifi.properties exists
+      ansible.builtin.stat:
+        path: "{{ minifi_cpp_directory }}/current/conf/minifi.properties"
+      register: minifi_cpp_properties
+
+    - name: Assert minifi.properties exists and is a file
+      ansible.builtin.assert:
+        that:
+          - minifi_cpp_properties.stat.exists
+          - minifi_cpp_properties.stat.isfile
+
+    # Optional: Check if MiNiFi process is running
+    - name: Check if MiNiFi process is running
+      ansible.builtin.shell: pgrep -f minifi
+      register: minifi_process
+      changed_when: false
+      failed_when: false
+
+    - name: Assert MiNiFi process is running
+      ansible.builtin.assert:
+        that:
+          - minifi_process.rc == 0
