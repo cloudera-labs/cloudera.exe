@@ -6,7 +6,7 @@ argument_specs:
       - Downloads, installs, and configures Cloudera Edge Flow Manager (EFM) on the target host.
       - Sets up the EFM properties, and manages the systemd service.
     author: Cloudera Labs
-    version_added: "3.0.0"
+    version_added: "3.1.0"
     options:
       efm_tarball_url:
         description: URL to the EFM tarball to download and install.
@@ -60,3 +60,99 @@ argument_specs:
         description: Password for protected Cloudera repositories (if required).
         type: str
         required: false
+      efm_tls_enabled:
+        description: Enable or disable TLS/SSL for EFM server.
+        type: bool
+        default: false
+      efm_ssl_client_auth:
+        description: SSL client authentication mode (NONE, WANT, NEED).
+        type: str
+        default: "WANT"
+      efm_ssl_keystore_type:
+        description: Type of keystore (jks, pkcs12).
+        type: str
+        default: "jks"
+      efm_ssl_truststore_type:
+        description: Type of truststore (jks, pkcs12).
+        type: str
+        default: "jks"
+      efm_ssl_keystore_path:
+        description: Path to the SSL keystore file (required when efm_tls_enabled is true).
+        type: str
+        required: false
+      efm_ssl_keystore_password:
+        description: Password for the SSL keystore (required when efm_tls_enabled is true).
+        type: str
+        required: false
+      efm_ssl_key_password:
+        description: Password for the SSL private key (required when efm_tls_enabled is true).
+        type: str
+        required: false
+      efm_ssl_truststore_path:
+        description: Path to the SSL truststore file (required when efm_tls_enabled is true).
+        type: str
+        required: false
+      efm_ssl_truststore_password:
+        description: Password for the SSL truststore (required when efm_tls_enabled is true).
+        type: str
+        required: false
+      efm_ldap_enabled:
+        description: Enable or disable LDAP authentication for EFM.
+        type: bool
+        default: false
+      efm_ldap_url:
+        description: LDAP server URL (required when efm_ldap_enabled is true).
+        type: str
+        required: false
+      efm_ldap_authentication_strategy:
+        description: LDAP authentication strategy (LDAPS, LDAP, etc).
+        type: str
+        default: "LDAPS"
+      efm_ldap_user_auth_groups_manager:
+        description: Authentication groups manager type.
+        type: str
+        default: "LDAP"
+      efm_ldap_auth_enabled:
+        description: Enable LDAP authentication.
+        type: bool
+        default: true
+      efm_ldap_auth_search_filter:
+        description: LDAP search filter for user authentication.
+        type: str
+        default: "(uid={0})"
+      efm_ldap_user_search_base:
+        description: LDAP search base for users.
+        type: str
+        default: "cn=users,cn=accounts,dc=cldr,dc=internal"
+      efm_ldap_user_object_class:
+        description: LDAP object class for users.
+        type: str
+        default: "person"
+      efm_ldap_tls_protocol:
+        description: TLS protocol version for LDAP connections.
+        type: str
+        default: "TLSv1.2"
+      efm_ldap_user_search_scope:
+        description: LDAP search scope for users.
+        type: str
+        default: "ONE_LEVEL"
+      efm_ldap_user_identity_attribute:
+        description: LDAP attribute used for user identity.
+        type: str
+        default: "uid"
+      efm_db_url:
+        description: Database connection URL.
+        type: str
+        default: "jdbc:postgresql://localhost:5432/efm"
+      efm_db_driver_class:
+        description: Database driver class name.
+        type: str
+        default: "org.postgresql.Driver"
+      efm_db_username:
+        description: Database username.
+        type: str
+        default: "efm"
+      efm_db_password:
+        description: Database password.
+        type: str
+        default: "efmPassword"

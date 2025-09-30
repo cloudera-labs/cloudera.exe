@@ -1,5 +1,4 @@
 ---
-
 - name: start efm service
   ansible.builtin.systemd:
     name: efm

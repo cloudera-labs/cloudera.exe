@@ -1,6 +1,4 @@
-
 ---
-
 - name: Create EFM directory
   ansible.builtin.file:
     path: "{{ efm_directory }}"
@@ -20,7 +18,7 @@
     dest: "{{ __efm_tmp.path }}/{{ efm_tarball_url | basename }}"
     url_username: "{{ cloudera_manager_repo_username | default(omit) }}"
     url_password: "{{ cloudera_manager_repo_password | default(omit) }}"
-    mode: '0644'
+    mode: "0644"
 
 - name: Extract the EFM tarball
   ansible.builtin.unarchive:
@@ -76,6 +74,5 @@
     dest: "{{ efm_service_directory }}"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: start efm service
-

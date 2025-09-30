@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2024 Cloudera, Inc. All rights reserved.
+# Copyright (c) 2018-2025 Cloudera, Inc. All rights reserved.
 #
 # This code is provided to you pursuant to your written agreement with Cloudera, which may be the terms of the
 # Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party authorized
@@ -18,56 +18,75 @@
 #      UNAVAILABILITY, OR LOSS OR CORRUPTION OF DATA.
 #
 
-# Web Server Properties
-#  address: the hostname or ip address of the interface to bind to; to bind to all, use 0.0.0.0
 efm.server.address={{ efm_server_address }}
 efm.server.port={{ efm_server_port }}
 #efm.server.c2Port=
 efm.server.servlet.contextPath=/efm
-
-# Proxy Properties
-# Full URL where EFM api (except for c2) can be accessed, without trailing slash, eg http://some.proxy:9876/efm-proxy-context/efm-api
-#efm.proxy.apiProxyPath=
-# Full URL where EFM C2 api can be accessed, without trailing slash, eg http://some.proxy:9876/efm-proxy-context/efm-c2-api
-# can be the same as efm.proxy.apiProxyPath if there is no distinction
-#efm.proxy.c2ProxyPath=
-
-# Cluster Properties
-#   address: the address (host or host:port) to bind to for node-to-node cluster communication
-#   memberAddress: the address (host or host:port) to advertise to other cluster members,
-#     - this is option and only needs to be specified if it is different from the bind `address` value
-#   members: comma-separated list all cluster nodes, including this node
-#     - use the `memberAddress` value in this list if it is specified, otherwise use the `address` value
-#     - the list must be identical on all nodes in the cluster
-#     - format of node address is one of: hostname, IP, hostname:port, IP:port
-#     - port is optional (5701 the default port)
 efm.cluster.enabled=false
 
-# Web Server TLS Properties
-efm.server.ssl.enabled=false
-efm.server.ssl.keyStore=./conf/keystore.jks
-efm.server.ssl.keyStoreType=jks
-efm.server.ssl.keyStorePassword=
-efm.server.ssl.keyPassword=
-efm.server.ssl.trustStore=./conf/truststore.jks
-efm.server.ssl.trustStoreType=jks
-efm.server.ssl.trustStorePassword=
-efm.server.ssl.clientAuth=WANT
 
-# User Authentication Properties
-efm.security.user.auth.enabled=false
+{% if efm_tls_enabled | default(false) %}
+efm.server.ssl.enabled=true
+efm.server.ssl.clientAuth={{ efm_ssl_client_auth }}
+efm.server.ssl.keyStore={{ efm_ssl_keystore_path }}
+efm.server.ssl.keyStoreType={{ efm_ssl_keystore_type }}
+efm.server.ssl.keyStorePassword={{ efm_ssl_keystore_password }}
+efm.server.ssl.keyPassword={{ efm_ssl_key_password }}
+efm.server.ssl.trustStore={{ efm_ssl_truststore_path }}
+efm.server.ssl.trustStoreType={{ efm_ssl_truststore_type }}
+efm.server.ssl.trustStorePassword={{ efm_ssl_truststore_password }}
+{% else %}
+efm.server.ssl.enabled=false
+{% endif %}
+
+
+efm.security.user.auth.enabled=true
 efm.security.user.auth.adminIdentities=admin
+efm.security.user.auth.groups.adminIdentities=admin
 efm.security.user.auth.autoRegisterNewUsers=true
 efm.security.user.auth.authTokenExpiration=12h
 
-# shows whether the group management should be handled within EFM(INTERNAL), by the IdP(EXTERNAL), or LDAP
-efm.security.user.auth.groups.manager=INTERNAL
-# groups.adminIdentities and groups.filter parameters are considered only in case of EXTERNAL manager type
-efm.security.user.auth.groups.adminIdentities=
-# only groups assigned to the user matching the filter will be available in the administration view
-efm.security.user.auth.groups.filter=.*
 
+efm.security.user.auth.groups.filter=.*
 efm.security.user.certificate.enabled=false
+
+
+{# efm.security.ldap.authentication-strategy=LDAPS
+efm.security.user.auth.groups.manager=LDAP
+efm.security.ldap.auth.enabled=true
+efm.security.ldap.url=ldaps://rsup-two-services-01.cldr.internal:636
+efm.security.ldap.auth.searchFilter=(uid={0})
+efm.security.ldap.user.searchBase=cn=users,cn=accounts,dc=cldr,dc=internal
+efm.security.ldap.user.objectClass=person
+efm.security.ldap.user.searchScope=ONE_LEVEL
+efm.security.ldap.user.identityAttribute=uid #}
+
+
+{% if efm_ldap_enabled | default(false) %}
+efm.security.ldap.authentication-strategy={{ efm_ldap_authentication_strategy }}
+efm.security.user.auth.groups.manager={{ efm_ldap_user_auth_groups_manager }}
+efm.security.ldap.auth.enabled={{ efm_ldap_auth_enabled | lower }}
+efm.security.ldap.url={{ efm_ldap_url }}
+efm.security.ldap.tls.tlsProtocol={{ efm_ldap_tls_protocol }}
+efm.security.ldap.auth.searchFilter={{ efm_ldap_auth_search_filter }}
+efm.security.ldap.user.searchBase={{ efm_ldap_user_search_base }}
+efm.security.ldap.user.objectClass={{ efm_ldap_user_object_class }}
+efm.security.ldap.user.searchScope={{ efm_ldap_user_search_scope }}
+efm.security.ldap.user.identityAttribute={{ efm_ldap_user_identity_attribute }}
+{% else %}
+efm.security.ldap.auth.enabled=false
+{% endif %}
+
+# Database Properties
+efm.db.url={{ efm_db_url }}
+efm.db.driverClass={{ efm_db_driver_class }}
+efm.db.username={{ efm_db_username }}
+efm.db.password={{ efm_db_password }}
+efm.db.maxConnections=50
+efm.db.sqlDebug=false
+efm.db.l2CacheEnabled=false
+
+
 
 efm.security.user.oidc.enabled=false
 #efm.security.user.oidc.issuerUri=
@@ -104,14 +123,7 @@ efm.security.user.proxy.ipWhitelist=
 efm.security.user.proxy.dnWhitelist[0]=
 
 
-# Database Properties
-efm.db.url=jdbc:postgresql://localhost:5432/efm
-efm.db.driverClass=org.postgresql.Driver
-efm.db.username=efm
-efm.db.password=efmPassword
-efm.db.maxConnections=50
-efm.db.sqlDebug=false
-efm.db.l2CacheEnabled=false
+
 
 # Heartbeat Properties
 #   maxAgeToKeep: specify value and units (d=days, h=hours, m=minutes, s=seconds, ms=milliseconds)
@@ -271,4 +283,4 @@ efm.agent-deployer.security.ca.privateKeyPassword=
 spring.servlet.multipart.max-file-size=16MB
 spring.servlet.multipart.max-request-size=16MB
 
-efm.encryption.password={{ efm_encryption_password }}
+efm.encryption.password={{  efm_encryption_password  }}
