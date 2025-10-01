@@ -1,0 +1,286 @@
+#
+# Copyright (c) 2018-2025 Cloudera, Inc. All rights reserved.
+#
+# This code is provided to you pursuant to your written agreement with Cloudera, which may be the terms of the
+# Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party authorized
+# to distribute this code.  If you do not have a written agreement with Cloudera or with an authorized and
+# properly licensed third party, you do not have any rights to this code.
+#
+# If this code is provided to you under the terms of the AGPLv3:
+#  (A) CLOUDERA PROVIDES THIS CODE TO YOU WITHOUT WARRANTIES OF ANY KIND;
+#  (B) CLOUDERA DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH RESPECT TO THIS CODE, INCLUDING BUT NOT
+#      LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE;
+#  (C) CLOUDERA IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY, OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING
+#      FROM OR RELATED TO THE CODE; AND
+#  (D) WITH RESPECT TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, CLOUDERA IS NOT LIABLE FOR ANY
+#      DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED
+#      TO, DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR
+#      UNAVAILABILITY, OR LOSS OR CORRUPTION OF DATA.
+#
+
+efm.server.address={{ efm_server_address }}
+efm.server.port={{ efm_server_port }}
+#efm.server.c2Port=
+efm.server.servlet.contextPath=/efm
+efm.cluster.enabled=false
+
+
+{% if efm_tls_enabled | default(false) %}
+efm.server.ssl.enabled=true
+efm.server.ssl.clientAuth={{ efm_ssl_client_auth }}
+efm.server.ssl.keyStore={{ efm_ssl_keystore_path }}
+efm.server.ssl.keyStoreType={{ efm_ssl_keystore_type }}
+efm.server.ssl.keyStorePassword={{ efm_ssl_keystore_password }}
+efm.server.ssl.keyPassword={{ efm_ssl_key_password }}
+efm.server.ssl.trustStore={{ efm_ssl_truststore_path }}
+efm.server.ssl.trustStoreType={{ efm_ssl_truststore_type }}
+efm.server.ssl.trustStorePassword={{ efm_ssl_truststore_password }}
+{% else %}
+efm.server.ssl.enabled=false
+{% endif %}
+
+
+efm.security.user.auth.enabled=true
+efm.security.user.auth.adminIdentities=admin
+efm.security.user.auth.groups.adminIdentities=admin
+efm.security.user.auth.autoRegisterNewUsers=true
+efm.security.user.auth.authTokenExpiration=12h
+
+
+efm.security.user.auth.groups.filter=.*
+efm.security.user.certificate.enabled=false
+
+
+{# efm.security.ldap.authentication-strategy=LDAPS
+efm.security.user.auth.groups.manager=LDAP
+efm.security.ldap.auth.enabled=true
+efm.security.ldap.url=ldaps://rsup-two-services-01.cldr.internal:636
+efm.security.ldap.auth.searchFilter=(uid={0})
+efm.security.ldap.user.searchBase=cn=users,cn=accounts,dc=cldr,dc=internal
+efm.security.ldap.user.objectClass=person
+efm.security.ldap.user.searchScope=ONE_LEVEL
+efm.security.ldap.user.identityAttribute=uid #}
+
+
+{% if efm_ldap_enabled | default(false) %}
+efm.security.ldap.authentication-strategy={{ efm_ldap_authentication_strategy }}
+efm.security.user.auth.groups.manager={{ efm_ldap_user_auth_groups_manager }}
+efm.security.ldap.auth.enabled={{ efm_ldap_auth_enabled | lower }}
+efm.security.ldap.url={{ efm_ldap_url }}
+efm.security.ldap.tls.tlsProtocol={{ efm_ldap_tls_protocol }}
+efm.security.ldap.auth.searchFilter={{ efm_ldap_auth_search_filter }}
+efm.security.ldap.user.searchBase={{ efm_ldap_user_search_base }}
+efm.security.ldap.user.objectClass={{ efm_ldap_user_object_class }}
+efm.security.ldap.user.searchScope={{ efm_ldap_user_search_scope }}
+efm.security.ldap.user.identityAttribute={{ efm_ldap_user_identity_attribute }}
+{% else %}
+efm.security.ldap.auth.enabled=false
+{% endif %}
+
+# Database Properties
+efm.db.url={{ efm_db_url }}
+efm.db.driverClass={{ efm_db_driver_class }}
+efm.db.username={{ efm_db_username }}
+efm.db.password={{ efm_db_password }}
+efm.db.maxConnections=50
+efm.db.sqlDebug=false
+efm.db.l2CacheEnabled=false
+
+
+
+efm.security.user.oidc.enabled=false
+#efm.security.user.oidc.issuerUri=
+#efm.security.user.oidc.clientId=
+#efm.security.user.oidc.clientSecret=
+#efm.security.user.oidc.scopes=profile,email,groups
+#efm.security.user.oidc.usernameAttribute=email
+#efm.security.user.oidc.displayNameAttribute=name
+#efm.security.user.oidc.groupAttribute=groups
+#efm.security.user.oidc.staticConfig.enabled=false
+#efm.security.user.oidc.staticConfig.authorizationUri=
+#efm.security.user.oidc.staticConfig.tokenUri=
+#efm.security.user.oidc.staticConfig.userInfoUri=
+#efm.security.user.oidc.staticConfig.jwkSetUri=
+
+efm.security.user.saml.enabled=false
+#efm.security.user.saml.entity-id=
+#efm.security.user.saml.metadata-location=
+#efm.security.user.saml.signing-credentials.private-key-location=
+#efm.security.user.saml.signing-credentials.private-key-password=
+#efm.security.user.saml.signing-credentials.certificate-location=
+#efm.security.user.saml.display-name-attribute=
+#efm.security.user.saml.groupAttribute=groups
+
+efm.security.user.knox.enabled=false
+efm.security.user.knox.url=
+efm.security.user.knox.publicKey=
+efm.security.user.knox.cookieName=
+efm.security.user.knox.audiences=
+
+efm.security.user.proxy.enabled=false
+efm.security.user.proxy.headerName=x-webauth-user
+efm.security.user.proxy.ipWhitelist=
+efm.security.user.proxy.dnWhitelist[0]=
+
+
+
+
+# Heartbeat Properties
+#   maxAgeToKeep: specify value and units (d=days, h=hours, m=minutes, s=seconds, ms=milliseconds)
+#                 Set to 0 to disable persisting edge events entirely
+#  manifestFilterEnabled: Filter all manifest in payload sent to /heartbeat endpoint
+efm.heartbeat.maxAgeToKeep=0
+efm.heartbeat.persistContent=false
+efm.heartbeat.kafka.publishEnabled=false
+# If Kafka is running in a cluster then you can provide comma separated addresses
+#efm.heartbeat.kafka.brokerAddress=
+#efm.heartbeat.kafka.clientId=efm
+#efm.heartbeat.kafka.heartbeatTopicName=heartbeat
+#efm.heartbeat.kafka.ackTopicName=ack
+# Optional Kafka parameters, you can consult the documentation for details on these https://kafka.apache.org/documentation/
+# For time parameter use postfixes (d=days, h=hours, m=minutes, s=seconds, ms=milliseconds)
+#efm.heartbeat.kafka.retryBackoff=
+#efm.heartbeat.kafka.reconnectBackoff=
+#efm.heartbeat.kafka.reconnectBackoffMax=
+#efm.heartbeat.kafka.requestTimeout=
+#efm.heartbeat.kafka.bufferMemory=
+#efm.heartbeat.kafka.batchSize=
+#efm.heartbeat.kafka.compressionType=
+#efm.heartbeat.kafka.deliveryTimeout=
+#efm.heartbeat.kafka.maxRequestSize=
+#efm.heartbeat.kafka.acks=
+#efm.heartbeat.kafka.ssl.enabled=false
+#efm.heartbeat.kafka.ssl.keystoreLocation=
+#efm.heartbeat.kafka.ssl.keystorePassword=
+#efm.heartbeat.kafka.ssl.keyPassword=
+#efm.heartbeat.kafka.ssl.truststoreLocation=
+#efm.heartbeat.kafka.ssl.truststorePassword=
+#efm.heartbeat.kafka.ssl.securityProtocol=
+#efm.heartbeat.kafka.ssl.enabledProtocols=
+#efm.heartbeat.kafka.ssl.saslSslUsername=
+#efm.heartbeat.kafka.ssl.saslSslPassword=
+# Edge Event Retention Properties
+# Specify value and units (d=days, h=hours, m=minutes, s=seconds, ms=milliseconds)
+# Set to 0 to disable persisting edge events entirely
+# Set no value to disable auto-cleanup (manual deletion only)
+efm.event.cleanupInterval=30s
+efm.event.maxAgeToKeep.debug=0m
+efm.event.maxAgeToKeep.info=1h
+efm.event.maxAgeToKeep.warn=1d
+efm.event.maxAgeToKeep.error=7d
+
+# Agent Class Flow Monitor Properties
+# Specify value and units (d=days, h=hours, m=minutes, s=seconds, ms=milliseconds)
+efm.agentClassMonitor.interval=15s
+
+# Agent Monitoring Properties
+# Specify value and units (d=days, h=hours, m=minutes, s=seconds, ms=milliseconds)
+# Set to zero to disable threshold monitoring entirely
+efm.monitor.maxHeartbeatInterval=5m
+#efm.monitor.maxHeartbeatIntervalForClass.[your\ class\ here]=10m
+#efm.monitor.agentCleanupAfterInactivityDuration=1d
+#efm.monitor.agentCleanupAfterInactivityDurationForClass.[your\ class\ here]=6h
+
+# Operation Properties
+efm.operation.monitoring.enabled=true
+efm.operation.monitoring.inQueuedStateTimeoutHeartbeatRate=1.0
+efm.operation.monitoring.inDeployedStateTimeout=5m
+efm.operation.monitoring.inDeployedStateCheckFrequency=1m
+efm.operation.monitoring.rollingBatchOperationsSize=100
+efm.operation.monitoring.rollingBatchOperationsFrequency=10s
+
+# Metrics Properties
+# If not using Prometheus or Grafana, disable everything.
+# For maximum visibility, enable everything.
+# For maximum scalability, disable everything.
+# For a good balance, recommend:
+#   enableTag.agentManifestId=false
+#   enableTag.agentId=false
+management.metrics.efm.enabled=true
+management.simple.metrics.export.enabled=false
+management.prometheus.metrics.export.enabled=true
+management.prometheus.metrics.export.descriptions=true
+management.metrics.enable.efm.heartbeat=true
+management.metrics.enable.efm.repo=true
+management.metrics.efm.enableTag.host=true
+management.metrics.efm.enableTag.protocol=false
+management.metrics.efm.enableTag.agentClass=true
+management.metrics.efm.enableTag.agentManifestId=true
+management.metrics.efm.enableTag.agentId=true
+management.metrics.efm.maxTags.agentClass=20
+management.metrics.efm.maxTags.agentManifestId=10
+management.metrics.efm.maxTags.agentId=100
+management.metrics.tags.application=efm
+management.metrics.distribution.percentiles.all=.75,.95,.99
+
+# External Metrics Dashboard Properties
+#   base-url: optionally set a base url to use as the base for all other dashboard urls.
+#               if blank, efm server base url is used (with proxy url rewriting rules as well)
+#   url.*: url for a given dashboard type:
+#            leave blank (or absent) do disable linking to that dashboard.
+#            use relative url to inherit from base-url property.
+#            use absolute url to override base-url for that dashboard type.
+#            can use the following placeholder: {agentClass}
+#efm.dashboard.baseUrl=http://localhost:3000
+#efm.dashboard.url.agentclass=/d/efm-agent-class/?var-agentClass={agentClass}
+
+# Health and Info Properties
+efm.actuator.clusterHealthUpdateFrequency=10s
+efm.actuator.clusterInfoUpdateFrequency=1m
+management.endpoint.health.showDetails=never
+management.endpoint.health.showComponents=always
+management.health.refresh.enabled=false
+management.health.livenessstate.enabled=false
+management.health.readinessstate.enabled=false
+spring.cloud.discovery.client.compositeIndicator.enabled=false
+
+
+# EL Specification Properties
+efm.el.specifications.dir=./specs
+
+# Logging Properties
+logging.pattern.level=%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]
+#  logging.level.{logger-name}={DEBUG|INFO|WARN|ERROR}
+#logging.efm.enableDebugForAgents=agentId1,agentId2
+logging.level.com.cloudera.cem.efm=INFO
+logging.level.com.hazelcast=WARN
+logging.level.com.hazelcast.internal.cluster.ClusterService=INFO
+logging.level.com.hazelcast.internal.nio.tcp.TcpIpConnection=ERROR
+logging.level.com.hazelcast.internal.nio.tcp.TcpIpConnector=ERROR
+# destination directory for log files default is: logs
+#logging.file.path=logs
+# file name of the application log, default is: efm-app.log
+#logging.file.name=efm-app.log
+# destination of the logs(comma separated values). Default is: CONSOLE,FILE
+#logging.efm.location=CONSOLE,FILE
+# maximum file size, default is 10MB
+#logging.logback.rollingpolicy.maxFileSize=10MB
+# for how many days do we want to keep logs, default is 30 days
+#logging.logback.rollingpolicy.maxHistory=30
+# total size of the log files, not limited by default
+#logging.logback.rollingpolicy.totalSizeCap=4GB
+
+# The 16MB is the maximum file size supported by MySQL and MariaDB, 1GB on Postgres
+efm.data.transfer.maxFileSize=16MB
+efm.data.transfer.cleanupInterval=1h
+efm.data.transfer.maxAgeToKeep=1d
+efm.data.transfer.maxEntriesToKeep=100
+
+#TODO
+efm.agentManager.commands.displayLimit=20
+
+spring.main.banner-mode=log
+
+efm.asset.s3.downloadRootPath=/tmp/efm-asset-download
+
+#TODO
+efm.diagnosticBundle.enabled=false
+
+#efm.agent-deployer.binariesRootPath=agent-deployer/binaries
+efm.agent-deployer.security.autoConfiguration=false
+efm.agent-deployer.security.ca.privateKeyPassword=
+
+spring.servlet.multipart.max-file-size=16MB
+spring.servlet.multipart.max-request-size=16MB
+
+efm.encryption.password={{  efm_encryption_password  }}
