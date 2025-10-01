@@ -156,4 +156,4 @@
     owner: root
     group: root
     mode: "0644"
-  notify: start efm service
+  notify: Start efm service

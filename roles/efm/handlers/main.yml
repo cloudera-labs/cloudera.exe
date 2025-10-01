@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: start efm service
+- name: Start efm service
   ansible.builtin.systemd:
     name: efm
     daemon_reload: true
