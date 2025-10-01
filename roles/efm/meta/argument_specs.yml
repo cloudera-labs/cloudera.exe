@@ -21,7 +21,7 @@ argument_specs:
       - Downloads, installs, and configures Cloudera Edge Flow Manager (EFM) on the target host.
       - Sets up the EFM properties, and manages the systemd service.
     author: Cloudera Labs
-    version_added: "3.1.0"
+    version_added: "3.2.0"
     options:
       efm_tarball_url:
         description: URL to the EFM tarball to download and install.
