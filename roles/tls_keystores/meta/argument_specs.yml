@@ -1,0 +1,42 @@
+---
+argument_specs:
+  main:
+    short_description: Create Java keystores and truststores from TLS certificates
+    description:
+      - Creates JKS keystores from certificate and private key files
+      - Creates JKS truststores with CA certificates
+    author: Cloudera Labs
+    version_added: "3.2.0"
+    options:
+      keystore_alias:
+        description: Alias name for the certificate in the keystore
+        type: str
+        required: true
+      keystore_password:
+        description: Password for both keystore and truststore
+        type: str
+        required: true
+      keystore_output_path:
+        description: Path to output JKS keystore file
+        type: str
+        default: /etc/pki/tls/private/keystore.jks
+      keystore_cert_path:
+        description: Path to the certificate file
+        type: str
+        default: /etc/pki/tls/certs/host.crt
+      keystore_key_path:
+        description: Path to the private key file
+        type: str
+        default: /etc/pki/tls/private/host.key
+      truststore_alias:
+        description: Alias name for the CA certificate in the truststore
+        type: str
+        default: ipa-ca
+      truststore_path:
+        description: Path to output JKS truststore file
+        type: str
+        default: /etc/pki/tls/private/truststore.jks
+      ca_cert_path:
+        description: Path to the CA certificate file
+        type: str
+        default: /etc/ipa/ca.crt

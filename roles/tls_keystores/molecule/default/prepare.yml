@@ -1,0 +1,57 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Extract the VPC subnet ID from the Molecule platform configuration
+      ansible.builtin.set_fact:
+        test_subnet_id: "{{ molecule_yml.platforms | selectattr('name', 'eq', inventory_hostname) | map(attribute='vpc_subnet_id') | first }}"
+
+    - name: Retrieve the VPC subnet details
+      amazon.aws.ec2_vpc_subnet_info:
+        subnet_id: "{{ test_subnet_id }}"
+      register: __subnet
+      become: false
+      delegate_to: localhost
+
+    - name: Retrieve the VPC details
+      amazon.aws.ec2_vpc_net_info:
+        vpc_ids: "{{ __subnet.subnets | map(attribute='vpc_id') | first }}"
+      register: __vpc
+      become: false
+      delegate_to: localhost
+
+    - name: Update the core networking
+      ansible.builtin.import_role:
+        name: cloudera.exe.prereq_network_dns
+      vars:
+        network_ip_address: "{{ ansible_default_ipv4.address }}"
+        network_dns_domain: "{{ ipaserver_domain }}"
+        # See https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html
+        vpc_cidr: "{{ __vpc.vpcs | map(attribute='cidr_block') | list }}"
+        network_dns_forwarders: "{{ vpc_cidr | map('ansible.utils.ipmath', '2') | list }}"
+
+    - name: Install FreeIPA server
+      ansible.builtin.import_role:
+        name: cloudera.exe.freeipa_server
+      vars:
+        # See https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html
+        vpc_cidr: "{{ __vpc.vpcs | map(attribute='cidr_block') | list }}"
+        ipaserver_cidr: "{{ vpc_cidr }}"
+        ipaserver_forwarders: "{{ vpc_cidr | map('ansible.utils.ipmath', '2') | list }}"
+        ipaserver_recursion_acl_cidr: "{{ vpc_cidr }}"
