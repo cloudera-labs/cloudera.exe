@@ -1,4 +1,72 @@
 ---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Validate TLS configuration variables
+  when: efm_tls_enabled | default(false)
+  ansible.builtin.assert:
+    that:
+      - efm_ssl_client_auth is defined
+      - efm_ssl_keystore_type is defined
+      - efm_ssl_truststore_type is defined
+      - efm_ssl_keystore_path is defined
+      - efm_ssl_keystore_password is defined
+      - efm_ssl_key_password is defined
+      - efm_ssl_truststore_path is defined
+      - efm_ssl_truststore_password is defined
+    fail_msg: |
+      TLS is enabled (efm_tls_enabled: true) but required SSL variables are missing.
+      Please define ALL of the following variables in your playbook:
+        - efm_ssl_client_auth: "WANT"
+        - efm_ssl_keystore_type: "jks"
+        - efm_ssl_truststore_type: "jks"
+        - efm_ssl_keystore_path: "/path/to/keystore.jks"
+        - efm_ssl_keystore_password: "your_password"
+        - efm_ssl_key_password: "your_password"
+        - efm_ssl_truststore_path: "/path/to/truststore.jks"
+        - efm_ssl_truststore_password: "your_password"
+    success_msg: "TLS configuration variables are properly defined"
+
+- name: Validate LDAP configuration variables
+  when: efm_ldap_enabled | default(false)
+  ansible.builtin.assert:
+    that:
+      - efm_ldap_url is defined
+      - efm_ldap_authentication_strategy is defined
+      - efm_ldap_user_auth_groups_manager is defined
+      - efm_ldap_auth_enabled is defined
+      - efm_ldap_auth_search_filter is defined
+      - efm_ldap_user_search_base is defined
+      - efm_ldap_user_object_class is defined
+      - efm_ldap_tls_protocol is defined
+      - efm_ldap_user_search_scope is defined
+      - efm_ldap_user_identity_attribute is defined
+    fail_msg: |
+      LDAP is enabled (efm_ldap_enabled: true) but required LDAP variables are missing.
+      Please define ALL of the following variables in your playbook:
+        - efm_ldap_url: "ldaps://your-ldap-server:636"
+        - efm_ldap_authentication_strategy: "LDAPS"
+        - efm_ldap_user_auth_groups_manager: "LDAP"
+        - efm_ldap_auth_enabled: true
+        - efm_ldap_auth_search_filter: "(uid={0})"
+        - efm_ldap_user_search_base: "cn=users,cn=accounts,dc=cldr,dc=internal"
+        - efm_ldap_user_object_class: "person"
+        - efm_ldap_tls_protocol: "TLSv1.2"
+        - efm_ldap_user_search_scope: "ONE_LEVEL"
+        - efm_ldap_user_identity_attribute: "uid"
+    success_msg: "LDAP configuration variables are properly defined"
+
 - name: Create EFM directory
   ansible.builtin.file:
     path: "{{ efm_directory }}"
@@ -16,8 +84,8 @@
   ansible.builtin.get_url:
     url: "{{ efm_tarball_url }}"
     dest: "{{ __efm_tmp.path }}/{{ efm_tarball_url | basename }}"
-    url_username: "{{ cloudera_manager_repo_username | default(omit) }}"
-    url_password: "{{ cloudera_manager_repo_password | default(omit) }}"
+    url_username: "{{ efm_repo_username | default(omit) }}"
+    url_password: "{{ efm_repo_password | default(omit) }}"
     mode: "0644"
 
 - name: Extract the EFM tarball
@@ -39,10 +107,24 @@
     patterns: "efm-*"
   register: efm_tarball
 
+- name: Validate EFM tarball extraction
+  ansible.builtin.assert:
+    that:
+      - efm_tarball.files | length > 0
+      - efm_tarball.files[0].path is defined
+    fail_msg: |
+      EFM tarball extraction failed or no EFM directory found.
+      This could indicate:
+        - Corrupted or invalid tarball
+        - Incorrect tarball URL
+        - Extraction failed
+        - Tarball doesn't contain expected EFM directory structure
+      Please check the EFM tarball URL and try again.
+    success_msg: "EFM directory found: {{ efm_tarball.files[0].path }}"
+
 - name: Set the full folder PATH as a variable
   ansible.builtin.set_fact:
     efm_tarball_folder: "{{ efm_tarball.files[0].path }}"
-  when: efm_tarball.files | length > 0
 
 - name: Create a symbolic link "efm" to full version folder name
   ansible.builtin.file:
@@ -51,7 +133,6 @@
     owner: "{{ efm_user }}"
     group: "{{ efm_group }}"
     state: link
-  when: efm_tarball_folder is defined
 
 - name: Set ownership of EFM installation directory
   become: true

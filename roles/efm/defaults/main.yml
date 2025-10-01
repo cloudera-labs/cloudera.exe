@@ -26,29 +26,27 @@ efm_encryption_password: "{{ undef(hint='Please define the EFM encryption passwo
 # TLS Configuration
 efm_tls_enabled: false
 # SSL/TLS settings (only used when efm_tls_enabled is true)
-efm_ssl_client_auth: "WANT"
-efm_ssl_keystore_type: "jks"
-efm_ssl_truststore_type: "jks"
-# Required TLS variables (only when efm_tls_enabled is true)
-efm_ssl_keystore_path: "{{ undef(hint='Please define the EFM SSL keystore path (efm_ssl_keystore_path)') if efm_tls_enabled else omit }}"
-efm_ssl_keystore_password: "{{ undef(hint='Please define the EFM SSL keystore password (efm_ssl_keystore_password)') if efm_tls_enabled else omit }}"
-efm_ssl_key_password: "{{ undef(hint='Please define the EFM SSL key password (efm_ssl_key_password)') if efm_tls_enabled else omit }}"
-efm_ssl_truststore_path: "{{ undef(hint='Please define the EFM SSL truststore path (efm_ssl_truststore_path)') if efm_tls_enabled else omit }}"
-efm_ssl_truststore_password: "{{ undef(hint='Please define the EFM SSL truststore password (efm_ssl_truststore_password)') if efm_tls_enabled else omit }}"
+# efm_ssl_client_auth: "WANT"
+# efm_ssl_keystore_type: "jks"
+# efm_ssl_truststore_type: "jks"
+# efm_ssl_keystore_path: /etc/pki/tls/private/keystore.jks
+# efm_ssl_truststore_path: /etc/pki/tls/private/truststore.jks
+# efm_ssl_keystore_password: keystore-passowrd
+# efm_ssl_key_password: keystore-passowrd
+# efm_ssl_truststore_password: keystore-passowrd
 
 # LDAP Authentication Configuration
 efm_ldap_enabled: false
-# LDAP URL (required only when efm_ldap_enabled is true)
-efm_ldap_url: "{{ undef(hint='Please define the EFM LDAP URL (efm_ldap_url)') if efm_ldap_enabled else omit }}"
-efm_ldap_authentication_strategy: "LDAPS"
-efm_ldap_user_auth_groups_manager: "LDAP"
-efm_ldap_auth_enabled: true
-efm_ldap_auth_search_filter: "(uid={0})"
-efm_ldap_user_search_base: "cn=users,cn=accounts,dc=cldr,dc=internal"
-efm_ldap_user_object_class: "person"
-efm_ldap_tls_protocol: "TLSv1.2"
-efm_ldap_user_search_scope: "ONE_LEVEL"
-efm_ldap_user_identity_attribute: "uid"
+# efm_ldap_url: "{{ undef(hint='Please define the EFM LDAP URL (efm_ldap_url)')}}"
+# efm_ldap_authentication_strategy: "LDAPS"
+# efm_ldap_user_auth_groups_manager: "LDAP"
+# efm_ldap_auth_enabled: true
+# efm_ldap_auth_search_filter: "(uid={0})"
+# efm_ldap_user_search_base: "cn=users,cn=accounts,dc=cldr,dc=internal"
+# efm_ldap_user_object_class: "person"
+# efm_ldap_tls_protocol: "TLSv1.2"
+# efm_ldap_user_search_scope: "ONE_LEVEL"
+# efm_ldap_user_identity_attribute: "uid"
 
 # Database Configuration
 efm_db_url: "jdbc:postgresql://localhost:5432/efm"

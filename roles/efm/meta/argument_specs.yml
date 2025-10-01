@@ -1,8 +1,23 @@
 ---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 argument_specs:
   main:
     short_description: Install and configure Cloudera Edge Flow Manager (EFM)
     description:
+      - Validates required configuration variables based on enabled features (TLS, LDAP).
       - Downloads, installs, and configures Cloudera Edge Flow Manager (EFM) on the target host.
       - Sets up the EFM properties, and manages the systemd service.
     author: Cloudera Labs
@@ -52,11 +67,11 @@ argument_specs:
         description: Password used for EFM encryption. This must be provided by the user.
         type: str
         required: true
-      cloudera_manager_repo_username:
+      efm_repo_username:
         description: Username for protected Cloudera repositories (if required).
         type: str
         required: false
-      cloudera_manager_repo_password:
+      efm_repo_password:
         description: Password for protected Cloudera repositories (if required).
         type: str
         required: false
@@ -77,23 +92,23 @@ argument_specs:
         type: str
         default: "jks"
       efm_ssl_keystore_path:
-        description: Path to the SSL keystore file (required when efm_tls_enabled is true).
+        description: Path to the SSL keystore file. Must be defined in playbook when efm_tls_enabled is true.
         type: str
         required: false
       efm_ssl_keystore_password:
-        description: Password for the SSL keystore (required when efm_tls_enabled is true).
+        description: Password for the SSL keystore. Must be defined in playbook when efm_tls_enabled is true.
         type: str
         required: false
       efm_ssl_key_password:
-        description: Password for the SSL private key (required when efm_tls_enabled is true).
+        description: Password for the SSL private key. Must be defined in playbook when efm_tls_enabled is true.
         type: str
         required: false
       efm_ssl_truststore_path:
-        description: Path to the SSL truststore file (required when efm_tls_enabled is true).
+        description: Path to the SSL truststore file. Must be defined in playbook when efm_tls_enabled is true.
         type: str
         required: false
       efm_ssl_truststore_password:
-        description: Password for the SSL truststore (required when efm_tls_enabled is true).
+        description: Password for the SSL truststore. Must be defined in playbook when efm_tls_enabled is true.
         type: str
         required: false
       efm_ldap_enabled:
@@ -101,45 +116,45 @@ argument_specs:
         type: bool
         default: false
       efm_ldap_url:
-        description: LDAP server URL (required when efm_ldap_enabled is true).
+        description: LDAP server URL. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
         required: false
       efm_ldap_authentication_strategy:
-        description: LDAP authentication strategy (LDAPS, LDAP, etc).
+        description: LDAP authentication strategy. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "LDAPS"
+        required: false
       efm_ldap_user_auth_groups_manager:
-        description: Authentication groups manager type.
+        description: Authentication groups manager type. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "LDAP"
+        required: false
       efm_ldap_auth_enabled:
-        description: Enable LDAP authentication.
+        description: Enable LDAP authentication. Must be defined in playbook when efm_ldap_enabled is true.
         type: bool
-        default: true
+        required: false
       efm_ldap_auth_search_filter:
-        description: LDAP search filter for user authentication.
+        description: LDAP search filter for user authentication. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "(uid={0})"
+        required: false
       efm_ldap_user_search_base:
-        description: LDAP search base for users.
+        description: LDAP search base for users. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "cn=users,cn=accounts,dc=cldr,dc=internal"
+        required: false
       efm_ldap_user_object_class:
-        description: LDAP object class for users.
+        description: LDAP object class for users. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "person"
+        required: false
       efm_ldap_tls_protocol:
-        description: TLS protocol version for LDAP connections.
+        description: TLS protocol version for LDAP connections. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "TLSv1.2"
+        required: false
       efm_ldap_user_search_scope:
-        description: LDAP search scope for users.
+        description: LDAP search scope for users. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "ONE_LEVEL"
+        required: false
       efm_ldap_user_identity_attribute:
-        description: LDAP attribute used for user identity.
+        description: LDAP attribute used for user identity. Must be defined in playbook when efm_ldap_enabled is true.
         type: str
-        default: "uid"
+        required: false
       efm_db_url:
         description: Database connection URL.
         type: str
