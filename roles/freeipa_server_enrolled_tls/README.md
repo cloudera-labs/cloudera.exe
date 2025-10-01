@@ -41,7 +41,7 @@ None.
   tasks:
     - name: Issue a TLS certificate and private key for enrolled host
       ansible.builtin.import_role:
-        name: freeipa_server_enrolled_tls
+        name: cloudera.exe.freeipa_server_enrolled_tls
       vars:
         enrolled_hostname: "hostname.example.internal"
         ipaadmin_password: "password"
