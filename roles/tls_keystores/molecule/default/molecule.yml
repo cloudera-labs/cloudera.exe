@@ -33,16 +33,18 @@ platforms:
     boot_wait_seconds: 15
     vpc_subnet_id: ${TEST_VPC_SUBNET_ID}
     tags:
-      Name: molecule-prereq_server_dns_ecs-rhel9-4
-      Project: Molecule testing for prereq_server_dns_ecs
+      Name: molecule-tls_keystores-rhel9-4
+      Project: Molecule testing for tls_keystores
 provisioner:
   name: ansible
   inventory:
     group_vars:
       all:
-        ipaadmin_password: admin_password
-        ipadm_password: admin_password
-        ipaserver_host: "{{ inventory_hostname }}"
-        ipaserver_domain: "molecule.internal"
-        ipaserver_realm: "MOLECULE.INTERNAL"
-        enrolled_hostname: "unenrolled.molecule.internal"
+        keystore_alias: "keystore-alias"
+        keystore_password: "keystore-password"
+        keystore_cert_path: /etc/pki/tls/certs/host.crt
+        keystore_key_path: /etc/pki/tls/private/host.key
+        truststore_alias: ipa-ca
+        ca_cert_path: /etc/ipa/ca.crt
+        keystore_output_path: /etc/pki/tls/private/keystore.jks
+        truststore_path: /etc/pki/tls/private/truststore.jks

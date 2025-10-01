@@ -6,7 +6,7 @@ argument_specs:
       - Creates JKS keystores from certificate and private key files
       - Creates JKS truststores with CA certificates
     author: Cloudera Labs
-    version_added: "3.1.0"
+    version_added: "3.2.0"
     options:
       keystore_alias:
         description: Alias name for the certificate in the keystore

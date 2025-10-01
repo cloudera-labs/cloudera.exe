@@ -38,7 +38,7 @@
 
     - name: Update the core networking
       ansible.builtin.import_role:
-        name: prereq_network_dns
+        name: cloudera.exe.prereq_network_dns
       vars:
         network_ip_address: "{{ ansible_default_ipv4.address }}"
         network_dns_domain: "{{ ipaserver_domain }}"
@@ -48,7 +48,7 @@
 
     - name: Install FreeIPA server
       ansible.builtin.import_role:
-        name: freeipa_server
+        name: cloudera.exe.freeipa_server
       vars:
         # See https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html
         vpc_cidr: "{{ __vpc.vpcs | map(attribute='cidr_block') | list }}"
