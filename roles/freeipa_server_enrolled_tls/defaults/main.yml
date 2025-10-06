@@ -20,3 +20,5 @@ enrolled_principal_type: host
 enrolled_cert_key_path: "/etc/pki/tls/private/host.key"
 enrolled_cert_csr_path: "/etc/pki/tls/private/host.csr"
 enrolled_cert_path: "/etc/pki/tls/certs/host.crt"
+# enrolled_file_owner: ""
+# enrolled_file_group: ""

@@ -52,3 +52,13 @@ argument_specs:
           - The type of principal for certificate request (e.g., host, service).
         type: str
         default: host
+      enrolled_file_owner:
+        description:
+          - Owner (user) for the generated certificate and private key files.
+        type: str
+        required: false
+      enrolled_file_group:
+        description:
+          - Group for the generated certificate and private key files.
+        type: str
+        required: false
