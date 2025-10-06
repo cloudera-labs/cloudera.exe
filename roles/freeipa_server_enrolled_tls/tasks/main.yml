@@ -34,3 +34,20 @@
     principal: "{{ enrolled_principal_type }}/{{ enrolled_hostname }}"
     certificate_out: "{{ enrolled_cert_path }}"
     state: requested
+
+- name: Set file ownership for certificate and key
+  when: enrolled_file_owner is defined and enrolled_file_group is defined
+  block:
+    - name: Set ownership for private key file
+      ansible.builtin.file:
+        path: "{{ enrolled_cert_key_path }}"
+        owner: "{{ enrolled_file_owner }}"
+        group: "{{ enrolled_file_group }}"
+        mode: "0400"
+
+    - name: Set ownership for certificate file
+      ansible.builtin.file:
+        path: "{{ enrolled_cert_path }}"
+        owner: "{{ enrolled_file_owner }}"
+        group: "{{ enrolled_file_group }}"
+        mode: "0644"

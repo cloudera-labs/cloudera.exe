@@ -33,6 +33,8 @@ None.
 | `enrolled_cert_key_path` | `path` | `False` | `/etc/pki/tls/private/host.key` | The path on the target host to save the generated private key file. |
 | `enrolled_cert_csr_path` | `path` | `False` | `/etc/pki/tls/private/host.csr` | The path on the target host to save the generated CSR file. |
 | `enrolled_cert_path` | `path` | `False` | `/etc/pki/tls/certs/host.crt` | The path on the target host to save the issued TLS certificate. |
+| `enrolled_cert_owner` | `str` | `False` |  | Owner (user) for the generated certificate and private key files. |
+| `enrolled_cert_group` | `str` | `False` |  | Group for the generated certificate and private key files. |
 
 ## Example Playbook
 
@@ -47,6 +49,19 @@ None.
         ipaadmin_password: "password"
         enrolled_cert_key_path: "/etc/pki/tls/private/gateway.key"
         enrolled_cert_path: "/etc/pki/tls/certs/gateway.crt"
+
+- hosts: enrolled_hosts
+  tasks:
+    - name: Issue a TLS certificate and private key for PostgreSQL service
+      ansible.builtin.import_role:
+        name: freeipa_server_enrolled_tls
+      vars:
+        enrolled_hostname: "postgres.example.internal"
+        ipaladmin_password: "password"
+        enrolled_cert_key_path: "/etc/pki/tls/private/postgres.key"
+        enrolled_cert_path: "/etc/pki/tls/certs/postgres.crt"
+        enrolled_cert_owner: "postgres"
+        enrolled_cert_group: "postgres"
 ```
 
 ## License
