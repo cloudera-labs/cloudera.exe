@@ -48,6 +48,10 @@ objects:
       description: Dynamic inventory
       name: dynamic_inventory
       version_added: 2.0.0
+    efm:
+      description: Install and configure Cloudera Edge Flow Manager (EFM)
+      name: efm
+      version_added: 3.2.0
     freeipa_client:
       description: Set up FreeIPA client
       name: freeipa_client
@@ -64,6 +68,10 @@ objects:
       description: Configure DNS zones and wildcard records for ECS
       name: freeipa_server_ecs
       version_added: 3.0.0
+    freeipa_server_enrolled_tls:
+      description: Issue a TLS certificate and private key for an enrolled host
+      name: freeipa_server_enrolled_tls
+      version_added: 3.2.0
     freeipa_server_unenrolled_tls:
       description: Issue a TLS certificate for an unenrolled host
       name: freeipa_server_unenrolled_tls
@@ -93,6 +101,10 @@ objects:
       description: Configuration init
       name: init_deployment
       version_added: 2.0.0
+    minifi_agent_cpp:
+      description: Install and configure Cloudera MiNiFi C++ Agent
+      name: minifi_agent_cpp
+      version_added: 3.2.0
     mount:
       description: Create and mount a storage volume
       name: mount
@@ -451,6 +463,10 @@ objects:
       description: Copy and install the signed TLS certificates to each cluster
       name: tls_install_certs
       version_added: 3.0.0
+    tls_keystores:
+      description: Create Java keystores and truststores from TLS certificates
+      name: tls_keystores
+      version_added: 3.2.0
     tls_signing:
       description: Sign of CSRs by a CA Server
       name: tls_signing
@@ -507,4 +523,4 @@ plugins:
       name: version
       version_added: 3.0.0
   vars: {}
-version: 3.1.0
+version: 3.2.0

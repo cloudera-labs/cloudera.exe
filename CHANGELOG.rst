@@ -4,6 +4,29 @@ cloudera.exe Release Notes
 
 .. contents:: Topics
 
+v3.2.0
+======
+
+Minor Changes
+-------------
+
+- Add Cloudera Edge Flow Manager role (https://github.com/cloudera-labs/cloudera.exe/pull/295)
+- Add Docker daemon configuration input docker role (https://github.com/cloudera-labs/cloudera.exe/pull/303)
+- Add Docker network configuration for pgadmin (https://github.com/cloudera-labs/cloudera.exe/pull/304)
+- Add FreeIPA role for issuing TLS certificates to enrolled hosts (https://github.com/cloudera-labs/cloudera.exe/pull/307)
+- Add ownership management for generated TLS certificate and key files (https://github.com/cloudera-labs/cloudera.exe/pull/310)
+- Add role for  MiNiFi C++ Agent  (https://github.com/cloudera-labs/cloudera.exe/pull/309)
+- Add tls_keystores role (https://github.com/cloudera-labs/cloudera.exe/pull/308)
+- Constrain OS-specific variables lookup to role var directory (https://github.com/cloudera-labs/cloudera.exe/pull/306)
+
+New Roles
+---------
+
+- cloudera.exe.efm - Install and configure Cloudera Edge Flow Manager (EFM).
+- cloudera.exe.freeipa_server_enrolled_tls - Issue a TLS certificate and private key for an enrolled host.
+- cloudera.exe.minifi_agent_cpp - Install and configure Cloudera MiNiFi C++ Agent.
+- cloudera.exe.tls_keystores - Create Java keystores and truststores from TLS certificates.
+
 v3.1.0
 ======
 
