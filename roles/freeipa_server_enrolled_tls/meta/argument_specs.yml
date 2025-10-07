@@ -20,7 +20,7 @@ argument_specs:
       - Issue a TLS certificate and private key for a host that is already enrolled in FreeIPA.
       - The certificate is requested from FreeIPA CA using the enrolled host's identity.
     author: Cloudera Labs
-    version_added: 3.1.0
+    version_added: 3.2.0
     options:
       ipaadmin_password:
         description: FreeIPA admin password used for authentication.
