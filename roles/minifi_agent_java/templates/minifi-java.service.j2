@@ -1,0 +1,14 @@
+[Unit]
+Description=Apache MiNiFi Java Agent
+After=network.target
+
+[Service]
+Type=forking
+
+WorkingDirectory={{ minifi_java_directory }}
+ExecStart={{ minifi_java_directory }}/bin/minifi.sh start
+ExecStop={{ minifi_java_directory }}/bin/minifi.sh stop
+ExecReload={{ minifi_java_directory }}/bin/minifi.sh restart
+
+[Install]
+WantedBy=multi-user.target
