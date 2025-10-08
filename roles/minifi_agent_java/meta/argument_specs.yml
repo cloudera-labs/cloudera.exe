@@ -20,7 +20,7 @@ argument_specs:
       - Downloads, installs, and configures Cloudera MiNiFi C++ Agent on the target host.
       - Sets up the MiNiFi properties, and manages the systemd service.
     author: Cloudera Labs
-    version_added: "3.2.0"
+    version_added: "3.3.0"
     options:
       minifi_java_tarball_url:
         description: URL to the MiNiFi C++ tarball to download and install.
