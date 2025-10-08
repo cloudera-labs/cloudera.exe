@@ -46,4 +46,3 @@ provisioner:
         minifi_java_properties_path: "/opt/cloudera/cem/minifi-java/conf/bootstrap.conf"
         minifi_java_service_path: "/etc/systemd/system/minifi-java.service"
         minifi_tls_enabled: false
-
