@@ -15,30 +15,30 @@
 
 argument_specs:
   main:
-    short_description: Install and configure Cloudera MiNiFi C++ Agent
+    short_description: Install and configure Cloudera MiNiFi Java Agent
     description:
-      - Downloads, installs, and configures Cloudera MiNiFi C++ Agent on the target host.
+      - Downloads, installs, and configures Cloudera MiNiFi Java Agent on the target host.
       - Sets up the MiNiFi properties, and manages the systemd service.
     author: Cloudera Labs
     version_added: "3.3.0"
     options:
       minifi_java_tarball_url:
-        description: URL to the MiNiFi C++ tarball to download and install.
+        description: URL to the MiNiFi Java tarball to download and install.
         type: str
         required: false
         default: "https://archive.cloudera.com/p/cem-agents/1.25.05-h2/ubuntu22/apt/tars/nifi-minifi-java/nifi-minifi-java-1.25.05-h2-b5-bin-linux.tar.gz"
       minifi_java_directory:
-        description: Directory where MiNiFi C++ will be installed.
+        description: Directory where MiNiFi Java will be installed.
         type: str
         required: false
         default: "/opt/cloudera/cem/minifi-java"
       minifi_java_properties_path:
-        description: Path to the MiNiFi C++ properties file.
+        description: Path to the MiNiFi Java properties file.
         type: str
         required: false
         default: "/opt/cloudera/cem/minifi-java/conf/minifi.properties"
       minifi_java_agent_class_name:
-        description: Agent class name for MiNiFi C++ agent.
+        description: Agent class name for MiNiFi Java agent.
         type: str
         required: false
         default: "minifi-agent-java2"
@@ -60,7 +60,7 @@ argument_specs:
         type: str
         default: "http://localhost:10090"
       minifi_tls_enabled:
-        description: Enable or disable TLS for MiNiFi C++ agent.
+        description: Enable or disable TLS for MiNiFi Java agent.
         type: bool
         default: false
       minifi_tls_client_certificate:
