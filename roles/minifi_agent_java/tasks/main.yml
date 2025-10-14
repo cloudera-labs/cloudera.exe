@@ -1,0 +1,83 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Validate TLS configuration variables
+  when: minifi_tls_enabled | default(false)
+  ansible.builtin.assert:
+    that:
+      - minifi_tls_keystore_path is defined
+      - minifi_tls_keystore_type is defined
+      - minifi_tls_keystore_password is defined
+      - minifi_tls_key_password is defined
+      - minifi_tls_truststore_path is defined
+      - minifi_tls_truststore_type is defined
+      - minifi_tls_truststore_password is defined
+      - minifi_tls_ssl_protocol is defined
+    fail_msg: |
+      TLS is enabled (minifi_tls_enabled: true) but required SSL variables are missing.
+      Please define ALL of the following variables in your playbook:
+        - minifi_tls_keystore_path: "/path/to/keystore.jks"
+        - minifi_tls_keystore_type: "jks"
+        - minifi_tls_keystore_password: "your_password"
+        - minifi_tls_key_password: "your_password"
+        - minifi_tls_truststore_path: "/path/to/truststore.jks"
+        - minifi_tls_truststore_type: "jks"
+        - minifi_tls_truststore_password: "your_password"
+        - minifi_tls_ssl_protocol: "TLSv1.2"
+    success_msg: "TLS configuration variables are properly defined"
+
+- name: Create MiNiFi Java directory
+  ansible.builtin.file:
+    path: "{{ minifi_java_directory }}"
+    state: directory
+    mode: 0755
+
+- name: Create a temporary directory for MiNiFi Java tarball
+  ansible.builtin.tempfile:
+    state: directory
+  register: __minifi_java_tmp
+
+- name: Download MiNiFi Java tarball to the temporary directory
+  ansible.builtin.get_url:
+    url: "{{ minifi_java_tarball_url }}"
+    dest: "{{ __minifi_java_tmp.path }}/{{ minifi_java_tarball_url | basename }}"
+    url_username: "{{ minifi_java_repo_username | default(omit) }}"
+    url_password: "{{ minifi_java_repo_password | default(omit) }}"
+    mode: "0644"
+
+- name: Extract the MiNiFi Java tarball
+  ansible.builtin.unarchive:
+    src: "{{ __minifi_java_tmp.path }}/{{ minifi_java_tarball_url | basename }}"
+    dest: "{{ minifi_java_directory }}"
+    remote_src: true
+    extra_opts: [--strip-components=1]
+
+- name: Configure minifi.properties
+  ansible.builtin.template:
+    src: minifi.properties.j2
+    dest: "{{ minifi_java_properties_path }}"
+
+- name: Install MiNiFi Java agent
+  ansible.builtin.command: bin/minifi.sh install
+  args:
+    chdir: "{{ minifi_java_directory }}"
+
+- name: Create and enable systemd service for MiNiFi Java agent
+  become: true
+  ansible.builtin.template:
+    src: minifi-java.service.j2
+    dest: "{{ minifi_java_service_path }}"
+    mode: "0644"
+  notify: Start minifi-java service
