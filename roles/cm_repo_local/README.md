@@ -46,7 +46,7 @@ None.
         cloudera_manager_version: 7.11.3
         cloudera_manager_tarball_url: "https://my-internal-repo.example/cm7/7.11.3/redhat8/yum/cloudera-manager-7.11.3.tar.gz"
         cloudera_manager_repo_username: "YOUR_UUID_HERE" # Replace with your actual UUID
-        cloudera_manager_repo_password: "YOUR_PASSWORD_HERE" # Replace with your actual 
+        cloudera_manager_repo_password: "YOUR_PASSWORD_HERE" # Replace with your actual
 
     - name: Set up local repository with custom paths and port
       ansible.builtin.import_role:
@@ -56,7 +56,7 @@ None.
         cm_local_repo_base_path: "/opt/repos/cloudera"
         cm_local_repo_httpd_port: 8080
         cloudera_manager_repo_username: "YOUR_UUID_HERE" # Replace with your actual UUID
-        cloudera_manager_repo_password: "YOUR_PASSWORD_HERE" # Replace with your actual 
+        cloudera_manager_repo_password: "YOUR_PASSWORD_HERE" # Replace with your actual
 ```
 
 # License
