@@ -1,0 +1,47 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Install Apache HTTP Server (httpd)
+  ansible.builtin.package:
+    name: httpd
+    state: present
+
+- name: Configure httpd to listen on custom port
+  ansible.builtin.replace:
+    path: "{{ cm_local_repo_httpd_conf }}"
+    regexp: '^ *Listen  *80$'
+    replace: "Listen {{ cm_local_repo_httpd_port }}"
+  notify: restart httpd
+
+- name: Enable and start httpd service
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: Configure Cloudera Manager YUM repository pointing to local repo
+  ansible.builtin.template:
+    src: "cloudera_manager.j2"
+    dest: "{{ cm_local_repo_yum_conf }}"
+
+- name: Clean YUM metadata
+  ansible.builtin.command:
+    cmd: yum clean metadata
+  register: __cm_local_yum_clean_result
+  until: __cm_local_yum_clean_result is succeeded
+  retries: 3
+  delay: 5
+  changed_when: false
+  tags: molecule-idempotence-notest

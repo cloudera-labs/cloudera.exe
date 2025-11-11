@@ -1,0 +1,27 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cloudera_manager_version: 7.11.3
+# cloudera_manager_release: "{{ cloudera_manager_version }}"
+
+# cloudera_manager_tarball_url: URL to the CM tarball package
+# cloudera_manager_repo_username: Username for authenticated downloads
+# cloudera_manager_repo_password: Password for authenticated downloads
+
+
+cm_local_repo_base_path: "/var/www/html/cloudera-repos"
+cm_local_repo_httpd_port: 3333
+cm_local_repo_httpd_conf: "/etc/httpd/conf/httpd.conf"
+cm_local_repo_yum_conf: "/etc/yum.repos.d/cloudera-manager.repo"

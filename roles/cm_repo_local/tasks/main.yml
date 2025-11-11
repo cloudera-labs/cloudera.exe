@@ -1,0 +1,74 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Gather distribution details
+  ansible.builtin.setup:
+    gather_subset: distribution
+
+- name: Extract tarball filename from URL
+  ansible.builtin.set_fact:
+    __cm_local_tarball_file: "{{ cloudera_manager_tarball_url | basename }}"
+
+- name: Extract CM version from tarball filename
+  ansible.builtin.set_fact:
+    __cm_local_version: "{{ __cm_local_tarball_file | regex_replace('(.*)-(redhat\\d+|el\\d+|sles\\d+|ubuntu\\d+).*', '\\1') }}"
+
+- name: Create local repository base directory
+  ansible.builtin.file:
+    path: "{{ cm_local_repo_base_path }}"
+    state: directory
+
+- name: Create temporary directory for downloading tarball
+  ansible.builtin.tempfile:
+    state: directory
+  register: __cm_local_repo_tmp
+
+- name: Download Cloudera Manager tarball
+  ansible.builtin.get_url:
+    url: "{{ cloudera_manager_tarball_url }}"
+    dest: "{{ __cm_local_repo_tmp.path }}/{{ __cm_local_tarball_file }}"
+    mode: '0644'
+    url_username: "{{ cloudera_manager_repo_username | default(omit) }}"
+    url_password: "{{ cloudera_manager_repo_password | default(omit) }}"
+  no_log: true
+
+- name: Extract tarball to local repository directory
+  ansible.builtin.unarchive:
+    src: "{{ __cm_local_repo_tmp.path }}/{{ __cm_local_tarball_file }}"
+    dest: "{{ cm_local_repo_base_path }}"
+    remote_src: true
+    mode: '0755'
+
+- name: Find the extracted repository directory name
+  ansible.builtin.find:
+    paths: "{{ cm_local_repo_base_path }}"
+    file_type: directory
+    recurse: false
+  register: __cm_local_extracted_dirs
+
+- name: Set the actual repository directory path for use in YUM repo configuration
+  ansible.builtin.set_fact:
+    __cm_local_repo_dir: "{{ __cm_local_extracted_dirs.files[0].path | basename }}"
+  when: __cm_local_extracted_dirs.files | length > 0
+
+- name: Remove temporary tarball directory
+  when: __cm_local_repo_tmp is defined
+  ansible.builtin.file:
+    path: "{{ __cm_local_repo_tmp.path }}"
+    state: absent
+
+- name: Configure local repository for distribution
+  ansible.builtin.include_tasks:
+    file: "{{ ansible_facts['distribution'] }}.yml"

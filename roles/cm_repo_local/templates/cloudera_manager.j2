@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+# Cloudera Manager Local Repository
+
+[cloudera-manager]
+name = Cloudera Manager
+baseurl = http://localhost:{{ cm_local_repo_httpd_port }}/cloudera-repos/{{ __cm_local_repo_dir }}/
+gpgcheck = 0
+enabled = 1
