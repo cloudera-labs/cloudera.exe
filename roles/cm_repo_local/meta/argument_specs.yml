@@ -21,6 +21,9 @@ argument_specs:
       - Installs and configures Apache HTTP Server (httpd)
       - Extracts the tarball with proper permissions (755)
       - Creates YUM repository configuration pointing to the local repository
+    author:
+      - "Ronald Suplina <rsuplina@cloudera.com>"
+    version_added: "3.3.0"
     options:
       cloudera_manager_version:
         type: str

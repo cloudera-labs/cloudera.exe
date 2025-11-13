@@ -57,11 +57,11 @@
     file_type: directory
     recurse: false
   register: __cm_local_extracted_dirs
+  failed_when: __cm_local_extracted_dirs.files | length == 0
 
 - name: Set the actual repository directory path for use in YUM repo configuration
   ansible.builtin.set_fact:
     __cm_local_repo_dir: "{{ __cm_local_extracted_dirs.files[0].path | basename }}"
-  when: __cm_local_extracted_dirs.files | length > 0
 
 - name: Remove temporary tarball directory
   when: __cm_local_repo_tmp is defined
