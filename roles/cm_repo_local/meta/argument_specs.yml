@@ -1,0 +1,65 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Set up a local HTTP-based package repository for Cloudera Manager
+    description:
+      - Downloads a Cloudera Manager tarball package and sets up a local HTTP repository
+      - Installs and configures Apache HTTP Server (httpd)
+      - Extracts the tarball with proper permissions (755)
+      - Creates YUM repository configuration pointing to the local repository
+    author:
+      - "Ronald Suplina <rsuplina@cloudera.com>"
+    version_added: "3.3.0"
+    options:
+      cloudera_manager_version:
+        type: str
+        required: false
+        default: "7.11.3"
+        description: Version of Cloudera Manager (used for reference/documentation)
+      cloudera_manager_tarball_url:
+        type: str
+        required: true
+        description: Full URL to the Cloudera Manager tarball package
+      cloudera_manager_repo_username:
+        type: str
+        required: false
+        description: Username for authenticated tarball downloads
+      cloudera_manager_repo_password:
+        type: str
+        required: false
+        description: Password for authenticated tarball downloads
+        no_log: true
+      cm_local_repo_base_path:
+        type: str
+        required: false
+        default: "/var/www/html/cloudera-repos"
+        description: Base directory where the repository will be extracted
+      cm_local_repo_httpd_port:
+        type: int
+        required: false
+        default: 3333
+        description: Port on which httpd will serve the local repository
+      cm_local_repo_httpd_conf:
+        type: str
+        required: false
+        default: "/etc/httpd/conf/httpd.conf"
+        description: Path to the httpd configuration file
+      cm_local_repo_yum_conf:
+        type: str
+        required: false
+        default: "/etc/yum.repos.d/cloudera-manager.repo"
+        description: Path to the YUM repository configuration file
