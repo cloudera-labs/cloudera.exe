@@ -31,19 +31,6 @@
 #     - Restart DBUS
 #     # - Restart logind
 
-- name: Set SSSD to enumerate users and groups
-  when: ipaclient_sssd_enumeration | bool
-  ansible.builtin.lineinfile:
-    path: "{{ sssd_config_path }}"
-    insertafter: "^\\[domain/.+\\]"
-    regexp: "^enumerate"
-    line: "enumerate = True"
-  notify:
-    - Restart SSSD
-
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
-
 - name: Install defined FreeIPA client packages
   when: freeipa_client_packages is defined
   ansible.builtin.package:
@@ -63,3 +50,16 @@
     ipaclient_install_packages: "{{ freeipa_client_packages is undefined }}"
     ipaserver_setup_dns: true
     ipasssd_enable_dns_updates: true
+
+- name: Set SSSD to enumerate users and groups
+  when: ipaclient_sssd_enumeration | bool
+  ansible.builtin.lineinfile:
+    path: "{{ sssd_config_path }}"
+    insertafter: "^\\[domain/.+\\]"
+    regexp: "^enumerate"
+    line: "enumerate = True"
+  notify:
+    - Restart SSSD
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
