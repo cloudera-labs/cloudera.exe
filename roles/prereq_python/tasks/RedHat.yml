@@ -14,6 +14,11 @@
 
 ---
 
+- name: Gather Python details
+  ansible.builtin.setup:
+    gather_subset:
+      - python
+
 - name: Install supported Python
   when:
     prereq_python_upgrade and
@@ -33,23 +38,52 @@
         first |
         ansible.builtin.split(".") |
         first == "3"
-      ansible.builtin.package:
-        name: "{{ python_packages | default('python' + __python_version) }}"
-        state: present
+      block:
+        - name: Install Python3 packages
+          ansible.builtin.package:
+            name: "{{ prereq_python_packages | default(__python3_packages) }}"
+            state: present
 
-    # TODO Confirm Python2 package names
+        - name: Set installed Python as /usr/bin/python3 alternative with high priority
+          when: prereq_python_alternatives
+          community.general.alternatives:
+            name: python3
+            link: /usr/bin/python3
+            path: "{{ '/usr/bin/python' + __python_version }}"
+            priority: 100
+
     - name: Install supported version of Python2
       when:
         prereq_python_supported |
         first |
         ansible.builtin.split(".") |
         first == "2"
-      ansible.builtin.package:
-        name: "{{ python_packages | default('python' + __python_version) }}"
-        state: present
+      block:
+        - name: Install Python2 packages
+          ansible.builtin.package:
+            name: "{{ prereq_python_packages | default(__python2_packages) }}"
+            state: present
 
-# TODO Confirm Python2-pip package names
+    - name: Set installed Python as /usr/bin/python alternative with high priority
+      when: prereq_python_alternatives
+      community.general.alternatives:
+        name: python
+        link: /usr/bin/python
+        path: "{{ '/usr/bin/python' + __python_version }}"
+        priority: 100
+
+    - name: Gather distribution and Python details
+      ansible.builtin.setup:
+        gather_subset:
+          - python
+
 - name: Install pip
   ansible.builtin.package:
-    name: "{{ python_pip_packages | default('python-pip') }}"
+    name: "{{ 
+      prereq_python_pip_packages | 
+      default(
+        ansible_python['version']['major'] == 3 |
+        ternary(__python3_pip_packages, __python2_pip_packages)
+      )
+    }}"
     state: present

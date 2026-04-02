@@ -13,11 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Gather distribution and Python details
+- name: Gather distribution details
   ansible.builtin.setup:
     gather_subset:
       - distribution
-      - python
 
 - name: Gather supported Python versions for Cloudera Runtime and Manager versions and OS
   ansible.builtin.set_fact:
@@ -47,6 +46,18 @@
       "{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
       is not supported by Cloudera Manager {{ cloudera_manager_version }}
       and Cloudera Runtime {{ cloudera_runtime_version }}"
+
+- name: Load OS-specific variables
+  ansible.builtin.include_vars:
+    file: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
 
 - name: Update or install Python
   ansible.builtin.include_tasks: "{{ item }}"

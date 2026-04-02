@@ -1,5 +1,5 @@
 ---
-# Copyright 2025 Cloudera, Inc.
+# Copyright 2026 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,11 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cloudera_manager_version: "{{ undef(hint='Please specify the Cloudera Manager version') }}"
-cloudera_runtime_version: "{{ undef(hint='Please specify the Cloudera Runtime version') }}"
+__python3_packages:
+  - python3
 
-# prereq_python_packages:
-# prereq_python_pip_packages:
+__python2_packages:
+  - python
 
-prereq_python_upgrade: true
-prereq_python_alternatives: false
+__python3_pip_packages:
+  - python3-pip
+
+__python2_pip_packages:
+  - python-pip
