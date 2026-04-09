@@ -77,13 +77,9 @@
         gather_subset:
           - python
 
-- name: Install pip
+- name: install pip
+  vars:
+    __python_version: "{{ [ansible_python['version']['major'], ansible_python['version']['minor']] | join('.') }}"
   ansible.builtin.package:
-    name: "{{ 
-      prereq_python_pip_packages | 
-      default(
-        ansible_python['version']['major'] == 3 |
-        ternary(__python3_pip_packages, __python2_pip_packages)
-      )
-    }}"
+    name: "{{ prereq_python_pip_packages | default((ansible_python['version']['major'] == 3) | ternary(__python3_pip_packages, __python2_pip_packages)) }}"
     state: present
