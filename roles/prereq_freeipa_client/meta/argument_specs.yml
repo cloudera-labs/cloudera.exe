@@ -1,0 +1,40 @@
+---
+# Copyright 2026 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Install FreeIPA client prerequisites
+    description:
+      - Install system packages and Python packages required for FreeIPA client functionality.
+      - Automatically detects the OS distribution and installs appropriate dependencies.
+      - Installs the ipaclient Python package and its dependencies.
+    author:
+      - "Ronald Suplina <rsuplina@cloudera.com>"
+    version_added: "3.3.0"
+    options:
+      system_packages:
+        description:
+          - List of system packages to install for FreeIPA client.
+          - If not provided, OS-specific defaults will be used.
+        type: list
+        elements: str
+        required: false
+      python_packages:
+        description:
+          - List of Python packages to install for FreeIPA client functionality.
+          - If not provided, defaults to ipaclient and packaging.
+        type: list
+        elements: str
+        required: false
