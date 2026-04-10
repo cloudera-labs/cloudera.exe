@@ -90,8 +90,13 @@
 - name: Retrieve services
   ansible.builtin.service_facts:
 
+- name: Check if Cloudera tuned profile already exists
+  ansible.builtin.stat:
+    path: /etc/tuned/cldr/tuned.conf
+  register: __cldr_profile_check
+
 - name: Disable Transparent Huge Pages in tuned profile
-  when: ('tuned.service' in ansible_facts.services) and __thp.stdout is not search("\[never\]")
+  when: ('tuned.service' in ansible_facts.services) and __thp.stdout is not search("\[never\]") and not __cldr_profile_check.stat.exists
   block:
     - name: Discover current active tuned profile
       ansible.builtin.command: tuned-adm active
