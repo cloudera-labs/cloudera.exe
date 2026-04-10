@@ -12,6 +12,7 @@ The role will:
 - Set the SSSD configuration to enumerate users and groups, if needed.
 - Install defined FreeIPA client packages, if needed
 - Set up and register FreeIPA client with the FreeIPA servers.
+- Ensure correct Python interpreter is used for FreeIPA tasks on systems with multiple Python3 versions (RHEL9+)
 
 ## Requirements
 

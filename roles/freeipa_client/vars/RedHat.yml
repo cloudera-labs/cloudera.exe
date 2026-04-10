@@ -16,4 +16,4 @@
 sssd_service: sssd
 sssd_config_path: /etc/sssd/sssd.conf
 
-__freeipa_python_interpreter: "/usr/bin/python3"
+__freeipa_python_interpreter: "/usr/libexec/platform-python"

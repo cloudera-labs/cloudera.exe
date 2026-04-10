@@ -31,35 +31,25 @@
 #     - Restart DBUS
 #     # - Restart logind
 
-- name: Install defined FreeIPA client packages
-  when: freeipa_client_packages is defined
-  ansible.builtin.package:
-    name: "{{ __ipa_package }}"
-    state: present
-  loop: "{{ freeipa_client_packages }}"
-  loop_control:
-    loop_var: __ipa_package
+- name: Load OS-specific variables
+  ansible.builtin.include_vars:
+    file: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"
 
-- name: Set up the FreeIPA Client via DNS discovery
-  ansible.builtin.include_role:
-    name: freeipa.ansible_freeipa.ipaclient
-  vars:
-    state: present
-    ipaclient_hostname: "{{ inventory_hostname }}"
-    ipaclient_mkhomedir: true
-    ipaclient_install_packages: "{{ freeipa_client_packages is undefined }}"
-    ipaserver_setup_dns: true
-    ipasssd_enable_dns_updates: true
-
-- name: Set SSSD to enumerate users and groups
-  when: ipaclient_sssd_enumeration | bool
-  ansible.builtin.lineinfile:
-    path: "{{ sssd_config_path }}"
-    insertafter: "^\\[domain/.+\\]"
-    regexp: "^enumerate"
-    line: "enumerate = True"
-  notify:
-    - Restart SSSD
-
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
+- name: Configure FreeIPA client with OS-specific Python
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['distribution'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+    - "{{ ansible_facts['os_family'] }}.yml"
+    - "default.yml"

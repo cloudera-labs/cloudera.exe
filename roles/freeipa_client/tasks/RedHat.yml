@@ -1,0 +1,51 @@
+---
+# Copyright 2025 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+- name: Install defined FreeIPA client packages
+  when: freeipa_client_packages is defined
+  ansible.builtin.package:
+    name: "{{ __ipa_package }}"
+    state: present
+  loop: "{{ freeipa_client_packages }}"
+  loop_control:
+    loop_var: __ipa_package
+  vars:
+    ansible_python_interpreter: "{{ __freeipa_python_interpreter }}"
+
+- name: Set up the FreeIPA Client via DNS discovery
+  ansible.builtin.include_role:
+    name: freeipa.ansible_freeipa.ipaclient
+  vars:
+    ansible_python_interpreter: "{{ __freeipa_python_interpreter }}"
+    state: present
+    ipaclient_hostname: "{{ inventory_hostname }}"
+    ipaclient_mkhomedir: true
+    ipaclient_install_packages: "{{ freeipa_client_packages is undefined }}"
+    ipaserver_setup_dns: true
+    ipasssd_enable_dns_updates: true
+
+- name: Set SSSD to enumerate users and groups
+  when: ipaclient_sssd_enumeration | bool
+  ansible.builtin.lineinfile:
+    path: "{{ sssd_config_path }}"
+    insertafter: "^\\[domain/.+\\]"
+    regexp: "^enumerate"
+    line: "enumerate = True"
+  notify:
+    - Restart SSSD
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
