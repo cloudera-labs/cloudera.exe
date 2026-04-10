@@ -29,7 +29,17 @@
     name: "{{ selinux_packages }}"
     state: present
 
+- name: Check if SELinux is already configured to desired state
+  ansible.builtin.lineinfile:
+    path: "{{ selinux_config_file }}"
+    regexp: "^SELINUX={{ selinux_state }}$"
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: __selinux_already_set
+
 - name: Manage SELinux policy state
+  when: not __selinux_already_set.found
   ansible.posix.selinux:
     policy: "{{ selinux_policy | default(__selinux_policy) }}"
     state: "{{ selinux_state }}"
