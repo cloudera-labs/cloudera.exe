@@ -50,4 +50,3 @@ platforms:
       Project: Molecule testing for prereq_python
 provisioner:
   name: ansible
-
