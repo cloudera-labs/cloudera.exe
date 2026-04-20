@@ -112,7 +112,7 @@
       register: __active
 
     - name: Set active tuned profile
-      when: 
+      when:
         - __active is defined
         - __active.stdout is defined
         - not (__active.stdout is search("cldr"))
