@@ -93,8 +93,21 @@
 - name: Disable Transparent Huge Pages in tuned profile
   when: ('tuned.service' in ansible_facts.services) and __thp.stdout is not search("\[never\]")
   block:
-    - name: Discover current active tuned profile
-      ansible.builtin.command: tuned-adm active
+
+    - name: Discover current active tuned profile (RHEL 9)
+      ansible.builtin.command:
+        cmd: /usr/libexec/platform-python /sbin/tuned-adm active
+      when:
+        - ansible_facts['distribution'] == 'RedHat'
+        - ansible_facts['distribution_major_version'] == '9'
+      changed_when: false
+      register: __active
+
+    - name: Discover current active tuned profile (other distros)
+      ansible.builtin.command:
+        cmd: tuned-adm active
+      when:
+        - not (ansible_facts['distribution'] == 'RedHat' and ansible_facts['distribution_major_version'] == '9')
       changed_when: false
       register: __active
 
