@@ -13,22 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Install System packages
-  ansible.builtin.package:
-    name: "{{ system_packages | default(__system_packages) }}"
-    state: present
-
 - name: Gather Python details
   ansible.builtin.setup:
     gather_subset:
       - python
 
-- name: Set pip executable path
-  ansible.builtin.set_fact:
-    __pip_executable: "{{ '/usr/bin/pip' + [ansible_python['version']['major'], ansible_python['version']['minor']] | join('.') }}"
+- name: Install FreeIPA client packages for Python 3.11+
+  when:
+    - prereq_python_supported | first | ansible.builtin.split('.') | first == '3'
+    - (prereq_python_supported | first | ansible.builtin.split('.') | last | int) >= 11
+  block:
+    - name: Install System packages
+      ansible.builtin.package:
+        name: "{{ system_packages | default(__system_packages) }}"
+        state: present
 
-- name: Install Python packages
-  ansible.builtin.pip:
-    name: "{{ python_packages | default(__python_packages) }}"
-    state: present
-    executable: "{{ __pip_executable }}"
+    - name: Set pip executable path
+      ansible.builtin.set_fact:
+        __pip_executable: "{{ '/usr/bin/pip' + (prereq_python_supported | first | string) }}"
+
+    - name: Install Python packages
+      ansible.builtin.pip:
+        name: "{{ __python_packages }}"
+        state: present
+        executable: "{{ __pip_executable }}"
