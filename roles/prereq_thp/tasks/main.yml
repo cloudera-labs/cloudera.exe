@@ -1,5 +1,5 @@
 ---
-# Copyright 2025 Cloudera, Inc.
+# Copyright 2026 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,13 +93,29 @@
 - name: Disable Transparent Huge Pages in tuned profile
   when: ('tuned.service' in ansible_facts.services) and __thp.stdout is not search("\[never\]")
   block:
-    - name: Discover current active tuned profile
-      ansible.builtin.command: tuned-adm active
+
+    - name: Discover current active tuned profile (RHEL 9)
+      ansible.builtin.command:
+        cmd: /usr/libexec/platform-python /sbin/tuned-adm active
+      when:
+        - ansible_facts['distribution'] == 'RedHat'
+        - ansible_facts['distribution_major_version'] == '9'
+      changed_when: false
+      register: __active
+
+    - name: Discover current active tuned profile (other distros)
+      ansible.builtin.command:
+        cmd: tuned-adm active
+      when:
+        - not (ansible_facts['distribution'] == 'RedHat' and ansible_facts['distribution_major_version'] == '9')
       changed_when: false
       register: __active
 
     - name: Set active tuned profile
-      when: __active.stdout is not search("cldr")
+      when:
+        - __active is defined
+        - __active.stdout is defined
+        - not (__active.stdout is search("cldr"))
       block:
         - name: Create tuned profile directory for disabled THP
           ansible.builtin.file:
