@@ -48,8 +48,7 @@
       and Cloudera Runtime {{ cloudera_runtime_version }}"
 
 - name: Load OS-specific variables
-  ansible.builtin.include_vars:
-    file: "{{ item }}"
+  ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
     - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
@@ -70,7 +69,20 @@
     - "{{ ansible_facts['os_family'] }}.yml"
     - "default.yml"
 
+- name: Set pip executable path
+  ansible.builtin.set_fact:
+    __pip_executable: "{{ '/usr/bin/pip' + (prereq_python_supported | first | string) }}"
+
 - name: Ensure pip is upgraded
   ansible.builtin.pip:
     name: pip
     extra_args: --upgrade
+    executable: "{{ __pip_executable }}"
+
+- name: Create symlink for pip3 to installed version
+  when: prereq_python_supported | first | ansible.builtin.split('.') | first == '3'
+  ansible.builtin.file:
+    src: "{{ __pip_executable }}"
+    dest: /usr/bin/pip3
+    state: link
+    force: true

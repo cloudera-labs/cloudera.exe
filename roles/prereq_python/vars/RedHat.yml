@@ -20,19 +20,12 @@ __python3_packages:
   - "python{{ __python_version }}"
   - "python{{ __python_version }}-libs"
   - "python{{ __python_version }}-devel"
-  - krb5-devel
-  - gcc
-  - libffi-devel
-  - openssl-devel
+  - "python{{ __python_version }}-setuptools"
 
 __python2_packages:
   - "python{{ __python_version }}"
   - "python{{ __python_version }}-libs"
   - "python{{ __python_version }}-devel"
-  - krb5-devel
-  - gcc
-  - libffi-devel
-  - openssl-devel
 
 __python3_pip_packages:
   - "python{{ __python_version }}-pip"

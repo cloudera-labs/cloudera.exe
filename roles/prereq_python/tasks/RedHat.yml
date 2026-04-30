@@ -19,18 +19,12 @@
     gather_subset:
       - python
 
-- name: Install supported Python
-  when:
-    prereq_python_upgrade and
-    prereq_python_supported is not contains(
-      [
-        ansible_python["version"]["major"],
-        ansible_python["version"]["minor"]
-      ] |
-      join(".")
-    )
-  vars:
+- name: Set Python version
+  ansible.builtin.set_fact:
     __python_version: "{{ prereq_python_supported | first | string }}"
+
+- name: Install supported Python packages
+  when: prereq_python_upgrade
   block:
     - name: Install supported version of Python3
       when:
@@ -72,14 +66,7 @@
         path: "{{ '/usr/bin/python' + __python_version }}"
         priority: 100
 
-    - name: Gather distribution and Python details
-      ansible.builtin.setup:
-        gather_subset:
-          - python
-
 - name: install pip
-  vars:
-    __python_version: "{{ [ansible_python['version']['major'], ansible_python['version']['minor']] | join('.') }}"
   ansible.builtin.package:
-    name: "{{ prereq_python_pip_packages | default((ansible_python['version']['major'] == 3) | ternary(__python3_pip_packages, __python2_pip_packages)) }}"
+    name: "{{ prereq_python_pip_packages | default((prereq_python_supported | first | ansible.builtin.split('.') | first == '3') | ternary(__python3_pip_packages, __python2_pip_packages)) }}"
     state: present
