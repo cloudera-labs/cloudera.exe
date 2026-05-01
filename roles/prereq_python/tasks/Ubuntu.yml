@@ -14,6 +14,11 @@
 
 ---
 
+- name: Gather Python details
+  ansible.builtin.setup:
+    gather_subset:
+      - python
+
 - name: Install supported Python
   when:
     prereq_python_upgrade and
@@ -35,13 +40,13 @@
         first == "3"
       block:
         - name: Install Python3 package
-          when: python_packages is defined
+          when: prereq_python_packages is defined
           ansible.builtin.package:
-            name: "{{ python_packages }}"
+            name: "{{ prereq_python_packages }}"
             state: present
 
         - name: Install Python3 from source
-          when: python_packages is not defined
+          when: prereq_python_packages is not defined
           block:
             - name: Ensure required dependencies are installed
               ansible.builtin.package:
@@ -86,13 +91,13 @@
       block:
         # Most likely need to update this to use get-pip.py and the like
         - name: Install Python2 package
-          when: python_packages is defined
+          when: prereq_python_packages is defined
           ansible.builtin.package:
-            name: "{{ python_packages }}"
+            name: "{{ prereq_python_packages }}"
             state: present
 
         - name: Install Python2 from source
-          when: python_packages is not defined
+          when: prereq_python_packages is not defined
           block:
             - name: Ensure required dependencies are installed
               ansible.builtin.package:
@@ -128,8 +133,13 @@
                 chdir: /tmp/Python-{{ __python_version }}
                 target: altinstall
 
-# TODO Confirm Python2-pip package names
-- name: Ensure pip is installed
+- name: Install pip
   ansible.builtin.package:
-    name: "{{ python_pip_packages | default('python3-pip') }}"
+    name: "{{
+      prereq_python_pip_packages |
+      default(
+        ansible_python['version']['major'] == 3 |
+        ternary(__python3_pip_packages, __python2_pip_packages)
+      )
+    }}"
     state: present
