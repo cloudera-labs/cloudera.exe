@@ -44,11 +44,14 @@
   loop: "{{ freeipa_server_packages }}"
   loop_control:
     loop_var: __ipa_package
+  vars:
+    ansible_python_interpreter: "{{ __freeipa_python_interpreter }}"
 
 - name: Set up the FreeIPA Server
   ansible.builtin.import_role:
     name: freeipa.ansible_freeipa.ipaserver
   vars:
+    ansible_python_interpreter: "{{ __freeipa_python_interpreter }}"
     state: present
     ipaserver_hostname: "{{ inventory_hostname }}"
     # ipaserver_no_host_dns: yes # redundant with ipaserver_setup_dns
