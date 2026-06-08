@@ -19,5 +19,5 @@ caddy_apt_gpg_key: "https://dl.cloudsmith.io/public/caddy/stable/gpg.key"
 
 caddy_packages:
   - caddy
-  
+
 caddy_service: "caddy"
