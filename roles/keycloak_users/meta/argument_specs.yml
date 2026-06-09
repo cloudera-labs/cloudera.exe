@@ -1,0 +1,123 @@
+---
+# Copyright 2026 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Manage Keycloak users, groups, and role mappings
+    description:
+      - This role manages Keycloak users, groups, and role mappings using the Keycloak REST API.
+      - It creates users with their associated groups and optionally assigns realm roles and client roles.
+      - The role automatically creates groups if they don't exist and handles role mappings for both realm and client scopes.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    version_added: "3.3.0"
+    options:
+      keycloak__auth_keycloak_url:
+        type: str
+        required: true
+        description:
+          - URL to the Keycloak instance.
+          - "Example: https://keycloak.example.com or https://keycloak.example.com:8543"
+      keycloak__auth_username:
+        type: str
+        required: false
+        default: admin
+        description: Username to authenticate for API access with
+      keycloak__auth_password:
+        type: str
+        required: true
+        description: Password to authenticate for API access
+      keycloak__auth_client_id:
+        type: str
+        required: false
+        default: admin-cli
+        description: OpenID Connect client_id to authenticate to the API with
+      keycloak__auth_client_secret:
+        type: str
+        required: false
+        default: ""
+        description: Client Secret to use in conjunction with auth_client_id (if required)
+      keycloak__auth_realm:
+        type: str
+        required: false
+        default: master
+        description: Keycloak realm name to authenticate to for API access
+      keycloak__auth_validate_certs:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to validate SSL certificates when connecting to Keycloak.
+          - Set to false when using self-signed certificates.
+      keycloak__useraccounts:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description: List of user account definitions to create in Keycloak
+        options:
+          username:
+            type: str
+            required: true
+            description: Username for the Keycloak user account
+          firstName:
+            type: str
+            required: true
+            description: First name of the user
+          lastName:
+            type: str
+            required: true
+            description: Last name of the user
+          email:
+            type: str
+            required: true
+            description: Email address of the user
+          password:
+            type: str
+            required: true
+            description: Password for the user account (non-temporary)
+          realm_name:
+            type: str
+            required: true
+            description: Name of the Keycloak realm to create the user in
+          groups:
+            type: list
+            elements: str
+            required: false
+            description:
+              - List of group names to add the user to.
+              - Groups will be automatically created if they don't exist.
+          realm_roles:
+            type: list
+            elements: str
+            required: false
+            description:
+              - List of realm role names to assign to the user.
+              - "Example: ['admin', 'create-realm']"
+          client_roles:
+            type: list
+            elements: dict
+            required: false
+            description: List of client role mappings to assign to the user
+            options:
+              client_id:
+                type: str
+                required: true
+                description: Name of the client whose roles to assign
+              roles:
+                type: list
+                elements: str
+                required: true
+                description: List of role names within the client to assign to the user

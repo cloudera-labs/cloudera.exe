@@ -1,0 +1,36 @@
+---
+# defaults file for keycloak
+
+keycloak__auth_keycloak_url: "{{ undef(hint='Please define the Keycloak URL') }}" # URL to the Keycloak instance. 
+keycloak__auth_username: "admin" # Username to authenticate for API access with.
+keycloak__auth_password: "{{ undef(hint='Please define the Keycloak authentication password') }}"
+
+keycloak__auth_client_id: "admin-cli" # OpenID Connect client_id to authenticate to the API with.
+keycloak__auth_client_secret: "" # Client Secret to use in conjunction with auth_client_id (if required).
+keycloak__auth_realm: "master" # Keycloak realm name to authenticate to for API access.
+keycloak__auth_validate_certs: true # Whether to validate SSL certificates when connecting to Keycloak.
+
+keycloak__useraccounts: []
+  # - username: user1
+  #   firstName: User1
+  #   lastName: One
+  #   email: user1@example.com
+  #   password: password
+  #   realm_name: master
+  #   groups:
+  #     - user1-group
+  #     - users
+  # # Example admin user with realm role mapping
+  # - username: admin-user
+  #   firstName: Admin
+  #   lastName: User
+  #   email: admin@example.com
+  #   password: adminpassword
+  #   realm_name: master
+  #   realm_roles:  # Optional: list of realm roles to assign
+  #     - admin
+  #   # client_roles:  # Optional: list of client role mappings
+  #   #   - client_id: my-client
+  #   #     roles:
+  #   #       - client-admin
+  #   #       - client-user
