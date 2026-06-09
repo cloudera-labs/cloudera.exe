@@ -1,0 +1,121 @@
+---
+# Copyright 2026 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Deploy Keycloak as a Docker container managed by systemd
+    description:
+      - This role deploys Keycloak as a Docker container managed by systemd on a Linux host.
+      - It configures Keycloak with self-signed SSL certificates, creates the necessary user/group structure, and sets up a systemd service for automated startup and management.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    options:
+      keycloak__container_name:
+        type: str
+        required: false
+        default: keycloak-server
+        description: Name of the Docker container
+      keycloak__container_image:
+        type: str
+        required: false
+        default: quay.io/keycloak/keycloak
+        description: Docker image repository for Keycloak
+      keycloak__container_tag:
+        type: str
+        required: false
+        default: "26.0.7"
+        description: Keycloak version tag
+      keycloak__container_http_port:
+        type: int
+        required: false
+        default: 8180
+        description: HTTP port mapping for Keycloak container
+      keycloak__container_https_port:
+        type: int
+        required: false
+        default: 8543
+        description: HTTPS port mapping for Keycloak container
+      keycloak__admin_username:
+        type: str
+        required: false
+        default: admin
+        description: Keycloak admin username
+      keycloak__admin_password:
+        type: str
+        required: true
+        description: Keycloak admin password (required, change in production)
+      keycloak__system_username:
+        type: str
+        required: false
+        default: keycloak
+        description: System user for Keycloak service
+      keycloak__system_groupname:
+        type: str
+        required: false
+        default: keycloak
+        description: System group for Keycloak service
+      keycloak__docker_exe:
+        type: path
+        required: false
+        default: /usr/bin/docker
+        description: Path to Docker executable
+      keycloak__metrics_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Enable Keycloak metrics endpoint
+      keycloak__health_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Enable Keycloak health check endpoint
+      keycloak__container_log_level:
+        type: str
+        required: false
+        default: INFO
+        choices:
+          - DEBUG
+          - INFO
+          - WARN
+          - ERROR
+        description: Logging level for Keycloak container
+      keycloak__proxy_mode:
+        type: str
+        required: false
+        default: edge
+        choices:
+          - edge
+          - reencrypt
+          - passthrough
+          - none
+        description: Proxy mode for Keycloak
+      keycloak__http_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Enable HTTP protocol
+      keycloak__https_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Enable HTTPS protocol
+      keycloak__container_domain_name:
+        type: str
+        required: true
+        description: Fully qualified domain name for Keycloak service (used in SSL certificate)
+      keycloak__container_ip_address:
+        type: str
+        required: true
+        description: IP address for Keycloak service (used in SSL certificate)
