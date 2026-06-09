@@ -1,7 +1,7 @@
 ---
 # defaults file for keycloak
 
-keycloak__auth_keycloak_url: "{{ undef(hint='Please define the Keycloak URL') }}" # URL to the Keycloak instance. 
+keycloak__auth_keycloak_url: "{{ undef(hint='Please define the Keycloak URL') }}" # URL to the Keycloak instance.
 keycloak__auth_username: "admin" # Username to authenticate for API access with.
 keycloak__auth_password: "{{ undef(hint='Please define the Keycloak authentication password') }}"
 
