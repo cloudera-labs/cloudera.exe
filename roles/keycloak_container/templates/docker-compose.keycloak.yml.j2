@@ -1,0 +1,26 @@
+services:
+  keycloak:
+    image: {{ keycloak__container_image }}:{{ keycloak__container_tag }}
+    container_name: {{ keycloak__container_name }}
+    command: ["start-dev"]
+    restart: unless-stopped
+    environment:
+      KC_METRICS_ENABLED: {{ keycloak__metrics_enabled | lower }}
+      KC_LOG_LEVEL: {{ keycloak__container_log_level }}
+      KC_HEALTH_ENABLED: {{ keycloak__health_enabled | lower | string | quote }}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_PROXY: {{ keycloak__proxy_mode }}
+      KC_HTTP_ENABLED: {{ keycloak__http_enabled | lower }}
+      KC_HTTPS_ENABLED: {{ keycloak__https_enabled | lower }}
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/keycloak/conf/private.key
+      KC_HTTPS_CERTIFICATE_FILE: /etc/keycloak/conf/cert.pem
+    ports:
+      - {{ keycloak__container_http_port }}:8080
+      - {{ keycloak__container_https_port }}:8443
+    volumes:
+      - {{ service_root_dir }}/ssl/private.key:/etc/keycloak/conf/private.key
+      - {{ service_root_dir }}/ssl/cert.pem:/etc/keycloak/conf/cert.pem
+    labels:
+      - "service=keycloak"
+      - "version={{ keycloak__container_tag }}"
