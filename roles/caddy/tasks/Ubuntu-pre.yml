@@ -13,10 +13,23 @@
 # limitations under the License.
 
 ---
-- name: Enable Fedora COPR
+- name: Install required packages
   ansible.builtin.package:
-    name: "dnf-command(copr)"
+    name: "{{ item }}"
+    state: "present"
+  loop:
+    - debian-keyring
+    - debian-archive-keyring
 
-- name: Enable Caddy project in COPR
-  ansible.builtin.command: "dnf copr enable -y @caddy/caddy"
-  changed_when: false
+- name: Add Caddy apt key
+  ansible.builtin.get_url:
+    url: "{{ caddy_repo_key | default(caddy_apt_gpg_key) }}"
+    dest: /etc/apt/keyrings/caddy.asc
+    mode: "0644"
+
+- name: Add Caddy repository
+  ansible.builtin.apt_repository:
+    repo: "{{ caddy_repo | default(caddy_apt_repository)  }}"
+    state: present
+    filename: "caddy"
+    update_cache: true

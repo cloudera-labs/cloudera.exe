@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     https://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,10 +13,11 @@
 # limitations under the License.
 
 ---
-- name: Enable Fedora COPR
-  ansible.builtin.package:
-    name: "dnf-command(copr)"
 
-- name: Enable Caddy project in COPR
-  ansible.builtin.command: "dnf copr enable -y @caddy/caddy"
-  changed_when: false
+caddy_apt_repository: "deb [arch=amd64 signed-by=/etc/apt/keyrings/caddy.asc] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
+caddy_apt_gpg_key: "https://dl.cloudsmith.io/public/caddy/stable/gpg.key"
+
+caddy_packages:
+  - caddy
+
+caddy_service: "caddy"

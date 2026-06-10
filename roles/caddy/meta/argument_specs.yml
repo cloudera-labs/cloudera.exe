@@ -1,5 +1,5 @@
 ---
-# Copyright 2025 Cloudera, Inc.
+# Copyright 2026 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,4 +52,16 @@ argument_specs:
           - External CA key for the Caddy TLS service.
           - Required if O(caddy_ca_pem) is defined.
         type: path
+        required: false
+      caddy_repo:
+        description:
+          - Caddy package repository configuration string (Ubuntu/Debian).
+          - If not defined, uses the default repository from distribution-specific vars.
+        type: str
+        required: false
+      caddy_repo_key:
+        description:
+          - URL to the GPG key for the Caddy package repository.
+          - If not defined, uses the default GPG key URL from distribution-specific vars.
+        type: str
         required: false

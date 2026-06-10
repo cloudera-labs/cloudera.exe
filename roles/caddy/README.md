@@ -33,6 +33,8 @@ None.
 | `caddy_self_signed` | `bool` | `False` | `true` | Flag enabling Caddy to issue self-signed TLS certificates. If `false`, Caddy defaults to using the Let's Encrypt ACME service. If `true` and `caddy_ca_pem` is not defined, Caddy generates its own root CA. |
 | `caddy_ca_pem` | `path` | `False` | | Path to an external CA certificate file (PEM format) to be used by Caddy for TLS. |
 | `caddy_ca_key` | `path` | `False` | | Path to the private key for the external CA (`caddy_ca_pem`). This parameter is required if `caddy_ca_pem` is defined. |
+| `caddy_repo` | `str` | `False` | | Caddy package repository configuration string (Ubuntu/Debian). If not defined, uses the default repository from distribution-specific vars. |
+| `caddy_repo_key` | `str` | `False` | | URL to the GPG key for the Caddy package repository. If not defined, uses the default GPG key URL from distribution-specific vars. |
 
 # Example Playbook
 
@@ -68,7 +70,7 @@ None.
 # License
 
 ```
-Copyright 2025 Cloudera, Inc.
+Copyright 2026 Cloudera, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

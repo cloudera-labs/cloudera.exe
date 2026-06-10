@@ -1,4 +1,4 @@
-# Copyright 2025 Cloudera, Inc.
+# Copyright 2026 Cloudera, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,3 +19,6 @@ caddy_domain: "{{ undef(hint='Please provide the default domain for the Caddy se
 caddy_www_root: /var/www_root
 # caddy_ca_pem: # path
 # caddy_ca_key: # path
+
+# caddy_repo: # Caddy deb package string (Ubuntu)
+# caddy_repo_key:
