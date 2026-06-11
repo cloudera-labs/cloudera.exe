@@ -11,7 +11,7 @@ RestartSec=3
 User=keycloak
 Group=keycloak
 
-ExecStart={{ keycloak__docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml -p keycloak up 
+ExecStart={{ keycloak__docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml -p keycloak up
 ExecStop={{ keycloak__docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml -p keycloak stop
 
 [Install]

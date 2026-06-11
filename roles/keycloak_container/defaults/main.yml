@@ -38,4 +38,3 @@ keycloak__http_enabled: true
 keycloak__https_enabled: false
 # keycloak__tls_key_path:
 # keycloak__tls_cert_path:
-

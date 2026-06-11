@@ -15,12 +15,12 @@
 
 # User and directory structure configuration
 - name: Create group for keycloak
-  ansible.builtin.group: 
+  ansible.builtin.group:
     name: "{{ keycloak__system_groupname }}"
     state: present
 
 - name: Create user for keycloak
-  ansible.builtin.user: 
+  ansible.builtin.user:
     name: "{{ keycloak__system_username }}"
     comment: "Keycloak User"
     group: "{{ keycloak__system_groupname }}"
@@ -56,7 +56,6 @@
     content: |
       KEYCLOAK_ADMIN={{ keycloak__admin_username }}
       KEYCLOAK_ADMIN_PASSWORD={{ keycloak__admin_password }}
-
 
 # Systemd configuration
 - name: Configure keycloak systemd service.
