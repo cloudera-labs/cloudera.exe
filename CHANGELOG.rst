@@ -4,6 +4,33 @@ cloudera.exe Release Notes
 
 .. contents:: Topics
 
+v3.3.0
+======
+
+Minor Changes
+-------------
+
+- Add Keycloak container role (#323)
+- Add Keycloak users role (#324)
+- Add Minifi Java Agent Role (#313)
+- Add Python interpreter variables for FreeIPA server roles (#321)
+- Add Ubuntu support to Caddy install role (#322)
+- Add cm_local_repo role for provisioning a local CM repository (#314)
+- Add prereq_freeipa_client role (#317)
+- Move SSSD config update after freeipa_client install (#315)
+- Update freeipa client role (#318)
+- Update prereq_thp and prereq_selinux (#319)
+- Update supported Python role (#320)
+
+New Roles
+---------
+
+- cloudera.exe.cm_repo_local - Set up a local HTTP-based package repository for Cloudera Manager.
+- cloudera.exe.keycloak_container - Deploy Keycloak as a Docker container managed by systemd.
+- cloudera.exe.keycloak_users - Manage Keycloak users, groups, and role mappings.
+- cloudera.exe.minifi_agent_java - Install and configure Cloudera MiNiFi Java Agent.
+- cloudera.exe.prereq_freeipa_client - Install FreeIPA client prerequisites.
+
 v3.2.0
 ======
 

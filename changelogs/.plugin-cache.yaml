@@ -28,6 +28,10 @@ objects:
       description: Manage the package repository for Cloudera Manager.
       name: cm_repo
       version_added: 3.0.0
+    cm_repo_local:
+      description: Set up a local HTTP-based package repository for Cloudera Manager
+      name: cm_repo_local
+      version_added: 3.3.0
     cm_server:
       description: Install Cloudera Manager server
       name: cm_server
@@ -101,10 +105,22 @@ objects:
       description: Configuration init
       name: init_deployment
       version_added: 2.0.0
+    keycloak_container:
+      description: Deploy Keycloak as a Docker container managed by systemd
+      name: keycloak_container
+      version_added: 3.3.0
+    keycloak_users:
+      description: Manage Keycloak users, groups, and role mappings
+      name: keycloak_users
+      version_added: 3.3.0
     minifi_agent_cpp:
       description: Install and configure Cloudera MiNiFi C++ Agent
       name: minifi_agent_cpp
       version_added: 3.2.0
+    minifi_agent_java:
+      description: Install and configure Cloudera MiNiFi Java Agent
+      name: minifi_agent_java
+      version_added: 3.3.0
     mount:
       description: Create and mount a storage volume
       name: mount
@@ -197,6 +213,10 @@ objects:
       description: Set up user accounts for Flume
       name: prereq_flume
       version_added: 3.0.0
+    prereq_freeipa_client:
+      description: Install FreeIPA client prerequisites
+      name: prereq_freeipa_client
+      version_added: 3.3.0
     prereq_hadoop:
       description: Set up user accounts for Hadoop
       name: prereq_hadoop
@@ -523,4 +543,4 @@ plugins:
       name: version
       version_added: 3.0.0
   vars: {}
-version: 3.2.0
+version: 3.3.0

@@ -22,6 +22,7 @@ argument_specs:
       - TLS can be enabled by supplying an existing certificate and key via keycloak_tls_cert_path and keycloak_tls_key_path.
     author:
       - "Jim Enright <jenright@cloudera.com>"
+    version_added: "3.3.0"
     options:
       keycloak_container_name:
         type: str
