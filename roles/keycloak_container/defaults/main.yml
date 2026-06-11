@@ -33,10 +33,9 @@ keycloak__docker_exe: /usr/bin/docker
 keycloak__metrics_enabled: true
 keycloak__health_enabled: true
 keycloak__container_log_level: INFO
-keycloak__proxy_mode: edge
+keycloak__proxy_headers: xforwarded
 keycloak__http_enabled: true
-keycloak__https_enabled: true
+keycloak__https_enabled: false
+# keycloak__tls_key_path:
+# keycloak__tls_cert_path:
 
-# NOTE: For TLS (replace with external certs)
-keycloak__container_domain_name: "{{ undef(hint='Please provide the default domain for the Keycloak service') }}"
-keycloak__container_ip_address: "{{ undef(hint='Please provide the IP address for the Keycloak service') }}"

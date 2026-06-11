@@ -57,34 +57,6 @@
       KEYCLOAK_ADMIN={{ keycloak__admin_username }}
       KEYCLOAK_ADMIN_PASSWORD={{ keycloak__admin_password }}
 
-# NOTE: For TLS (replace with external certs)
-# TLS cert and key configuration
-- name: Create private key (RSA, 4096 bits)
-  community.crypto.openssl_privatekey:
-    path: "{{ service_root_dir }}/ssl/private.key"
-    owner: "{{ keycloak__system_username }}"
-    group: "{{ keycloak__system_groupname }}"
-    mode: 0644
-
-- name: Create certificate signing request (CSR) for self-signed certificate
-  community.crypto.openssl_csr_pipe:
-    privatekey_path: "{{ service_root_dir }}/ssl/private.key"
-    common_name: "{{ keycloak__container_domain_name }}"
-    organization_name: Cloudera, Inc.
-    subject_alt_name:
-      - "DNS:{{ keycloak__container_domain_name }}"
-      - "IP:{{ keycloak__container_ip_address }}"
-  register: __keycloak_csr
-
-- name: Create self-signed certificate from CSR
-  community.crypto.x509_certificate:
-    path: "{{ service_root_dir }}/ssl/cert.pem"
-    csr_content: "{{ __keycloak_csr.csr }}"
-    privatekey_path: "{{ service_root_dir }}/ssl/private.key"
-    provider: selfsigned
-    owner: "{{ keycloak__system_username }}"
-    group: "{{ keycloak__system_groupname }}"
-    mode: 0644
 
 # Systemd configuration
 - name: Configure keycloak systemd service.

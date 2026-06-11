@@ -18,7 +18,8 @@ argument_specs:
     short_description: Deploy Keycloak as a Docker container managed by systemd
     description:
       - This role deploys Keycloak as a Docker container managed by systemd on a Linux host.
-      - It configures Keycloak with self-signed SSL certificates, creates the necessary user/group structure, and sets up a systemd service for automated startup and management.
+      - It creates the necessary user/group structure and sets up a systemd service for automated startup and management.
+      - TLS can be enabled by supplying an existing certificate and key via keycloak__tls_cert_path and keycloak__tls_key_path.
     author:
       - "Jim Enright <jenright@cloudera.com>"
     options:
@@ -91,16 +92,14 @@ argument_specs:
           - WARN
           - ERROR
         description: Logging level for Keycloak container
-      keycloak__proxy_mode:
+      keycloak__proxy_headers:
         type: str
         required: false
-        default: edge
+        default: xforwarded
         choices:
-          - edge
-          - reencrypt
-          - passthrough
-          - none
-        description: Proxy mode for Keycloak
+          - xforwarded
+          - forwarded
+        description: Proxy headers mode for Keycloak
       keycloak__http_enabled:
         type: bool
         required: false
@@ -109,13 +108,13 @@ argument_specs:
       keycloak__https_enabled:
         type: bool
         required: false
-        default: true
+        default: false
         description: Enable HTTPS protocol
-      keycloak__container_domain_name:
-        type: str
-        required: true
-        description: Fully qualified domain name for Keycloak service (used in SSL certificate)
-      keycloak__container_ip_address:
-        type: str
-        required: true
-        description: IP address for Keycloak service (used in SSL certificate)
+      keycloak__tls_key_path:
+        type: path
+        required: false
+        description: Path on the host to the TLS private key file (required when keycloak__https_enabled is true)
+      keycloak__tls_cert_path:
+        type: path
+        required: false
+        description: Path on the host to the TLS certificate file (required when keycloak__https_enabled is true)
