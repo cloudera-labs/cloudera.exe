@@ -1,26 +1,26 @@
 services:
   keycloak:
-    image: {{ keycloak__container_image }}:{{ keycloak__container_tag }}
-    container_name: {{ keycloak__container_name }}
+    image: {{ keycloak_container_image }}:{{ keycloak_container_tag }}
+    container_name: {{ keycloak_container_name }}
     command: ["start-dev"]
     restart: unless-stopped
     environment:
-      KC_METRICS_ENABLED: {{ keycloak__metrics_enabled | lower }}
-      KC_LOG_LEVEL: {{ keycloak__container_log_level }}
-      KC_HEALTH_ENABLED: {{ keycloak__health_enabled | lower | string | quote }}
+      KC_METRICS_ENABLED: {{ keycloak_metrics_enabled | lower }}
+      KC_LOG_LEVEL: {{ keycloak_container_log_level }}
+      KC_HEALTH_ENABLED: {{ keycloak_health_enabled | lower | string | quote }}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      KC_PROXY_HEADERS: {{ keycloak__proxy_headers }}
-      KC_HTTP_ENABLED: {{ keycloak__http_enabled | lower }}
-      KC_HTTPS_ENABLED: {{ keycloak__https_enabled | lower }}
+      KC_PROXY_HEADERS: {{ keycloak_proxy_headers }}
+      KC_HTTP_ENABLED: {{ keycloak_http_enabled | lower }}
+      KC_HTTPS_ENABLED: {{ keycloak_https_enabled | lower }}
       KC_HTTPS_CERTIFICATE_FILE: /etc/keycloak/conf/cert.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/keycloak/conf/private.key
     ports:
-      - {{ keycloak__container_http_port }}:8080
-      - {{ keycloak__container_https_port }}:8443
+      - {{ keycloak_container_http_port }}:8080
+      - {{ keycloak_container_https_port }}:8443
     volumes:
-      - {{ keycloak__tls_key_path }}:/etc/keycloak/conf/private.key
-      - {{ keycloak__tls_cert_path }}:/etc/keycloak/conf/cert.pem
+      - {{ keycloak_tls_key_path }}:/etc/keycloak/conf/private.key
+      - {{ keycloak_tls_cert_path }}:/etc/keycloak/conf/cert.pem
     labels:
       - "service=keycloak"
-      - "version={{ keycloak__container_tag }}"
+      - "version={{ keycloak_container_tag }}"

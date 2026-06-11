@@ -13,28 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+keycloak_container_name: keycloak-server
+keycloak_container_image: quay.io/keycloak/keycloak
+keycloak_container_tag: 26.0.7
 
-keycloak__container_name: keycloak-server
-keycloak__container_image: quay.io/keycloak/keycloak
-keycloak__container_tag: 26.0.7
+keycloak_container_http_port: 8180
+keycloak_container_https_port: 8543
 
-keycloak__container_http_port: 8180
-keycloak__container_https_port: 8543
+keycloak_admin_username: "admin"
+keycloak_admin_password: "{{ undef(hint='Please define the Keycloak authentication password') }}"
 
-keycloak__admin_username: "admin"
-keycloak__admin_password: "{{ undef(hint='Please define the Keycloak authentication password') }}"
+keycloak_system_username: keycloak
+keycloak_system_groupname: keycloak
 
-keycloak__system_username: keycloak
-keycloak__system_groupname: keycloak
-
-keycloak__docker_exe: /usr/bin/docker
+keycloak_docker_exe: /usr/bin/docker
 
 # Keycloak container configuration options
-keycloak__metrics_enabled: true
-keycloak__health_enabled: true
-keycloak__container_log_level: INFO
-keycloak__proxy_headers: xforwarded
-keycloak__http_enabled: true
-keycloak__https_enabled: false
-# keycloak__tls_key_path:
-# keycloak__tls_cert_path:
+keycloak_metrics_enabled: true
+keycloak_health_enabled: true
+keycloak_container_log_level: INFO
+keycloak_proxy_headers: xforwarded
+keycloak_http_enabled: true
+keycloak_https_enabled: false
+# keycloak_tls_key_path:
+# keycloak_tls_cert_path:

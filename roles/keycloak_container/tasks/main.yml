@@ -16,14 +16,14 @@
 # User and directory structure configuration
 - name: Create group for keycloak
   ansible.builtin.group:
-    name: "{{ keycloak__system_groupname }}"
+    name: "{{ keycloak_system_groupname }}"
     state: present
 
 - name: Create user for keycloak
   ansible.builtin.user:
-    name: "{{ keycloak__system_username }}"
+    name: "{{ keycloak_system_username }}"
     comment: "Keycloak User"
-    group: "{{ keycloak__system_groupname }}"
+    group: "{{ keycloak_system_groupname }}"
     groups:
       - docker
     state: present
@@ -32,8 +32,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ keycloak__system_username }}"
-    group: "{{ keycloak__system_groupname }}"
+    owner: "{{ keycloak_system_username }}"
+    group: "{{ keycloak_system_groupname }}"
     mode: 0777
   loop:
     - "{{ service_root_dir }}"
@@ -50,12 +50,12 @@
 - name: Create .env file for docker-compose
   ansible.builtin.copy:
     dest: "{{ service_root_dir }}/.env"
-    owner: "{{ keycloak__system_username }}"
-    group: "{{ keycloak__system_groupname }}"
+    owner: "{{ keycloak_system_username }}"
+    group: "{{ keycloak_system_groupname }}"
     mode: 0640
     content: |
-      KEYCLOAK_ADMIN={{ keycloak__admin_username }}
-      KEYCLOAK_ADMIN_PASSWORD={{ keycloak__admin_password }}
+      KEYCLOAK_ADMIN={{ keycloak_admin_username }}
+      KEYCLOAK_ADMIN_PASSWORD={{ keycloak_admin_password }}
 
 # Systemd configuration
 - name: Configure keycloak systemd service.
