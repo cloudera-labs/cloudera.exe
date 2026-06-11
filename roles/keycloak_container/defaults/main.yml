@@ -1,0 +1,39 @@
+---
+# Copyright 2026 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+keycloak_container_name: keycloak-server
+keycloak_container_image: quay.io/keycloak/keycloak
+keycloak_container_tag: 26.0.7
+
+keycloak_container_http_port: 8180
+keycloak_container_https_port: 8543
+
+keycloak_admin_username: "admin"
+keycloak_admin_password: "{{ undef(hint='Please define the Keycloak authentication password') }}"
+
+keycloak_system_username: keycloak
+keycloak_system_groupname: keycloak
+
+keycloak_docker_exe: /usr/bin/docker
+
+# Keycloak container configuration options
+keycloak_metrics_enabled: true
+keycloak_health_enabled: true
+keycloak_container_log_level: INFO
+keycloak_proxy_headers: xforwarded
+keycloak_http_enabled: true
+keycloak_https_enabled: false
+# keycloak_tls_key_path:
+# keycloak_tls_cert_path:

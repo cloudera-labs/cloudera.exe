@@ -1,0 +1,120 @@
+---
+# Copyright 2026 Cloudera, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+argument_specs:
+  main:
+    short_description: Deploy Keycloak as a Docker container managed by systemd
+    description:
+      - This role deploys Keycloak as a Docker container managed by systemd on a Linux host.
+      - It creates the necessary user/group structure and sets up a systemd service for automated startup and management.
+      - TLS can be enabled by supplying an existing certificate and key via keycloak_tls_cert_path and keycloak_tls_key_path.
+    author:
+      - "Jim Enright <jenright@cloudera.com>"
+    options:
+      keycloak_container_name:
+        type: str
+        required: false
+        default: keycloak-server
+        description: Name of the Docker container
+      keycloak_container_image:
+        type: str
+        required: false
+        default: quay.io/keycloak/keycloak
+        description: Docker image repository for Keycloak
+      keycloak_container_tag:
+        type: str
+        required: false
+        default: "26.0.7"
+        description: Keycloak version tag
+      keycloak_container_http_port:
+        type: int
+        required: false
+        default: 8180
+        description: HTTP port mapping for Keycloak container
+      keycloak_container_https_port:
+        type: int
+        required: false
+        default: 8543
+        description: HTTPS port mapping for Keycloak container
+      keycloak_admin_username:
+        type: str
+        required: false
+        default: admin
+        description: Keycloak admin username
+      keycloak_admin_password:
+        type: str
+        required: true
+        description: Keycloak admin password (required, change in production)
+      keycloak_system_username:
+        type: str
+        required: false
+        default: keycloak
+        description: System user for Keycloak service
+      keycloak_system_groupname:
+        type: str
+        required: false
+        default: keycloak
+        description: System group for Keycloak service
+      keycloak_docker_exe:
+        type: path
+        required: false
+        default: /usr/bin/docker
+        description: Path to Docker executable
+      keycloak_metrics_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Enable Keycloak metrics endpoint
+      keycloak_health_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Enable Keycloak health check endpoint
+      keycloak_container_log_level:
+        type: str
+        required: false
+        default: INFO
+        choices:
+          - DEBUG
+          - INFO
+          - WARN
+          - ERROR
+        description: Logging level for Keycloak container
+      keycloak_proxy_headers:
+        type: str
+        required: false
+        default: xforwarded
+        choices:
+          - xforwarded
+          - forwarded
+        description: Proxy headers mode for Keycloak
+      keycloak_http_enabled:
+        type: bool
+        required: false
+        default: true
+        description: Enable HTTP protocol
+      keycloak_https_enabled:
+        type: bool
+        required: false
+        default: false
+        description: Enable HTTPS protocol
+      keycloak_tls_key_path:
+        type: path
+        required: false
+        description: Path on the host to the TLS private key file (required when keycloak_https_enabled is true)
+      keycloak_tls_cert_path:
+        type: path
+        required: false
+        description: Path on the host to the TLS certificate file (required when keycloak_https_enabled is true)

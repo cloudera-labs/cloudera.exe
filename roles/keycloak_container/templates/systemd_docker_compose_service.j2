@@ -1,0 +1,18 @@
+[Unit]
+Description=Keycloak Service (version {{ keycloak_container_tag }})
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutSec=infinity
+Restart=always
+RestartSec=3
+
+User=keycloak
+Group=keycloak
+
+ExecStart={{ keycloak_docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml -p keycloak up
+ExecStop={{ keycloak_docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml -p keycloak stop
+
+[Install]
+WantedBy=multi-user.target
