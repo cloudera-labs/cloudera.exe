@@ -24,44 +24,44 @@ argument_specs:
       - "Jim Enright <jenright@cloudera.com>"
     version_added: "3.3.0"
     options:
-      keycloak__auth_keycloak_url:
+      keycloak_auth_keycloak_url:
         type: str
         required: true
         description:
           - URL to the Keycloak instance.
           - "Example: https://keycloak.example.com or https://keycloak.example.com:8543"
-      keycloak__auth_username:
+      keycloak_auth_username:
         type: str
         required: false
         default: admin
         description: Username to authenticate for API access with
-      keycloak__auth_password:
+      keycloak_auth_password:
         type: str
         required: true
         description: Password to authenticate for API access
-      keycloak__auth_client_id:
+      keycloak_auth_client_id:
         type: str
         required: false
         default: admin-cli
         description: OpenID Connect client_id to authenticate to the API with
-      keycloak__auth_client_secret:
+      keycloak_auth_client_secret:
         type: str
         required: false
         default: ""
         description: Client Secret to use in conjunction with auth_client_id (if required)
-      keycloak__auth_realm:
+      keycloak_auth_realm:
         type: str
         required: false
         default: master
         description: Keycloak realm name to authenticate to for API access
-      keycloak__auth_validate_certs:
+      keycloak_auth_validate_certs:
         type: bool
         required: false
         default: true
         description:
           - Whether to validate SSL certificates when connecting to Keycloak.
           - Set to false when using self-signed certificates.
-      keycloak__useraccounts:
+      keycloak_useraccounts:
         type: list
         elements: dict
         required: false

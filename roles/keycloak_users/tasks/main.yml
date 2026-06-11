@@ -17,7 +17,7 @@
   set_fact:
     _keycloak_unique_groups: >-
       {%- set groups = [] -%}
-      {%- for user in keycloak__useraccounts -%}
+      {%- for user in keycloak_useraccounts -%}
         {%- for group in user.groups | default([]) -%}
           {%- set _ = groups.append({'group': group, 'realm': user.realm_name}) -%}
         {%- endfor -%}
@@ -29,24 +29,24 @@
     state: present
     name: "{{ item.group }}"
     realm: "{{ item.realm }}"
-    auth_client_id: "{{ keycloak__auth_client_id }}"
-    auth_keycloak_url: "{{ keycloak__auth_keycloak_url }}"
-    validate_certs: "{{ keycloak__auth_validate_certs }}"
-    auth_realm: "{{ keycloak__auth_realm }}"
-    auth_username: "{{ keycloak__auth_username }}"
-    auth_password: "{{ keycloak__auth_password }}"
+    auth_client_id: "{{ keycloak_auth_client_id }}"
+    auth_keycloak_url: "{{ keycloak_auth_keycloak_url }}"
+    validate_certs: "{{ keycloak_auth_validate_certs }}"
+    auth_realm: "{{ keycloak_auth_realm }}"
+    auth_username: "{{ keycloak_auth_username }}"
+    auth_password: "{{ keycloak_auth_password }}"
   loop: "{{ _keycloak_unique_groups }}"
   loop_control:
     label: "{{ item.realm }}/{{ item.group }}"
 
 - name: Create Keycloak users
   community.general.keycloak_user:
-    auth_keycloak_url: "{{ keycloak__auth_keycloak_url }}"
-    auth_username: "{{ keycloak__auth_username }}"
-    auth_password: "{{ keycloak__auth_password }}"
-    auth_client_id: "{{ keycloak__auth_client_id }}"
-    auth_realm: "{{ keycloak__auth_realm }}"
-    validate_certs: "{{ keycloak__auth_validate_certs }}"
+    auth_keycloak_url: "{{ keycloak_auth_keycloak_url }}"
+    auth_username: "{{ keycloak_auth_username }}"
+    auth_password: "{{ keycloak_auth_password }}"
+    auth_client_id: "{{ keycloak_auth_client_id }}"
+    auth_realm: "{{ keycloak_auth_realm }}"
+    validate_certs: "{{ keycloak_auth_validate_certs }}"
     realm: "{{ item.realm_name }}"
     username: "{{ item.username }}"
     firstName: "{{ item.firstName }}"
@@ -61,41 +61,41 @@
     groups: >-
       {{ item.groups | default([]) | map('regex_replace', '^(.*)$', '{"name": "\1", "state": "present"}') | map('from_json') | list }}
     state: present
-  loop: "{{ keycloak__useraccounts }}"
+  loop: "{{ keycloak_useraccounts }}"
   loop_control:
     label: "{{ item.realm_name }}/{{ item.username }}"
 
 - name: Map realm roles to users
   community.general.keycloak_user_rolemapping:
-    auth_keycloak_url: "{{ keycloak__auth_keycloak_url }}"
-    auth_username: "{{ keycloak__auth_username }}"
-    auth_password: "{{ keycloak__auth_password }}"
-    auth_client_id: "{{ keycloak__auth_client_id }}"
-    auth_realm: "{{ keycloak__auth_realm }}"
-    validate_certs: "{{ keycloak__auth_validate_certs }}"
+    auth_keycloak_url: "{{ keycloak_auth_keycloak_url }}"
+    auth_username: "{{ keycloak_auth_username }}"
+    auth_password: "{{ keycloak_auth_password }}"
+    auth_client_id: "{{ keycloak_auth_client_id }}"
+    auth_realm: "{{ keycloak_auth_realm }}"
+    validate_certs: "{{ keycloak_auth_validate_certs }}"
     realm: "{{ item.0.realm_name }}"
     target_username: "{{ item.0.username }}"
     roles:
       - name: "{{ item.1 }}"
     state: present
-  loop: "{{ keycloak__useraccounts | subelements('realm_roles', skip_missing=True) }}"
+  loop: "{{ keycloak_useraccounts | subelements('realm_roles', skip_missing=True) }}"
   loop_control:
     label: "{{ item.0.realm_name }}/{{ item.0.username }} - realm role: {{ item.1 }}"
 
 - name: Map client roles to users
   community.general.keycloak_user_rolemapping:
-    auth_keycloak_url: "{{ keycloak__auth_keycloak_url }}"
-    auth_username: "{{ keycloak__auth_username }}"
-    auth_password: "{{ keycloak__auth_password }}"
-    auth_client_id: "{{ keycloak__auth_client_id }}"
-    auth_realm: "{{ keycloak__auth_realm }}"
-    validate_certs: "{{ keycloak__auth_validate_certs }}"
+    auth_keycloak_url: "{{ keycloak_auth_keycloak_url }}"
+    auth_username: "{{ keycloak_auth_username }}"
+    auth_password: "{{ keycloak_auth_password }}"
+    auth_client_id: "{{ keycloak_auth_client_id }}"
+    auth_realm: "{{ keycloak_auth_realm }}"
+    validate_certs: "{{ keycloak_auth_validate_certs }}"
     realm: "{{ item.0.realm_name }}"
     target_username: "{{ item.0.username }}"
     client_id: "{{ item.1.client_id }}"
     roles:
       - name: "{{ item.2 }}"
     state: present
-  loop: "{{ keycloak__useraccounts | subelements('client_roles', skip_missing=True) | subelements('1.roles') }}"
+  loop: "{{ keycloak_useraccounts | subelements('client_roles', skip_missing=True) | subelements('1.roles') }}"
   loop_control:
     label: "{{ item.0.realm_name }}/{{ item.0.username }} - client: {{ item.1.client_id }} role: {{ item.2 }}"

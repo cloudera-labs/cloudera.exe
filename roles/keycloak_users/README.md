@@ -14,26 +14,26 @@ This Ansible role manages Keycloak users, groups, and role mappings using the Ke
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `keycloak__auth_keycloak_url` | **Yes** | - | URL to the Keycloak instance (e.g., `https://keycloak.example.com`) |
-| `keycloak__auth_username` | No | `admin` | Username to authenticate for API access |
-| `keycloak__auth_password` | **Yes** | - | Password to authenticate for API access |
-| `keycloak__auth_client_id` | No | `admin-cli` | OpenID Connect client_id to authenticate with |
-| `keycloak__auth_client_secret` | No | `""` | Client Secret (if required) |
-| `keycloak__auth_realm` | No | `master` | Keycloak realm name to authenticate to for API access |
-| `keycloak__auth_validate_certs` | No | `true` | Whether to validate SSL certificates when connecting to Keycloak |
+| `keycloak_auth_keycloak_url` | **Yes** | - | URL to the Keycloak instance (e.g., `https://keycloak.example.com`) |
+| `keycloak_auth_username` | No | `admin` | Username to authenticate for API access |
+| `keycloak_auth_password` | **Yes** | - | Password to authenticate for API access |
+| `keycloak_auth_client_id` | No | `admin-cli` | OpenID Connect client_id to authenticate with |
+| `keycloak_auth_client_secret` | No | `""` | Client Secret (if required) |
+| `keycloak_auth_realm` | No | `master` | Keycloak realm name to authenticate to for API access |
+| `keycloak_auth_validate_certs` | No | `true` | Whether to validate SSL certificates when connecting to Keycloak |
 
 ### User Account Configuration
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `keycloak__useraccounts` | No | `[]` | List of user account definitions (see structure below) |
+| `keycloak_useraccounts` | No | `[]` | List of user account definitions (see structure below) |
 
 #### User Account Structure
 
-Each user account in `keycloak__useraccounts` has the following structure:
+Each user account in `keycloak_useraccounts` has the following structure:
 
 ```yaml
-keycloak__useraccounts:
+keycloak_useraccounts:
   - username: user1              # Required: Username
     firstName: User1             # Required: User's first name
     lastName: One                # Required: User's last name
@@ -62,10 +62,10 @@ Basic usage:
   roles:
     - role: keycloak_users
       vars:
-        keycloak__auth_keycloak_url: "https://keycloak.example.com"
-        keycloak__auth_password: "AdminPassword123"
-        keycloak__auth_validate_certs: false
-        keycloak__useraccounts:
+        keycloak_auth_keycloak_url: "https://keycloak.example.com"
+        keycloak_auth_password: "AdminPassword123"
+        keycloak_auth_validate_certs: false
+        keycloak_useraccounts:
           - username: user1
             firstName: User1
             lastName: One
@@ -84,11 +84,11 @@ Admin User with Role Mappings
   roles:
     - role: keycloak_users
       vars:
-        keycloak__auth_keycloak_url: "https://keycloak.example.com:8543"
-        keycloak__auth_username: admin
-        keycloak__auth_password: "SecurePassword"
-        keycloak__auth_validate_certs: false
-        keycloak__useraccounts:
+        keycloak_auth_keycloak_url: "https://keycloak.example.com:8543"
+        keycloak_auth_username: admin
+        keycloak_auth_password: "SecurePassword"
+        keycloak_auth_validate_certs: false
+        keycloak_useraccounts:
           - username: admin-user
             firstName: Admin
             lastName: User
