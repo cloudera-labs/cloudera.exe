@@ -2,6 +2,7 @@ services:
   keycloak:
     image: {{ keycloak_container_image }}:{{ keycloak_container_tag }}
     container_name: {{ keycloak_container_name }}
+    user: "{{ keycloak_uid }}:"
     command: ["start-dev"]
     restart: unless-stopped
     environment:

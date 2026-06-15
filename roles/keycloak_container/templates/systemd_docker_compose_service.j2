@@ -8,8 +8,8 @@ TimeoutSec=infinity
 Restart=always
 RestartSec=3
 
-User=keycloak
-Group=keycloak
+User={{ keycloak_system_username }}
+Group={{ keycloak_system_groupname }}
 
 ExecStart={{ keycloak_docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml -p keycloak up
 ExecStop={{ keycloak_docker_exe }} compose -f {{ service_root_dir }}/docker-compose.yml -p keycloak stop
