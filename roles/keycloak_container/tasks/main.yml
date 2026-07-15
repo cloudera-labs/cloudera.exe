@@ -13,31 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# User and directory structure configuration
-- name: Create group for keycloak
-  ansible.builtin.group:
-    name: "{{ keycloak_system_groupname }}"
-    state: present
+# Look up system user and group IDs
+- name: Get keycloak system user info
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ keycloak_system_username }}"
 
-- name: Create user for keycloak
-  ansible.builtin.user:
-    name: "{{ keycloak_system_username }}"
-    comment: "Keycloak User"
-    group: "{{ keycloak_system_groupname }}"
-    groups:
-      - docker
-    state: present
+- name: Set keycloak UID fact
+  ansible.builtin.set_fact:
+    keycloak_uid: "{{ ansible_facts.getent_passwd[keycloak_system_username][1] }}"
+
+# Directory structure configuration
 
 - name: Make directory for the service
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ service_root_dir }}"
     state: directory
     owner: "{{ keycloak_system_username }}"
     group: "{{ keycloak_system_groupname }}"
     mode: 0777
-  loop:
-    - "{{ service_root_dir }}"
-    - "{{ service_root_dir }}/ssl"
 
 # Docker Compose configuration
 - name: Copy keycloak docker-compose.yml file into place.
