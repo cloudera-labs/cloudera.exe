@@ -106,6 +106,9 @@ For example, here we use the
         cloudera_manager_host: cm.example.internal
 ```
 
+> [!NOTE]
+> To use the GCP legacy infrastructure roles, you will need to install the `ansible.netcommon` collection.
+
 ## Building the API Documentation
 
 If you wish to create a local copy of the API documentation, first set up the `hatch` build tool, as shown in the [TESTING](./TESTING.md) guide.
@@ -120,14 +123,14 @@ This will kick off the build toolchain. The local documentation can be found in 
 
 ## License and Copyright
 
-Copyright 2025, Cloudera, Inc.
+Copyright 2026, Cloudera, Inc.
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+    https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
