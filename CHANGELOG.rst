@@ -4,6 +4,19 @@ cloudera.exe Release Notes
 
 .. contents:: Topics
 
+v3.4.0
+======
+
+Minor Changes
+-------------
+
+- Update Keycloak container role for better uid and gid handling (https://github.com/cloudera-labs/cloudera.exe/pull/328)
+
+Deprecated Features
+-------------------
+
+- Remove ansible.netcommon from dependencies (legacy usage) (https://github.com/cloudera-labs/cloudera.exe/pull/329)
+
 v3.3.0
 ======
 
