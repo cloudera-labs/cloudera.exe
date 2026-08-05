@@ -59,7 +59,7 @@
 
 - name: Set Grafana admin password if API login fails
   ansible.builtin.command: >
-    grafana-cli admin reset-admin-password {{ grafana_security_admin_password }}
+    grafana-cli admin reset-admin-password {{ grafana_security_admin_password | quote | quote }}
   no_log: true
   notify: Restart Grafana Service
   when: grafana_admin_login.status != 200
