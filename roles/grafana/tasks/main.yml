@@ -45,24 +45,58 @@
     state: started
     enabled: true
 
-- name: Test Grafana admin password via API
+- name: Test default Grafana admin password
+  ansible.builtin.uri:
+    url: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}://localhost:{{ grafana_http_port }}/api/user"
+    method: GET
+    user: admin
+    password: admin # default password for admin user
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 401
+    validate_certs: false
+  register: __grafana_admin_default
+
+- name: Set Grafana admin password
+  when: __grafana_admin_default.status == 200
+  ansible.builtin.uri:
+    url: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}://localhost:{{ grafana_http_port }}/api/admin/users/1/password"
+    method: PUT
+    user: admin
+    password: admin
+    force_basic_auth: true
+    body_format: json
+    body:
+      password: "{{ grafana_security_admin_password }}"
+    status_code: 200
+    validate_certs: false
+  no_log: true
+
+- name: Test defined Grafana admin password
+  when: __grafana_admin_default.status == 401
   ansible.builtin.uri:
     url: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}://localhost:{{ grafana_http_port }}/api/user"
     method: GET
     user: admin
     password: "{{ grafana_security_admin_password }}"
-    force_basic_auth: yes
-    status_code: 200
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 401
     validate_certs: false
-  register: grafana_admin_login
-  failed_when: false
-
-- name: Set Grafana admin password if API login fails
-  ansible.builtin.command: >
-    grafana-cli admin reset-admin-password {{ grafana_security_admin_password }}
   no_log: true
-  notify: Restart Grafana Service
-  when: grafana_admin_login.status != 200
+  register: __grafana_admin_defined
+
+- name: Fail if both default and defined admin passwords are invalid
+  when:
+    - __grafana_admin_defined.status is defined
+    - __grafana_admin_defined.status == 401
+  ansible.builtin.fail:
+    msg: |
+      Unable to set the administrator credentials for Grafana 'admin'.
+      The credentials have already been set outside of this automation;
+      please check the defined password for the account.
 
 - name: Connect Prometheus datasource
   ansible.builtin.template:
