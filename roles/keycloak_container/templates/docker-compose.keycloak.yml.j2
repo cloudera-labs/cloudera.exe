@@ -20,6 +20,11 @@ services:
       - {{ keycloak_container_http_port }}:8080
       - {{ keycloak_container_https_port }}:8443
     volumes:
+      # Persists custom configuration files
+      - {{ service_root_dir }}/conf:/opt/keycloak/conf
+      # Persists users, realms, and dev database state
+      - {{ service_root_dir }}/data:/opt/keycloak/data
+      # TLS cert and key for HTTPS
       - {{ keycloak_tls_key_path }}:/etc/keycloak/conf/private.key
       - {{ keycloak_tls_cert_path }}:/etc/keycloak/conf/cert.pem
     labels:

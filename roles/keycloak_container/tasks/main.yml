@@ -27,11 +27,15 @@
 
 - name: Make directory for the service
   ansible.builtin.file:
-    path: "{{ service_root_dir }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ keycloak_system_username }}"
     group: "{{ keycloak_system_groupname }}"
     mode: 0777
+  loop:
+    - "{{ service_root_dir }}"
+    - "{{ service_root_dir }}/conf"
+    - "{{ service_root_dir }}/data"
 
 # Docker Compose configuration
 - name: Copy keycloak docker-compose.yml file into place.
