@@ -84,6 +84,11 @@ ansible_facts:
           description:
             - JDK C(patch) version.
           returned: when supported
+        security:
+          description:
+            - JDK C(security) version (4th segment, e.g. the C(1) in C(17.0.20.1)).
+            - Empty string if not present in the version.
+          returned: when supported
         release:
           description:
             - JDK C(release) version.
@@ -111,6 +116,7 @@ VERSION_REGEX = re.compile(
     + "(?P<major>\\d*)"
     + "\\.?(?P<minor>\\d*)"
     + "\\.?(?P<patch>\\d*)"
+    + "(?:\\.(?P<security>\\d+))?"
     + "[+-_]?(?P<release>[\\w\\d]*)"
     + "[+-_]?(?P<build>[\\w\\d]*)"
     + ")"
@@ -148,6 +154,7 @@ def main():
             major=version.group("major"),
             minor=version.group("minor"),
             patch=version.group("patch"),
+            security=version.group("security") or "",
             release=version.group("release"),
             build=version.group("build"),
             update=(update[1] if update is not None else ""),
