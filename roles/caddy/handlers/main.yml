@@ -17,3 +17,8 @@
   ansible.builtin.service:
     name: "{{ caddy_service }}"
     state: reloaded
+
+- name: Restart Caddy
+  ansible.builtin.service:
+    name: "{{ caddy_service }}"
+    state: restarted
