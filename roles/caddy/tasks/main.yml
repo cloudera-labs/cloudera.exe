@@ -87,6 +87,7 @@
         - "{{ caddy_ca_key }}"
       loop_control:
         loop_var: __ca_file
+      notify: Restart Caddy
 
 # - name: Set up Caddyfile ACME issuers
 #   ansible.builtin.blockinfile:
@@ -126,12 +127,16 @@
     src: Caddyfile.j2
     dest: /etc/caddy/Caddyfile
     mode: "0755"
+  notify: Restart Caddy
 
 - name: Enable and run the Caddy service
   ansible.builtin.service:
     name: "{{ caddy_service }}"
     enabled: true
     state: started
+
+- name: Flush handlers to ensure Caddy is restarted
+  ansible.builtin.meta: flush_handlers
 
 - name: Retrieve the Caddy self-signed CA certificate
   when: caddy_self_signed and caddy_ca_pem is undefined
