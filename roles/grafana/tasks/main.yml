@@ -103,12 +103,14 @@
     src: prometheus_source.yml.j2
     dest: "{{ grafana_datasource_directory }}"
     mode: "0755"
+  notify: Restart Grafana Service
 
 - name: Add configuration for reading dashboards
   ansible.builtin.template:
     src: providers.yml.j2
     dest: "{{ grafana_providers_configuration }}"
     mode: "0755"
+  notify: Restart Grafana Service
 
 - name: Ensure that directory for dashboards exist
   ansible.builtin.file:
