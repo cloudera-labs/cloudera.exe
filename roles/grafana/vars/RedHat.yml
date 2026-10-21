@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-grafana_tarball_url: https://dl.grafana.com/oss/release/grafana-10.2.3-1.x86_64.rpm
+grafana_tarball_url: https://dl.grafana.com/oss/release/grafana-13.2.4-1.x86_64.rpm
 grafana_gpg_key_url: https://rpm.grafana.com/gpg.key
 
 grafana_service: grafana-server
