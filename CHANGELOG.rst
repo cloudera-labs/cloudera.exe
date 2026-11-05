@@ -4,6 +4,23 @@ cloudera.exe Release Notes
 
 .. contents:: Topics
 
+v3.5.0
+======
+
+Minor Changes
+-------------
+
+- Add configuration for Keycloak configuration and data persistence (https://github.com/cloudera-labs/cloudera.exe/pull/334)
+- Add handler to restart Caddy service after configuration changes (https://github.com/cloudera-labs/cloudera.exe/pull/335)
+- Enhance Grafana admin password management via API (https://github.com/cloudera-labs/cloudera.exe/pull/332)
+- Update Grafana role (https://github.com/cloudera-labs/cloudera.exe/pull/339)
+- Update Prometheus, Grafana and exporter versions (https://github.com/cloudera-labs/cloudera.exe/pull/341)
+
+Bugfixes
+--------
+
+- Add security version retrieval to jdk_facts module (https://github.com/cloudera-labs/cloudera.exe/pull/336)
+
 v3.4.0
 ======
 

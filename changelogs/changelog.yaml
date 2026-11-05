@@ -1,6 +1,17 @@
 ---
 ancestor:
 releases:
+  3.5.0:
+    changes:
+      minor_changes:
+        - Update Prometheus, Grafana and exporter versions (https://github.com/cloudera-labs/cloudera.exe/pull/341)
+        - Update Grafana role (https://github.com/cloudera-labs/cloudera.exe/pull/339)
+        - Add handler to restart Caddy service after configuration changes (https://github.com/cloudera-labs/cloudera.exe/pull/335)
+        - Add configuration for Keycloak configuration and data persistence (https://github.com/cloudera-labs/cloudera.exe/pull/334)
+        - Enhance Grafana admin password management via API (https://github.com/cloudera-labs/cloudera.exe/pull/332)
+      bugfixes:
+        - Add security version retrieval to jdk_facts module (https://github.com/cloudera-labs/cloudera.exe/pull/336)
+    release_date: '2026-11-05'
   3.4.0:
     changes:
       deprecated_features:
