@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-postgresql_version: 14
+postgresql_version: 17
 
 postgresql_repo_enabled: true
 # postgresql_packages: []
