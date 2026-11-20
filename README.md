@@ -1,6 +1,7 @@
 # cloudera.exe - Tools and Utilities for Cloudera Deployments
 
 [![API documentation](https://github.com/cloudera-labs/cloudera.exe/actions/workflows/publish_docs.yml/badge.svg?branch=main&event=push)](https://github.com/cloudera-labs/cloudera.exe/actions/workflows/publish_docs.yml)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcloudera-labs%2Fcloudera.exe.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcloudera-labs%2Fcloudera.exe?ref=badge_shield)
 
 `cloudera.exe` is an Ansible collection for helping setup **[Cloudera Data Platform (CDP)](https://www.cloudera.com/products/cloudera-data-platform.html) on cloud (Public Cloud) and on premise (Private Cloud)** deployments. The collection contains a number of utilities for common scenarios encountered when managing a deployment, including:
 
@@ -138,3 +139,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcloudera-labs%2Fcloudera.exe.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcloudera-labs%2Fcloudera.exe?ref=badge_large)
