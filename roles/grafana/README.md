@@ -19,9 +19,10 @@ Automates the installation and configuration of a Grafana server, with Prometheu
 
 1. Installs Grafana using the appropriate package manager for the detected OS.
 2. Configures server and security settings in `grafana.ini`, including TLS and admin credentials if specified.
-3. Provisions Prometheus as a data source and sets up dashboard providers using Jinja2 templates.
-4. Ensures the dashboards directory exists and copies a default dashboard for immediate use.
-5. Restarts or reloads the Grafana service as needed to apply configuration changes.
+3. Starts the Grafana service and waits (up to 2.5 minutes) for its API to report healthy before setting the admin password; the first start of a new install can take 30+ seconds.
+4. Provisions Prometheus as a data source and sets up dashboard providers using Jinja2 templates.
+5. Ensures the dashboards directory exists and copies a default dashboard for immediate use.
+6. Restarts or reloads the Grafana service as needed to apply configuration changes.
 
 ## Requirements
 

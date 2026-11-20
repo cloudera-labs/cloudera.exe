@@ -45,6 +45,17 @@
     state: started
     enabled: true
 
+- name: Wait for Grafana API to be ready
+  ansible.builtin.uri:
+    url: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}://localhost:{{ grafana_http_port }}/api/health"
+    method: GET
+    status_code: 200
+    validate_certs: false
+  register: __grafana_health
+  until: __grafana_health.status == 200
+  retries: 6
+  delay: 30
+
 - name: Test default Grafana admin password
   ansible.builtin.uri:
     url: "{{ 'https' if grafana_tls_enabled | default(false) else 'http' }}://localhost:{{ grafana_http_port }}/api/user"
